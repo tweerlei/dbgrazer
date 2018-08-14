@@ -1,0 +1,63 @@
+<%--
+ * Copyright 2018 tweerlei Wruck + Buchmeier GbR - http://www.tweerlei.de/
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+--%><%--
+	
+	Tab panel for directory contents
+	
+--%><div class="tab-header" id="submitresult"><form class="filter" action="db/${currentConnection.linkName}/message.html" method="get"<c:if test="${not empty targetElement}"> onsubmit="return showMessage(event, $F('f1-topic'), $F('f1-partition'), $F('f1-offset'), $F('f1-format'));"</c:if>>
+			<input type="hidden" id="f1-topic" name="topic" value="${topic}"/>
+			<input type="hidden" id="f1-partition" name="partition" value="${partition}"/>
+			<input type="hidden" id="f1-offset" name="offset" value="${offset}"/>
+			<div class="column3"><dl class="result">
+				<dt>Topic</dt>
+				<dd>${topic}</dd>
+				<dt>Partition</dt>
+				<dd>${partition}</dd>
+				<dt>ID</dt>
+				<dd>${offset}</dd>
+			</dl><hr/></div>
+<c:if test="${rs != null}"
+>			<div class="column3"><dl class="result">
+				<dt>Timestamp</dt>
+				<dd><fmt:formatDate pattern="yyyy-MM-dd HH:mm:ss" value="${rs.timestamp}"/></dd>
+				<dt>Key</dt>
+				<dd>${fn:escapeXml(rs.key)}</dd>
+				<dt>Format</dt>
+				<dd><select id="f1-format" name="format" onchange="Forms.submit(form);">
+					<option value=""><fmt:message key="default"/></option>
+<c:forEach items="${formats}" var="f"
+>					<option value="${f}"<c:if test="${f == format}"> selected="selected"</c:if>><fmt:message key="${f}"/></option>
+</c:forEach
+>				</select></dd>
+			</dl><hr/></div>
+<c:if test="${not empty rs.headers}"
+>			<div class="column3"><dl class="result">
+<c:forEach items="${rs.headers}" var="h"
+>				<dt>${fn:escapeXml(h.key)}</dt>
+				<dd>${fn:escapeXml(h.value)}</dd>
+</c:forEach
+>			</dl><hr/></div>
+</c:if
+></c:if
+>		<hr/></form><hr/></div>
+		<div class="tab-body">
+<c:choose><c:when test="${rs != null && format == 'HTML'}"
+>			<div id="text-${label}" class="hidden">${rs.value}</div><iframe id="html-${label}" class="result"></iframe>
+</c:when><c:when test="${rs != null}"
+>			<pre class="code">${rs.value}</pre>
+</c:when><c:otherwise
+>			<strong><fmt:message key="noData"/></strong>
+</c:otherwise></c:choose
+>		</div>

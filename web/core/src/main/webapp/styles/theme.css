@@ -1,0 +1,721 @@
+/********************************************************************
+ *
+ * Default theme for hue 201, saturation 46%.
+ * Derived colors by lightness:
+ *
+ * #295871 (30%)
+ * #4791bc (50%)
+ * #7db2cf (65%)
+ * #c6ddea (85%)
+ * #e3eff5 (93%)
+ *
+ ********************************************************************/
+
+/********************************************************************
+ *
+ * Elements
+ *
+ ********************************************************************/
+
+body {
+	font-family: Verdana, Arial, sans-serif;
+	font-size: 8pt;
+	line-height: 1.5em;
+	background-color: #c6ddea;
+	color: #000000;
+}
+
+pre, textarea {
+	font-family: "Courier New", monospace;
+	tab-size: 4;
+	-moz-tab-size: 4;
+}
+
+input, select {
+	font-family: inherit;
+}
+
+th, td {
+	border: 1px solid #c6ddea;
+}
+
+thead tr, tfoot tr {
+	background-color: #ffffff;
+	font-weight: bold;
+}
+
+tbody>tr:nth-child(odd) {
+	background-color: #e3eff5;
+}
+
+tbody>tr:nth-child(even) {
+	background-color: #ffffff;
+}
+
+dt {
+	font-weight: bold;
+}
+
+input, select, textarea {
+	border: 1px solid #c6ddea;
+	background-color: #ffffff;
+	color: #000000;
+	font-size: inherit;
+}
+
+input:disabled, textarea:disabled, select:disabled {
+	background-color: #eeeeee;
+	color: #aaaaaa;
+}
+
+input[type="submit"], input[type="reset"], input[type="button"] {
+	background-color: #4791bc;
+	color: #ffffff;
+}
+
+input[type="submit"]:disabled, input[type="reset"]:disabled, input[type="button"]:disabled {
+	background-color: #4791bc;
+	color: #aaaaaa;
+}
+
+a {
+	color: inherit;
+}
+
+h1 {
+	font-size: 1.2em;
+	color: #295871;
+}
+
+h2 {
+	font-size: 1.1em;
+	color: #295871;
+}
+
+h3 {
+	font-size: 1em;
+	color: #295871;
+}
+
+em {
+	font-weight: bold;
+	font-style: normal;
+}
+
+strong {
+	color: #ff0000;
+	font-weight: bold;
+}
+
+/********************************************************************
+ *
+ * Header and footer
+ *
+ ********************************************************************/
+
+#header {
+	background-color: #4791bc;
+	color: #ffffff;
+}
+
+#header a {
+	text-decoration: none;
+}
+
+.header-logo {
+	font-size: 1.2em;
+	font-weight: bold;
+}
+
+.header-left {
+	font-weight: bold;
+}
+
+.header-right {
+	font-weight: bold;
+}
+
+/********************************************************************
+ *
+ * Content
+ *
+ ********************************************************************/
+
+.h1-buttons {
+	color: #295871;
+}
+
+.h1-buttons .action {
+	font-size: 1.2em;
+}
+
+.h1-actions {
+	color: #295871;
+}
+
+.h1-actions .action {
+	font-size: 1.2em;
+}
+
+.h2-buttons {
+	color: #295871;
+}
+
+.h2-buttons .action {
+	font-size: 1.1em;
+}
+
+.h2-actions {
+	color: #295871;
+}
+
+.h2-actions .action {
+	font-size: 1.1em;
+}
+
+/********************************************************************
+ *
+ * Menu
+ *
+ ********************************************************************/
+
+#menu {
+	background-color: #4791bc;
+	color: #ffffff;
+}
+
+#menu a {
+	text-decoration: none;
+}
+
+.menuitem:hover {
+	background-color: #ffffff;
+	color: #4791bc;
+}
+
+.menuseparator {
+	border-width: 1px 0px 0px 0px;
+	border-style: solid;
+	border-color: #ffffff;
+}
+
+span.menu {
+	background-color: #4791bc;
+	color: #ffffff;
+}
+
+span.menu:after {
+	content: "\00a0\0025bc";
+}
+
+span.button {
+	background-color: #4791bc;
+	color: #ffffff;
+}
+
+/********************************************************************
+ *
+ * Popup
+ *
+ ********************************************************************/
+
+#popup {
+	border: 1px solid #4791bc;
+	background-color: #ffffff;
+}
+
+/********************************************************************
+ *
+ * Tool tips
+ *
+ ********************************************************************/
+
+#tooltip {
+	background-color: #ffff91;
+	color: #808080;
+}
+
+/********************************************************************
+ *
+ * Dialog
+ *
+ ********************************************************************/
+
+#overlay {
+	background-color: #000000;
+	opacity: 0.5;
+}
+
+#dialog {
+	border: 1px solid #4791bc;
+	background-color: #ffffff;
+}
+
+#dialog-title {
+	background-color: #4791bc;
+	color: #ffffff;
+}
+
+#dialog-name {
+	font-weight: bold;
+}
+
+#dialog-close {
+	font-weight: bold;
+}
+
+/********************************************************************
+ *
+ * Tab controls
+ *
+ ********************************************************************/
+
+.tab {
+	background-color: #4791bc;
+	color: #ffffff;
+	border-left: 1px solid #ffffff;
+	border-bottom: 1px solid #ffffff;
+}
+
+.tab:nth-child(1) {
+	border-left: none;
+}
+
+.tab-active {
+	background-color: #ffffff;
+	color: #295871;
+}
+
+.tab-page {
+	background-color: #ffffff;
+}
+
+.tab-page input[type="submit"], .tab-page input[type="reset"], .tab-page input[type="button"] {
+	background-color: #7db2cf;
+}
+
+.tab-page input[type="submit"]:disabled, .tab-page input[type="reset"]:disabled, .tab-page input[type="button"]:disabled {
+	background-color: #7db2cf;
+}
+
+.tab-page span.menu {
+	background-color: #7db2cf;
+}
+
+.tab-page span.button {
+	background-color: #7db2cf;
+}
+
+/********************************************************************
+ *
+ * Combo box controls
+ *
+ ********************************************************************/
+
+.combo-head {
+	background-color: #4791bc;
+	color: #ffffff;
+}
+
+.combo-head select {
+	background-color: #4791bc;
+	color: #ffffff;
+	border: 0em;
+}
+
+/********************************************************************
+ *
+ * Dashboard
+ *
+ ********************************************************************/
+
+.dashboard-tab {
+	background-color: #7db2cf;
+	color: #ffffff;
+}
+
+.dashboard-body {
+	border: 1px solid #c6ddea;
+}
+
+/********************************************************************
+ *
+ * Result tables
+ *
+ ********************************************************************/
+
+td.heading {
+	font-weight: bold;
+}
+
+th.table-sorted-asc:after {
+	content: "\00a0\002191";
+}
+
+th.table-sorted-desc:after {
+	content: "\00a0\002193";
+}
+
+tbody tr.highlight, tbody td.highlight {
+	background-color: #ffff00;
+	color: #000000;
+}
+
+tbody tr.crosshair, tbody td.crosshair {
+	background-color: #ffffc0;
+	color: #000000;
+}
+
+/********************************************************************
+ *
+ * Result lists
+ *
+ ********************************************************************/
+
+div.subheading {
+	font-weight: bold;
+	border-bottom: 1px dotted #000000;
+}
+
+dl.result dt {
+	font-weight: bold;
+}
+
+dl.result>dd:nth-child(4n) {
+	background-color: #ffffff;
+}
+
+dl.result>dd:nth-child(4n+2) {
+	background-color: #e3eff5;
+}
+
+/********************************************************************
+ *
+ * Result tree
+ *
+ ********************************************************************/
+
+.treedetails {
+	color: #808080;
+}
+
+/********************************************************************
+ *
+ * Code blocks
+ *
+ ********************************************************************/
+
+pre.code span.no {
+	background-color: #eeeeee;
+	border-right: 1px solid #c0c0c0;
+}
+
+pre.code span.errno {
+	background-color: #eeeeee;
+	border-right: 1px solid #c0c0c0;
+}
+
+pre.code span.errmsg {
+	background-color: #ff0000;
+	color: #ffffff;
+}
+
+/********************************************************************
+ *
+ * Date picker
+ *
+ ********************************************************************/
+
+.calendar_date_select {
+	color: #ffffff;
+}
+
+.calendar_date_select .cds_header {
+	background-color: #4791bc;
+}
+
+.calendar_date_select .cds_header a {
+	text-decoration: none;
+	font-size: 1.2em;
+}
+
+.calendar_date_select th {
+	background-color: #7db2cf;
+}
+
+.calendar_date_select td {
+	background-color: #ffffff;
+}
+.calendar_date_select td:hover {
+	background-color: #c6ddea;
+}
+.calendar_date_select td.weekend {
+	background-color: #e3eff5;
+}
+.calendar_date_select td.weekend:hover {
+	background-color: #c6ddea;
+}
+.calendar_date_select td.selected {
+	background-color: #7db2cf;
+}
+
+.calendar_date_select td div {
+	color: #000000;
+}
+.calendar_date_select td div.other {
+	color: #7db2cf;
+}
+.calendar_date_select td.selected div {
+	color: #ffffff;
+}
+.calendar_date_select td.today div {
+	color: #ff0000;
+}
+.calendar_date_select td.disabled div {
+	color: #c6ddea;
+}
+
+.calendar_date_select .cds_buttons {
+	background-color: #4791bc;
+}
+
+.calendar_date_select .cds_footer {
+	background-color: #4791bc;
+}
+
+/********************************************************************
+ *
+ * Result coloring
+ *
+ ********************************************************************/
+
+tbody tr.colored-black {
+	background-color: black;
+	color: white;
+}
+
+tbody tr.colored-gray {
+	background-color: gray;
+	color: white;
+}
+
+tbody tr.colored-silver {
+	background-color: silver;
+	color: black;
+}
+
+tbody tr.colored-white {
+	background-color: white;
+	color: black;
+}
+
+tbody tr.colored-red {
+	background-color: red;
+	color: white;
+}
+
+tbody tr.colored-yellow {
+	background-color: yellow;
+	color: black;
+}
+
+tbody tr.colored-lime {
+	background-color: lime;
+	color: black;
+}
+
+tbody tr.colored-aqua {
+	background-color: aqua;
+	color: black;
+}
+
+tbody tr.colored-blue {
+	background-color: blue;
+	color: white;
+}
+
+tbody tr.colored-fuchsia {
+	background-color: fuchsia;
+	color: white;
+}
+
+tbody tr.colored-maroon {
+	background-color: maroon;
+	color: white;
+}
+
+tbody tr.colored-olive {
+	background-color: olive;
+	color: white;
+}
+
+tbody tr.colored-green {
+	background-color: green;
+	color: white;
+}
+
+tbody tr.colored-teal {
+	background-color: teal;
+	color: white;
+}
+
+tbody tr.colored-navy {
+	background-color: navy;
+	color: white;
+}
+
+tbody tr.colored-purple {
+	background-color: purple;
+	color: white;
+}
+
+tbody tr.colored-orange {
+	background-color: orange;
+	color: black;
+}
+
+tbody tr.diff-add {
+	color: #008000;
+	font-weight: bold;
+}
+
+tbody tr.diff-del {
+	color: #800000;
+	font-weight: bold;
+}
+
+/********************************************************************
+ *
+ * Syntax coloring
+ *
+ ********************************************************************/
+
+.xml-tag {
+	color: #0000ff;
+	font-weight: bold;
+}
+
+.xml-attr {
+	color: #0000ff;
+	font-weight: bold;
+}
+
+.xml-value {
+	color: #008000;
+	font-weight: bold;
+}
+
+.xml-comment {
+	color: #808080;
+}
+
+.json-key {
+	color: #0000ff;
+	font-weight: bold;
+}
+
+.json-value {
+	color: #008000;
+	font-weight: bold;
+}
+
+.json-comment {
+	color: #808080;
+}
+
+.sql-word {
+	color: #0000ff;
+	font-weight: bold;
+}
+
+.sql-literal {
+	color: #008000;
+}
+
+.sql-comment {
+	color: #808080;
+}
+
+.diff-hunk {
+	color: #0000ff;
+}
+
+.diff-add {
+	color: #008000;
+	font-weight: bold;
+}
+
+.diff-del {
+	color: #800000;
+	font-weight: bold;
+}
+
+/********************************************************************
+ *
+ * Links
+ *
+ ********************************************************************/
+
+a.action {
+	text-decoration: none;
+}
+
+a.external {
+	color: #c00000;
+}
+
+a.external:before {
+	content: "\0027a4\00a0";
+}
+
+span.link {
+	text-decoration: underline;
+}
+
+/********************************************************************
+ *
+ * Other classes
+ *
+ ********************************************************************/
+
+#fullscreen {
+	background-color: #ffffff;
+}
+
+.error {
+	background-color: #ff0000;
+	color: #ffffff;
+}
+
+.error a {
+	text-decoration: none;
+	font-weight: bold;
+}
+
+.notice {
+	background-color: #00a000;
+	color: #ffffff;
+}
+
+.match {
+	background-color: #cccccc;
+}
+
+.wait:before {
+	content: "\00231b\00a0";
+	font-size: 2em;
+}
+
+.warn {
+	color: #ff0000;
+	font-weight: bold;
+}
+
+.warn:before {
+	content: "\0026a0\00a0";
+	font-size: 2em;
+}
+
+.plan-title {
+	font-weight: bold;
+}

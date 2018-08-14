@@ -1,0 +1,729 @@
+/********************************************************************
+ *
+ * Default theme for hue 0, saturation 0%.
+ * Derived colors by lightness (inverted):
+ *
+ * #cccccc (30%)
+ * #808080 (50%)
+ * #666666 (65%)
+ * #444444 (85%)
+ * #333333 (93%)
+ *
+ ********************************************************************/
+
+/********************************************************************
+ *
+ * Elements
+ *
+ ********************************************************************/
+
+body {
+	font-family: Verdana, Arial, sans-serif;
+	font-size: 8pt;
+	line-height: 1.5em;
+	background-color: #444444;
+	color: #ffffff;
+}
+
+pre, textarea {
+	font-family: "Courier New", monospace;
+	tab-size: 4;
+	-moz-tab-size: 4;
+}
+
+input, select {
+	font-family: inherit;
+}
+
+th, td {
+	border: 1px solid #444444;
+}
+
+thead tr, tfoot tr {
+	background-color: #000000;
+	font-weight: bold;
+}
+
+tbody>tr:nth-child(odd) {
+	background-color: #333333;
+}
+
+tbody>tr:nth-child(even) {
+	background-color: #000000;
+}
+
+dt {
+	font-weight: bold;
+}
+
+input, select, textarea {
+	border: 1px solid #444444;
+	background-color: #000000;
+	color: #ffffff;
+	font-size: inherit;
+}
+
+input:disabled, textarea:disabled, select:disabled {
+	background-color: #333333;
+	color: #aaaaaa;
+}
+
+input[type="text"]:focus, input[type="password"]:focus, textarea:focus, select:focus {
+	border: 1px solid #f27800;
+}
+
+input[type="submit"], input[type="reset"], input[type="button"] {
+	background-color: #808080;
+	color: #ffffff;
+}
+
+input[type="submit"]:disabled, input[type="reset"]:disabled, input[type="button"]:disabled {
+	background-color: #808080;
+	color: #aaaaaa;
+}
+
+a {
+	color: inherit;
+}
+
+h1 {
+	font-size: 1.2em;
+	color: #cccccc;
+}
+
+h2 {
+	font-size: 1.1em;
+	color: #cccccc;
+}
+
+h3 {
+	font-size: 1em;
+	color: #cccccc;
+}
+
+em {
+	font-weight: bold;
+	font-style: normal;
+}
+
+strong {
+	color: #ff0000;
+	font-weight: bold;
+}
+
+/********************************************************************
+ *
+ * Header and footer
+ *
+ ********************************************************************/
+
+#header {
+	background-color: #333333;
+	color: #eeeeee;
+}
+
+#header a {
+	text-decoration: none;
+}
+
+#footer {
+	color: #cccccc;
+}
+
+.header-logo {
+	font-size: 1.2em;
+	font-weight: bold;
+}
+
+.header-left {
+	font-weight: bold;
+}
+
+.header-right {
+	font-weight: bold;
+}
+
+/********************************************************************
+ *
+ * Content
+ *
+ ********************************************************************/
+
+.h1-buttons {
+	color: #cccccc;
+}
+
+.h1-buttons .action {
+	font-size: 1.2em;
+}
+
+.h1-actions {
+	color: #cccccc;
+}
+
+.h1-actions .action {
+	font-size: 1.2em;
+}
+
+.h2-buttons {
+	color: #cccccc;
+}
+
+.h2-buttons .action {
+	font-size: 1.1em;
+}
+
+.h2-actions {
+	color: #cccccc;
+}
+
+.h2-actions .action {
+	font-size: 1.1em;
+}
+
+/********************************************************************
+ *
+ * Menu
+ *
+ ********************************************************************/
+
+#menu {
+	background-color: #333333;
+	color: #eeeeee;
+}
+
+#menu a {
+	text-decoration: none;
+}
+
+.menuitem:hover {
+	background-color: #f27800;
+	color: #ffffff;
+}
+
+.menuseparator {
+	border-width: 1px 0px 0px 0px;
+	border-style: solid;
+	border-color: #ffffff;
+}
+
+span.menu {
+	background-color: #333333;
+	color: #eeeeee;
+}
+
+span.menu:after {
+	content: "\00a0\0025bc";
+}
+
+span.button {
+	background-color: #333333;
+	color: #eeeeee;
+}
+
+/********************************************************************
+ *
+ * Popup
+ *
+ ********************************************************************/
+
+#popup {
+	border: 1px solid #333333;
+	background-color: #000000;
+}
+
+/********************************************************************
+ *
+ * Tool tips
+ *
+ ********************************************************************/
+
+#tooltip {
+	background-color: #f27800;
+	color: #ffffff;
+}
+
+/********************************************************************
+ *
+ * Dialog
+ *
+ ********************************************************************/
+
+#overlay {
+	background-color: #333333;
+	opacity: 0.5;
+}
+
+#dialog {
+	border: 1px solid #333333;
+	background-color: #000000;
+}
+
+#dialog-title {
+	background-color: #f27800;
+	color: #ffffff;
+}
+
+#dialog-name {
+	font-weight: bold;
+}
+
+#dialog-close {
+	font-weight: bold;
+}
+
+/********************************************************************
+ *
+ * Tab controls
+ *
+ ********************************************************************/
+
+.tab {
+	background-color: #333333;
+	color: #eeeeee;
+	border-left: 1px solid #000000;
+	border-bottom: 1px solid #000000;
+}
+
+.tab:nth-child(1) {
+	border-left: none;
+}
+
+.tab-active {
+	background-color: #f27800;
+	color: #ffffff;
+}
+
+.tab-page {
+	background-color: #000000;
+}
+
+.tab-page input[type="submit"], .tab-page input[type="reset"], .tab-page input[type="button"] {
+	background-color: #666666;
+}
+
+.tab-page input[type="submit"]:disabled, .tab-page input[type="reset"]:disabled, .tab-page input[type="button"]:disabled {
+	background-color: #666666;
+}
+
+.tab-page span.menu {
+	background-color: #666666;
+}
+
+.tab-page span.button {
+	background-color: #666666;
+}
+
+/********************************************************************
+ *
+ * Combo box controls
+ *
+ ********************************************************************/
+
+.combo-head {
+	background-color: #333333;
+	color: #eeeeee;
+}
+
+.combo-head select {
+	background-color: #333333;
+	color: #eeeeee;
+	border: 0em;
+}
+
+/********************************************************************
+ *
+ * Dashboard
+ *
+ ********************************************************************/
+
+.dashboard-tab {
+	background-color: #333333;
+	color: #eeeeee;
+}
+
+.dashboard-body {
+	border: 1px solid #444444;
+}
+
+/********************************************************************
+ *
+ * Result tables
+ *
+ ********************************************************************/
+
+td.heading {
+	font-weight: bold;
+}
+
+th.table-sorted-asc:after {
+	content: "\00a0\002191";
+}
+
+th.table-sorted-desc:after {
+	content: "\00a0\002193";
+}
+
+tbody tr.highlight, tbody td.highlight {
+	background-color: #f27800;
+	color: #ffffff;
+}
+
+tbody tr.crosshair, tbody td.crosshair {
+	background-color: #ad6500;
+	color: #ffffff;
+}
+
+/********************************************************************
+ *
+ * Result lists
+ *
+ ********************************************************************/
+
+div.subheading {
+	font-weight: bold;
+	border-bottom: 1px dotted #ffffff;
+}
+
+dl.result dt {
+	font-weight: bold;
+}
+
+dl.result>dd:nth-child(4n) {
+	background-color: #000000;
+}
+
+dl.result>dd:nth-child(4n+2) {
+	background-color: #333333;
+}
+
+/********************************************************************
+ *
+ * Result tree
+ *
+ ********************************************************************/
+
+.treedetails {
+	color: #808080;
+}
+
+/********************************************************************
+ *
+ * Code blocks
+ *
+ ********************************************************************/
+
+pre.code span.no {
+	background-color: #333333;
+	border-right: 1px solid #c0c0c0;
+}
+
+pre.code span.errno {
+	background-color: #333333;
+	border-right: 1px solid #c0c0c0;
+}
+
+pre.code span.errmsg {
+	background-color: #ff0000;
+	color: #000000;
+}
+
+/********************************************************************
+ *
+ * Date picker
+ *
+ ********************************************************************/
+
+.calendar_date_select {
+	color: #000000;
+}
+
+.calendar_date_select .cds_header {
+	background-color: #808080;
+}
+
+.calendar_date_select .cds_header a {
+	text-decoration: none;
+	font-size: 1.2em;
+}
+
+.calendar_date_select th {
+	background-color: #666666;
+}
+
+.calendar_date_select td {
+	background-color: #000000;
+}
+.calendar_date_select td:hover {
+	background-color: #444444;
+}
+.calendar_date_select td.weekend {
+	background-color: #333333;
+}
+.calendar_date_select td.weekend:hover {
+	background-color: #444444;
+}
+.calendar_date_select td.selected {
+	background-color: #666666;
+}
+
+.calendar_date_select td div {
+	color: #ffffff;
+}
+.calendar_date_select td div.other {
+	color: #666666;
+}
+.calendar_date_select td.selected div {
+	color: #000000;
+}
+.calendar_date_select td.today div {
+	color: #ff0000;
+}
+.calendar_date_select td.disabled div {
+	color: #444444;
+}
+
+.calendar_date_select .cds_buttons {
+	background-color: #808080;
+}
+
+.calendar_date_select .cds_footer {
+	background-color: #808080;
+}
+
+/********************************************************************
+ *
+ * Result coloring
+ *
+ ********************************************************************/
+
+tbody tr.colored-black {
+	background-color: black;
+	color: white;
+}
+
+tbody tr.colored-gray {
+	background-color: gray;
+	color: white;
+}
+
+tbody tr.colored-silver {
+	background-color: silver;
+	color: black;
+}
+
+tbody tr.colored-white {
+	background-color: white;
+	color: black;
+}
+
+tbody tr.colored-red {
+	background-color: red;
+	color: white;
+}
+
+tbody tr.colored-yellow {
+	background-color: yellow;
+	color: black;
+}
+
+tbody tr.colored-lime {
+	background-color: lime;
+	color: black;
+}
+
+tbody tr.colored-aqua {
+	background-color: aqua;
+	color: black;
+}
+
+tbody tr.colored-blue {
+	background-color: blue;
+	color: white;
+}
+
+tbody tr.colored-fuchsia {
+	background-color: fuchsia;
+	color: white;
+}
+
+tbody tr.colored-maroon {
+	background-color: maroon;
+	color: white;
+}
+
+tbody tr.colored-olive {
+	background-color: olive;
+	color: white;
+}
+
+tbody tr.colored-green {
+	background-color: green;
+	color: white;
+}
+
+tbody tr.colored-teal {
+	background-color: teal;
+	color: white;
+}
+
+tbody tr.colored-navy {
+	background-color: navy;
+	color: white;
+}
+
+tbody tr.colored-purple {
+	background-color: purple;
+	color: white;
+}
+
+tbody tr.colored-orange {
+	background-color: orange;
+	color: black;
+}
+
+tbody tr.diff-add {
+	color: #008000;
+	font-weight: bold;
+}
+
+tbody tr.diff-del {
+	color: #800000;
+	font-weight: bold;
+}
+
+/********************************************************************
+ *
+ * Syntax coloring
+ *
+ ********************************************************************/
+
+.xml-tag {
+	color: #8080ff;
+	font-weight: bold;
+}
+
+.xml-attr {
+	color: #8080ff;
+	font-weight: bold;
+}
+
+.xml-value {
+	color: #00c000;
+	font-weight: bold;
+}
+
+.xml-comment {
+	color: #c0c0c0;
+}
+
+.json-key {
+	color: #8080ff;
+	font-weight: bold;
+}
+
+.json-value {
+	color: #00c000;
+	font-weight: bold;
+}
+
+.json-comment {
+	color: #c0c0c0;
+}
+
+.sql-word {
+	color: #8080ff;
+	font-weight: bold;
+}
+
+.sql-literal {
+	color: #00c000;
+}
+
+.sql-comment {
+	color: #c0c0c0;
+}
+
+.diff-hunk {
+	color: #0000ff;
+}
+
+.diff-add {
+	color: #008000;
+	font-weight: bold;
+}
+
+.diff-del {
+	color: #800000;
+	font-weight: bold;
+}
+
+/********************************************************************
+ *
+ * Links
+ *
+ ********************************************************************/
+
+a.action {
+	text-decoration: none;
+}
+
+a.external {
+	color: #c00000;
+}
+
+a.external:before {
+	content: "\0027a4\00a0";
+}
+
+span.link {
+	text-decoration: underline;
+}
+
+/********************************************************************
+ *
+ * Other classes
+ *
+ ********************************************************************/
+
+#fullscreen {
+	background-color: #000000;
+}
+
+.error {
+	background-color: #ff0000;
+	color: #000000;
+}
+
+.error a {
+	text-decoration: none;
+	font-weight: bold;
+}
+
+.notice {
+	background-color: #f27800;
+	color: #000000;
+}
+
+.match {
+	background-color: #ff0000;
+}
+
+.wait:before {
+	content: "\00231b\00a0";
+	font-size: 2em;
+}
+
+.warn {
+	color: #ff0000;
+	font-weight: bold;
+}
+
+.warn:before {
+	content: "\0026a0\00a0";
+	font-size: 2em;
+}
+
+.plan-title {
+	font-weight: bold;
+}

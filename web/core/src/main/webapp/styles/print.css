@@ -1,0 +1,84 @@
+body, div, h1, h2, h3 {
+	background-color: #ffffff !important;
+	color: #000000 !important;
+	border: 0em !important;
+}
+
+th, td {
+	background-color: #ffffff !important;
+	color: #000000 !important;
+	border: 1px solid #c0c0c0 !important;
+}
+
+form {
+	display: none;
+}
+
+a {
+	text-decoration: none;
+}
+
+#header {
+	display: none;
+}
+
+#footer {
+	display: none;
+}
+
+#explorer-left {
+	display: none;
+}
+
+#explorer-left {
+	width: auto !important;
+}
+
+#menu {
+	display: none;
+}
+
+#popup {
+	display: none;
+}
+
+#tooltip {
+	display: none;
+}
+
+#overlay {
+	display: none;
+}
+
+#dialog {
+	display: none;
+}
+
+.error {
+	display: none;
+}
+
+.tab {
+	display: none;
+}
+
+.tab-active {
+	display: block;
+}
+
+.tab-header {
+	display: none;
+}
+
+.tab-body {
+	height: auto !important;
+	overflow: visible !important;
+}
+
+.action, .menu, .button {
+	display: none;
+}
+
+.calendar_date_select {
+	display: none !important;
+}

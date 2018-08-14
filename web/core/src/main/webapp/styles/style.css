@@ -1,0 +1,804 @@
+/********************************************************************
+ *
+ * Elements
+ *
+ ********************************************************************/
+
+body {
+	margin: 0em;
+	border: 0em;
+	padding: 0em;
+}
+
+table, tbody, thead, tr, th, td {
+	margin: 0em;
+	border-collapse: collapse;
+	text-align: left;
+}
+
+tr {
+	vertical-align: top;
+}
+
+th, td {
+	padding: 0.2em 0.5em;	
+}
+
+ul {
+	margin: 0em;
+	border: 0em;
+	padding: 0em;
+}
+
+li {
+	float: left;
+	width: 25em;
+	margin: 0em 0em 0.3em 0em;
+	list-style-type: none;
+}
+
+dl {
+	margin: 0em;
+	border: 0em;
+	padding: 0em;
+}
+
+dt {
+	float: left;
+	clear: left;
+	width: 15em;
+	margin-right: 1em;
+	text-align: right;
+}
+
+dd {
+	float: left;
+	margin: 0em;
+}
+
+img {
+	margin: 0em;
+	border: 0em;
+	padding: 0em;
+}
+
+form {
+	margin: 0em;
+	border: 0em;
+	padding: 0em;
+}
+
+input, select, textarea {
+	margin: 0.1em 0em 0.1em 0em;
+	resize: none;
+	box-sizing: border-box;
+}
+
+input[type="submit"], input[type="reset"], input[type="button"] {
+	border: 0em;
+	padding: 0em 0.5em 0em 0.5em;
+	cursor: pointer;
+}
+
+input[type="checkbox"], input[type="radio"] {
+	vertical-align: text-bottom;
+	margin: 0em;
+}
+
+dd textarea {
+	vertical-align: top;
+}
+
+h1 {
+	float: left;
+	margin: 0em 0em 0.5em 0em;
+}
+
+h2 {
+	float: left;
+	margin: 0em 0em 0.5em 0em;
+}
+
+h3 {
+	float: left;
+	margin: 0em;
+}
+
+pre {
+	margin: 0em;
+	border: 0em;
+	padding: 0em;
+	text-align: left;
+	white-space: pre-wrap;
+}
+
+iframe {
+	margin: 0em;
+	border: 0em;
+	padding: 0em;
+}
+
+hr {
+	margin: 0em;
+	border: 0em;
+	padding: 0em;
+	clear: both;
+	height: 0em;
+}
+
+:focus {
+	outline-style: none;
+}
+
+/********************************************************************
+ *
+ * Generic classes
+ *
+ ********************************************************************/
+
+.float-left	{
+	float: left;
+}
+
+.float-right	{
+	float: right;
+}
+
+.right	{
+	text-align: right;
+}
+
+.center	{
+	text-align: center;
+}
+
+.hidden {
+	display: none;
+}
+
+.nowrap {
+	white-space: nowrap;
+}
+
+/********************************************************************
+ *
+ * Header and footer
+ *
+ ********************************************************************/
+
+#header {
+	padding: 0.5em 0em 0.5em 0em;
+}
+
+.header-logo {
+	float: left;
+	padding: 0em 1em 0em 0.5em;
+}
+
+.header-left {
+	float: left;
+}
+
+.header-right {
+	float: right;
+}
+
+#footer {
+	clear: both;
+	padding: 0em 0.5em 0em 0.5em;
+	text-align: right;
+}
+
+/********************************************************************
+ *
+ * Content
+ *
+ ********************************************************************/
+
+#main {
+	margin: 1em;
+}
+
+#left-content dt {
+	text-align: left;
+}
+
+.h1-buttons {
+	float: right;
+	margin-left: 1em;
+}
+
+.h1-actions {
+	float: left;
+	margin-left: 1em;
+}
+
+.h2-buttons {
+	float: right;
+	margin-left: 1em;
+}
+
+.h2-actions {
+	float: left;
+	margin-left: 1em;
+}
+
+.filter {
+	float: left;
+	margin-right: 1em;
+}
+
+/********************************************************************
+ *
+ * Menu
+ *
+ ********************************************************************/
+
+#menu {
+	position: absolute;
+	top: 0px;
+/*	left: 0px;*/
+	padding: 0.5em 0em 0em 0em;
+	z-index: 1000;
+}
+
+.menucolumn {
+	float: left;
+}
+
+.menuitem {
+	padding: 0.3em 0.5em 0.3em 0.5em;
+	cursor: pointer;
+}
+
+.menutext {
+	padding: 0.3em 0.5em 0.3em 0.5em;
+}
+
+span.menu {
+	margin: 0.1em 0em 0.1em 0em;
+	padding: 0em 0.5em 0em 0.5em;
+	cursor: pointer;
+}
+
+span.button {
+	margin: 0.1em 0em 0.1em 0em;
+	padding: 0em 0.5em 0em 0.5em;
+	cursor: pointer;
+}
+
+/********************************************************************
+ *
+ * Popup
+ *
+ ********************************************************************/
+
+#popup {
+	position: absolute;
+	top: 0px;
+/*	left: 0px;*/
+	padding: 0.5em;
+	z-index: 2500;
+}
+
+#popup select {
+	width: 100%;
+}
+
+/********************************************************************
+ *
+ * Tool tips
+ *
+ ********************************************************************/
+
+#tooltip {
+	position: absolute;
+	padding: 0.5em 0.5em 0.5em 0.5em;
+	z-index: 4000;
+	white-space: pre-line;
+}
+
+/********************************************************************
+ *
+ * Dialog
+ *
+ ********************************************************************/
+
+#overlay {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	z-index: 2000;
+}
+
+#dialog {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	z-index: 2001;
+}
+
+#dialog-title {
+	padding: 0.5em;
+}
+
+#dialog-close {
+	float: right;
+}
+
+#dialog-content {
+	padding: 0.5em;
+/*	height: 26em;
+	overflow: auto;*/
+}
+
+#dialog pre {
+	width: 60em;
+	height: 30em;
+	overflow: auto;
+}
+
+#dialog form {
+	margin: 1em;
+}
+
+#dialog input[type="text"], #dialog input[type="password"], #dialog select {
+	width: 20em;
+}
+
+#dialog textarea {
+	width: 40em;
+}
+
+/********************************************************************
+ *
+ * Forms
+ *
+ ********************************************************************/
+
+form.left dd {
+	width: 100%;
+}
+
+form.left input[type="text"], form.left input[type="password"], form.left select, form.left textarea {
+	width: 90%;
+}
+
+form.full input[type="text"], form.full input[type="password"], form.full select {
+	width: 40em;
+}
+
+form.full dd {
+	width: 60%;
+}
+
+form.full textarea {
+	width: 90%;
+}
+
+table.aggregate input[type="text"] {
+	width: 100%;
+}
+
+table.aggregate select {
+	min-width: 100%;
+}
+
+table.props input[type="text"], table.props input[type="password"], table.props select {
+	width: 20em;
+}
+
+textarea.small {
+	height: 5em;
+}
+
+textarea.medium {
+	height: 20em;
+}
+
+textarea.large {
+	height: 40em;
+}
+
+/********************************************************************
+ *
+ * Tab controls
+ *
+ ********************************************************************/
+
+.tab {
+	float: left;
+	padding: 0.5em;
+	cursor: pointer;
+}
+
+.tab-page {
+	clear: both;
+}
+
+.tab-header {
+	padding: 1em 1em 0em 1em;
+}
+
+.tab-body {
+	overflow: auto;
+	padding: 1em;
+}
+
+/********************************************************************
+ *
+ * Combo box controls
+ *
+ ********************************************************************/
+
+.combo-head {
+	padding: 0.5em;
+}
+
+.combo-head-level {
+	margin-left: 1em;
+}
+
+.combo-head select {
+	max-width: 90%;
+}
+
+.combo-body {
+	height: 100%;
+	overflow: auto;
+}
+
+/********************************************************************
+ *
+ * Dashboard
+ *
+ ********************************************************************/
+
+#marker {
+	display: none;
+}
+
+.dashboard-tab {
+	float: left;
+	padding: 0.5em;
+}
+
+.dashboard-body {
+	margin: 0em 1em 1em 0em;
+	padding: 1em;
+	max-height: 45em;
+	overflow: auto;
+}
+
+.dashboard-body img {
+	max-height: 43em;
+}
+
+.zoomed .dashboard-body {
+	max-height: none;
+}
+
+.zoomed .dashboard-body img {
+	max-height: none;
+}
+
+.collapsed .dashboard-title {
+	margin: 0em 1em 1em 0em;
+}
+
+.collapsed .dashboard-body {
+	display: none;
+}
+
+.dashboard-body table {
+	width: 100%;
+}
+
+/********************************************************************
+ *
+ * Explorer
+ *
+ ********************************************************************/
+
+#explorer-left {
+	float: left;
+	width: 20%;
+	margin: 0em 0.5% 0em 0em;
+}
+
+#explorer-right {
+	float: left;
+	width: 79.5%;
+}
+
+#detailQuery {
+	display: none;
+}
+
+/********************************************************************
+ *
+ * Result tables
+ *
+ ********************************************************************/
+
+table.single td:nth-child(2) {
+	white-space: pre-line;
+}
+
+table.multiple td, table.transposed td, table.aggregate td {
+	white-space: pre-line;
+}
+
+table.columns td:nth-child(1) {
+	text-align: right;
+}
+
+table.columns td:nth-child(6) {
+	text-align: right;
+}
+
+table.columns td:nth-child(7) {
+	text-align: right;
+}
+
+th.table-sortable {
+	cursor: pointer;
+}
+
+#drilldown0 {
+	margin-top: 1em;
+}
+
+/********************************************************************
+ *
+ * Result lists
+ *
+ ********************************************************************/
+
+div.subheading {
+	width: 96%;
+	margin: 1em 0em 0.3em 1em;
+}
+
+dl.result dt {
+	width: 30%;
+	padding-bottom: 0.3em;
+}
+
+dl.result dd {
+	width: 66%;
+	white-space: pre-line;
+}
+
+iframe.result {
+	width: 100%;
+	height: 100%;
+	
+}
+
+/********************************************************************
+ *
+ * Code blocks
+ *
+ ********************************************************************/
+
+pre.code {
+	display: table;
+	table-layout: fixed;
+	width: 100%;
+}
+
+pre.code::before {
+	counter-reset: linenum;
+}
+
+pre.code span.line {
+	display: table-row;
+	counter-increment: linenum;
+}
+
+pre.code span.no {
+	display: table-cell;
+	user-select: none;
+	-moz-user-select: none;
+	width: 5em;
+	text-align: right;
+	padding-right: 0.5em;
+}
+
+pre.code span.no::before {
+	content: counter(linenum);
+}
+
+pre.code code {
+	display: table-cell;
+}
+
+pre.code span.errline {
+	display: table-row;
+}
+
+pre.code span.errno {
+	display: table-cell;
+	user-select: none;
+	-moz-user-select: none;
+	width: 5em;
+	text-align: right;
+	padding-right: 0.5em;
+}
+
+pre.code span.errno::before {
+	content: '0';
+}
+
+pre.code span.errmsg {
+	display: table-cell;
+}
+
+/********************************************************************
+ *
+ * Tree
+ *
+ ********************************************************************/
+
+#treeselection {
+	display: none;
+}
+
+div.treerow {
+	clear: both;
+}
+
+div.treerow div.treerow {
+	margin-left: 1.5em;
+}
+
+div.treebutton {
+	float: left;
+	clear: both;
+	width: 1.5em;
+}
+
+div.treelabel {
+	padding-left: 1.5em;
+	white-space: nowrap;
+}
+
+div.treedetails {
+	float: left;
+}
+
+/********************************************************************
+ *
+ * Wiki
+ *
+ ********************************************************************/
+
+.wiki h1, .wiki h2, .wiki h3 {
+	float: none;
+}
+
+/********************************************************************
+ *
+ * Date picker
+ *
+ ********************************************************************/
+
+.calendar_date_select {
+	display: block;
+	z-index: 3000;
+}
+/* this is a fun ie6 hack to get drop downs to stay behind the popup window.  This should always be just underneath .calendar_date_select */
+iframe.ie6_blocker {
+	position: absolute;
+	z-index: 2999;
+}
+
+.calendar_date_select .cds_header {
+	padding: 0.3em 0.5em 0.3em 0.5em;
+	text-align: center;
+}
+
+.calendar_date_select .cds_header a.prev {
+	float: left;
+}
+.calendar_date_select .cds_header a.next {
+	float: right;
+}
+.calendar_date_select .cds_header a.close {
+	float: right;
+	display: none;
+}
+
+.calendar_date_select th {
+	text-align: center;
+}
+
+.calendar_date_select td {
+	text-align: center;
+}
+
+.calendar_date_select .cds_buttons {
+	padding: 0.3em 0.5em 0.3em 0.5em;
+	text-align: center;
+}
+
+.calendar_date_select .cds_footer {
+	padding: 0em 0.5em 0.3em 0.5em;
+	text-align: center;
+}
+
+/********************************************************************
+ *
+ * Links
+ *
+ ********************************************************************/
+
+span.action {
+	cursor: pointer;
+}
+
+span.link {
+	cursor: pointer;
+}
+
+span.aggfilter {
+	cursor: zoom-in;
+}
+
+/********************************************************************
+ *
+ * Other classes
+ *
+ ********************************************************************/
+
+img.scaled {
+	max-width: 100%;
+	cursor: zoom-in;
+}
+
+img.unscaled {
+	cursor: zoom-out;
+}
+
+#fullscreen {
+	position: absolute;
+	z-index: 500;
+}
+
+#search-result {
+	width: 80em;
+	height: 40em;
+	overflow: auto;
+}
+
+.content {
+	box-sizing: border-box;
+	height: 100%;
+	padding: 1em;
+}
+
+.column {
+	float: left;
+	margin: 0em 3em 2em 0em;
+}
+
+.column2 {
+	float: left;
+	width: 50%;
+}
+
+.column3 {
+	float: left;
+/*	width: 33%;*/
+	width: 48em;
+}
+
+.error {
+	padding: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.message {
+	white-space: pre-line;
+}

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+	Configuration for the Spring ApplicationContext
+	shared by all servlets
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+		"
+	>
+	
+	<!-- Apply logging levels -->
+	<bean id="loggingConfigurator" class="de.tweerlei.spring.util.LoggingConfigurator" lazy-init="false">
+		<constructor-arg>
+			<props>
+<!--
+				<prop key="org.springframework">WARNING</prop>
+-->
+				<prop key="org.hibernate.cfg">WARNING</prop>
+				<prop key="org.hibernate.cache">WARNING</prop>
+				<prop key="org.hibernate.SQL">INFO</prop>
+				<!-- OpenMQ bug 6874125: _destroy():called on a connection that was not closed -->
+				<prop key="javax.jms.Connection.mqjmsra">SEVERE</prop>
+				
+				<prop key="de.tweerlei">INFO</prop>
+			</props>
+		</constructor-arg>
+	</bean>
+	
+	<!-- Message resource bundle that uses external messages and falls back to the built-in messages -->
+	<bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+		<!--property name="basename" value="classpath:de/tweerlei/dbgrazer/web/messages"/-->
+		<property name="defaultEncoding" value="UTF-8"/>
+		<property name="fallbackToSystemLocale" value="false"/>
+		<property name="parentMessageSource">
+			<bean class="de.tweerlei.spring.util.WildcardReloadableResourceBundleMessageSource">
+				<property name="basename" value="classpath*:de/tweerlei/dbgrazer/web/messages"/>
+				<property name="defaultEncoding" value="UTF-8"/>
+				<property name="fallbackToSystemLocale" value="false"/>
+			</bean>
+		</property>
+	</bean>
+	
+	<!-- Enumerate all manifests reachable from the web application context (this will include the JAR containing the main application context) -->
+	<bean id="manifestEnumerator" class="de.tweerlei.spring.service.impl.ManifestEnumeratorServiceImpl">
+	</bean>
+	
+	<!-- Scan for annotated components in these packages -->
+	<context:component-scan base-package="de.tweerlei.dbgrazer.web.backend"/>
+	<context:component-scan base-package="de.tweerlei.dbgrazer.web.service"/>
+	<!-- Export plugins -->
+	<context:component-scan base-package="de.tweerlei.dbgrazer.web.export"/>
+	<!-- These services are session-scoped, so we need to proxy them -->
+	<context:component-scan base-package="de.tweerlei.dbgrazer.web.session" scoped-proxy="interfaces" />
+	
+	<!-- WebappResourceService -->
+	<context:component-scan base-package="de.tweerlei.spring.web.service"/>
+	
+</beans>

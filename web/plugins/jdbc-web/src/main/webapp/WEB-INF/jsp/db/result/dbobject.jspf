@@ -1,0 +1,324 @@
+<%--
+ * Copyright 2018 tweerlei Wruck + Buchmeier GbR - http://www.tweerlei.de/
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+--%><%--
+	
+	Tab panel for a DB object
+	
+--%><c:choose><%--
+***********************************************************************
+*
+* Object details
+*
+***********************************************************************
+--%><c:when test="${ix == 1}"
+>		<div class="tab-body">
+		<div class="column2">
+			<fmt:message key="dbObject" var="title"/><ui:panel title="${title}" zoomable="true">
+				<dl class="result">
+					<dt><fmt:message key="name"/>:</dt>
+					<dd>${object}</dd>
+					<dt><fmt:message key="dbObjectType"/>:</dt>
+					<dd>${info.type}</dd>
+					<dt><fmt:message key="comment"/>:</dt>
+					<dd>${fn:escapeXml(info.comment)}</dd>
+				</dl><hr/>
+			</ui:panel>
+			<fmt:message key="columnsTab" var="title"><fmt:param value="${fn:length(info.columns)}"/></fmt:message><ui:panel title="${title}" zoomable="true">
+				<table class="multiple columns table-autosort">
+					<thead>
+						<tr>
+							<th class="table-sortable table-sortable:numeric"><fmt:message key="position"/></th>
+							<th class="table-sortable table-sortable:ignorecase"><fmt:message key="name"/></th>
+							<th class="table-sortable table-sortable:numeric"><fmt:message key="primaryKeyIndex"/></th>
+							<th class="table-sortable table-sortable:ignorecase"><fmt:message key="nullable"/></th>
+							<th class="table-sortable table-sortable:ignorecase"><fmt:message key="columnType"/></th>
+							<th class="table-sortable table-sortable:numeric"><fmt:message key="length"/></th>
+							<th class="table-sortable table-sortable:numeric"><fmt:message key="decimals"/></th>
+							<th class="table-sortable table-sortable:ignorecase"><fmt:message key="defaultValue"/></th>
+							<th><fmt:message key="comment"/></th>
+						</tr>
+					</thead>
+					<tbody>
+<c:forEach items="${info.columns}" var="c" varStatus="st"
+>						<tr>
+							<td>${st.index + 1}</td>
+							<td>${c.name}</td>
+							<td>${pkIndices[st.index]}</td>
+							<td>${c.nullable ? '&#x2612;' : '&#x2610;'}</td>
+							<td>${c.type.name}</td>
+							<td>${c.type.length}</td>
+							<td>${c.type.decimals > 0 ? c.type.decimals : ''}</td>
+							<td>${fn:escapeXml(c.defaultValue)}</td>
+							<td>${fn:escapeXml(c.comment)}</td>
+						</tr>
+</c:forEach
+>					</tbody>
+				</table>
+			</ui:panel>
+<c:if test="${not empty privs}"
+>			<fmt:message key="privilegesTab" var="title"><fmt:param value="${fn:length(privs)}"/></fmt:message><ui:panel title="${title}" zoomable="true">
+				<table class="multiple table-autosort">
+					<thead>
+						<tr>
+							<th class="table-sortable table-sortable:ignorecase"><fmt:message key="action"/></th>
+							<th class="table-sortable table-sortable:ignorecase"><fmt:message key="grantee"/></th>
+							<th class="table-sortable table-sortable:ignorecase"><fmt:message key="grantor"/></th>
+							<th class="table-sortable table-sortable:ignorecase"><fmt:message key="grantable"/></th>
+						</tr>
+					</thead>
+					<tbody>
+<c:forEach items="${privs}" var="priv"
+>						<tr>
+							<td>${priv.privilege}</td>
+							<td>${priv.grantee}</td>
+							<td>${priv.grantor}</td>
+							<td>${priv.grantable ? '&#x2612;' : '&#x2610;'}</td>
+						</tr>
+</c:forEach
+>					</tbody>
+				</table>
+			</ui:panel>
+</c:if
+>		</div>
+	
+		<div class="column2">
+<c:if test="${not empty info.indices}"
+>			<fmt:message key="indicesTab" var="title"><fmt:param value="${fn:length(info.indices)}"/></fmt:message><ui:panel title="${title}" zoomable="true">
+				<table class="multiple table-autosort">
+					<thead>
+						<tr>
+							<th class="table-sortable table-sortable:ignorecase"><fmt:message key="name"/></th>
+							<th class="table-sortable table-sortable:ignorecase"><fmt:message key="unique"/></th>
+							<th class="table-sortable table-sortable:ignorecase"><fmt:message key="columns"/></th>
+						</tr>
+					</thead>
+					<tbody>
+<c:forEach items="${info.indices}" var="ix"
+>						<tr>
+							<td>${ix.name}</td>
+							<td>${ix.unique ? '&#x2612;' : '&#x2610;'}</td>
+							<td><c:forEach items="${ix.columns}" var="c" varStatus="st"><c:if test="${!st.first}"><br/></c:if>${c}</c:forEach></td>
+						</tr>
+</c:forEach
+>					</tbody>
+				</table>
+			</ui:panel>
+</c:if><c:if test="${not empty info.referencedKeys}"
+>			<fmt:message key="referencedObjectsTab" var="title"><fmt:param value="${fn:length(info.referencedKeys)}"/></fmt:message><ui:panel title="${title}" zoomable="true">
+				<table class="multiple table-autosort">
+					<thead>
+						<tr>
+							<th class="table-sortable table-sortable:ignorecase"><fmt:message key="dbObject"/></th>
+							<th class="table-sortable table-sortable:ignorecase"><fmt:message key="viaFK"/></th>
+							<th class="table-sortable table-sortable:ignorecase"><fmt:message key="sourceColumns"/></th>
+							<th class="table-sortable table-sortable:ignorecase"><fmt:message key="destinationColumns"/></th>
+						</tr>
+					</thead>
+					<tbody>
+<c:forEach items="${info.referencedKeys}" var="fk"
+>						<tr>
+							<td><a href="db/${currentConnection.linkName}/dbobject.html?catalog=${fk.tableName.catalogName}&amp;schema=${fk.tableName.schemaName}&amp;object=${fk.tableName.objectName}"<c:if test="${not empty targetElement}"
+								> onclick="return showDBObject(event, '${fk.tableName.catalogName}', '${fk.tableName.schemaName}', '${fk.tableName.objectName}');"</c:if
+								>>${fk.tableName.objectName}</a></td>
+							<td>${fk.name}</td>
+							<td><c:forEach items="${fk.columns}" var="c" varStatus="st"><c:if test="${!st.first}"><br/></c:if>${c.key}</c:forEach></td>
+							<td><c:forEach items="${fk.columns}" var="c" varStatus="st"><c:if test="${!st.first}"><br/></c:if>${c.value}</c:forEach></td>
+						</tr>
+</c:forEach
+>					</tbody>
+				</table>
+			</ui:panel>
+</c:if><c:if test="${not empty info.referencingKeys}"
+>
+			<fmt:message key="referencingObjectsTab" var="title"><fmt:param value="${fn:length(info.referencingKeys)}"/></fmt:message><ui:panel title="${title}" zoomable="true">
+				<table class="multiple table-autosort">
+					<thead>
+						<tr>
+							<th class="table-sortable table-sortable:ignorecase"><fmt:message key="dbObject"/></th>
+							<th class="table-sortable table-sortable:ignorecase"><fmt:message key="viaFK"/></th>
+							<th class="table-sortable table-sortable:ignorecase"><fmt:message key="sourceColumns"/></th>
+							<th class="table-sortable table-sortable:ignorecase"><fmt:message key="destinationColumns"/></th>
+						</tr>
+					</thead>
+					<tbody>
+<c:forEach items="${info.referencingKeys}" var="fk"
+>						<tr>
+							<td><a href="db/${currentConnection.linkName}/dbobject.html?catalog=${fk.tableName.catalogName}&amp;schema=${fk.tableName.schemaName}&amp;object=${fk.tableName.objectName}"<c:if test="${not empty targetElement}"
+								> onclick="return showDBObject(event, '${fk.tableName.catalogName}', '${fk.tableName.schemaName}', '${fk.tableName.objectName}');"</c:if
+								>>${fk.tableName.objectName}</a></td>
+							<td>${fk.name}</td>
+							<td><c:forEach items="${fk.columns}" var="c" varStatus="st"><c:if test="${!st.first}"><br/></c:if>${c.key}</c:forEach></td>
+							<td><c:forEach items="${fk.columns}" var="c" varStatus="st"><c:if test="${!st.first}"><br/></c:if>${c.value}</c:forEach></td>
+						</tr>
+</c:forEach
+>					</tbody>
+				</table>
+			</ui:panel>
+</c:if
+>		</div>
+		<hr/>
+		</div>
+</c:when><%--
+***********************************************************************
+*
+* ERM graph
+*
+***********************************************************************
+--%><c:when test="${ix == 0}"
+>		<div class="tab-header">
+			<div id="tools-${object}" class="hidden"><div class="menucolumn">
+				<div class="menuitem"><span onclick="return postForm('dlform-${object}', event, 'db/${currentConnection.linkName}/dbgraph-image.html', null, '_blank');"><fmt:message key="Image"/></span></div>
+<c:if test="${currentUser.dotDisplayEnabled}"
+>				<div class="menuitem"><span onclick="return postForm('dlform-${object}', event, 'db/${currentConnection.linkName}/dbgraph-source.html', null, '_blank');"><fmt:message key="DOT"/></span></div>
+</c:if
+>			</div></div>
+<c:choose><c:when test="${not empty targetElement}"
+>			<form id="dlform-${object}" class="filter" action="#" method="get" onsubmit="return false;">
+				<input type="hidden" name="catalog" value="${catalog}"/>
+				<input type="hidden" name="schema" value="${schema}"/>
+				<input type="hidden" name="object" value="${object}"/>
+				<input type="hidden" name="depth" value="${depth}"/>
+				<span class="menu" onclick="return showElementMenu(event, 'tools-${object}');"><fmt:message key="download"/></span>
+			</form>
+<c:if test="${depth > 0}"
+>			<div class="filter">
+				<span class="button" onclick="showDBObject(event, '${catalog}', '${schema}', '${object}', ${depth-1}, ${currentConnection.expandOtherSchemas});"><fmt:message key="less"/></span>
+			</div>
+</c:if><c:if test="${depth < maxDepth}"
+>			<div class="filter">
+				<span class="button" onclick="showDBObject(event, '${catalog}', '${schema}', '${object}', ${depth+1}, ${currentConnection.expandOtherSchemas});"><fmt:message key="more"/></span>
+			</div>
+</c:if
+>			<form class="filter" action="#" method="get" onsubmit="return false;">
+				<input id="allSchemas" type="checkbox" name="allSchemas" value="true"<c:if test="${currentConnection.expandOtherSchemas}"> checked="checked"</c:if> onchange="showDBObject(event, '${catalog}', '${schema}', '${object}', ${depth}, \$('allSchemas').checked, ${currentConnection.sortColumns});"/> <label for="allSchemas"><fmt:message key="allSchemas"/></label>
+			</form>
+			<form class="filter" action="#" method="get" onsubmit="return false;">
+				<input id="sort" type="checkbox" name="sort" value="true"<c:if test="${currentConnection.sortColumns}"> checked="checked"</c:if> onchange="showDBObject(event, '${catalog}', '${schema}', '${object}', ${depth}, ${currentConnection.expandOtherSchemas}, \$('sort').checked);"/> <label for="sort"><fmt:message key="sortColumns"/></label>
+			</form>
+</c:when><c:otherwise
+>			<div class="filter">
+				<span class="menu" onclick="return showElementMenu(event, 'tools-${object}');"><fmt:message key="download"/></span>
+			</div>
+			<form id="dlform-${object}" action="db/${currentConnection.linkName}/dbobject.html" method="get">
+				<input type="hidden" name="catalog" value="${catalog}"/>
+				<input type="hidden" name="schema" value="${schema}"/>
+				<input type="hidden" name="object" value="${object}"/>
+				<input type="hidden" name="depth" value="${depth}"/>
+<c:if test="${depth > 0}"
+>				<input type="button" value="<fmt:message key="less"/>" onclick="form.elements['depth'].value = ${depth-1}; Forms.submit(form, event);"/>
+</c:if><c:if test="${depth < maxDepth}"
+>				<input type="button" value="<fmt:message key="more"/>" onclick="form.elements['depth'].value = ${depth+1}; Forms.submit(form, event);"/>
+</c:if
+>				<input id="allSchemas" type="checkbox" name="allSchemas" value="true"<c:if test="${currentConnection.expandOtherSchemas}"> checked="checked"</c:if> onchange="Forms.submit(form, event);"/> <label for="allSchemas"><fmt:message key="allSchemas"/></label>
+				<input id="sort" type="checkbox" name="sort" value="true"<c:if test="${currentConnection.sortColumns}"> checked="checked"</c:if> onchange="Forms.submit(form, event);"/> <label for="sort"><fmt:message key="sortColumns"/></label>
+			</form>
+</c:otherwise></c:choose>
+			<hr/>
+		</div>
+		<div class="tab-body">
+			${imagemap}
+			<img src="db/${currentConnection.linkName}/dbgraph.html?catalog=${catalog}&amp;schema=${schema}&amp;object=${object}&amp;depth=${depth}&amp;key=${imageId}&amp;t=${currentDate.time}" usemap="#${imagemapId}" style="max-width: 100%;" onclick="return toggleScaling(this);" alt="<fmt:message key="imageLoading"/>" onload="imageLoaded(event);" onerror="imageLoadingFailed(event);" title="${object}"/>
+		</div>
+</c:when><%--
+***********************************************************************
+*
+* DDL script
+*
+***********************************************************************
+--%><c:when test="${ix == 2}"
+>		<div class="tab-header">
+			<form action="#" method="get" onsubmit="return downloadElement('src', 'text/plain;charset=utf-8');">
+				<input type="submit" value="<fmt:message key="downloadText"/>"/>
+			</form>
+		</div>
+		<div class="tab-body">
+			<pre id="src">${fn:escapeXml(ddl)}</pre>
+		</div>
+</c:when><%--
+***********************************************************************
+*
+* DML script
+*
+***********************************************************************
+--%><c:when test="${ix == 3}"
+>		<div class="tab-header">
+			<form action="#" method="get" onsubmit="return downloadElement('dmlsrc', 'text/plain;charset=utf-8');">
+				<input type="submit" value="<fmt:message key="downloadText"/>"/>
+			</form>
+		</div>
+		<div class="tab-body">
+			<pre id="dmlsrc">${fn:escapeXml(statement)}${fn:escapeXml(dml)}</pre>
+		</div>
+</c:when><%--
+***********************************************************************
+*
+* Query form
+*
+***********************************************************************
+--%><c:when test="${ix == 4}"
+>		<div class="tab-header">
+			<form id="submitform" class="full" action="db/${currentConnection.linkName}/ajax/submit-simple.html" method="post" onsubmit="return submitForm(this, 'table');">
+				<input type="hidden" name="catalog" value="${catalog}"/>
+				<input type="hidden" name="schema" value="${schema}"/>
+				<input type="hidden" name="object" value="${object}"/>
+				<input type="hidden" name="target" value="${targetElement}"/>
+				<input id="resulttype" type="hidden" name="view" value=""/>
+				<input id="resultformat" type="hidden" name="format" value=""/>
+				<dl>
+					<dt><label for="where"><fmt:message key="WHERE"/></label></dt>
+					<dd><textarea id="where" class="small" name="where" cols="80" rows="5">${where}</textarea></dd>
+					<dt><label for="order"><fmt:message key="ORDER_BY"/></label></dt>
+					<dd><textarea id="order" class="small" name="order" cols="80" rows="5">${orderBy}</textarea></dd>
+					<dt>&nbsp;</dt>
+					<dd><input type="submit" value="<fmt:message key="execute"/>"/>
+						<input type="button" value="<fmt:message key="showCount"/>" onclick="submitForm(form, 'count');"/>
+						<input type="button" value="<fmt:message key="showStats"/>" onclick="submitForm(form, 'stats');"/>
+						<span class="menu" onclick="showDbMenu(event, 'tbllinks');"><fmt:message key="download"/></span>
+						<input id="form-all" type="checkbox" name="allRows" value="true"/> <label for="form-all"><fmt:message key="downloadAllRows"/></label>
+<c:if test="${currentConnection.writable}"
+>						<br/>
+						<span class="button" onclick="showInsertDialog(event, '${catalog}', '${schema}', '${object}');"><fmt:message key="insertRow"/></span>
+						<input type="button" value="<fmt:message key="deleteRows"/>" onclick="confirmSubmit(form, 'delete', '<fmt:message key="deleteRows"/>', '<fmt:message key="confirmDeletes"/>');"/>
+						<input type="button" value="<fmt:message key="truncate"/>" onclick="confirmSubmit(form, 'truncate', '<fmt:message key="truncate"/>', '<fmt:message key="confirmTruncate"/>');"/>
+</c:if
+>						</dd>
+				</dl><hr/>
+			</form>
+			<div id="submitresult"></div>
+		</div>
+		<div id="result">
+			<div class="tab-body"></div>
+		</div>
+</c:when><%--
+***********************************************************************
+*
+* Referenced tables
+*
+***********************************************************************
+--%><c:when test="${ix == 5}"
+>		<div class="tab-body">
+			<ui:result-tabletree infos="${infos}" label="up" dir="true" targetElement="${targetElement}"/>
+		</div>
+</c:when><%--
+***********************************************************************
+*
+* Referencing tables
+*
+***********************************************************************
+--%><c:when test="${ix == 6}"
+>		<div class="tab-body">
+			<ui:result-tabletree infos="${infos}" label="down" dir="false" targetElement="${targetElement}"/>
+		</div>
+</c:when></c:choose>

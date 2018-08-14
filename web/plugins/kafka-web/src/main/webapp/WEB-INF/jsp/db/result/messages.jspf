@@ -1,0 +1,56 @@
+<%--
+ * Copyright 2018 tweerlei Wruck + Buchmeier GbR - http://www.tweerlei.de/
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+--%><%--
+	
+	Tab panel for directory contents
+	
+--%><div class="tab-header" id="submitresult">
+			<form action="db/${currentConnection.linkName}/partition.html" method="get"<c:if test="${not empty targetElement}"> onsubmit="return showPartition(event, $F('f1-topic'), $F('f1-partition'), $F('f1-offset'));"</c:if>>
+				<input type="hidden" id="f1-topic" name="topic" value="${topic}"/>
+				<input type="hidden" id="f1-partition" name="partition" value="${partition}"/>
+				Message ID range: ${startOffset} - ${endOffset} &nbsp;
+				Next ID: ${currentOffset} &nbsp;
+<c:choose><c:when test="${minOffset != null}"
+><c:if test="${prevOffset != null}"
+>				<input type="button" value="rewind" onclick="$('f1-offset').value = ${prevOffset}; Forms.submit(form);"/>
+</c:if
+>				Fetched ${minOffset} - ${maxOffset}
+<c:if test="${nextOffset != null}"
+>				<input type="button" value="next" onclick="$('f1-offset').value = ${nextOffset}; Forms.submit(form);"/>
+</c:if
+></c:when><c:otherwise
+>				Fetched no records
+</c:otherwise></c:choose
+>				&nbsp; <label for="f1-offset">Go to:</label> <input type="text" id="f1-offset" name="offset" value="${offset}"/>
+				<input type="submit"/>
+			</form>
+			<hr/>
+		</div><div class="tab-body"><table id="table-${label}" class="multiple table-autosort">
+			<thead>
+				<tr>
+					<th class="table-sortable table-sortable:numeric">ID</th>
+					<th class="table-sortable table-sortable:ignorecase">Key</th>
+				</tr>
+			</thead>
+			<tbody>
+<c:forEach items="${rs}" var="row"
+>				<tr>
+					<td><a href="db/${currentConnection.linkName}/message.html?topic=${topic}&amp;partition=${partition}&amp;offset=${row.offset}"<c:if test="${not empty targetElement}"> onclick="return showMessage(event, '${topic}', '${partition}', '${row.offset}');"</c:if>>${row.offset}</a></td>
+					<td>${fn:escapeXml(row.key)}</td>
+				</tr>
+</c:forEach
+>			</tbody>
+		</table>
+</div>

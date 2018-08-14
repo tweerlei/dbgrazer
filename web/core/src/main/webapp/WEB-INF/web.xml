@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+	version="2.5"
+	>
+	
+	<!-- Session timeout: 30 minutes -->
+	<session-config>
+		<session-timeout>30</session-timeout>
+	</session-config>
+	
+	<!-- Directory index -->
+	<welcome-file-list>
+		<welcome-file>index.jsp</welcome-file>
+	</welcome-file-list>
+	
+	<!-- Error handling -->
+	<error-page>
+		<error-code>404</error-code>
+		<location>/404.jsp</location>
+	</error-page>
+	<error-page>
+		<error-code>500</error-code>
+		<location>/500.jsp</location>
+	</error-page>
+	<error-page>
+		<exception-type>java.lang.Throwable</exception-type>
+		<location>/500.jsp</location>
+	</error-page>
+	
+	<!-- MIME type mappings for static resources -->
+	<mime-mapping>
+		<extension>js</extension>
+		<mime-type>text/javascript;charset=UTF-8</mime-type>
+	</mime-mapping>
+	<mime-mapping>
+		<extension>css</extension>
+		<mime-type>text/css;charset=UTF-8</mime-type>
+	</mime-mapping>
+	
+	<!-- Context parameters -->
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>classpath:de/tweerlei/dbgrazer/web/application-context.xml</param-value>
+	</context-param>
+	<context-param>
+		<param-name>locatorFactorySelector</param-name>
+		<param-value>classpath:de/tweerlei/dbgrazer/parent-context.xml</param-value>
+	</context-param>
+	<context-param>
+		<param-name>parentContextKey</param-name>
+		<param-value>parentContext</param-value>
+	</context-param>
+	
+	<!-- Spring application context listener -->
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+	
+	<!-- Publish session creation/destruction events -->
+	<listener>
+		<listener-class>de.tweerlei.dbgrazer.web.support.SessionListener</listener-class>
+	</listener>
+	
+	<!-- Filter to add HTTP Expires header -->
+	<filter>
+		<filter-name>expiresFilter</filter-name>
+		<filter-class>de.tweerlei.spring.web.filter.ExpiresFilter</filter-class>
+		<init-param>
+			<param-name>ttl</param-name>
+			<param-value>86400</param-value>
+		</init-param>
+	</filter>
+	
+	<filter-mapping>
+		<filter-name>expiresFilter</filter-name>
+		<url-pattern>/scripts/*</url-pattern>
+		<url-pattern>/styles/*</url-pattern>
+	</filter-mapping>
+	
+	<!-- Spring filter to convert servlet default ISO-8859-1 to UTF-8 -->
+	<filter>
+		<filter-name>charsetFilter</filter-name>
+		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>UTF-8</param-value>
+		</init-param>
+	</filter>
+	
+	<filter-mapping>
+		<filter-name>charsetFilter</filter-name>
+		<url-pattern>*.html</url-pattern>
+	</filter-mapping>
+	
+	<!-- Spring dispatcher servlet -->
+	<servlet>
+		<servlet-name>dispatcher</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<init-param>
+			<param-name>contextConfigLocation</param-name>
+			<param-value>/WEB-INF/spring/dispatcher-servlet.xml</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	
+	<servlet-mapping>
+		<!-- Use dispatcher servlet to handle all html URLs -->
+		<servlet-name>dispatcher</servlet-name>
+		<url-pattern>*.html</url-pattern>
+	</servlet-mapping>
+	
+</web-app>

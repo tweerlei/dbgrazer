@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<taglib
+    xmlns="http://java.sun.com/xml/ns/javaee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-jsptaglibrary_2_1.xsd"
+    version="2.1">
+
+    <display-name>JSP utility functions</display-name>    
+    <tlib-version>1.0</tlib-version>
+    <short-name>file</short-name>
+    <uri>http://tweerlei.de/dbgrazer/web/taglib/file/FileFunctions</uri>
+
+    <function>
+        <description>Get the base name of a path.</description>
+        <name>basename</name>
+        <function-class>de.tweerlei.dbgrazer.web.taglib.file.FileFunctions</function-class>
+        <function-signature>java.lang.String basename(java.lang.String)</function-signature>
+    </function>
+
+    <function>
+        <description>Get the dir name of a path.</description>
+        <name>dirname</name>
+        <function-class>de.tweerlei.dbgrazer.web.taglib.file.FileFunctions</function-class>
+        <function-signature>java.lang.String dirname(java.lang.String)</function-signature>
+    </function>
+
+</taglib>

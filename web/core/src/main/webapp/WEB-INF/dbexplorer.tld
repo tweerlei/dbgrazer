@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<taglib
+    xmlns="http://java.sun.com/xml/ns/javaee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-jsptaglibrary_2_1.xsd"
+    version="2.1">
+
+    <display-name>JSP utility functions</display-name>    
+    <tlib-version>1.0</tlib-version>
+    <short-name>util</short-name>
+    <uri>http://tweerlei.de/dbgrazer/web/taglib/JspFunctions</uri>
+
+    <function>
+        <description>Encode a String for passing as query parameters in a URL.</description>
+        <name>paramEncode</name>
+        <function-class>de.tweerlei.dbgrazer.web.taglib.JspFunctions</function-class>
+        <function-signature>java.lang.String paramEncode(java.lang.String)</function-signature>
+    </function>
+
+    <function>
+        <description>Format a String as link title.</description>
+        <name>getLinkTitle</name>
+        <function-class>de.tweerlei.dbgrazer.web.taglib.JspFunctions</function-class>
+        <function-signature>java.lang.String getLinkTitle(java.lang.String)</function-signature>
+    </function>
+
+    <function>
+        <description>Get the number of menu items per column for a total number of items.</description>
+        <name>getMenuRows</name>
+        <function-class>de.tweerlei.dbgrazer.web.taglib.JspFunctions</function-class>
+        <function-signature>int getMenuRows(int, de.tweerlei.common.math.Rational)</function-signature>
+    </function>
+
+</taglib>

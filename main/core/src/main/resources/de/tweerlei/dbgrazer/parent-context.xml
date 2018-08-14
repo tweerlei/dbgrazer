@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+	Parent application context shared by all web applications
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd"
+	>
+	
+	<!-- Global application context -->
+	<bean id="parentContext" class="org.springframework.context.support.ClassPathXmlApplicationContext" scope="singleton" lazy-init="false">
+		<constructor-arg value="de/tweerlei/dbgrazer/application-context.xml"/>
+	</bean>
+	
+</beans>

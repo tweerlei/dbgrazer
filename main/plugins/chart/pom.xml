@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	
+	<modelVersion>4.0.0</modelVersion>
+	
+	<groupId>de.tweerlei</groupId>
+	<artifactId>dbgrazer-plugin-chart</artifactId>
+	<version>3.0</version>
+	<packaging>jar</packaging>
+	
+	<name>dbgrazer-plugin-chart</name>
+	<description>Web application for browsing DB schemas</description>
+	<url>http://www.tweerlei.de/</url>
+	
+	<parent>
+		<groupId>de.tweerlei</groupId>
+		<artifactId>dbgrazer-pom-library</artifactId>
+		<version>3.0</version>
+		<relativePath></relativePath>
+	</parent>
+	
+	<dependencies>
+		<!--
+			tweerlei packages
+		-->
+		<dependency>
+			<groupId>de.tweerlei</groupId>
+			<artifactId>dbgrazer-backend</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<!--
+			JFreeChart uses 1.3.04 while Xerces (from the WSDL plugin) needs 1.4.01
+		-->
+		<dependency>
+			<groupId>xml-apis</groupId>
+			<artifactId>xml-apis</artifactId>
+			<version>1.4.01</version>
+		</dependency>
+		<!--
+			compile time dependencies
+		-->
+		<dependency>
+			<groupId>org.jfree</groupId>
+			<artifactId>jfreechart</artifactId>
+			<version>1.0.14</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.lowagie</groupId>
+					<artifactId>itext</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>xml-apis</groupId>
+					<artifactId>xml-apis</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+	</dependencies>
+	
+	<repositories>
+		<repository>
+			<id>tweerlei</id>
+			<url>http://localhost</url>
+		</repository>
+	</repositories>
+</project>

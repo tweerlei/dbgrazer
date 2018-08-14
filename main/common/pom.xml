@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	
+	<modelVersion>4.0.0</modelVersion>
+	
+	<groupId>de.tweerlei</groupId>
+	<artifactId>dbgrazer-common-parent</artifactId>
+	<version>3.0</version>
+	<packaging>pom</packaging>
+	
+	<name>dbgrazer-common-parent</name>
+	<description>Web application for browsing DB schemas</description>
+	<url>http://www.tweerlei.de/</url>
+	
+	<modules>
+		<module>db</module>
+		<module>file</module>
+		<module>http</module>
+		<module>jdbc</module>
+		<module>json</module>
+		<module>kafka</module>
+		<module>lang</module>
+		<module>spring</module>
+		<module>sql</module>
+		<module>web</module>
+		<module>wiki</module>
+		<module>xml</module>
+	</modules>
+</project>

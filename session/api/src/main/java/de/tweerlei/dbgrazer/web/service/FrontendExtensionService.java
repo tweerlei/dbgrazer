@@ -1,0 +1,87 @@
+/*
+ * Copyright 2018 tweerlei Wruck + Buchmeier GbR - http://www.tweerlei.de/
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package de.tweerlei.dbgrazer.web.service;
+
+import java.util.List;
+
+import de.tweerlei.dbgrazer.query.model.Query;
+import de.tweerlei.dbgrazer.web.extension.ExtensionGroup;
+import de.tweerlei.dbgrazer.web.extension.ExtensionLink;
+
+/**
+ * Manage frontend extensions
+ * 
+ * @author Robert Wruck
+ */
+public interface FrontendExtensionService
+	{
+	/**
+	 * Get the extensions for an extension point
+	 * @return ExtensionDefs
+	 */
+	public List<ExtensionLink> getTopMenuExtensions();
+	
+	/**
+	 * Get the extensions for an extension point
+	 * @return ExtensionDefs
+	 */
+	public List<ExtensionLink> getEditMenuExtensions();
+	
+	/**
+	 * Get the extensions for an extension point
+	 * @return ExtensionDefs
+	 */
+	public List<ExtensionLink> getAdminMenuExtensions();
+	
+	/**
+	 * Get the extensions for an extension point
+	 * @return ExtensionDefs
+	 */
+	public List<ExtensionGroup> getQueryOverviewExtensions();
+	
+	/**
+	 * Get the extensions for an extension point and query context
+	 * @param query Current query
+	 * @return ExtensionDefs
+	 */
+	public List<ExtensionLink> getQueryViewExtensions(Query query);
+	
+	/**
+	 * Get the JavaScripts for an extension point and query context
+	 * @param query Current query
+	 * @return JavaScript file names
+	 */
+	public List<String> getQueryViewJS(Query query);
+	
+	/**
+	 * Get the extensions for an extension point
+	 * @return ExtensionDefs
+	 */
+	public List<ExtensionLink> getLinkOverviewExtensions();
+	
+	/**
+	 * Get the extensions for an extension point
+	 * @param linkName Link name
+	 * @return ExtensionDefs
+	 */
+	public List<ExtensionLink> getLinkViewExtensions(String linkName);
+	
+	/**
+	 * Get the extensions for an extension point
+	 * @return ExtensionDefs
+	 */
+	public List<ExtensionLink> getRestApiExtensions();
+	}

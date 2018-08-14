@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	
+	<modelVersion>4.0.0</modelVersion>
+	
+	<groupId>de.tweerlei</groupId>
+	<artifactId>dbgrazer-session-api</artifactId>
+	<version>3.0</version>
+	<packaging>jar</packaging>
+	
+	<name>dbgrazer-session-api</name>
+	<description>Web application for browsing DB schemas</description>
+	<url>http://www.tweerlei.de/</url>
+	
+	<parent>
+		<groupId>de.tweerlei</groupId>
+		<artifactId>dbgrazer-pom-library</artifactId>
+		<version>3.0</version>
+		<relativePath></relativePath>
+	</parent>
+	
+	<dependencies>
+		<!--
+			tweerlei packages
+		-->
+		<dependency>
+			<groupId>de.tweerlei</groupId>
+			<artifactId>dbgrazer-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>de.tweerlei</groupId>
+			<artifactId>dbgrazer-common-db</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>de.tweerlei</groupId>
+			<artifactId>dbgrazer-common-web</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<!--
+			JavaEE APIs
+		-->
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<version>2.5</version>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
+	
+	<repositories>
+		<repository>
+			<id>tweerlei</id>
+			<url>http://localhost</url>
+		</repository>
+	</repositories>
+</project>

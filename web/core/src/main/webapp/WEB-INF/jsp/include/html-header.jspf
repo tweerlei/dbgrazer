@@ -1,0 +1,84 @@
+<%--
+ * Copyright 2018 tweerlei Wruck + Buchmeier GbR - http://www.tweerlei.de/
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+--%><%--
+
+	HTML header including body tag
+
+	Since we are serving documents as text/html (seen include.jspf), we should not send an XML declaration
+
+--%><%--<?xml version="1.0" encoding="UTF-8"?>
+--%><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+	<title>${fn:escapeXml(pageTitle)}${(empty pageTitle) ? '' : ' - '}${fn:escapeXml(currentConnection.linkName)}${(empty currentConnection.linkName) ? '' : ' - '}<fmt:message key="appName"/></title>
+	<meta name="author" content="tweerlei Wruck &amp; Buchmeier GbR - http://www.tweerlei.de/"/>
+	<base href="${baseURI}"/>
+	
+<theme:theme code="appIcon" var="appIcon"/><c:if test="${not empty appIcon}"
+>	<link rel="shortcut icon" type="image/png" href="${appIcon}"/>
+</c:if
+>	<link rel="stylesheet" type="text/css" href="styles/style.css" charset="UTF-8"/>
+	<link rel="stylesheet" type="text/css" href="<theme:theme code="appStyle"/>" charset="UTF-8"/>
+	<link rel="stylesheet" type="text/css" media="print" href="styles/print.css" charset="UTF-8"/>
+	
+	<script type="text/javascript" src="scripts/prototype.js" charset="UTF-8"></script>
+	<script type="text/javascript" src="scripts/calendar_date_select.js" charset="UTF-8"></script>
+	<script type="text/javascript" src="scripts/table.js" charset="UTF-8"></script>
+	<script type="text/javascript" src="scripts/scheduler.js" charset="UTF-8"></script>
+	<script type="text/javascript" src="scripts/api.js" charset="UTF-8"></script>
+	<script type="text/javascript" src="scripts/elements.js" charset="UTF-8"></script>
+	<script type="text/javascript" src="scripts/imagemap.js" charset="UTF-8"></script>
+	<script type="text/javascript" src="scripts/keyboard.js" charset="UTF-8"></script>
+	<script type="text/javascript" src="scripts/timer.js" charset="UTF-8"></script>
+	<script type="text/javascript" src="scripts/menu.js" charset="UTF-8"></script>
+	<script type="text/javascript" src="scripts/tooltip.js" charset="UTF-8"></script>
+	<script type="text/javascript" src="scripts/autorefresh.js" charset="UTF-8"></script>
+	<script type="text/javascript" src="scripts/forms.js" charset="UTF-8"></script>
+	<script type="text/javascript" src="scripts/dialog.js" charset="UTF-8"></script>
+	<script type="text/javascript" src="scripts/fragment.js" charset="UTF-8"></script>
+	<script type="text/javascript" src="scripts/tabs.js" charset="UTF-8"></script>
+	<script type="text/javascript" src="scripts/tree.js" charset="UTF-8"></script>
+	<script type="text/javascript" src="<fmt:message key="localeJS"/>" charset="UTF-8"></script>
+	<script type="text/javascript" src="scripts/functions.js" charset="UTF-8"></script>
+<c:forEach items="${extensionJS}" var="js"
+>	<script type="text/javascript" src="scripts/${js}" charset="UTF-8"></script>
+</c:forEach
+>	<script type="text/javascript">/*<![CDATA[*/
+<c:if test="${currentConnection.linkName != null}"
+>		WSApi.currentDB = '${currentConnection.linkName}';
+</c:if><c:if test="${currentUser.principal != null}"
+>		WSApi.currentUser = '${currentUser.principal.login}';
+</c:if
+>	/*]]>*/</script>
+<%--
+	Hack for defining table cell alignments per column,
+	which is not possible using colgroup/col tags.
+--%><c:if test="${tableColumns != null}"
+>	
+	<style id="local-styles" type="text/css">/*<![CDATA[*/
+<c:forEach items="${tableColumns}" var="tc" varStatus="st1"><c:forEach items="${tc}" var="col" varStatus="st2"
+><c:choose><c:when test="${col.type == 'INTEGER'}"
+>		#table-result${st1.index} td:nth-child(${st2.index + 1}) { text-align: right; }
+</c:when><c:when test="${col.type == 'FLOAT'}"
+>		#table-result${st1.index} td:nth-child(${st2.index + 1}) { text-align: right; }
+</c:when></c:choose
+></c:forEach></c:forEach
+>	/*]]>*/</style>
+</c:if
+></head>
+
+<body>

@@ -1,0 +1,101 @@
+<%--
+ * Copyright 2018 tweerlei Wruck + Buchmeier GbR - http://www.tweerlei.de/
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+--%><%--
+	
+	Create a panel, used by result.jsp
+	
+--%><c:choose><c:when test="${rs.subQueryIndex >= 0}"><c:choose><%--
+***********************************************************************
+*
+* No data returned
+*
+***********************************************************************
+--%><c:when test="${fn:length(rs.rows) == 0}"
+><strong><fmt:message key="noData"/></strong></c:when
+><%--
+***********************************************************************
+*
+* Single value returned (preformatted HTML)
+*
+***********************************************************************
+--%><c:when test="${rs.query.type.resultType == 'SINGLE' && rs.query.attributes['formatter'] == 'WIKI'}"
+><div class="wiki">${rs.firstValue}</div></c:when
+><c:when test="${rs.query.type.resultType == 'SINGLE' && rs.query.attributes['formatter'] == 'HTML'}"
+><div id="text-${label}" class="hidden">${rs.firstValue}</div><iframe id="html-${label}" class="result"></iframe></c:when
+><c:when test="${rs.query.type.resultType == 'SINGLE'}"
+><pre id="text-${label}" class="code">${rs.firstValue}</pre></c:when
+><%--
+***********************************************************************
+*
+* Map (name, value)
+*
+***********************************************************************
+--%><c:when test="${rs.query.type.resultType == 'KEYVALUE'}"
+><ui:result-map rs="${rs}" label="${label}" columns="3" targetElement="${targetElement}"/></c:when
+><%--
+***********************************************************************
+*
+* Single row (name, value)
+*
+***********************************************************************
+--%><c:when test="${rs.query.type.resultType == 'ROW'}"
+><ui:result-row rs="${rs}" label="${label}" columns="3" targetElement="${targetElement}"/></c:when
+><%--
+***********************************************************************
+*
+* Transposed table
+*
+***********************************************************************
+--%><c:when test="${rs.query.type == 'TRANSPOSED'}"
+><ui:result-transposed rs="${rs}" label="${label}" params="${detailParams}" paramString="${detailParamString}" detailLink="${detailLink}" targetElement="${targetElement}"/></c:when
+><%--
+***********************************************************************
+*
+* Static tree
+*
+***********************************************************************
+--%><c:when test="${rs.query.type.resultType == 'HIERARCHICAL'}"
+><ui:result-statictree rs="${rs}" label="${label}" root="${rs}" targetElement="${targetElement}"/></c:when
+><%--
+***********************************************************************
+*
+* Other result types
+*
+***********************************************************************
+--%><c:otherwise
+><ui:result-table rs="${rs}" label="${label}" params="${detailParams}" paramString="${detailParamString}" detailLink="${detailLink}" targetElement="${targetElement}"/></c:otherwise></c:choose
+></c:when><%--
+***********************************************************************
+*
+* Related queries
+*
+***********************************************************************
+--%><c:when test="${rs.subQueryIndex == -1}"
+><ui:result-related rs="${rs}" params="${detailParams}" paramString="${detailParamString}" targetElement="${targetElement}"/></c:when><%--
+***********************************************************************
+*
+* Graph
+*
+***********************************************************************
+--%><c:when test="${rs.subQueryIndex == -2}"
+><ui:result-graph rs="${rs}" params="${detailParams}" paramString="${detailParamString}" detailLink="${detailLink}"/></c:when><%--
+***********************************************************************
+*
+* Tree
+*
+***********************************************************************
+--%><c:when test="${rs.subQueryIndex == -3}"
+><ui:result-tree rs="${rs}" label="${label}" level="1" first="true" targetElement="${targetElement}"/></c:when
+></c:choose>

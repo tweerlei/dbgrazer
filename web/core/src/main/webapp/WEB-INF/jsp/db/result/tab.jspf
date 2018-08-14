@@ -1,0 +1,260 @@
+<%--
+ * Copyright 2018 tweerlei Wruck + Buchmeier GbR - http://www.tweerlei.de/
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+--%><%--
+	
+	Create a tab panel, used by result.jsp
+	
+--%><c:choose><%--
+***********************************************************************
+*
+* Result with rows
+*
+***********************************************************************
+--%><c:when test="${rs.subQueryIndex >= 0}"
+><div class="tab-header">
+<c:if test="${(fn:length(rs.rows) > 0) && rs.query.type.resultType == 'TABLE' && rs.query.type != 'REPORT'}"
+>			<ui:filter id="filter-table-${label}" target="table-${label}" form="true"/>
+</c:if
+>			<div id="tools-${label}" class="hidden"><div class="menucolumn">
+<c:forEach items="${downloadFormats}" var="f"
+><c:choose><c:when test="${rs.query.type == 'EDITABLE'}"
+>				<div class="menuitem"><span onclick="return postForm('aggform-${label}', event, 'db/${currentConnection.linkName}/aggregate-export.html', {aggformat:'${f}'}, '_blank');"><fmt:message key="${f}"/></span></div>
+</c:when><c:when test="${isdiff}"
+>				<div class="menuitem"><span onclick="return postForm('dlform-${label}', event, 'db/${currentConnection.linkName}/compare-export.html', {resultfmt${label}:'${f}'}, '_blank');"><fmt:message key="${f}"/></span></div>
+</c:when><c:when test="${rs.moreAvailable || rs.query.type == 'REPORT'}"
+>				<div class="menuitem"><span onclick="return postForm('dlform-${label}', event, 'db/${currentConnection.linkName}/query-fullexport.html', {resultfmt${label}:'${f}'}, '_blank');"><fmt:message key="${f}"/></span></div>
+</c:when><c:otherwise
+>				<div class="menuitem"><span onclick="return postForm('dlform-${label}', event, 'db/${currentConnection.linkName}/query-export.html', {resultfmt${label}:'${f}'}, '_blank');"><fmt:message key="${f}"/></span></div>
+</c:otherwise></c:choose
+></c:forEach
+><c:if test="${(fn:length(rs.rows) > 0) && rs.query.type.resultType == 'SINGLE'}"
+>				<div class="menuitem"><span onclick="return downloadElement('text-${label}', 'text/plain;charset=utf-8');"><fmt:message key="PLAIN"/></a></div>
+</c:if
+>				<hr class="menuseparator"/>
+				<div class="menuitem"><span onclick="return generateQueryLink(event, '<fmt:message key="permalink"/>', 'dlform-${label}');"><fmt:message key="permalink"/></span></div>
+			</div></div>
+<c:if test="${(fn:length(rs.rows) > 0) && rs.query.type.resultType == 'SINGLE' && currentConnection.submitEnabled && currentConnection.type.customQuerySupported && not isdiff && not empty rs.query.attributes['formatter']}"
+>			<form class="filter" action="db/${currentConnection.linkName}/submit-${currentConnection.type}.html" method="post" onsubmit="return setFieldContent('stmt-${label}', 'text-${label}');">
+				<input id="stmt-${label}" type="hidden" name="statement" value=""/>
+				<input type="submit" value="<fmt:message key="sqlQuery"/>"/>
+			</form> 
+</c:if
+>			<form class="filter" id="dlform-${label}" action="db/${currentConnection.linkName}/query-export.html" method="get" onsubmit="return false;">
+				<input type="hidden" name="q" value="${rs.query.name}"/>
+				<input type="hidden" name="index" value="${rs.subQueryIndex}"/>
+				<input id="resultfmt${label}" type="hidden" name="format" value=""/>
+				<ui:hidden items="${model.params}" name="params"/>
+<c:if test="${isdiff}"
+>				<input type="hidden" name="connection2" value="${connection2}"/>
+				<ui:hidden items="${model.params2}" name="params2"/>
+</c:if><c:if test="${(fn:length(rs.rows) > 0) && (rs.query.type.resultType == 'SINGLE' || not empty downloadFormats)}"
+>				<span class="menu" onclick="return showElementMenu(event, 'tools-${label}');"><fmt:message key="download"/></span>
+</c:if><c:if test="${(fn:length(rs.rows) > 0) && rs.query.type.resultType == 'SINGLE' && not isdiff && rs.query.attributes['formatter'] != 'HTML'}"
+><c:choose><c:when test="${not empty rs.query.attributes['formatter']}"
+>				<div id="outline-${label}" class="hidden"><div class="menuitem"><fmt:message key="noOutline"/></div></div>
+				&nbsp; <span class="menu" onclick="return showOutline(event, '${label}');"><fmt:message key="outline"/></span>
+				&nbsp; <input id="format-${label}" type="checkbox" name="dummy1" value="true"<c:if test="${rs.attributes['formatting']}"> checked="checked"</c:if> onchange="toggleFormatMode('${rs.query.name}', ${rs.attributes['formatting'] ? 'false' : 'true'});"/> <label for="format-${label}"><fmt:message key="format"><fmt:param value="${rs.query.attributes['formatter']}"/></fmt:message></label>
+</c:when><c:otherwise
+>				&nbsp; <label for="formatter-${label}"><fmt:message key="formatter"/></label> <select id="formatter-${label}" name="dummy0" onchange="toggleFormatter('${rs.query.name}', 'formatter-${label}');">
+					<option value=""><fmt:message key="default"/></option>
+<c:forEach items="${formatters}" var="v"
+>					<option value="${v}"<c:if test="${rs.attributes['formatter'] == v}"> selected="selected"</c:if>><fmt:message key="${v}"/></option>
+</c:forEach
+>				</select>
+</c:otherwise></c:choose
+>				&nbsp; <input id="coloring-${label}" type="checkbox" name="dummy2" value="true"<c:if test="${rs.attributes['syntaxColoring']}"> checked="checked"</c:if> onchange="toggleColoringMode('${rs.query.name}', ${rs.attributes['syntaxColoring'] ? 'false' : 'true'});"/> <label for="coloring-${label}"><fmt:message key="coloring"/></label>
+				&nbsp; <input id="humanReadable-${label}" type="checkbox" name="dummy3" value="true"<c:if test="${rs.attributes['humanReadable']}"> checked="checked"</c:if> onchange="toggleHumanReadableMode('${rs.query.name}', ${rs.attributes['humanReadable'] ? 'false' : 'true'});"/> <label for="humanReadable-${label}"><fmt:message key="humanReadable"/></label>
+				&nbsp; <input id="lineno-${label}" type="checkbox" name="dummy4" value="true"<c:if test="${rs.attributes['lineNumbers']}"> checked="checked"</c:if> onchange="toggleLineNumberMode('${rs.query.name}', ${rs.attributes['lineNumbers'] ? 'false' : 'true'});"/> <label for="lineno-${label}"><fmt:message key="lineno"/></label>
+</c:if><c:if test="${(fn:length(rs.rows) > 0) && rs.query.type.resultType == 'TABLE' && rs.query.type != 'REPORT'}"
+>				&nbsp; <input id="trim-${label}" type="checkbox" name="dummy5" value="true"<c:if test="${rs.attributes['trim']}"> checked="checked"</c:if> onchange="toggleTrimColumnsMode('${rs.query.name}', ${rs.attributes['trim'] ? 'false' : 'true'});"/> <label for="trim-${label}"><fmt:message key="trim"/></label>
+</c:if><c:if test="${currentUser.sqlDisplayEnabled}"
+>				&nbsp; <span class="button" onclick="showDbDialog(event, 'sql', { q: '${rs.query.name}' }, '${rs.query.name}');"><fmt:message key="showSQL"/></span>
+</c:if
+>				&nbsp; <span class="nowrap"><fmt:message key="duration"><fmt:param value="${rs.queryTime}"/></fmt:message></span>
+<c:if test="${rs.moreAvailable}"
+>				&nbsp; <strong><fmt:message key="moreData"/></strong>
+</c:if
+>			</form><hr/>
+		</div>
+		<div class="tab-body">
+		<c:choose><%--
+***********************************************************************
+*
+* No data returned
+*
+***********************************************************************
+--%><c:when test="${fn:length(rs.rows) == 0}"
+><strong><fmt:message key="noData"/></strong></c:when
+><%--
+***********************************************************************
+*
+* Single value returned (preformatted HTML)
+*
+***********************************************************************
+--%><c:when test="${rs.query.type.resultType == 'SINGLE' && rs.query.attributes['formatter'] == 'WIKI'}"
+><div class="wiki">${rs.firstValue}</div></c:when
+><c:when test="${rs.query.type.resultType == 'SINGLE' && rs.query.attributes['formatter'] == 'HTML'}"
+><div id="text-${label}" class="hidden">${rs.firstValue}</div><iframe id="html-${label}" class="result"></iframe></c:when
+><c:when test="${rs.query.type.resultType == 'SINGLE'}"
+><pre id="text-${label}" class="code">${rs.firstValue}</pre></c:when
+><%--
+***********************************************************************
+*
+* Single row editor
+*
+***********************************************************************
+--%><c:when test="${(rs.query.type == 'ROW_EDITOR') && currentConnection.writable}"
+><span class="button" onclick="showUpdateDialog(event, '${rs.query.attributes['tableCatalog']}', '${rs.query.attributes['tableSchema']}', '${rs.query.attributes['tableName']}', '${rs.firstValue}', '${rs.query.name}');"><fmt:message key="updateRow"/></span>
+<ui:result-row rs="${rs}" label="${label}" columns="3" targetElement="${targetElement}"/></c:when
+><%--
+***********************************************************************
+*
+* Map (name, value)
+*
+***********************************************************************
+--%><c:when test="${rs.query.type.resultType == 'KEYVALUE'}"
+><ui:result-map rs="${rs}" label="${label}" columns="3" targetElement="${targetElement}"/></c:when
+><%--
+***********************************************************************
+*
+* Single row (name, value)
+*
+***********************************************************************
+--%><c:when test="${rs.query.type.resultType == 'ROW'}"
+><ui:result-row rs="${rs}" label="${label}" columns="3" targetElement="${targetElement}"/></c:when
+><%--
+***********************************************************************
+*
+* Report (row count only)
+*
+***********************************************************************
+--%><c:when test="${rs.query.type == 'REPORT'}"
+><div class="message"><fmt:message key="dataOnDownload"><fmt:param value="${rs.firstValue}"/></fmt:message></div></c:when
+><%--
+***********************************************************************
+*
+* Result with aggregation and filtering
+*
+***********************************************************************
+--%><c:when test="${rs.query.type == 'EDITABLE'}"
+><ui:result-aggregate rs="${rs}" label="${label}" params="${detailParams}" paramString="${detailParamString}" targetElement="${targetElement}"/></c:when
+><%--
+***********************************************************************
+*
+* Transposed table
+*
+***********************************************************************
+--%><c:when test="${rs.query.type == 'TRANSPOSED'}"
+><ui:result-transposed rs="${rs}" label="${label}" params="${detailParams}" paramString="${detailParamString}" detailLink="${detailLink}" targetElement="${targetElement}"/></c:when
+><%--
+***********************************************************************
+*
+* Static tree
+*
+***********************************************************************
+--%><c:when test="${rs.query.type.resultType == 'HIERARCHICAL'}"
+><ui:result-statictree rs="${rs}" label="${label}" root="${rs}" targetElement="${targetElement}"/></c:when
+><%--
+***********************************************************************
+*
+* Drill down view
+*
+***********************************************************************
+--%><c:when test="${rs.query.type == 'DRILLDOWN'}"
+><ui:result-table rs="${rs}" label="${label}" params="${detailParams}" paramString="${detailParamString}" detailLink="${detailLink}" targetElement="drilldown0"/>
+<div id="drilldown0"></div></c:when
+><%--
+***********************************************************************
+*
+* Record editor
+*
+***********************************************************************
+--%><c:when test="${(rs.query.type == 'EDITOR' || rs.query.type == 'GROUPED_EDITOR') && currentConnection.writable}"
+><span class="button" onclick="showInsertDialog(event, '${rs.query.attributes['tableCatalog']}', '${rs.query.attributes['tableSchema']}', '${rs.query.attributes['tableName']}', '${rs.query.name}');"><fmt:message key="insertRow"/></span>
+<ui:result-table rs="${rs}" label="${label}" params="${detailParams}" paramString="${detailParamString}" detailLink="${detailLink}" targetElement="${targetElement}" catalogName="${rs.query.attributes['tableCatalog']}" schemaName="${rs.query.attributes['tableSchema']}" objectName="${rs.query.attributes['tableName']}" pkColumns="${pkColumns}"/></c:when
+><%--
+***********************************************************************
+*
+* Other result types
+*
+***********************************************************************
+--%><c:otherwise
+><ui:result-table rs="${rs}" label="${label}" params="${detailParams}" paramString="${detailParamString}" detailLink="${detailLink}" targetElement="${targetElement}"/></c:otherwise></c:choose
+></div></c:when><%--
+***********************************************************************
+*
+* Related queries
+*
+***********************************************************************
+--%><c:when test="${rs.subQueryIndex == -1}"
+><ui:result-related rs="${rs}" params="${detailParams}" paramString="${detailParamString}" targetElement="${targetElement}" tab="true"/></c:when><%--
+***********************************************************************
+*
+* Graph
+*
+***********************************************************************
+--%><c:when test="${rs.subQueryIndex == -2}"
+><ui:result-graph rs="${rs}" label="${label}" params="${detailParams}" paramString="${detailParamString}" detailLink="${detailLink}" tab="true"/></c:when><%--
+***********************************************************************
+*
+* Tree
+*
+***********************************************************************
+--%><c:when test="${rs.subQueryIndex == -3}"
+><div class="tab-header">
+			<div id="tools-${label}" class="hidden"><div class="menucolumn">
+<c:forEach items="${downloadFormats}" var="f"
+>				<div class="menuitem"><span onclick="return postForm('dlform-${label}', event, 'db/${currentConnection.linkName}/query-export.html', {resultfmt${label}:'${f}'}, '_blank');"><fmt:message key="${f}"/></span></div>
+</c:forEach
+><c:if test="${(fn:length(rs.rows) > 0) && rs.query.type.resultType == 'SINGLE'}"
+>				<div class="menuitem"><span onclick="return downloadElement('text-${label}', 'text/plain;charset=utf-8');"><fmt:message key="PLAIN"/></span></div>
+</c:if
+>				<hr class="menuseparator"/>
+				<div class="menuitem"><span onclick="return generateQueryLink(event, '<fmt:message key="permalink"/>', 'dlform-${label}');"><fmt:message key="permalink"/></span></div>
+			</div></div>
+			<form class="filter" id="dlform-${label}" action="db/${currentConnection.linkName}/query-export.html" method="get" onsubmit="return false;">
+				<input type="hidden" name="q" value="${rs.query.name}"/>
+				<input type="hidden" name="index" value="${rs.subQueryIndex}"/>
+				<input id="resultfmt${label}" type="hidden" name="format" value=""/>
+				<ui:hidden items="${model.params}" name="params"/>
+<c:if test="${(fn:length(rs.rows) > 0) && (not empty downloadFormats)}"
+>				<span class="menu" onclick="return showElementMenu(event, 'tools-${label}');"><fmt:message key="download"/></span>
+</c:if><c:if test="${currentUser.sqlDisplayEnabled}"
+>				&nbsp; <span class="button" onclick="showDbDialog(event, 'sql', { q: '${rs.query.name}' }, '${rs.query.name}');"><fmt:message key="showSQL"/></span>
+</c:if
+>				&nbsp; <span class="nowrap"><fmt:message key="duration"><fmt:param value="${rs.queryTime}"/></fmt:message></span>
+<c:if test="${rs.moreAvailable}"
+>				&nbsp; <strong><fmt:message key="moreData"/></strong>
+</c:if
+>			</form><hr/>
+		</div>
+		<div class="tab-body"><c:choose
+			><c:when test="${fn:length(rs.rows) == 0}"
+				><strong><fmt:message key="noData"/></strong></c:when
+			><c:otherwise><div id="treeselection">${label}-<c:forEach items="${rs.attributes['expandLevels']}" var="l" varStatus="st"
+				><c:set var="rowid" value="${fn:contains(l, ' ') ? fn:substringBefore(l, ' ') : l}"
+				/><c:if test="${!st.first}">-</c:if
+					>${fn:escapeXml(rowid)}</c:forEach
+				></div>
+				<ui:result-tree rs="${rs}" label="${label}" level="1" first="true" targetElement="${targetElement}"/></c:otherwise
+		></c:choose></div></c:when><%--
+***********************************************************************
+*
+* Multilevel
+*
+***********************************************************************
+--%><c:when test="${rs.subQueryIndex == -4}"
+><ui:result-multilevel rs="${rs}" level="${(level == null) ? 1 : level}" left="${left}" label="${label}" targetElement="${targetElement}"/></c:when
+></c:choose>

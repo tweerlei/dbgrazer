@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+	Configuration for the Spring dispatcher servlet
+	May refer to beans defined in application-context.xml
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+		"
+	>
+	
+	<!--
+		Web MVC configuration
+	-->
+	
+	<!-- View name translator: Translate request URLs to view names -->
+	<bean id="viewNameTranslator" class="de.tweerlei.dbgrazer.web.support.ViewNameResolver">
+	</bean>
+	
+	<!-- View resolver: Maps view names returned by the controller to JSP names -->
+	<bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
+		<property name="prefix" value="/WEB-INF/jsp/"/>
+		<property name="suffix" value=".jsp"/>
+	</bean>
+	
+	<!-- Multipart resolver for handling file uploads -->
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<property name="maxUploadSize" value="10485760"/>
+		<property name="maxInMemorySize" value="1048576"/>
+		<!--property name="uploadTempDir" value="/var/opt/imagedb/uploads"/-->
+	</bean>
+	
+	<!--
+		The ModelInterceptor adds common attributes to all views.
+		To achieve this for error views, it is registered as ExceptionResolver as well as Interceptor.
+	-->
+	<bean id="exceptionResolver" class="de.tweerlei.dbgrazer.web.support.ModelInterceptor">
+		<property name="excludedPaths">
+			<!-- Paths the user should not be redirected to after login or choosing a connection -->
+			<list>
+				<value>ajax/</value>
+				<value>login.html</value>
+				<value>logout.html</value>
+				<value>logoff.html</value>
+				<value>relogin.html</value>
+				<value>profile.html</value>
+				<value>switch.html</value>
+				<value>reload-</value>
+				<value>remove-</value>
+				<value>db/ajax/</value>
+				<value>db/csv.html</value>
+				<value>db/chart.html</value>
+				<value>db/graph.html</value>
+				<value>db/graph-source.html</value>
+				<value>db/dbgraph.html</value>
+				<value>db/dbgraph-source.html</value>
+				<value>db/dbexport.html</value>
+				<value>db/submit-csv.html</value>
+				<value>db/submit-chart.html</value>
+				<value>db/submit-sql.html</value>
+				<value>db/reload-</value>
+				<value>db/rename-</value>
+				<value>db/remove-</value>
+			</list>
+		</property>
+		<property name="ajaxPaths">
+			<!-- Paths that don't return complete pages but are loaded via AJAX -->
+			<list>
+				<value>ajax/</value>
+				<value>db/ajax/</value>
+			</list>
+		</property>
+		<property name="authPaths">
+			<!-- Paths that require HTTP basic auth -->
+			<list>
+				<value>ws/</value>
+			</list>
+		</property>
+	</bean>
+	
+	<!-- Handler mapping: Determine handler methods for incoming requests -->
+	<bean id="handlerMapping" class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping">
+    	<!-- Interpret RequestMapping values as absolute paths rather than relative to the servlet mapping -->
+    	<property name="alwaysUseFullPath" value="true"/>
+		<property name="interceptors">
+			<list>
+				<!-- Initialize the RequestSettings object -->
+				<bean class="de.tweerlei.dbgrazer.web.support.RequestSettingsInterceptor"></bean>
+				<ref bean="exceptionResolver"/>
+				<!--
+					Log the request if a session is present.
+					Added last because previous interceptors might create the session or redirect to another page.
+				-->
+				<bean class="de.tweerlei.dbgrazer.web.support.RequestLoggerInterceptor"></bean>
+			</list>
+		</property>
+	</bean>
+	
+	<!-- Handler adapter: Map request parameters to handler method parameters -->
+    <bean id="handlerAdapter" class="de.tweerlei.spring.web.handler.ExceptionResolvingHandlerAdapter">
+    	<!-- Interpret RequestMapping values as absolute paths rather than relative to the servlet mapping -->
+    	<property name="alwaysUseFullPath" value="true"/>
+    	<!-- When an exception occurs, show the error view, passing the exception as attribute -->
+		<!--property name="errorView" value="error"/-->
+		<property name="exceptionAttribute" value="exception"/>
+		<property name="exceptionResolver" ref="exceptionResolver"/>
+    </bean>
+	
+	<!-- Locale resolver: Allow the preferred locale to be stored in a session attribute -->
+	<bean id="localeResolver" class="org.springframework.web.servlet.i18n.SessionLocaleResolver">
+		<!--property name="defaultLocale" value="US"/-->
+	</bean>
+	
+	<!-- Determine available theme names -->
+	<bean id="themeEnumerator" class="de.tweerlei.dbgrazer.web.support.ThemeSourceConfigurator">
+	</bean>
+	
+	<!-- Resolve current theme from a session attribute -->
+	<bean id="themeResolver" class="de.tweerlei.spring.web.handler.ValidatingSessionThemeResolver">
+		<constructor-arg ref="themeEnumerator"/>
+	</bean>
+	
+	<!-- Loads theme definitions from the file system and falls back to the build-in theme -->
+	<bean id="themeSource" class="de.tweerlei.spring.web.handler.ReloadableResourceBundleThemeSource">
+		<!--property name="basenamePrefix" value="de.tweerlei.dlmanager.web.resource.themes."/-->
+		<property name="defaultEncoding" value="UTF-8"/>
+		<!--property name="fallbackToSystemLocale" value="false"/-->
+		<property name="parentMessageSource">
+			<bean class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+				<property name="basename" value="classpath:de/tweerlei/dbgrazer/web/theme"/>
+				<property name="defaultEncoding" value="UTF-8"/>
+				<property name="fallbackToSystemLocale" value="false"/>
+			</bean>
+		</property>
+	</bean>
+	
+	<!-- Time zone resolver: Allow the preferred time zone to be stored in a session attribute -->
+	<bean id="timeZoneResolver" class="de.tweerlei.spring.web.handler.SessionTimeZoneResolver">
+		<!--property name="defaultTimeZone" value="Europe/Berlin"/-->
+	</bean>
+	
+	<!-- Facade for the localeResolver, themeResolver and timeZoneResolver -->
+	<bean id="requestSettingsService" class="de.tweerlei.spring.web.service.impl.RequestSettingsServiceImpl">
+	</bean>
+	
+	<!-- Scan for annotated components in these packages -->
+	<context:component-scan base-package="de.tweerlei.dbgrazer.web.controller"/>
+	<context:component-scan base-package="de.tweerlei.dbgrazer.web.extension"/>
+	<context:component-scan base-package="de.tweerlei.dbgrazer.web.taglib"/>
+	
+	<context:component-scan base-package="de.tweerlei.spring.web.taglib"/>
+	<!-- Request scoped beans, so proxy them -->
+	<context:component-scan base-package="de.tweerlei.spring.web.view" scoped-proxy="interfaces"/>
+	
+</beans>

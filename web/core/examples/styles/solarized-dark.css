@@ -1,0 +1,762 @@
+/********************************************************************
+ *
+ * Solarized dark theme (http://ethanschoonover.com/solarized)
+ *
+ * base03    #002b36
+ * base02    #073642
+ * base01    #586e75
+ * (base00    #657b83)
+ * base0     #839496
+ * base1     #93a1a1
+ * (base2     #eee8d5)
+ * (base3     #fdf6e3)
+ * yellow    #b58900
+ * orange    #cb4b16
+ * red       #dc322f
+ * magenta   #d33682
+ * violet    #6c71c4
+ * blue      #268bd2
+ * cyan      #2aa198
+ * green     #859900
+ *
+ ********************************************************************/
+
+/********************************************************************
+ *
+ * Elements
+ *
+ ********************************************************************/
+
+body {
+	font-family: Verdana, Arial, sans-serif;
+	font-size: 8pt;
+	line-height: 1.5em;
+	background-color: #073642;
+	color: #93a1a1;
+}
+
+pre, textarea {
+	font-family: "Courier New", monospace;
+	tab-size: 4;
+	-moz-tab-size: 4;
+}
+
+input, select {
+	font-family: inherit;
+}
+
+th, td {
+	border: 1px solid #073642;
+}
+
+thead tr, tfoot tr {
+	background-color: #002b36;
+	color: #839496;
+	font-weight: bold;
+}
+
+tbody>tr:nth-child(odd) {
+	background-color: #073642;
+	color: #93a1a1;
+}
+
+tbody>tr:nth-child(even) {
+	background-color: #002b36;
+	color: #839496;
+}
+
+dt {
+	font-weight: bold;
+}
+
+input, select, textarea {
+	border: 1px solid #073642;
+	background-color: #002b36;
+	color: #839496;
+	font-size: inherit;
+}
+
+input:disabled, textarea:disabled, select:disabled {
+	background-color: #073642;
+	color: #586e75;
+}
+
+input[type="text"]:focus, input[type="password"]:focus, textarea:focus, select:focus {
+	border: 1px solid #cb4b16;
+}
+
+input[type="submit"], input[type="reset"], input[type="button"] {
+	background-color: #839496;
+	color: #002b36;
+	cursor: pointer;
+}
+
+input[type="submit"]:disabled, input[type="reset"]:disabled, input[type="button"]:disabled {
+	background-color: #839496;
+	color: #586e75;
+}
+
+input[type="checkbox"], input[type="radio"] {
+	display: none;
+}
+
+input[type="checkbox"] + label:before, input[type="radio"] + label:before {
+	content: "\002610\00a0";
+}
+
+input[type="checkbox"]:checked + label:before, input[type="radio"]:checked + label:before {
+	content: "\002612\00a0";
+}
+
+a {
+	color: inherit;
+}
+
+h1 {
+	font-size: 1.2em;
+	color: #93a1a1;
+}
+
+h2 {
+	font-size: 1.1em;
+	color: #93a1a1;
+}
+
+h3 {
+	font-size: 1em;
+	color: #93a1a1;
+}
+
+em {
+	font-weight: bold;
+	font-style: normal;
+}
+
+strong {
+	color: #dc322f;
+	font-weight: bold;
+}
+
+/********************************************************************
+ *
+ * Header and footer
+ *
+ ********************************************************************/
+
+#header {
+	background-color: #839496;
+	color: #002b36;
+}
+
+#header a {
+	text-decoration: none;
+}
+
+.header-logo {
+	font-size: 1.2em;
+	font-weight: bold;
+}
+
+.header-left {
+	font-weight: bold;
+}
+
+.header-right {
+	font-weight: bold;
+}
+
+/********************************************************************
+ *
+ * Content
+ *
+ ********************************************************************/
+
+.h1-buttons {
+	color: #93a1a1;
+}
+
+.h1-buttons .action {
+	font-size: 1.2em;
+}
+
+.h1-actions {
+	color: #93a1a1;
+}
+
+.h1-actions .action {
+	font-size: 1.2em;
+}
+
+.h2-buttons {
+	color: #93a1a1;
+}
+
+.h2-buttons .action {
+	font-size: 1.1em;
+}
+
+.h2-actions {
+	color: #93a1a1;
+}
+
+.h2-actions .action {
+	font-size: 1.1em;
+}
+
+/********************************************************************
+ *
+ * Menu
+ *
+ ********************************************************************/
+
+#menu {
+	background-color: #839496;
+	color: #002b36;
+}
+
+#menu a {
+	text-decoration: none;
+}
+
+.menuitem:hover {
+	background-color: #073642;
+	color: #93a1a1;
+}
+
+.menuseparator {
+	border-width: 1px 0px 0px 0px;
+	border-style: solid;
+	border-color: #073642;
+}
+
+span.menu {
+	background-color: #839496;
+	color: #002b36;
+}
+
+span.menu:after {
+	content: "\00a0\0025bc";
+}
+
+span.button {
+	background-color: #839496;
+	color: #002b36;
+}
+
+/********************************************************************
+ *
+ * Popup
+ *
+ ********************************************************************/
+
+#popup {
+	border: 1px solid #073642;
+	background-color: #002b36;
+	color: #839496;
+}
+
+/********************************************************************
+ *
+ * Tool tips
+ *
+ ********************************************************************/
+
+#tooltip {
+	background-color: #cb4b16;
+	color: #002b36;
+}
+
+/********************************************************************
+ *
+ * Dialog
+ *
+ ********************************************************************/
+
+#overlay {
+	background-color: #93a1a1;
+	opacity: 0.5;
+}
+
+#dialog {
+	border: 1px solid #073642;
+	background-color: #002b36;
+	color: #839496;
+}
+
+#dialog-title {
+	background-color: #cb4b16;
+	color: #002b36;
+}
+
+#dialog-name {
+	font-weight: bold;
+}
+
+#dialog-close {
+	font-weight: bold;
+}
+
+/********************************************************************
+ *
+ * Tab controls
+ *
+ ********************************************************************/
+
+.tab {
+	background-color: #002b36;
+	color: #839496;
+	border-left: 1px solid #073642;
+	border-bottom: 1px solid #073642;
+}
+
+.tab:nth-child(1) {
+	border-left: none;
+}
+
+.tab-active {
+	background-color: #cb4b16;
+	color: #002b36;
+}
+
+.tab-page {
+	background-color: #002b36;
+	color: #839496;
+}
+
+.tab-page input[type="submit"], .tab-page input[type="reset"], .tab-page input[type="button"] {
+	background-color: #586e75;
+	color: #002b36;
+}
+
+.tab-page input[type="submit"]:disabled, .tab-page input[type="reset"]:disabled, .tab-page input[type="button"]:disabled {
+	background-color: #586e75;
+	color: #073642;
+}
+
+.tab-page span.menu {
+	background-color: #586e75;
+	color: #002b36;
+}
+
+.tab-page span.button {
+	background-color: #586e75;
+	color: #002b36;
+}
+
+/********************************************************************
+ *
+ * Combo box controls
+ *
+ ********************************************************************/
+
+.combo-head {
+	background-color: #073642;
+	color: #93a1a1;
+}
+
+.combo-head select {
+	background-color: #073642;
+	color: #93a1a1;
+	border: 0em;
+}
+
+/********************************************************************
+ *
+ * Dashboard
+ *
+ ********************************************************************/
+
+.dashboard-tab {
+	background-color: #073642;
+	color: #93a1a1;
+}
+
+.dashboard-body {
+	border: 1px solid #073642;
+}
+
+/********************************************************************
+ *
+ * Result tables
+ *
+ ********************************************************************/
+
+td.heading {
+	font-weight: bold;
+}
+
+th.table-sorted-asc:after {
+	content: "\00a0\002191";
+}
+
+th.table-sorted-desc:after {
+	content: "\00a0\002193";
+}
+
+tbody tr.highlight, tbody td.highlight {
+	background-color: #cb4b16;
+	color: #002b36;
+}
+
+tbody tr.crosshair, tbody td.crosshair {
+	background-color: #586e75;
+	color: #002b36;
+}
+
+/********************************************************************
+ *
+ * Result lists
+ *
+ ********************************************************************/
+
+div.subheading {
+	font-weight: bold;
+	border-bottom: 1px dotted #839496;
+}
+
+dl.result dt {
+	font-weight: bold;
+}
+
+dl.result>dd:nth-child(4n) {
+	background-color: #002b36;
+	color: #839496;
+}
+
+dl.result>dd:nth-child(4n+2) {
+	background-color: #073642;
+	color: #93a1a1;
+}
+
+/********************************************************************
+ *
+ * Result tree
+ *
+ ********************************************************************/
+
+.treedetails {
+	color: #93a1a1;
+}
+
+/********************************************************************
+ *
+ * Code blocks
+ *
+ ********************************************************************/
+
+pre.code span.no {
+	background-color: #073642;
+	border-right: 1px solid #93a1a1;
+}
+
+pre.code span.errno {
+	background-color: #073642;
+	border-right: 1px solid #93a1a1;
+}
+
+pre.code span.errmsg {
+	background-color: #dc322f;
+	color: #002b36;
+}
+
+/********************************************************************
+ *
+ * Date picker
+ *
+ ********************************************************************/
+
+.calendar_date_select {
+	background-color: #839496;
+	color: #002b36;
+}
+
+.calendar_date_select .cds_header a {
+	text-decoration: none;
+	font-size: 1.2em;
+}
+
+.calendar_date_select th {
+	background-color: #839496;
+}
+
+.calendar_date_select td {
+	background-color: #002b36;
+	color: #839496;
+}
+.calendar_date_select td:hover {
+	background-color: #073642;
+	color: #93a1a1;
+}
+.calendar_date_select td.weekend {
+	background-color: #073642;
+	color: #93a1a1;
+}
+.calendar_date_select td.weekend:hover {
+	background-color: #002b36;
+	color: #839496;
+}
+.calendar_date_select td.selected {
+	background-color: #586e75;
+	color: #002b36;
+}
+
+.calendar_date_select td div {
+	color: #839496;
+}
+.calendar_date_select td div.other {
+	color: #586e75;
+}
+.calendar_date_select td.selected div {
+	color: #002b36;
+}
+.calendar_date_select td.today div {
+	color: #dc322f;
+}
+.calendar_date_select td.disabled div {
+	color: #586e75;
+}
+
+.calendar_date_select .cds_buttons {
+	background-color: #586e75;
+}
+
+.calendar_date_select .cds_footer {
+	background-color: #586e75;
+}
+
+/********************************************************************
+ *
+ * Result coloring
+ *
+ ********************************************************************/
+
+tbody tr.colored-black {
+	background-color: black;
+	color: white;
+}
+
+tbody tr.colored-gray {
+	background-color: gray;
+	color: white;
+}
+
+tbody tr.colored-silver {
+	background-color: silver;
+	color: black;
+}
+
+tbody tr.colored-white {
+	background-color: white;
+	color: black;
+}
+
+tbody tr.colored-red {
+	background-color: red;
+	color: white;
+}
+
+tbody tr.colored-yellow {
+	background-color: yellow;
+	color: black;
+}
+
+tbody tr.colored-lime {
+	background-color: lime;
+	color: black;
+}
+
+tbody tr.colored-aqua {
+	background-color: aqua;
+	color: black;
+}
+
+tbody tr.colored-blue {
+	background-color: blue;
+	color: white;
+}
+
+tbody tr.colored-fuchsia {
+	background-color: fuchsia;
+	color: white;
+}
+
+tbody tr.colored-maroon {
+	background-color: maroon;
+	color: white;
+}
+
+tbody tr.colored-olive {
+	background-color: olive;
+	color: white;
+}
+
+tbody tr.colored-green {
+	background-color: green;
+	color: white;
+}
+
+tbody tr.colored-teal {
+	background-color: teal;
+	color: white;
+}
+
+tbody tr.colored-navy {
+	background-color: navy;
+	color: white;
+}
+
+tbody tr.colored-purple {
+	background-color: purple;
+	color: white;
+}
+
+tbody tr.colored-orange {
+	background-color: orange;
+	color: black;
+}
+
+tbody tr.diff-add {
+	color: #859900;
+	font-weight: bold;
+}
+
+tbody tr.diff-del {
+	color: #dc322f;
+	font-weight: bold;
+}
+
+/********************************************************************
+ *
+ * Syntax coloring
+ *
+ ********************************************************************/
+
+.xml-tag {
+	color: #cb4b16;
+	font-weight: bold;
+}
+
+.xml-attr {
+	color: #cb4b16;
+	font-weight: bold;
+}
+
+.xml-value {
+	color: #859900;
+	font-weight: bold;
+}
+
+.xml-comment {
+	color: #586e75;
+}
+
+.json-key {
+	color: #cb4b16;
+	font-weight: bold;
+}
+
+.json-value {
+	color: #859900;
+	font-weight: bold;
+}
+
+.json-comment {
+	color: #586e75;
+}
+
+.sql-word {
+	color: #cb4b16;
+	font-weight: bold;
+}
+
+.sql-literal {
+	color: #859900;
+}
+
+.sql-comment {
+	color: #586e75;
+}
+
+.diff-hunk {
+	color: #268bd2;
+}
+
+.diff-add {
+	color: #859900;
+	font-weight: bold;
+}
+
+.diff-del {
+	color: #dc322f;
+	font-weight: bold;
+}
+
+/********************************************************************
+ *
+ * Links
+ *
+ ********************************************************************/
+
+a.action {
+	text-decoration: none;
+}
+
+a.external {
+	color: #6c71c4;
+}
+
+a.external:before {
+	content: "\0027a4\00a0";
+}
+
+span.link {
+	text-decoration: underline;
+}
+
+/********************************************************************
+ *
+ * Other classes
+ *
+ ********************************************************************/
+
+#fullscreen {
+	background-color: #002b36;
+}
+
+.error {
+	background-color: #dc322f;
+	color: #073642;
+}
+
+.error a {
+	text-decoration: none;
+	font-weight: bold;
+}
+
+.notice {
+	background-color: #cb4b16;
+	color: #002b36;
+}
+
+.match {
+	background-color: #dc322f;
+}
+
+.wait:before {
+	content: "\00231b\00a0";
+	font-size: 2em;
+}
+
+.warn {
+	color: #dc322f;
+	font-weight: bold;
+}
+
+.warn:before {
+	content: "\0026a0\00a0";
+	font-size: 2em;
+}
+
+.plan-title {
+	font-weight: bold;
+}

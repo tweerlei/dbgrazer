@@ -1,0 +1,84 @@
+<%--
+ * Copyright 2018 tweerlei Wruck + Buchmeier GbR - http://www.tweerlei.de/
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+--%><%--
+
+	Page header and menu bar
+
+--%><%@
+	include file="html-header.jspf"
+%>
+	<div id="header" class="hideable">
+<c:choose><c:when test="${currentConnection.linkName == null}"
+>		<div class="header-logo">
+			<a href="index.html"><fmt:message key="appName"/></a>
+		</div>
+<c:if test="${!loginRequired || currentUser.principal != null}"
+>		<div class="header-right">
+			<span class="menu" onclick="return showTopMenuRight(event, 'connections');"><fmt:message key="chooseConnection"/></span>
+		</div>
+</c:if></c:when><c:otherwise
+>		<div class="header-logo">
+			<a href="db/${currentConnection.linkName}/index.html"><fmt:message key="appName"/></a>
+		</div>
+		<div class="header-left">
+			<span class="menu" onclick="return showDbMenu(event, 'lists');"><fmt:message key="lists"/></span>
+		</div>
+		<div class="header-left">
+			<span class="menu" onclick="return showDbMenu(event, 'views');"><fmt:message key="views"/></span>
+		</div>
+		<div class="header-left">
+			<span class="menu" onclick="return showDbMenu(event, 'queries');"><fmt:message key="queries"/></span>
+		</div>
+<c:if test="${currentConnection.writable}"
+>		<div class="header-left">
+			<span class="menu" onclick="return showDbMenu(event, 'actions');"><fmt:message key="actions"/></span>
+		</div>
+</c:if><c:if test="${historyEnabled}"
+>		<div class="header-left">
+			<span class="menu" onclick="return showDbMenu(event, 'history');"><fmt:message key="history"/></span>
+		</div>
+</c:if><c:forEach items="${menuExtensions}" var="i"
+>		<div class="header-left">
+			<c:choose
+				><c:when test="${not empty i.onclick}"><span class="menu" onclick="${fn:escapeXml(i.onclick)}"><fmt:message key="${i.label}"/></span></c:when
+				><c:otherwise><a href="${fn:escapeXml(i.href)}"><fmt:message key="${i.label}"/></a></c:otherwise
+			></c:choose>
+		</div>
+</c:forEach><c:if test="${currentConnection.editorEnabled || currentConnection.submitEnabled || currentConnection.browserEnabled}"
+>		<div class="header-left">
+			<span class="menu" onclick="return showDbMenu(event, 'edit');"><fmt:message key="edit"/></span>
+		</div>
+</c:if
+>		<div class="header-right">
+			<span class="menu" onclick="return showTopMenuRight(event, 'connections');"><fmt:message key="currentConnection"><fmt:param value="${currentConnection.description}"/></fmt:message></span>
+		</div>
+</c:otherwise></c:choose><c:if test="${loginEnabled}"><c:choose><c:when test="${currentUser.principal == null}"><c:if test="${!loginRequired}"
+>		<div class="header-right">
+			<span class="menu" onclick="return showTopMenu(event, 'user');"><fmt:message key="user"/></span>
+		</div>
+</c:if></c:when><c:otherwise
+>		<div class="header-right">
+			<span class="menu" onclick="return showTopMenu(event, 'user');"><fmt:message key="currentUser"><fmt:param value="${currentUser.principal.name}"/></fmt:message></span>
+		</div>
+<c:if test="${currentUser.linkEditorEnabled || currentUser.userEditorEnabled || currentUser.reloadEnabled}"
+>		<div class="header-right">
+			<span class="menu" onclick="return showTopMenu(event, 'admin');"><fmt:message key="admin"/></span>
+		</div>
+</c:if
+></c:otherwise></c:choose></c:if
+>		<hr/>
+	</div>
+	
+	<div id="main"><ui:errors label="" var="e"/>
