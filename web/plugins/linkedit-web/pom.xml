@@ -8,7 +8,7 @@
 	
 	<groupId>de.tweerlei</groupId>
 	<artifactId>dbgrazer-web-linkedit</artifactId>
-	<version>3.0</version>
+	<version>3.1-SNAPSHOT</version>
 	<packaging>war</packaging>
 	
 	<name>dbgrazer-web-linkedit</name>
@@ -18,7 +18,7 @@
 	<parent>
 		<groupId>de.tweerlei</groupId>
 		<artifactId>dbgrazer-pom-webapp</artifactId>
-		<version>3.0</version>
+		<version>3.1-SNAPSHOT</version>
 		<relativePath></relativePath>
 	</parent>
 	

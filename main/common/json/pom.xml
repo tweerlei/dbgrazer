@@ -8,7 +8,7 @@
 	
 	<groupId>de.tweerlei</groupId>
 	<artifactId>dbgrazer-common-json</artifactId>
-	<version>3.0</version>
+	<version>3.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	
 	<name>dbgrazer-common-json</name>
@@ -18,7 +18,7 @@
 	<parent>
 		<groupId>de.tweerlei</groupId>
 		<artifactId>dbgrazer-pom-library</artifactId>
-		<version>3.0</version>
+		<version>3.1-SNAPSHOT</version>
 		<relativePath></relativePath>
 	</parent>
 	
