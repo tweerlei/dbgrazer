@@ -27,6 +27,15 @@ Default layout of the configuration files is:
 	dialects/				Dialect-specific query definition files for the file-based queryLoaders
 
 
+Docker
+------
+
+You can build a Docker image that bundles the application with a Tomcat servlet container (see "Tomcat" below):
+  docker build -t dbgrazer .
+
+See Dockerfile for details.
+
+
 Tomcat
 ------
 

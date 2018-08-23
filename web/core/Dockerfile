@@ -6,7 +6,7 @@
 # Usage:
 #   mvn -P <profiles> clean package
 #   docker build -t dbgrazer .
-#   docker run --name dbgrazer -p <hostport>:8080 -v <hostpath>:/root/.dbgrazer dbgrazer
+#   docker run --name dbgrazer --rm -d -p <hostport>:8080 -v <hostpath>:/root/.dbgrazer dbgrazer
 #
 # For SSL support, replace examples/conf/server.jks with a keystore containing your certificate,
 # alias 'tomcat', password 'changeit'.
@@ -28,16 +28,16 @@ RUN apk add --no-cache graphviz msttcorefonts-installer
 RUN update-ms-fonts && fc-cache -f
 
 # Enable SSL and copy certificate
-ADD examples/conf/server.xml /usr/local/tomcat/conf/server.xml
-ADD examples/conf/server.jks /usr/local/tomcat/conf/server.jks
-ADD examples/conf/trust.jks /usr/local/tomcat/conf/trust.jks
+COPY examples/conf/server.xml /usr/local/tomcat/conf/server.xml
+COPY examples/conf/server.jks /usr/local/tomcat/conf/server.jks
+COPY examples/conf/trust.jks /usr/local/tomcat/conf/trust.jks
 
 # Autodeploy webapp
-ADD target/dbgrazer-web-1.0-SNAPSHOT.war /usr/local/tomcat/webapps/dbgrazer.war
+COPY target/dbgrazer-web-*.war /usr/local/tomcat/webapps/dbgrazer.war
 
 # Add static resources
-ADD examples/styles/*.css /usr/local/tomcat/webapps/ROOT/
+COPY examples/styles/*.css /usr/local/tomcat/webapps/ROOT/
 
 # Setup config directory
-ADD examples/*.properties /root/.dbgrazer/
-ADD examples/themes/*.properties /root/.dbgrazer/themes/
+COPY examples/*.properties /root/.dbgrazer/
+COPY examples/themes/*.properties /root/.dbgrazer/themes/
