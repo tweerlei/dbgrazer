@@ -33,6 +33,7 @@ import org.xml.sax.SAXException;
 
 import de.tweerlei.common.util.StringUtils;
 import de.tweerlei.common5.jdbc.model.QualifiedName;
+import de.tweerlei.common5.jdbc.model.TableDescription;
 import de.tweerlei.dbgrazer.extension.jdbc.MetadataService;
 import de.tweerlei.dbgrazer.extension.jdbc.MetadataService.ColumnMode;
 import de.tweerlei.dbgrazer.link.service.LinkService;
@@ -532,7 +533,7 @@ public class SchemaDiffController
 		if (flush)
 			metadataService.flushCache(conn);
 		
-		final Map<QualifiedName, String> tables = metadataService.getTables(conn, catalog, schema, filter);
+		final Map<QualifiedName, String> tables = metadataService.getTables(conn, catalog, schema, TableDescription.TABLE, filter);
 		p.setTodo(tables.size());
 		
 		return (new SQLSchema(catalog, schema, metadataService.getTableInfos(conn, tables.keySet(), null, ColumnMode.ALL, p)));

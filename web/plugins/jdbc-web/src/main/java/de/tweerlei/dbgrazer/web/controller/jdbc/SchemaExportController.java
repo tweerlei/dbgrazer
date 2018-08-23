@@ -160,7 +160,7 @@ public class SchemaExportController
 	
 	private Set<TableDescription> readSchema(String conn, String catalog, String schema, String filter)
 		{
-		final Map<QualifiedName, String> tables = metadataService.getTables(conn, catalog, schema, filter);
+		final Map<QualifiedName, String> tables = metadataService.getTables(conn, catalog, schema, TableDescription.TABLE, filter);
 		
 		return (metadataService.getTableInfos(conn, tables.keySet(), null, ColumnMode.ALL, null));
 		}

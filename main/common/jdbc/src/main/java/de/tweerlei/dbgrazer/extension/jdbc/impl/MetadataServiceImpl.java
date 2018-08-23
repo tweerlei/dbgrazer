@@ -180,13 +180,27 @@ public class MetadataServiceImpl implements MetadataService, ConfigListener, Lin
 	@Override
 	public SortedMap<QualifiedName, String> getTables(String link, String catalog, String schema)
 		{
-		return (getTables(link, catalog, schema, null));
+		return (getTables(link, catalog, schema, null, null));
 		}
 	
 	@Override
-	public SortedMap<QualifiedName, String> getTables(String link, String catalog, String schema, String filter)
+	public SortedMap<QualifiedName, String> getTables(String link, String catalog, String schema, String type)
+		{
+		return (getTables(link, catalog, schema, type, null));
+		}
+	
+	@Override
+	public SortedMap<QualifiedName, String> getTables(String link, String catalog, String schema, String type, String filter)
 		{
 		final SortedMap<QualifiedName, String> tables = getMetadataLoader(link).getTables(catalog, schema);
+		if (type != null)
+			{
+			for (Iterator<String> i = tables.values().iterator(); i.hasNext(); )
+				{
+				if (type.equals(i.next()))
+					i.remove();
+				}
+			}
 		if (!StringUtils.empty(filter))
 			{
 			try	{

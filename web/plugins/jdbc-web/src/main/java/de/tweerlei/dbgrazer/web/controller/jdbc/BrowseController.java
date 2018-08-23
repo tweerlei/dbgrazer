@@ -515,7 +515,7 @@ public class BrowseController
 	
 	private Map<String, TabItem<RowSet>> groupObjects(Query query, Map<QualifiedName, String> objects)
 		{
-		final Map<String, Set<String>> tmp = new TreeMap<String, Set<String>>();
+		final Map<String, Set<String>> tmp = new HashMap<String, Set<String>>();
 		
 		for (Map.Entry<QualifiedName, String> ent : objects.entrySet())
 			{
@@ -528,16 +528,16 @@ public class BrowseController
 			s.add(ent.getKey().getObjectName());
 			}
 		
-		final Map<String, TabItem<RowSet>> ret = new TreeMap<String, TabItem<RowSet>>();
+		final Map<String, TabItem<RowSet>> ret = new LinkedHashMap<String, TabItem<RowSet>>();
+		
+		// Make sure that "TABLE" is always the first entry, even if there are no tables
+		ret.put(TableDescription.TABLE, new TabItem<RowSet>(resultBuilder.createEmptyRowSet(query, 0, 0), 0));
 		
 		for (Map.Entry<String, Set<String>> ent : tmp.entrySet())
 			{
 			final RowSet rs = buildRowSet(query, ent.getValue(), false);
 			ret.put(ent.getKey(), new TabItem<RowSet>(rs, rs.getRows().size()));
 			}
-		
-		if (ret.isEmpty())
-			ret.put(TableDescription.TABLE, new TabItem<RowSet>(resultBuilder.createEmptyRowSet(query, 0, 0), 0));
 		
 		return (ret);
 		}

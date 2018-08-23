@@ -257,7 +257,7 @@ public class DesignController
 			if (connectionSettings.getSchema() != null)
 				{
 				model.put("schema", connectionSettings.getSchema());
-				model.put("objects", metadataService.getTables(connectionSettings.getLinkName(), connectionSettings.getCatalog(), connectionSettings.getSchema()).keySet());
+				model.put("objects", metadataService.getTables(connectionSettings.getLinkName(), connectionSettings.getCatalog(), connectionSettings.getSchema(), TableDescription.TABLE).keySet());
 				}
 			}
 		
@@ -335,7 +335,7 @@ public class DesignController
 		connectionSettings.setCatalog(catalog);
 		connectionSettings.setSchema(schema);
 		
-		for (QualifiedName qn : metadataService.getTables(connectionSettings.getLinkName(), catalog, schema, object).keySet())
+		for (QualifiedName qn : metadataService.getTables(connectionSettings.getLinkName(), catalog, schema, TableDescription.TABLE, object).keySet())
 			connectionSettings.getDesign().getTableNames().add(qn);
 		
 		connectionSettings.getDesign().modify();

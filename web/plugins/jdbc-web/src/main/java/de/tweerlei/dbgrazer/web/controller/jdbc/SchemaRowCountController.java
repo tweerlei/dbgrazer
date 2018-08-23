@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import de.tweerlei.common5.jdbc.model.QualifiedName;
+import de.tweerlei.common5.jdbc.model.TableDescription;
 import de.tweerlei.dbgrazer.extension.jdbc.MetadataService;
 import de.tweerlei.dbgrazer.link.service.LinkService;
 import de.tweerlei.dbgrazer.web.exception.AccessDeniedException;
@@ -273,8 +274,8 @@ public class SchemaRowCountController
 		
 		final Map<String, Object> model = new HashMap<String, Object>();
 		
-		final Set<QualifiedName> tablesLeft = metadataService.getTables(connectionSettings.getLinkName(), fbo.getCatalog(), fbo.getSchema(), fbo.getFilter()).keySet();
-		final Set<QualifiedName> tablesRight = metadataService.getTables(fbo.getConnection2(), fbo.getCatalog2(), fbo.getSchema2(), fbo.getFilter()).keySet();
+		final Set<QualifiedName> tablesLeft = metadataService.getTables(connectionSettings.getLinkName(), fbo.getCatalog(), fbo.getSchema(), null, fbo.getFilter()).keySet();
+		final Set<QualifiedName> tablesRight = metadataService.getTables(fbo.getConnection2(), fbo.getCatalog2(), fbo.getSchema2(), null, fbo.getFilter()).keySet();
 		
 		final SQLDialect dialect = getSQLDialect();
 		final Map<QualifiedName, Object> srcCounts = rowCountService.countRows(connectionSettings.getLinkName(), tablesLeft, dialect);

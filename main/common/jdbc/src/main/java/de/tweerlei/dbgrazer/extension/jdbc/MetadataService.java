@@ -91,10 +91,20 @@ public interface MetadataService
 	 * @param link Link name
 	 * @param catalog Catalog
 	 * @param schema Schema
+	 * @param type Return only tables of this type
+	 * @return Map: Table name -> object type
+	 */
+	public SortedMap<QualifiedName, String> getTables(String link, String catalog, String schema, String type);
+	
+	/**
+	 * Get tables
+	 * @param link Link name
+	 * @param catalog Catalog
+	 * @param schema Schema
 	 * @param filter Filter expression
 	 * @return Map: Table name -> object type
 	 */
-	public SortedMap<QualifiedName, String> getTables(String link, String catalog, String schema, String filter);
+	public SortedMap<QualifiedName, String> getTables(String link, String catalog, String schema, String type, String filter);
 	
 	/**
 	 * Get table info
