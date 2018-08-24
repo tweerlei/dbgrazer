@@ -31,8 +31,10 @@ import javax.annotation.PreDestroy;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.serialization.StringDeserializer;
+import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -57,30 +59,47 @@ public class KafkaClientServiceImpl implements KafkaClientService, LinkListener,
 	{
 	private static class KafkaConnectionHolder
 		{
-		private final List<KafkaConsumer<String, String>> allConnections;
-		private final ThreadLocal<KafkaConsumer<String, String>> activeConnection;
+		private final List<KafkaConsumer<String, String>> allConsumers;
+		private final ThreadLocal<KafkaConsumer<String, String>> activeConsumer;
+		private final List<KafkaProducer<String, String>> allProducers;
+		private final ThreadLocal<KafkaProducer<String, String>> activeProducer;
 		
 		public KafkaConnectionHolder()
 			{
-			this.allConnections = new LinkedList<KafkaConsumer<String, String>>();
-			this.activeConnection = new ThreadLocal<KafkaConsumer<String, String>>();
+			this.allConsumers = new LinkedList<KafkaConsumer<String, String>>();
+			this.activeConsumer = new ThreadLocal<KafkaConsumer<String, String>>();
+			this.allProducers = new LinkedList<KafkaProducer<String, String>>();
+			this.activeProducer = new ThreadLocal<KafkaProducer<String, String>>();
 			}
 		
 		public KafkaConsumer<String, String> getConsumer()
 			{
-			return (activeConnection.get());
+			return (activeConsumer.get());
 			}
 		
 		public synchronized void setConsumer(KafkaConsumer<String, String> consumer)
 			{
-			allConnections.add(consumer);
-			activeConnection.set(consumer);
+			allConsumers.add(consumer);
+			activeConsumer.set(consumer);
+			}
+		
+		public KafkaProducer<String, String> getProducer()
+			{
+			return (activeProducer.get());
+			}
+		
+		public synchronized void setProducer(KafkaProducer<String, String> producer)
+			{
+			allProducers.add(producer);
+			activeProducer.set(producer);
 			}
 		
 		public synchronized void close()
 			{
-			for (KafkaConsumer<String, String> consumer : allConnections)
+			for (KafkaConsumer<String, String> consumer : allConsumers)
 				consumer.close();
+			for (KafkaProducer<String, String> producer : allProducers)
+				producer.close();
 			}
 		}
 	
@@ -163,7 +182,21 @@ public class KafkaClientServiceImpl implements KafkaClientService, LinkListener,
 				return (ret);
 			}
 		
-		return (createClient(c));
+		return (createConsumer(c));
+		}
+	
+	@Override
+	public KafkaProducer<String, String> getProducer(String c)
+		{
+		final KafkaConnectionHolder holder = activeConnections.get(c);
+		if (holder != null)
+			{
+			final KafkaProducer<String, String> ret = holder.getProducer();
+			if (ret != null)
+				return (ret);
+			}
+		
+		return (createProducer(c));
 		}
 	
 	@Override
@@ -219,7 +252,7 @@ public class KafkaClientServiceImpl implements KafkaClientService, LinkListener,
 		return (ret);
 		}
 	
-	private synchronized KafkaConsumer<String, String> createClient(String c)
+	private synchronized KafkaConsumer<String, String> createConsumer(String c)
 		{
 		KafkaConnectionHolder holder = activeConnections.get(c);
 		KafkaConsumer<String, String> ret = null;
@@ -235,6 +268,55 @@ public class KafkaClientServiceImpl implements KafkaClientService, LinkListener,
 			activeConnections.put(c, holder);
 			}
 		
+		final Properties props = initKafkaProperties(c);
+		
+		// Always treat contents as Strings
+		props.setProperty("key.deserializer", StringDeserializer.class.getName());
+		props.setProperty("value.deserializer", StringDeserializer.class.getName());
+		
+		// Don't commit offsets, start at earliest message
+		props.setProperty("enable.auto.commit", "false");
+		props.setProperty("auto.offset.reset", "earliest");
+		
+		ret = new KafkaConsumer<String, String>(props);
+		
+		holder.setConsumer(ret);
+		return (ret);
+		}
+	
+	private synchronized KafkaProducer<String, String> createProducer(String c)
+		{
+		KafkaConnectionHolder holder = activeConnections.get(c);
+		KafkaProducer<String, String> ret = null;
+		if (holder != null)
+			{
+			ret = holder.getProducer();
+			if (ret != null)
+				return (ret);
+			}
+		else
+			{
+			holder = new KafkaConnectionHolder();
+			activeConnections.put(c, holder);
+			}
+		
+		final Properties props = initKafkaProperties(c);
+		
+		// Always treat contents as Strings
+		props.setProperty("key.serializer", StringSerializer.class.getName());
+		props.setProperty("value.serializer", StringSerializer.class.getName());
+		
+		// Send each message exactly once
+		props.setProperty("enable.idempotence", "true");
+		
+		ret = new KafkaProducer<String, String>(props);
+		
+		holder.setProducer(ret);
+		return (ret);
+		}
+	
+	private Properties initKafkaProperties(String c)
+		{
 		final LinkDef def = linkService.getLink(c, null);
 		if ((def == null) /*|| !(def.getType() instanceof WebserviceLinkType)*/)
 			throw new RuntimeException("Unknown link " + c);
@@ -256,17 +338,6 @@ public class KafkaClientServiceImpl implements KafkaClientService, LinkListener,
 		if (!StringUtils.empty(trustStorePath))
 			props.setProperty("ssl.truststore.location", configFileStore.getFileLocation(trustStorePath).getAbsolutePath());
 		
-		// Always treat contents as Strings
-		props.setProperty("key.deserializer", StringDeserializer.class.getName());
-		props.setProperty("value.deserializer", StringDeserializer.class.getName());
-		
-		// Don't commit offsets, start at earliest message
-		props.setProperty("enable.auto.commit", "false");
-		props.setProperty("auto.offset.reset", "earliest");
-		
-		ret = new KafkaConsumer<String, String>(props);
-		
-		holder.setConsumer(ret);
-		return (ret);
+		return (props);
 		}
 	}

@@ -23,6 +23,7 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -224,7 +225,7 @@ public class KafkaBrowseController
 			}
 		
 		final Map<String, TabItem<Map<String, List<PartitionInfoBean>>>> tabs = new HashMap<String, TabItem<Map<String, List<PartitionInfoBean>>>>(1);
-		tabs.put(MessageKeys.FOLDERS_TAB, new TabItem<Map<String, List<PartitionInfoBean>>>(sortedTopics, sortedTopics.size()));
+		tabs.put(MessageKeys.TOPICS_TAB, new TabItem<Map<String, List<PartitionInfoBean>>>(sortedTopics, sortedTopics.size()));
 		
 		model.put("tabs", tabs);
 		model.put("extensionJS", "kafka.js");
@@ -332,6 +333,7 @@ public class KafkaBrowseController
 	 * @param partition Partition number
 	 * @param offset Starting offset
 	 * @param format Format
+	 * @param formatting Pretty print
 	 * @return Model
 	 */
 	@RequestMapping(value = "/db/*/message.html", method = RequestMethod.GET)
@@ -339,10 +341,11 @@ public class KafkaBrowseController
 			@RequestParam("topic") String topic,
 			@RequestParam("partition") Integer partition,
 			@RequestParam("offset") Long offset,
-			@RequestParam(value = "format", required = false) String format
+			@RequestParam(value = "format", required = false) String format,
+			@RequestParam(value = "formatting", required = false) Boolean formatting
 			)
 		{
-		return (showMessageInternal(topic, partition, offset, format));
+		return (showMessageInternal(topic, partition, offset, format, (formatting == null) ? false : formatting));
 		}
 	
 	/**
@@ -351,6 +354,7 @@ public class KafkaBrowseController
 	 * @param partition Partition number
 	 * @param offset Starting offset
 	 * @param format Format
+	 * @param formatting Pretty print
 	 * @return Model
 	 */
 	@RequestMapping(value = "/db/*/ajax/message.html", method = RequestMethod.GET)
@@ -358,13 +362,14 @@ public class KafkaBrowseController
 			@RequestParam("topic") String topic,
 			@RequestParam("partition") Integer partition,
 			@RequestParam("offset") Long offset,
-			@RequestParam(value = "format", required = false) String format
+			@RequestParam(value = "format", required = false) String format,
+			@RequestParam(value = "formatting", required = false) Boolean formatting
 			)
 		{
-		return (showMessageInternal(topic, partition, offset, format));
+		return (showMessageInternal(topic, partition, offset, format, (formatting == null) ? false : formatting));
 		}
 	
-	private Map<String, Object> showMessageInternal(String topic, Integer partition, Long offset, String format)
+	private Map<String, Object> showMessageInternal(String topic, Integer partition, Long offset, String format, boolean formatting)
 		{
 		if (!connectionSettings.isBrowserEnabled())
 			throw new AccessDeniedException();
@@ -375,6 +380,7 @@ public class KafkaBrowseController
 		model.put("partition", partition);
 		model.put("offset", offset);
 		model.put("format", format);
+		model.put("formatting", formatting);
 		
 		model.put("formats", textFormatterService.getSupportedTextFormats());
 		
@@ -384,7 +390,12 @@ public class KafkaBrowseController
 		if (record == null)
 			rec = null;
 		else
-			rec = new ConsumerRecordBean(record, textFormatterService.format(record.value(), format, EnumSet.of(TextTransformerService.Option.SYNTAX_COLORING, TextTransformerService.Option.LINE_NUMBERS)));
+			{
+			final Set<TextTransformerService.Option> options = EnumSet.of(TextTransformerService.Option.SYNTAX_COLORING, TextTransformerService.Option.LINE_NUMBERS);
+			if (formatting)
+				options.add(TextTransformerService.Option.FORMATTING);
+			rec = new ConsumerRecordBean(record, textFormatterService.format(record.value(), format, options));
+			}
 		
 		final Map<String, TabItem<ConsumerRecordBean>> tabs = new HashMap<String, TabItem<ConsumerRecordBean>>(1);
 		tabs.put(offset.toString(), new TabItem<ConsumerRecordBean>(rec, 1));

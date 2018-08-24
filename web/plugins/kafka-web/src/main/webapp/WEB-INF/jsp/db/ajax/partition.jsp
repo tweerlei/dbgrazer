@@ -17,8 +17,15 @@
 %><c:set var="targetElement" value="explorer-right"
 /><ui:headline2 label="${topic}" zoomable="true">
 		<div class="h2-actions">
+			<span class="menu" onclick="return showElementMenu(event, 'tools-2');"><fmt:message key="actions"/></span>
+		</div>
+		<div class="h2-actions">
 			<a class="action" title="<fmt:message key="showQuery"/>" href="db/${currentConnection.linkName}/partition.html?topic=${topic}&amp;partition=${partition}&amp;offset=${offset}">&#x279a;</a>
 		</div>
+		
+		<div id="tools-2" class="hidden"><div class="menucolumn">
+			<div class="menuitem"><span onclick="return showDbDialog(event, 'send-message', { topic: '${topic}', partition: '${partition}' }, '<fmt:message key="send"/>');"><fmt:message key="send"/></span></div>
+		</div></div>
 	</ui:headline2>
 	
 	<ui:tabs items="${tabs}" var="rs" varKey="label" varLink="detailLink" varParams="detailParams" varParamString="detailParamString" name="result"><%@

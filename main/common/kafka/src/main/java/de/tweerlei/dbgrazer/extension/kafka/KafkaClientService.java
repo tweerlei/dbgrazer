@@ -18,6 +18,7 @@ package de.tweerlei.dbgrazer.extension.kafka;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.clients.producer.KafkaProducer;
 
 /**
  * Perform HTTP requests
@@ -32,6 +33,13 @@ public interface KafkaClientService
 	 * @return KafkaConsumer
 	 */
 	public KafkaConsumer<String, String> getConsumer(String c);
+	
+	/**
+	 * Get a KafkaProducer for a link
+	 * @param c Link name
+	 * @return KafkaProducer
+	 */
+	public KafkaProducer<String, String> getProducer(String c);
 	
 	/**
 	 * Fetch a single record

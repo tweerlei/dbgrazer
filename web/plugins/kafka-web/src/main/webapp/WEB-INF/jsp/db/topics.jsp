@@ -14,7 +14,7 @@
  * limitations under the License.
 --%><%@
 	include file="../include/include.jspf"
-%><fmt:message key="fileBrowser" var="pageTitle"/><%@
+%><fmt:message key="kafkaBrowser" var="pageTitle"/><%@
 	include file="../include/header.jspf"
 %><c:set var="targetElement" value="explorer-right"
 />
@@ -37,25 +37,34 @@
 	}
 	
 	function reloadPage() {
-		return refreshDir();
+		return refreshTopic();
 	}
 	
 	/*]]>*/</script>
 	
 	<ui:headline1 label="${pageTitle}">
 	<div class="h1-actions">
+		<span class="menu" onclick="return showElementMenu(event, 'tools-1');"><fmt:message key="actions"/></span>
+	</div>
+	<div class="h1-actions">
 		<span class="action" title="<fmt:message key="refresh"/>" onclick="return reloadPage();">&#x21ba;</span>
 		<a class="action" title="<fmt:message key="newWindow"/>" href="db/${currentConnection.linkName}/files.html" target="_blank">&#x2750;</a>
 	</div>
+	
+	<div id="tools-1" class="hidden"><div class="menucolumn">
+		<div class="menuitem"><span onclick="return showDbDialog(event, 'send-message', null, '<fmt:message key="send"/>');"><fmt:message key="send"/></span></div>
+	</div></div>
 	</ui:headline1>
+	
+	<div id="submitresult"></div>
 	
 	<div id="explorer-left"><ui:combo items="${tabs}" var="rs" varKey="label" varParams="detailParams" varParamString="detailParamString" name="combo"
 		><div class="tab-body"><c:forEach items="${rs}" var="row"
 		><c:set var="rowid" value="${row.key}"
-		/><div class="treerow" id="treerow-${label}-${rowid}"><div class="treebutton"><span class="action" title="<fmt:message key="expand"/>" onclick="return toggleStaticTreeItem(event, '${label}', '${rowid}');">&#x25bc;</span></div>
+		/><div class="treerow" id="treerow-${label}-${rowid}"><div class="treebutton"><span class="action" title="<fmt:message key="expand"/>" onclick="return toggleStaticTreeItem(event, '${label}', '${rowid}');">&#x25ba;</span></div>
 		<div class="treelabel">${row.key}</div><c:forEach items="${row.value}" var="t"
 			><c:set var="rowid" value="${t.topic}-${t.partition}"
-			/><div class="treerow" id="treerow-${label}-${rowid}"><div class="treebutton">&#x25b7;</div>
+			/><div class="treerow" id="treerow-${label}-${rowid}" style="display: none;"><div class="treebutton">&#x25b7;</div>
 			<div class="treelabel"><a href="db/${currentConnection.linkName}/partition.html?topic=${t.topic}&amp;partition=${t.partition}" onclick="return showPartition(event, '${t.topic}', '${t.partition}');">Partition ${t.partition}</a></div></div>
 		</c:forEach></div>
 		</c:forEach></div></ui:combo></div>

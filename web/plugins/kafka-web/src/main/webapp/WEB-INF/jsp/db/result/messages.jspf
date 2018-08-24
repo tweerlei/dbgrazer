@@ -16,7 +16,7 @@
 	
 	Tab panel for directory contents
 	
---%><div class="tab-header" id="submitresult">
+--%><div class="tab-header">
 			<form action="db/${currentConnection.linkName}/partition.html" method="get"<c:if test="${not empty targetElement}"> onsubmit="return showPartition(event, $F('f1-topic'), $F('f1-partition'), $F('f1-offset'));"</c:if>>
 				<input type="hidden" id="f1-topic" name="topic" value="${topic}"/>
 				<input type="hidden" id="f1-partition" name="partition" value="${partition}"/>
