@@ -422,6 +422,9 @@ function tw_contentChanged() {
 			e.src = 'db/' + WSApi.currentDB + '/graph-image.html?q=' + x;
 		}
 	});
+	$$('td.zoomable').each(function(e) {
+		e.onclick = function() { zoomContent(e); };
+	});
 	// Establish keyboard handlers
 	Forms.init();
 	// Resize new content
@@ -1164,6 +1167,7 @@ function zoomLeft() {
 			left.addClassName('zoomed');
 		}
 	}
+	tw_windowOnResize();
 	return false;
 }
 
@@ -1182,6 +1186,7 @@ function zoomRight() {
 			right.addClassName('zoomed');
 		}
 	}
+	tw_windowOnResize();
 	return false;
 }
 
@@ -1197,9 +1202,6 @@ function zoomElement(e) {
 	var full = $('fullscreen');
 	if (el && full && !full.visible()) {
 		var marker = getMarker();
-		
-		var tab = el.up('.tab-page');
-		Elements.moveTo(full, Elements.getX(tab), Elements.getY(tab));
 		
 		var p = el.parentNode;
 		p.insertBefore(marker, el);
@@ -1244,6 +1246,30 @@ function toggleZoom(e) {
 	} else {
 		return zoomElement(e);
 	}
+}
+
+function zoomContent(e) {
+	var el = $(e);
+	var full = $('fullscreen');
+	var fullc = $('fullscreen-content');
+	var fulls = $('f1-statement');
+	if (el && full && fullc && fulls && !full.visible()) {
+		fullc.innerHTML = el.innerHTML;
+		fulls.value = el.innerText;
+		
+		full.show();
+		tw_windowOnResize();
+	}
+	return false;
+}
+
+function unzoomContent() {
+	var full = $('fullscreen');
+	if (full && full.visible()) {
+		full.hide();
+		tw_windowOnResize();
+	}
+	return false;
 }
 
 function toggleElement(e) {

@@ -61,7 +61,10 @@
 </c:if
 >	</ui:headline1>
 	
-	<div class="tab-page"><div class="tab-body">
+	<div class="tab-page"><div id="fullscreen" style="display: none;"><form class="content" action="#" onsubmit="return unzoomElement();">
+		<div><input type="button" value="<fmt:message key="format"><fmt:param value="SQL"/></fmt:message>" onclick="formatQuery(form);"/>
+		<span class="action" title="<fmt:message key="maximize"/>" onclick="return unzoomElement();">&#x25f1;</span></div>
+	</form></div><div class="tab-body">
 <c:forEach items="${resultTypes}" var="j"
 >		<div class="hidden" id="tooltip-${j}"><fmt:message key="help_${j}"/></div>
 </c:forEach
@@ -228,10 +231,7 @@
 					<input type="reset" value="<fmt:message key="cancel"/>"/></dd>
 			</dl><hr/>
 		</spring:form>
-	</div><div id="fullscreen" style="display: none;"><form class="content" action="#" onsubmit="return unzoomElement();">
-		<div><input type="button" value="<fmt:message key="format"><fmt:param value="SQL"/></fmt:message>" onclick="formatQuery(form);"/>
-		<span class="action" title="<fmt:message key="maximize"/>" onclick="return unzoomElement();">&#x25f1;</span></div>
-	</form></div></div>
+	</div></div>
 <%@
 	include file="../include/footer.jspf"
 %>

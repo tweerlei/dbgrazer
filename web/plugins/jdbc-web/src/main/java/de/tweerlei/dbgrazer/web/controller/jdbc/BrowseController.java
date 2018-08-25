@@ -69,6 +69,7 @@ import de.tweerlei.dbgrazer.web.service.FrontendHelperService;
 import de.tweerlei.dbgrazer.web.service.MetadataExportService;
 import de.tweerlei.dbgrazer.web.service.QuerySettingsManager;
 import de.tweerlei.dbgrazer.web.service.SchemaTransformerService;
+import de.tweerlei.dbgrazer.web.service.TextTransformerService;
 import de.tweerlei.dbgrazer.web.service.SchemaTransformerService.GraphMode;
 import de.tweerlei.dbgrazer.web.service.VisualizationService;
 import de.tweerlei.dbgrazer.web.session.ConnectionSettings;
@@ -228,6 +229,7 @@ public class BrowseController
 	private final DataFormatterFactory dataFormatterFactory;
 	private final MetadataExportService exportService;
 	private final VisualizationService visualizationService;
+	private final TextTransformerService textFormatterService;
 	private final SchemaTransformerService schemaTransformer;
 	private final FrontendHelperService frontendHelper;
 	private final QuerySettingsManager querySettingsManager;
@@ -246,6 +248,7 @@ public class BrowseController
 	 * @param visualizationService VisualizationService
 	 * @param frontendHelper FrontendHelperService
 	 * @param querySettingsManager QuerySettingsManager
+	 * @param textFormatterService TextFormatterService
 	 * @param schemaTransformer SchemaTransformerService
 	 * @param resultCache ResultCache
 	 * @param connectionSettings ConnectionSettings
@@ -255,6 +258,7 @@ public class BrowseController
 			SQLGeneratorService sqlGenerator, DataFormatterFactory dataFormatterFactory,
 			ResultBuilderService resultBuilder, MetadataExportService exportService,
 			VisualizationService visualizationService, SchemaTransformerService schemaTransformer,
+			TextTransformerService textFormatterService,
 			FrontendHelperService frontendHelper, QuerySettingsManager querySettingsManager,
 			ResultCache resultCache, ConnectionSettings connectionSettings)
 		{
@@ -265,6 +269,7 @@ public class BrowseController
 		this.dataFormatterFactory = dataFormatterFactory;
 		this.exportService = exportService;
 		this.visualizationService = visualizationService;
+		this.textFormatterService = textFormatterService;
 		this.schemaTransformer = schemaTransformer;
 		this.frontendHelper = frontendHelper;
 		this.querySettingsManager = querySettingsManager;
@@ -664,6 +669,7 @@ public class BrowseController
 		model.put("maxDepth", configService.get(ConfigKeys.ERM_LEVELS));
 		model.put("tableColumns", Collections.emptyList());
 		model.put("extensionJS", "jdbc.js");
+		model.put("formats", textFormatterService.getSupportedTextFormats());
 		
 		final TableFilterEntry filter = connectionSettings.getTableFilters().get(qname.toString());
 		if (filter != null)

@@ -19,9 +19,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -111,6 +113,33 @@ public class CustomQueryController
 		final Map<String, Object> model = new HashMap<String, Object>();
 		
 		final String result = textFormatterService.format(statement, format, null);
+		
+		model.put("statement", result);
+		
+		return (model);
+		}
+	
+	/**
+	 * Show a parameter input form
+	 * @param statement Effective query string
+	 * @param format Format name
+	 * @param formatting Pretty print
+	 * @return Model
+	 */
+	@RequestMapping(value = "/db/*/ajax/formatlines.html", method = RequestMethod.POST)
+	public Map<String, Object> formatQuery(
+			@RequestParam("statement") String statement,
+			@RequestParam("format") String format,
+			@RequestParam(value = "formatting", required = false) Boolean formatting
+			)
+		{
+		final Map<String, Object> model = new HashMap<String, Object>();
+		
+		final Set<TextTransformerService.Option> options = EnumSet.of(TextTransformerService.Option.SYNTAX_COLORING, TextTransformerService.Option.LINE_NUMBERS);
+		if (formatting != null && formatting)
+			options.add(TextTransformerService.Option.FORMATTING);
+		
+		final String result = textFormatterService.format(statement, format, options);
 		
 		model.put("statement", result);
 		

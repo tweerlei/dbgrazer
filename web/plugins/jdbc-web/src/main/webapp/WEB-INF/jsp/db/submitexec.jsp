@@ -68,6 +68,10 @@
 	</ui:headline1>
 	
 	<div class="tab-page">
+		<div id="fullscreen" style="display: none;"><form class="content" action="#" onsubmit="return unzoomElement();">
+			<div><input type="button" value="<fmt:message key="format"><fmt:param value="PLSQL"/></fmt:message>" onclick="formatQuery(form);"/>
+			<span class="action" title="<fmt:message key="maximize"/>" onclick="return unzoomElement();">&#x25f1;</span></div>
+		</form></div>
 		<div id="zoomable1" class="tab-header">
 			<spring:form id="submitform" cssClass="full" action="db/${currentConnection.linkName}/ajax/submitexec.html" modelAttribute="model" method="post" onsubmit="return submitForm(this);">
 				<dl>
@@ -90,10 +94,6 @@
 		<div id="result">
 			<div class="tab-body"></div>
 		</div>
-		<div id="fullscreen" style="display: none;"><form class="content" action="#" onsubmit="return unzoomElement();">
-			<div><input type="button" value="<fmt:message key="format"><fmt:param value="PLSQL"/></fmt:message>" onclick="formatQuery(form);"/>
-			<span class="action" title="<fmt:message key="maximize"/>" onclick="return unzoomElement();">&#x25f1;</span></div>
-		</form></div>
 	</div>
 <%@
 	include file="../include/footer.jspf"

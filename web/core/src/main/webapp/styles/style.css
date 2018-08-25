@@ -545,6 +545,10 @@ th.table-sortable {
 	cursor: pointer;
 }
 
+td.zoomable {
+	cursor: zoom-in;
+}
+
 #drilldown0 {
 	margin-top: 1em;
 }

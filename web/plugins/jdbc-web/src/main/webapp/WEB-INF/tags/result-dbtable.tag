@@ -54,7 +54,7 @@
 <c:forEach items="${rs.rows}" var="row"
 >				<tr>
 <c:forEach items="${row.values}" var="v" varStatus="st"
->					<td><ui:dblink value="${v}" fk="${foreignKeys[st.index]}" targetElement="${targetElement}"/><c:if test="${(not empty objectName) && (not empty pkColumns) && (st.index == pkColumns[0])}"
+>					<td<c:if test="${fn:length(v) >= 100}"> class="zoomable"</c:if>><ui:dblink value="${v}" fk="${foreignKeys[st.index]}" targetElement="${targetElement}"/><c:if test="${(not empty objectName) && (not empty pkColumns) && (st.index == pkColumns[0])}"
 > <span class="action" title="<fmt:message key="referencedBy"/>" onclick="showDbMenu(event, 'dbrefs', { catalog: '${catalogName}', schema: '${schemaName}', object: '${objectName}', pk: '${v}', target: '${targetElement}' });">&#x25bc;</span><c:set var="args" value="event, '${catalogName}', '${schemaName}', '${objectName}', ["
 /><c:forEach items="${pkColumns}" var="pk" varStatus="pkst"
 	><c:if test="${!pkst.first}"
