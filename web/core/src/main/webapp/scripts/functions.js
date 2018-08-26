@@ -414,6 +414,10 @@ function tw_contentChanged() {
 		var x = e.getAttribute('href');	// .href always returns the absolute URL
 		if ((x.indexOf(':') < 0) && (x.indexOf('/') < 0) && (x.indexOf('?') < 0)) {
 			e.href = 'db/' + WSApi.currentDB + '/result.html?q=' + x;
+		} else if (x.startsWith('./')) {
+			e.href = 'db/' + WSApi.currentDB + '/' + x.substr(2);
+		} else if (x.startsWith('../')) {
+			e.href = 'db/' + x.substr(3);
 		}
 	});
 	$$('.wiki img').each(function(e) {

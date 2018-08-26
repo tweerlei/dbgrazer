@@ -31,7 +31,7 @@
 *
 ***********************************************************************
 --%><c:when test="${rs.query.type.resultType == 'SINGLE' && rs.query.attributes['formatter'] == 'WIKI'}"
-><div class="wiki">${rs.firstValue}</div></c:when
+><div id="text-${label}" class="wiki">${rs.firstValue}</div></c:when
 ><c:when test="${rs.query.type.resultType == 'SINGLE' && rs.query.attributes['formatter'] == 'HTML'}"
 ><div id="text-${label}" class="hidden">${rs.firstValue}</div><iframe id="html-${label}" class="result"></iframe></c:when
 ><c:when test="${rs.query.type.resultType == 'SINGLE'}"

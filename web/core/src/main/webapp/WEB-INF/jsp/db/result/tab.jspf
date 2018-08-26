@@ -61,7 +61,7 @@
 				<ui:hidden items="${model.params2}" name="params2"/>
 </c:if><c:if test="${(fn:length(rs.rows) > 0) && (rs.query.type.resultType == 'SINGLE' || not empty downloadFormats)}"
 >				<span class="menu" onclick="return showElementMenu(event, 'tools-${label}');"><fmt:message key="download"/></span>
-</c:if><c:if test="${(fn:length(rs.rows) > 0) && rs.query.type.resultType == 'SINGLE' && not isdiff && rs.query.attributes['formatter'] != 'HTML'}"
+</c:if><c:if test="${(fn:length(rs.rows) > 0) && rs.query.type.resultType == 'SINGLE' && not isdiff && rs.query.attributes['formatter'] != 'HTML' && rs.query.attributes['formatter'] != 'WIKI'}"
 ><c:choose><c:when test="${not empty rs.query.attributes['formatter']}"
 >				<div id="outline-${label}" class="hidden"><div class="menuitem"><fmt:message key="noOutline"/></div></div>
 				&nbsp; <span class="menu" onclick="return showOutline(event, '${label}');"><fmt:message key="outline"/></span>
@@ -104,7 +104,7 @@
 *
 ***********************************************************************
 --%><c:when test="${rs.query.type.resultType == 'SINGLE' && rs.query.attributes['formatter'] == 'WIKI'}"
-><div class="wiki">${rs.firstValue}</div></c:when
+><div id="text-${label}" class="wiki">${rs.firstValue}</div></c:when
 ><c:when test="${rs.query.type.resultType == 'SINGLE' && rs.query.attributes['formatter'] == 'HTML'}"
 ><div id="text-${label}" class="hidden">${rs.firstValue}</div><iframe id="html-${label}" class="result"></iframe></c:when
 ><c:when test="${rs.query.type.resultType == 'SINGLE'}"
