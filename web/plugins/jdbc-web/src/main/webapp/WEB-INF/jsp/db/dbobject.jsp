@@ -43,10 +43,6 @@
 		});
 	}
 	
-	function formatContent(frm) {
-		getFormInto(frm, 'fullscreen-content');
-	}
-	
 	/*]]>*/</script>
 	
 	<ui:headline1><jsp:attribute name="content"><a href="db/${currentConnection.linkName}/dbcatalogs.html"><fmt:message key="schemaBrowser"/></a>

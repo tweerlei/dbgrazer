@@ -112,7 +112,8 @@ public class CustomQueryController
 		{
 		final Map<String, Object> model = new HashMap<String, Object>();
 		
-		final String result = textFormatterService.format(statement, format, null);
+		final Set<TextTransformerService.Option> options = EnumSet.of(TextTransformerService.Option.FORMATTING);
+		final String result = textFormatterService.format(statement, format, options);
 		
 		model.put("statement", result);
 		
@@ -127,21 +128,74 @@ public class CustomQueryController
 	 * @return Model
 	 */
 	@RequestMapping(value = "/db/*/ajax/formatlines.html", method = RequestMethod.POST)
-	public Map<String, Object> formatQuery(
+	public Map<String, Object> formatLines(
 			@RequestParam("statement") String statement,
-			@RequestParam("format") String format,
+			@RequestParam(value = "format", required = false) String format,
 			@RequestParam(value = "formatting", required = false) Boolean formatting
 			)
 		{
 		final Map<String, Object> model = new HashMap<String, Object>();
 		
+		final String formatName;
+		final boolean formattingActive;
+		if (format == null)
+			{
+			formatName = querySettingsManager.getFormatName(null);
+			formattingActive = querySettingsManager.isFormattingActive(null);
+			}
+		else
+			{
+			formatName = format;
+			formattingActive = (formatting == null) ? false : formatting;
+			querySettingsManager.setFormatName(null, formatName);
+			querySettingsManager.setFormattingActive(null, formattingActive);
+			}
+		
 		final Set<TextTransformerService.Option> options = EnumSet.of(TextTransformerService.Option.SYNTAX_COLORING, TextTransformerService.Option.LINE_NUMBERS);
-		if (formatting != null && formatting)
+		if (formattingActive)
 			options.add(TextTransformerService.Option.FORMATTING);
 		
-		final String result = textFormatterService.format(statement, format, options);
+		final String result = textFormatterService.format(statement, formatName, options);
 		
-		model.put("statement", result);
+		model.put("statement", statement);
+		model.put("format", formatName);
+		model.put("formatting", formattingActive);
+		model.put("formats", textFormatterService.getSupportedTextFormats());
+		model.put("result", result);
+		
+		return (model);
+		}
+	
+	/**
+	 * Show a parameter input form
+	 * @param statement Effective query string
+	 * @param format Format name
+	 * @return Model
+	 */
+	@RequestMapping(value = "/db/*/ajax/formatstmt.html", method = RequestMethod.POST)
+	public Map<String, Object> formatStatement(
+			@RequestParam("statement") String statement,
+			@RequestParam(value = "format", required = false) String format
+			)
+		{
+		final Map<String, Object> model = new HashMap<String, Object>();
+		
+		final String formatName;
+		if (format == null)
+			formatName = querySettingsManager.getFormatName(null);
+		else
+			{
+			formatName = format;
+			querySettingsManager.setFormatName(null, formatName);
+			}
+		
+		final Set<TextTransformerService.Option> options = EnumSet.of(TextTransformerService.Option.FORMATTING);
+		final String result = textFormatterService.format(statement, formatName, options);
+		
+		model.put("statement", statement);
+		model.put("format", formatName);
+		model.put("formats", textFormatterService.getSupportedTextFormats());
+		model.put("result", result);
 		
 		return (model);
 		}

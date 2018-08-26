@@ -14,7 +14,7 @@
  * limitations under the License.
 --%><%@
 	include file="../../include/include.jspf"
-%><form class="content" action="db/${currentConnection.linkName}/ajax/formatlines.html" method="post" onsubmit="return getFormInto(this, this.parentNode);">
+%><form class="content" action="db/${currentConnection.linkName}/ajax/formatstmt.html" method="post" onsubmit="return getFormInto(this, this.parentNode);">
 	<input id="f1-statement" type="hidden" name="statement" value="${fn:escapeXml(statement)}"/>
 	<div>
 		<select id="f1-format" name="format" onchange="Forms.submit(form);">
@@ -23,8 +23,7 @@
 >			<option value="${f}"<c:if test="${f == format}"> selected="selected"</c:if>><fmt:message key="${f}"/></option>
 </c:forEach
 >		</select>
-		&nbsp; <input id="f1-formatting" type="checkbox" name="formatting" value="true"<c:if test="${formatting}"> checked="checked"</c:if> onchange="Forms.submit(form);"/> <label for="f1-formatting"><fmt:message key="formatter"/></label>
 		&nbsp; <span class="action" title="<fmt:message key="maximize"/>" onclick="return unzoomContent();">&#x25f1;</span>
 	</div>
-	<pre class="code">${result}</pre>
+	<textarea id="zoomresult" name="result" style="width: 100%; height: 95%">${result}</textarea>
 </form>

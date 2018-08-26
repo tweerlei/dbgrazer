@@ -299,11 +299,8 @@ public class QuerySettingsManagerImpl implements QuerySettingsManager
 	@Override
 	public String getFormatName(Query query)
 		{
-		if (query == null)
-			return (null);
-		
 		final String value = getQuerySettings(query).get(RowSetConstants.ATTR_FORMATTER);
-		if (StringUtils.empty(value))
+		if (StringUtils.empty(value) && (query != null))
 			return (query.getAttributes().get(RowSetConstants.ATTR_FORMATTER));
 		
 		return (value);

@@ -19,28 +19,13 @@
 %>
 	<script type="text/javascript">/*<![CDATA[*/
 	
-	function prepareForm() {
-		unzoomElement();
-	}
-	
 	function submitForm(frm) {
-		prepareForm();
 		getFormInto(frm, 'result', null, null, true);
 		return false;
 	}
 	
 	function submitFormTo(frm, ev, url) {
-		prepareForm();
 		return postForm(frm, ev, url);
-	}
-	
-	function formatQuery(frm) {
-		var e = $('statement');
-		var stmt = e.value;
-		formatText(stmt, 'PLSQL', function(txt) {
-			e.value = txt;
-		});
-		return false;
 	}
 	
 	/*]]>*/</script>
@@ -68,17 +53,18 @@
 	</ui:headline1>
 	
 	<div class="tab-page">
-		<div id="fullscreen" style="display: none;"><form class="content" action="#" onsubmit="return unzoomElement();">
-			<div><input type="button" value="<fmt:message key="format"><fmt:param value="PLSQL"/></fmt:message>" onclick="formatQuery(form);"/>
-			<span class="action" title="<fmt:message key="maximize"/>" onclick="return unzoomElement();">&#x25f1;</span></div>
-		</form></div>
+		<div id="fullscreen" style="display: none;"></div>
+		<form id="zoomform" class="hidden" method="post" action="db/${currentConnection.linkName}/ajax/formatstmt.html">
+			<input id="zoomstmt" type="hidden" name="statement" value=""/>
+			<input type="hidden" name="format" value=""/>
+		</form>
 		<div id="zoomable1" class="tab-header">
 			<spring:form id="submitform" cssClass="full" action="db/${currentConnection.linkName}/ajax/submitexec.html" modelAttribute="model" method="post" onsubmit="return submitForm(this);">
 				<dl>
 					<dt><label for="statement"><fmt:message key="sqlStatement"/></label></dt>
-					<dd><div><input type="button" value="<fmt:message key="format"><fmt:param value="PLSQL"/></fmt:message>" onclick="formatQuery(form);"/>
+					<dd><div>
 						<span class="action" title="<fmt:message key="delete"/>" onclick="return clearElement('statement');">&#x232b;</span>
-						<span class="action" title="<fmt:message key="maximize"/>" onclick="return zoomElement('statement');">&#x25f1;</span></div>
+						<span class="action" title="<fmt:message key="maximize"/>" onclick="return zoomContent('statement');">&#x25f1;</span></div>
 						<spring:textarea id="statement" cssClass="large" path="statement" cols="80" rows="25"/>
 						<div>[ <span id="statement-row">1</span> : <span id="statement-column">1</span> ]</div></dd>
 					<dt><fmt:message key="executeAs"/></dt>

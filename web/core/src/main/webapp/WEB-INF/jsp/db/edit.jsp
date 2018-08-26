@@ -17,18 +17,6 @@
 %><ui:set text="${model.originalName}" key="newQuery" var="pageTitle"/><%@
 	include file="../include/header.jspf"
 %><fmt:message key="noQuery" var="noQuery"/>
-	<script type="text/javascript">/*<![CDATA[*/
-	
-	function formatQuery(frm) {
-		var e = $('statement');
-		formatText(e.value, 'SQL', function(txt) {
-			e.value = txt;
-		});
-		return false;
-	}
-	
-	/*]]>*/</script>
-	
 	<ui:headline1 label="${pageTitle}">
 <c:if test="${not empty model.originalName}"
 >	<div class="h1-actions">
@@ -61,10 +49,13 @@
 </c:if
 >	</ui:headline1>
 	
-	<div class="tab-page"><div id="fullscreen" style="display: none;"><form class="content" action="#" onsubmit="return unzoomElement();">
-		<div><input type="button" value="<fmt:message key="format"><fmt:param value="SQL"/></fmt:message>" onclick="formatQuery(form);"/>
-		<span class="action" title="<fmt:message key="maximize"/>" onclick="return unzoomElement();">&#x25f1;</span></div>
-	</form></div><div class="tab-body">
+	<div class="tab-page">
+		<div id="fullscreen" style="display: none;"></div>
+		<form id="zoomform" class="hidden" method="post" action="db/${currentConnection.linkName}/ajax/formatstmt.html">
+			<input id="zoomstmt" type="hidden" name="statement" value=""/>
+			<input type="hidden" name="format" value=""/>
+		</form>
+		<div class="tab-body">
 <c:forEach items="${resultTypes}" var="j"
 >		<div class="hidden" id="tooltip-${j}"><fmt:message key="help_${j}"/></div>
 </c:forEach
@@ -221,9 +212,9 @@
 					</tbody>
 					</table></dd>
 				<dt class="query-only"<c:if test="${model.viewType}"> style="display: none;"</c:if>><spring:label path="statement"><fmt:message key="sqlStatement"/></spring:label></dt>
-				<dd class="query-only"<c:if test="${model.viewType}"> style="display: none;"</c:if>><div><input type="button" value="<fmt:message key="format"><fmt:param value="SQL"/></fmt:message>" onclick="formatQuery(form);"/>
+				<dd class="query-only"<c:if test="${model.viewType}"> style="display: none;"</c:if>><div>
 					<span class="action" title="<fmt:message key="delete"/>" onclick="return clearElement('statement');">&#x232b;</span>
-					<span class="action" title="<fmt:message key="maximize"/>" onclick="return zoomElement('statement');">&#x25f1;</span>
+					<span class="action" title="<fmt:message key="maximize"/>" onclick="return zoomContent('statement');">&#x25f1;</span>
 					<ui:info name="sqlStatement"><fmt:message key="help_sqlStatement"/></ui:info></div>
 					<spring:textarea path="statement" cssClass="large" cols="80" rows="25"/></dd>
 				<dt>&nbsp;</dt>

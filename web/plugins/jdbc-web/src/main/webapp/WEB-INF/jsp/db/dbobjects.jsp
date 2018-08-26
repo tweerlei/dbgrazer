@@ -36,10 +36,6 @@
 		});
 	}
 	
-	function formatContent(frm) {
-		getFormInto(frm, 'fullscreen-content');
-	}
-	
 	function reloadPage() {
 		return refreshDBObject();
 	}

@@ -20,7 +20,6 @@
 	<script type="text/javascript">/*<![CDATA[*/
 	
 	function prepareForm() {
-		unzoomElement();
 		var e = $('statement');
 		$('query').value = Forms.getSelectedText(e);
 	}
@@ -38,15 +37,6 @@
 	
 	function submitDownloadForm(event, format) {
 		return submitFormTo('submitform', event, 'db/${currentConnection.linkName}/submit-JDBC-export.html', format, '_blank');
-	}
-	
-	function formatQuery(frm) {
-		var e = $('statement');
-		var stmt = Forms.getSelectedText(e);
-		formatText(stmt, 'SQL', function(txt) {
-			Forms.replaceSelectedText(e, txt);
-		});
-		return false;
 	}
 	
 	// on reload (caused by changing the chart type), just reload the chart image
@@ -79,10 +69,11 @@
 	</ui:headline1>
 	
 	<div class="tab-page">
-		<div id="fullscreen" style="display: none;"><form class="content" action="#" onsubmit="return unzoomElement();">
-			<div><input type="button" value="<fmt:message key="format"><fmt:param value="SQL"/></fmt:message>" onclick="formatQuery(form);"/>
-			<span class="action" title="<fmt:message key="maximize"/>" onclick="return unzoomElement();">&#x25f1;</span></div>
-		</form></div>
+		<div id="fullscreen" style="display: none;"></div>
+		<form id="zoomform" class="hidden" method="post" action="db/${currentConnection.linkName}/ajax/formatstmt.html">
+			<input id="zoomstmt" type="hidden" name="statement" value=""/>
+			<input type="hidden" name="format" value=""/>
+		</form>
 		<div id="zoomable1" class="tab-header">
 			<spring:form id="submitform" cssClass="full" action="db/${currentConnection.linkName}/ajax/submit-JDBC.html" modelAttribute="model" method="post" onsubmit="return submitForm(this, 'table');">
 				<spring:hidden id="query" path="statement"/>
@@ -90,9 +81,9 @@
 				<spring:hidden id="resultformat" path="format"/>
 				<dl>
 					<dt><label for="statement"><fmt:message key="sqlStatement"/><c:if test="${currentConnection.writable}"> <fmt:message key="dmlAllowed"/></c:if></label></dt>
-					<dd><div><input type="button" value="<fmt:message key="format"><fmt:param value="SQL"/></fmt:message>" onclick="formatQuery(form);"/>
+					<dd><div>
 						<span class="action" title="<fmt:message key="delete"/>" onclick="return clearElement('statement');">&#x232b;</span>
-						<span class="action" title="<fmt:message key="maximize"/>" onclick="return zoomElement('statement');">&#x25f1;</span></div>
+						<span class="action" title="<fmt:message key="maximize"/>" onclick="return zoomContent('statement');">&#x25f1;</span></div>
 						<spring:textarea id="statement" cssClass="medium" path="query" cols="80" rows="25"/></dd>
 					<dt><fmt:message key="queryParams"/></dt>
 					<dd><table class="props">

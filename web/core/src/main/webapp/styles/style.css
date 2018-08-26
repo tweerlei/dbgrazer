@@ -603,8 +603,8 @@ pre.code span.line {
 
 pre.code span.no {
 	display: table-cell;
-	user-select: none;
-	-moz-user-select: none;
+/*	user-select: none;
+	-moz-user-select: none;*/
 	width: 5em;
 	text-align: right;
 	padding-right: 0.5em;
@@ -624,8 +624,8 @@ pre.code span.errline {
 
 pre.code span.errno {
 	display: table-cell;
-	user-select: none;
-	-moz-user-select: none;
+/*	user-select: none;
+	-moz-user-select: none;*/
 	width: 5em;
 	text-align: right;
 	padding-right: 0.5em;

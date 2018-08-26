@@ -1197,68 +1197,24 @@ function clearElement(e) {
 	return false;
 }
 
-function zoomElement(e) {
-	var el = $(e);
-	var full = $('fullscreen');
-	if (el && full && !full.visible()) {
-		var marker = getMarker();
-		
-		var p = el.parentNode;
-		p.insertBefore(marker, el);
-		full.firstChild.appendChild(el);
-		
-		el.style.width = '100%';
-		el.style.height = '95%';
-		
-		full.show();
-		tw_windowOnResize();
-		
-		el.focus();
-	}
-	return false;
-}
-
-function unzoomElement() {
-	var full = $('fullscreen');
-	if (full && full.visible()) {
-		var el = full.firstChild.lastChild;
-		var marker = getMarker();
-		
-		var p = marker.parentNode;
-		p.insertBefore(el, marker);
-		document.body.appendChild(marker);
-		
-		el.style.width = '';
-		el.style.height = '';
-		
-		full.hide();
-		tw_windowOnResize();
-		
-		el.focus();
-	}
-	return false;
-}
-
-function toggleZoom(e) {
-	var full = $('fullscreen');
-	if (full && full.visible()) {
-		return unzoomElement();
-	} else {
-		return zoomElement(e);
-	}
-}
+var zoomContentSource = null;
 
 function zoomContent(e) {
 	var el = $(e);
+	var frm = $('zoomform');
 	var full = $('fullscreen');
-	var fullc = $('fullscreen-content');
-	var fulls = $('f1-statement');
-	if (el && full && fullc && fulls && !full.visible()) {
-		fullc.innerHTML = el.innerHTML;
-		fulls.value = el.innerText;
-		
-		full.show();
-		tw_windowOnResize();
+	if (el && frm && full && !full.visible()) {
+		var txt;
+		zoomContentSource = el;
+		if (zoomContentSource.tagName == 'TEXTAREA') {
+			txt = zoomContentSource.value;
+		} else {
+			txt = zoomContentSource.innerText;
+		}
+		getFormInto(frm, full, { zoomstmt: txt }, function() {
+			full.show();
+			tw_windowOnResize();
+		});
 	}
 	return false;
 }
@@ -1266,6 +1222,12 @@ function zoomContent(e) {
 function unzoomContent() {
 	var full = $('fullscreen');
 	if (full && full.visible()) {
+		if (zoomContentSource.tagName == 'TEXTAREA') {
+			var el = $('zoomresult');
+			if (el) {
+				zoomContentSource.value = el.value;
+			}
+		}
 		full.hide();
 		tw_windowOnResize();
 	}

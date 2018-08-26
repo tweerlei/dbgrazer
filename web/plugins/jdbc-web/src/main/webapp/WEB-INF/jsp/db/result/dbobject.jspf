@@ -268,20 +268,10 @@
 *
 ***********************************************************************
 --%><c:when test="${ix == 4}"
->		<div id="fullscreen" style="display: none;"><form class="content" action="db/${currentConnection.linkName}/ajax/formatlines.html" method="post" onsubmit="return formatContent(this);">
-			<input id="f1-statement" type="hidden" name="statement" value=""/>
-			<div>
-				<select id="f1-format" name="format" onchange="Forms.submit(form);">
-					<option value=""><fmt:message key="default"/></option>
-<c:forEach items="${formats}" var="f"
-	>				<option value="${f}"<c:if test="${f == format}"> selected="selected"</c:if>><fmt:message key="${f}"/></option>
-</c:forEach
->				</select>
-				&nbsp; <input id="f1-formatting" type="checkbox" name="formatting" value="true"<c:if test="${formatting}"> checked="checked"</c:if> onchange="Forms.submit(form);"/> <label for="f1-formatting"><fmt:message key="formatter"/></label>
-				&nbsp; <span class="action" title="<fmt:message key="maximize"/>" onclick="return unzoomContent();">&#x25f1;</span>
-			</div>
-			<pre id="fullscreen-content" class="code"></pre>
-		</form></div>
+>		<div id="fullscreen" style="display: none;"></div>
+		<form id="zoomform" class="hidden" method="post" action="db/${currentConnection.linkName}/ajax/formatlines.html">
+			<input id="zoomstmt" type="hidden" name="statement" value=""/>
+		</form>
 		<div class="tab-header">
 			<form id="submitform" class="full" action="db/${currentConnection.linkName}/ajax/submit-simple.html" method="post" onsubmit="return submitForm(this, 'table');">
 				<input type="hidden" name="catalog" value="${catalog}"/>

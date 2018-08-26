@@ -42,6 +42,7 @@ import de.tweerlei.dbgrazer.extension.kafka.KafkaClientService;
 import de.tweerlei.dbgrazer.web.constant.MessageKeys;
 import de.tweerlei.dbgrazer.web.exception.AccessDeniedException;
 import de.tweerlei.dbgrazer.web.model.TabItem;
+import de.tweerlei.dbgrazer.web.service.QuerySettingsManager;
 import de.tweerlei.dbgrazer.web.service.TextTransformerService;
 import de.tweerlei.dbgrazer.web.session.ConnectionSettings;
 
@@ -181,20 +182,23 @@ public class KafkaBrowseController
 	
 	private final KafkaClientService kafkaClientService;
 	private final TextTransformerService textFormatterService;
+	private final QuerySettingsManager querySettingsManager;
 	private final ConnectionSettings connectionSettings;
 	
 	/**
 	 * Constructor
 	 * @param kafkaClientService KafkaClientService
 	 * @param textFormatterService TextFormatterService
+	 * @param querySettingsManager QuerySettingsManager
 	 * @param connectionSettings ConnectionSettings
 	 */
 	@Autowired
 	public KafkaBrowseController(KafkaClientService kafkaClientService, TextTransformerService textFormatterService,
-			ConnectionSettings connectionSettings)
+			QuerySettingsManager querySettingsManager, ConnectionSettings connectionSettings)
 		{
 		this.kafkaClientService = kafkaClientService;
 		this.textFormatterService = textFormatterService;
+		this.querySettingsManager = querySettingsManager;
 		this.connectionSettings = connectionSettings;
 		}
 	
@@ -345,7 +349,7 @@ public class KafkaBrowseController
 			@RequestParam(value = "formatting", required = false) Boolean formatting
 			)
 		{
-		return (showMessageInternal(topic, partition, offset, format, (formatting == null) ? false : formatting));
+		return (showMessageInternal(topic, partition, offset, format, formatting));
 		}
 	
 	/**
@@ -366,21 +370,36 @@ public class KafkaBrowseController
 			@RequestParam(value = "formatting", required = false) Boolean formatting
 			)
 		{
-		return (showMessageInternal(topic, partition, offset, format, (formatting == null) ? false : formatting));
+		return (showMessageInternal(topic, partition, offset, format, formatting));
 		}
 	
-	private Map<String, Object> showMessageInternal(String topic, Integer partition, Long offset, String format, boolean formatting)
+	private Map<String, Object> showMessageInternal(String topic, Integer partition, Long offset, String format, Boolean formatting)
 		{
 		if (!connectionSettings.isBrowserEnabled())
 			throw new AccessDeniedException();
+		
+		final String formatName;
+		final boolean formattingActive;
+		if (format == null)
+			{
+			formatName = querySettingsManager.getFormatName(null);
+			formattingActive = querySettingsManager.isFormattingActive(null);
+			}
+		else
+			{
+			formatName = format;
+			formattingActive = (formatting == null) ? false : formatting;
+			querySettingsManager.setFormatName(null, formatName);
+			querySettingsManager.setFormattingActive(null, formattingActive);
+			}
 		
 		final Map<String, Object> model = new HashMap<String, Object>();
 		
 		model.put("topic", topic);
 		model.put("partition", partition);
 		model.put("offset", offset);
-		model.put("format", format);
-		model.put("formatting", formatting);
+		model.put("format", formatName);
+		model.put("formatting", formattingActive);
 		
 		model.put("formats", textFormatterService.getSupportedTextFormats());
 		
@@ -392,9 +411,9 @@ public class KafkaBrowseController
 		else
 			{
 			final Set<TextTransformerService.Option> options = EnumSet.of(TextTransformerService.Option.SYNTAX_COLORING, TextTransformerService.Option.LINE_NUMBERS);
-			if (formatting)
+			if (formattingActive)
 				options.add(TextTransformerService.Option.FORMATTING);
-			rec = new ConsumerRecordBean(record, textFormatterService.format(record.value(), format, options));
+			rec = new ConsumerRecordBean(record, textFormatterService.format(record.value(), formatName, options));
 			}
 		
 		final Map<String, TabItem<ConsumerRecordBean>> tabs = new HashMap<String, TabItem<ConsumerRecordBean>>(1);

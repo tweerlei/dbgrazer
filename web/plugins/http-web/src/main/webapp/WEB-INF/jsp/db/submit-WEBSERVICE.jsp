@@ -19,32 +19,17 @@
 %>
 	<script type="text/javascript">/*<![CDATA[*/
 	
-	function prepareForm() {
-		unzoomElement();
-	}
-	
 	function submitForm(frm) {
-		prepareForm();
 		getFormInto(frm, 'result');
 		return false;
 	}
 	
 	function submitFormTo(frm, ev, url, format, target) {
-		prepareForm();
 		return postForm(frm, ev, url, { resultformat: format }, target);
 	}
 	
 	function submitDownloadForm(event, format) {
 		return submitFormTo('submitform', event, 'db/${currentConnection.linkName}/submit-WEBSERVICE-export.html', format, '_blank');
-	}
-	
-	function formatQuery(frm) {
-		var e = $('statement');
-		var stmt = e.value;
-		formatText(stmt, 'XML', function(txt) {
-			e.value = txt;
-		});
-		return false;
 	}
 	
 	// on reload (caused by changing the formatting options), just reload the chart image
@@ -77,10 +62,11 @@
 	</ui:headline1>
 	
 	<div class="tab-page">
-		<div id="fullscreen" style="display: none;"><form class="content" action="#" onsubmit="return unzoomElement();">
-			<div><input type="button" value="<fmt:message key="format"><fmt:param value="XML"/></fmt:message>" onclick="formatQuery(form);"/>
-			<span class="action" title="<fmt:message key="maximize"/>" onclick="return unzoomElement();">&#x25f1;</span></div>
-		</form></div>
+		<div id="fullscreen" style="display: none;"></div>
+		<form id="zoomform" class="hidden" method="post" action="db/${currentConnection.linkName}/ajax/formatstmt.html">
+			<input id="zoomstmt" type="hidden" name="statement" value=""/>
+			<input type="hidden" name="format" value=""/>
+		</form>
 		<div id="zoomable1" class="tab-header">
 			<spring:form id="submitform" cssClass="full" action="db/${currentConnection.linkName}/ajax/submit-WEBSERVICE.html" modelAttribute="model" method="post" onsubmit="return submitForm(this);">
 				<spring:hidden id="resultformat" path="format"/>
@@ -103,9 +89,9 @@
 </c:otherwise></c:choose
 ></c:forEach
 >					<dt><label for="statement"><fmt:message key="sqlStatement"/></label></dt>
-					<dd><div><input type="button" value="<fmt:message key="format"><fmt:param value="XML"/></fmt:message>" onclick="formatQuery(form);"/>
+					<dd><div>
 						<span class="action" title="<fmt:message key="delete"/>" onclick="return clearElement('statement');">&#x232b;</span>
-						<span class="action" title="<fmt:message key="maximize"/>" onclick="return zoomElement('statement');">&#x25f1;</span></div>
+						<span class="action" title="<fmt:message key="maximize"/>" onclick="return zoomContent('statement');">&#x25f1;</span></div>
 						<spring:textarea id="statement" cssClass="medium" path="statement" cols="80" rows="25"/></dd>
 					<dt>&nbsp;</dt>
 					<dd><input type="submit" value="<fmt:message key="execute"/>"/>
