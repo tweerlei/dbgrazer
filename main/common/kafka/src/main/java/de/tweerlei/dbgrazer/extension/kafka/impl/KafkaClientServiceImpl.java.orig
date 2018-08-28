@@ -97,7 +97,7 @@ public class KafkaClientServiceImpl implements KafkaClientService, LinkListener,
 		public synchronized void close()
 			{
 			for (KafkaConsumer<String, String> consumer : allConsumers)
-				consumer.wakeup();
+				consumer.close();
 			for (KafkaProducer<String, String> producer : allProducers)
 				producer.close();
 			}
