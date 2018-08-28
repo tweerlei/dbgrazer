@@ -28,7 +28,7 @@
 	
 	<div id="tools-1" class="hidden"><div class="menucolumn">
 		<div class="menuitem"><span onclick="return toggleTextField('name');"><fmt:message key="rename"/></span></div>
-		<div class="menuitem"><span onclick="return showConfirmDialog('<fmt:message key="delete"/>', Messages.deleteLinkText, 'remove-link.html', '${model.originalName}');"><fmt:message key="delete"/></span></div>
+		<div class="menuitem"><span onclick="return showConfirmDialog('<fmt:message key="delete"/>', '<fmt:message key="deleteLinkText"/>', 'remove-link.html', '${model.originalName}');"><fmt:message key="delete"/></span></div>
 		<div class="menuitem"><span onclick="return gotoPage('link.html?template=${model.originalName}');"><fmt:message key="copy"/></span></div>
 		<ui:extensions items="${extensions}" separatorBefore="true"/>
 	</div></div>

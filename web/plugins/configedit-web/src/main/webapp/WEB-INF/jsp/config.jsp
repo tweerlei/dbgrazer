@@ -21,9 +21,12 @@
 	<div class="h1-actions">
 		<span class="menu" onclick="return showElementMenu(event, 'tools-1');"><fmt:message key="actions"/></span>
 	</div>
+	<div class="h1-actions">
+		<span class="menu" onclick="return showTopMenu(event, 'confighistory');"><fmt:message key="changeLog"/></span>
+	</div>
 	
 	<div id="tools-1" class="hidden"><div class="menucolumn">
-		<div class="menuitem"><span onclick="return showConfirmDialog('<fmt:message key="reloadConfig"/>', Messages.reloadConfigText, 'reload-config.html');"><fmt:message key="reloadConfig"/></span></div>
+		<div class="menuitem"><span onclick="return showConfirmDialog('<fmt:message key="reloadConfig"/>', '<fmt:message key="reloadConfigText"/>', 'reload-config.html');"><fmt:message key="reloadConfig"/></span></div>
 	</div></div>
 	</ui:headline1>
 	
@@ -36,7 +39,10 @@
 				<tr>
 					<th><fmt:message key="name"/></th>
 					<th><fmt:message key="description"/></th>
-					<th><fmt:message key="value"/></th>
+<c:if test="${currentUser.configEditorEnabled}"
+>					<th><fmt:message key="action"/></th>
+</c:if
+>					<th><fmt:message key="value"/></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -44,7 +50,12 @@
 >				<tr>
 					<td>${fn:escapeXml(c.key)}</td>
 					<td><fmt:message key="help_${c.key}"/></td>
-					<td><c:choose
+<c:if test="${currentUser.configEditorEnabled}"
+>					<td><span class="action" title="<fmt:message key="change"/>" onclick="showDialog(event, 'config', {q: '${fn:escapeXml(c.key)}'}, '${fn:escapeXml(c.key)}');">&#x270e;</span><c:if test="${settings[c.key] != null}"
+>						<span class="action" title="<fmt:message key="delete"/>" onclick="showConfirmDialog('${fn:escapeXml(c.key)}', '<fmt:message key="deleteConfigText"/>', 'unset-config.html', '${fn:escapeXml(c.key)}');">&#x2716;</span></c:if
+>						</td>
+</c:if
+>					<td><c:choose
 						><c:when test="${(settings[c.key] != null) && (settings[c.key] != c.value)}"><em>${fn:escapeXml(settings[c.key])}</em></c:when
 						><c:when test="${c.value == null}">&#x2205;</c:when
 						><c:otherwise>${fn:escapeXml(c.value)}</c:otherwise

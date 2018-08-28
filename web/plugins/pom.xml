@@ -17,6 +17,7 @@
 	
 	<modules>
 		<module>bookmark-web</module>
+		<module>configedit-web</module>
 		<module>file-web</module>
 		<module>http-web</module>
 		<module>jdbc-web</module>

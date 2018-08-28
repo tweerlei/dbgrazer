@@ -12,12 +12,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
---%><%@
-	include file="../include/include.jspf"
-%><div class="menucolumn">
-<ui:extensions items="${extensions}"/>
-<c:if test="${currentUser.reloadEnabled}"
-><hr class="menuseparator"/>
-<div class="menuitem"><a href="stats.html"><fmt:message key="stats"/></a></div>
-</c:if
-></div>
+--%><%--
+
+	Dummy file for overlay WAR. The actual file is found in DBExplorer-Web.
+
+--%>

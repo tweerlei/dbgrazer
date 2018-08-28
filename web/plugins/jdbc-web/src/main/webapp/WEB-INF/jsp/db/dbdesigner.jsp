@@ -34,7 +34,7 @@
 >		<div class="menuitem"><span onclick="return showDbDialog(event, 'design-save', { q: '${currentConnection.design.name}' }, '<fmt:message key="save"/>');"><fmt:message key="save"/></span></div>
 </c:if
 >		<div class="menuitem"><span onclick="return showDbDialog(event, 'design-load', { q: '${currentConnection.design.name}' }, '<fmt:message key="load"/>');"><fmt:message key="load"/></span></div>
-		<div class="menuitem"><span onclick="return showConfirmDialog('<fmt:message key="reset"/>', Messages.resetText, 'db/${currentConnection.linkName}/dbdesigner-reset.html');"><fmt:message key="reset"/></span></div>
+		<div class="menuitem"><span onclick="return showConfirmDialog('<fmt:message key="reset"/>', '<fmt:message key="resetText"/>', 'db/${currentConnection.linkName}/dbdesigner-reset.html');"><fmt:message key="reset"/></span></div>
 		<hr class="menuseparator"/>
 		<div class="menuitem"><span onclick="return showDbDialog(event, 'design-data', { q: '${currentConnection.design.name}' }, '<fmt:message key="downloadData"/>');"><fmt:message key="downloadData"/></span></div>
 		<div class="menuitem"><a href="db/${currentConnection.linkName}/dbdesigner-compare.html" target="_blank"><fmt:message key="structureCompare"/></a></div>

@@ -14,10 +14,12 @@
  * limitations under the License.
 --%><%@
 	include file="../include/include.jspf"
-%><div class="menucolumn">
-<ui:extensions items="${extensions}"/>
-<c:if test="${currentUser.reloadEnabled}"
-><hr class="menuseparator"/>
-<div class="menuitem"><a href="stats.html"><fmt:message key="stats"/></a></div>
-</c:if
-></div>
+%><form id="f1" action="set-config.html" method="post" onsubmit="return submitDialog(this);" onreset="return closeDialog();">
+	<input type="hidden" name="q" value="${fn:escapeXml(key)}"/>
+	<dl>
+		<dt><label for="f1-to"><fmt:message key="value"/></label></dt>
+		<dd><input id="f1-to" type="text" name="v" value="${fn:escapeXml(value)}"/></dd>
+		<dt>&nbsp;</dt>
+		<dd><input id="f1-submit" type="submit" value="<fmt:message key="apply"/>"/> <input id="f1-reset" type="reset" value="<fmt:message key="cancel"/>"/></dd>
+	</dl><hr/>
+</form>

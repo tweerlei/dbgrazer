@@ -15,24 +15,18 @@
  */
 package de.tweerlei.dbgrazer.common.service.impl;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import de.tweerlei.common.io.StreamUtils;
-import de.tweerlei.dbgrazer.common.service.ConfigFileStore;
+import de.tweerlei.dbgrazer.common.backend.ConfigLoader;
 import de.tweerlei.dbgrazer.common.service.ConfigListener;
 import de.tweerlei.dbgrazer.common.service.ConfigService;
 import de.tweerlei.spring.config.ConfigKey;
@@ -52,59 +46,38 @@ public class ConfigServiceImpl implements ConfigService
 	{
 	private static final class FileConfigProvider extends MapBackedConfigProvider
 		{
-		private final Logger logger;
+		private final ConfigLoader configLoader;
 		
-		public FileConfigProvider()
+		public FileConfigProvider(ConfigLoader configLoader)
 			{
-			this.logger = Logger.getLogger(getClass().getCanonicalName());
+			this.configLoader = configLoader;
 			}
 		
-		public void reload(File file, File dir, String charset)
+		public void reload()
 			{
-			try	{
-				final InputStreamReader isr = new InputStreamReader(new FileInputStream(file), charset);
-				try	{
-					final Properties props = new Properties();
-					props.load(isr);
-					
-					final Map<String, String> tmp = list();
-					tmp.clear();
-					for (Map.Entry<?, ?> ent : props.entrySet())
-						tmp.put(String.valueOf(ent.getKey()), String.valueOf(ent.getValue()));
-					
-					tmp.put(ConfigKeys.CONFIG_FILE.getKey(), file.getAbsolutePath());
-					tmp.put(ConfigKeys.CONFIG_PATH.getKey(), dir.getAbsolutePath());
-					}
-				finally
-					{
-					StreamUtils.closeQuietly(isr);
-					}
-				}
-			catch (IOException e)
-				{
-				logger.log(Level.WARNING, file.getAbsolutePath(), e);
-				}
+			final Properties props = configLoader.loadConfig();
+			
+			final Map<String, String> tmp = list();
+			tmp.clear();
+			for (Map.Entry<?, ?> ent : props.entrySet())
+				tmp.put(String.valueOf(ent.getKey()), String.valueOf(ent.getValue()));
 			}
 		}
 	
-	private final ConfigFileStore store;
 	private final FileConfigProvider configProvider;
 	private final CachedConfigAccessor accessor;
-	private final Logger logger;
 	private final List<ConfigListener> listeners;
 	
 	/**
 	 * Constructor
+	 * @param configLoader ConfigLoader
 	 * @param serializerFactory SerializerFactory
-	 * @param store ConfigFileStore
 	 */
 	@Autowired
-	public ConfigServiceImpl(ConfigFileStore store, SerializerFactory serializerFactory)
+	public ConfigServiceImpl(@Qualifier("fileConfigLoader") ConfigLoader configLoader, SerializerFactory serializerFactory)
 		{
-		this.store = store;
-		this.configProvider = new FileConfigProvider();
+		this.configProvider = new FileConfigProvider(configLoader);
 		this.accessor = new CachedConfigAccessor(new ConfigProviderAccessor(configProvider, serializerFactory));
-		this.logger = Logger.getLogger(getClass().getCanonicalName());
 		this.listeners = new LinkedList<ConfigListener>();
 		}
 	
@@ -115,17 +88,7 @@ public class ConfigServiceImpl implements ConfigService
 	@Override
 	public void reload()
 		{
-		final String configPath = store.getConfigFilePath();
-		final File configFile = store.getFileLocation(configPath);
-		configProvider.reload(configFile, store.getFileLocation(null), store.getFileEncoding());
-		
-		final StringBuilder sb = new StringBuilder();
-		sb.append("Loaded properties from ").append(configFile).append("\n");
-		for (Map.Entry<String, String> ent : configProvider.list().entrySet())
-			sb.append(ent.getKey()).append(" = ").append(ent.getValue()).append("\n");
-		
-		logger.log(Level.INFO, sb.toString());
-		
+		configProvider.reload();
 		accessor.flush();
 		
 		fireConfigChanged();

@@ -12,16 +12,6 @@ var Messages = {
 	loginTitle: 'Anmelden',
 	searchTitle: 'Abfragen suchen',
 	
-	deleteQueryText: 'Sind Sie sicher, daß Sie die Abfrage löschen möchten?',
-	deleteLinkText: 'Sind Sie sicher, daß Sie die Verbindung löschen möchten?',
-	deleteUserText: 'Sind Sie sicher, daß Sie den Benutzer löschen möchten?',
-	
-	reloadQueriesText: 'Abfragen neu laden?',
-	reloadConnectionsText: 'Verbindungen neu laden?',
-	reloadConfigText: 'Konfiguration neu laden?',
-	
-	resetText: 'Sind Sie sicher, daß Sie alle Objekte entfernen möchten?',
-	
 	imageFailed: 'Keine Daten gefunden.',
 	
 	cancel: 'abbrechen',

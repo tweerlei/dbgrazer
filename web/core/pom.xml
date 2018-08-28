@@ -126,6 +126,18 @@
 			</dependencies>
 		</profile>
 		<profile>
+			<id>configedit</id>
+			<dependencies>
+				<dependency>
+					<groupId>de.tweerlei</groupId>
+					<artifactId>dbgrazer-web-configedit</artifactId>
+					<version>${project.version}</version>
+					<type>war</type>
+					<scope>runtime</scope>
+				</dependency>
+			</dependencies>
+		</profile>
+		<profile>
 			<id>csv</id>
 			<dependencies>
 				<dependency>

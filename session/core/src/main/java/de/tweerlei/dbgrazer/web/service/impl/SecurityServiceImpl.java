@@ -108,6 +108,7 @@ public class SecurityServiceImpl implements SecurityService
 //		userSettings.setEditorActive(principal.isGranted(Authority.ROLE_EDIT) && configService.get(ConfigKeys.ENABLE_EDITOR));
 		userSettings.setLinkEditorEnabled(principal.isGranted(Authority.ROLE_LINKS) && configService.get(ConfigKeys.ENABLE_LINKS));
 		userSettings.setUserEditorEnabled(principal.isGranted(Authority.ROLE_USERS) && configService.get(ConfigKeys.ENABLE_USERS));
+		userSettings.setConfigEditorEnabled(principal.isGranted(Authority.ROLE_RELOAD) && configService.get(ConfigKeys.ENABLE_CONFIG));
 		userSettings.setSqlDisplayEnabled(configService.get(ConfigKeys.SHOW_SQL));
 		userSettings.setDotDisplayEnabled(configService.get(ConfigKeys.SHOW_DOT));
 		
@@ -123,6 +124,7 @@ public class SecurityServiceImpl implements SecurityService
 		userSettings.setEditorActive(false);
 		userSettings.setLinkEditorEnabled(false);
 		userSettings.setUserEditorEnabled(false);
+		userSettings.setConfigEditorEnabled(false);
 		userSettings.setSqlDisplayEnabled(false);
 		userSettings.setDotDisplayEnabled(false);
 		

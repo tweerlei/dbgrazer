@@ -12,16 +12,6 @@ var Messages = {
 	loginTitle: 'Log in',
 	searchTitle: 'Search queries',
 	
-	deleteQueryText: 'Are you sure you want to delete this query?',
-	deleteLinkText: 'Are you sure you want to delete this connection?',
-	deleteUserText: 'Are you sure you want to delete this user?',
-	
-	reloadQueriesText: 'Reload queries?',
-	reloadConnectionsText: 'Reload connections?',
-	reloadConfigText: 'Reload configuration?',
-	
-	resetText: 'Are you sure you want to remove all objects?',
-	
 	imageFailed: 'No data found.',
 	
 	cancel: 'cancel',

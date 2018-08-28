@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.tweerlei.dbgrazer.common.service.impl;
+package de.tweerlei.dbgrazer.common.backend.impl;
 
 import de.tweerlei.spring.config.ConfigKey;
 
@@ -25,13 +25,16 @@ import de.tweerlei.spring.config.ConfigKey;
 public final class ConfigKeys
 	{
 	/*
-	 * Backend settings (config.properties only)
+	 * Config location (System properties only)
 	 */
 	
-	private static final String PACKAGE_NAME = "dbgrazer.backend";
+	private static final String PACKAGE_NAME = "dbgrazer";
 	
-	/** Module prefix for the config loader impl. */
-	public static final ConfigKey<String> CONFIG_LOADER = ConfigKey.create(PACKAGE_NAME, "configLoader", String.class, "dummy");
+	/** This property will contain the path to the used config.properties */
+	public static final ConfigKey<String> CONFIG_FILE = ConfigKey.create(PACKAGE_NAME, "configFile", String.class, "config.properties");
+	
+	/** This property will contain the path to the used configuration files */
+	public static final ConfigKey<String> CONFIG_PATH = ConfigKey.create(PACKAGE_NAME, "configPath", String.class, null);
 	
 	
 	private ConfigKeys()

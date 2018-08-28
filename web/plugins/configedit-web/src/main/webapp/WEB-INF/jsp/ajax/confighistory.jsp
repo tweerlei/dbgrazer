@@ -15,9 +15,5 @@
 --%><%@
 	include file="../include/include.jspf"
 %><div class="menucolumn">
-<ui:extensions items="${extensions}"/>
-<c:if test="${currentUser.reloadEnabled}"
-><hr class="menuseparator"/>
-<div class="menuitem"><a href="stats.html"><fmt:message key="stats"/></a></div>
-</c:if
-></div>
+	<ui:history items="${history}"/>
+</div>

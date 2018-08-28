@@ -74,6 +74,9 @@ public final class ConfigKeys
 	/** Whether to enable the user editor */
 	public static final ConfigKey<Boolean> ENABLE_USERS = ConfigKey.create(PACKAGE_NAME, "security.enableUserEditor", Boolean.class, Boolean.FALSE);
 	
+	/** Whether to enable the config editor */
+	public static final ConfigKey<Boolean> ENABLE_CONFIG = ConfigKey.create(PACKAGE_NAME, "security.enableConfigEditor", Boolean.class, Boolean.FALSE);
+	
 	/** Expose SQL statements */
 	public static final ConfigKey<Boolean> SHOW_SQL = ConfigKey.create(PACKAGE_NAME, "security.showSQL", Boolean.class, Boolean.FALSE);
 	

@@ -25,7 +25,7 @@
 <c:if test="${not empty currentConnection.schemaVersion}"
 ><div class="menuitem"><a href="db/${currentConnection.linkName}/subschema.html"><fmt:message key="subschemaQueries"><fmt:param value="${currentConnection.schemaVersion}"/></fmt:message></a></div>
 </c:if
-><div class="menuitem"><span onclick="return showConfirmDialog('<fmt:message key="reloadQueries"/>', Messages.reloadQueriesText, 'db/${currentConnection.linkName}/reload-queries.html');"><fmt:message key="reloadQueries"/></span></div>
+><div class="menuitem"><span onclick="return showConfirmDialog('<fmt:message key="reloadQueries"/>', '<fmt:message key="reloadQueriesText"/>', 'db/${currentConnection.linkName}/reload-queries.html');"><fmt:message key="reloadQueries"/></span></div>
 <hr class="menuseparator"/>
 <div class="menuitem"><span onclick="return toggleEditMode();"><fmt:message key="previewMode"/> (<fmt:message key="previewModeShortcut"/>)</span></div>
 </c:if

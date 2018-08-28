@@ -13,28 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.tweerlei.dbgrazer.common.service.impl;
+package de.tweerlei.dbgrazer.common.service;
 
-import de.tweerlei.spring.config.ConfigKey;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+
+import de.tweerlei.dbgrazer.common.file.HistoryEntry;
 
 /**
- * Well known configuration keys
+ * Manage configuration
  * 
  * @author Robert Wruck
  */
-public final class ConfigKeys
+public interface ConfigManagerService
 	{
-	/*
-	 * Backend settings (config.properties only)
+	/**
+	 * Store a complete configuration
+	 * @param user User name
+	 * @param settings All configuration entries
+	 * @throws IOException on error
 	 */
+	public void updateConfig(String user, Map<String, String> settings) throws IOException;
 	
-	private static final String PACKAGE_NAME = "dbgrazer.backend";
-	
-	/** Module prefix for the config loader impl. */
-	public static final ConfigKey<String> CONFIG_LOADER = ConfigKey.create(PACKAGE_NAME, "configLoader", String.class, "dummy");
-	
-	
-	private ConfigKeys()
-		{
-		}
+	/**
+	 * Get the modification history
+	 * @param limit Limit number of returned entries
+	 * @return History
+	 */
+	public List<HistoryEntry> getHistory(int limit);
 	}

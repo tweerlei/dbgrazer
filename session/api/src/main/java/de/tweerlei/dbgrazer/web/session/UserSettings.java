@@ -91,6 +91,18 @@ public interface UserSettings
 	public void setUserEditorEnabled(boolean b);
 	
 	/**
+	 * Check whether the editor is enabled
+	 * @return Editor enabled
+	 */
+	public boolean isConfigEditorEnabled();
+	
+	/**
+	 * Set editor enabled
+	 * @param b Editor enabled
+	 */
+	public void setConfigEditorEnabled(boolean b);
+	
+	/**
 	 * Check whether the SQL display is enabled
 	 * @return SQL enabled
 	 */

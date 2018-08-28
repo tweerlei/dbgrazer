@@ -55,6 +55,7 @@ public class UserSettingsImpl implements UserSettings, Serializable
 	private boolean editorActive;
 	private boolean connEditor;
 	private boolean userEditor;
+	private boolean configEditor;
 	private boolean sql;
 	private boolean dot;
 	
@@ -127,6 +128,18 @@ public class UserSettingsImpl implements UserSettings, Serializable
 	public void setUserEditorEnabled(boolean b)
 		{
 		userEditor = b;
+		}
+
+	@Override
+	public boolean isConfigEditorEnabled()
+		{
+		return (configEditor);
+		}
+	
+	@Override
+	public void setConfigEditorEnabled(boolean b)
+		{
+		configEditor = b;
 		}
 
 	@Override

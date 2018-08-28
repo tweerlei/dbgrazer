@@ -25,7 +25,7 @@
 	<div id="tools-1" class="hidden"><div class="menucolumn">
 		<div class="menuitem"><a href="link.html"><fmt:message key="newConnection"/></a></div>
 		<hr class="menuseparator"/>
-		<div class="menuitem"><span onclick="return showConfirmDialog('<fmt:message key="reloadConnections"/>', Messages.reloadConnectionsText, 'reload-connections.html');"><fmt:message key="reloadConnections"/></span></div>
+		<div class="menuitem"><span onclick="return showConfirmDialog('<fmt:message key="reloadConnections"/>', '<fmt:message key="reloadConnectionsText"/>', 'reload-connections.html');"><fmt:message key="reloadConnections"/></span></div>
 		<ui:extensions items="${extensions}" separatorBefore="true"/>
 	</div></div>
 	</ui:headline1>
