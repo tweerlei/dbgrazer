@@ -40,7 +40,6 @@ import de.tweerlei.dbgrazer.query.model.Result;
 import de.tweerlei.dbgrazer.query.model.StatementProducer;
 import de.tweerlei.dbgrazer.query.service.QueryService;
 import de.tweerlei.dbgrazer.query.service.ResultBuilderService;
-import de.tweerlei.dbgrazer.web.constant.MessageKeys;
 import de.tweerlei.dbgrazer.web.exception.AccessDeniedException;
 import de.tweerlei.dbgrazer.web.model.TaskCompareProgressMonitor;
 import de.tweerlei.dbgrazer.web.model.TaskDMLProgressMonitor;
@@ -50,6 +49,8 @@ import de.tweerlei.dbgrazer.web.service.QueryPerformerService;
 import de.tweerlei.dbgrazer.web.service.SchemaTransformerService;
 import de.tweerlei.dbgrazer.web.service.TaskProgressService;
 import de.tweerlei.dbgrazer.web.service.UserSettingsManager;
+import de.tweerlei.dbgrazer.web.service.jdbc.DesignManagerService;
+import de.tweerlei.dbgrazer.web.service.jdbc.impl.TableSet;
 import de.tweerlei.dbgrazer.web.session.ConnectionSettings;
 import de.tweerlei.dbgrazer.web.session.UserSettings;
 import de.tweerlei.ermtools.dialect.SQLDialect;
@@ -125,6 +126,7 @@ public class DesignDiffController
 	private final DataFormatterFactory dataFormatterFactory;
 	private final UserSettingsManager userSettingsManager;
 	private final TaskProgressService taskProgressService;
+	private final DesignManagerService designManagerService;
 	private final UserSettings userSettings;
 	private final ConnectionSettings connectionSettings;
 	private final Logger logger;
@@ -140,6 +142,7 @@ public class DesignDiffController
 	 * @param resultBuilder ResultBuilderService
 	 * @param dataFormatterFactory DataFormatterFactory
 	 * @param taskProgressService TaskProgressService
+	 * @param designManagerService DesignManagerService
 	 * @param userSettings UserSettings
 	 * @param connectionSettings ConnectionSettings
 	 */
@@ -148,6 +151,7 @@ public class DesignDiffController
 			QueryService queryService, QueryPerformerService runner, SchemaTransformerService schemaTransformer,
 			UserSettingsManager userSettingsManager, ResultBuilderService resultBuilder,
 			DataFormatterFactory dataFormatterFactory, TaskProgressService taskProgressService,
+			DesignManagerService designManagerService,
 			UserSettings userSettings, ConnectionSettings connectionSettings)
 		{
 		this.metadataService = metadataService;
@@ -159,6 +163,7 @@ public class DesignDiffController
 		this.dataFormatterFactory = dataFormatterFactory;
 		this.userSettingsManager = userSettingsManager;
 		this.taskProgressService = taskProgressService;
+		this.designManagerService = designManagerService;
 		this.userSettings = userSettings;
 		this.connectionSettings = connectionSettings;
 		this.logger = Logger.getLogger(getClass().getCanonicalName());
@@ -208,7 +213,7 @@ public class DesignDiffController
 		final Set<QueryType> resultTypes = queryService.findScriptQueryTypes(connectionSettings.getType());
 		model.put("resultTypes", resultTypes);
 		
-		model.put("extensionJS", "jdbc.js");
+		model.put("extensionJS", JdbcMessageKeys.EXTENSION_JS);
 		
 		return (model);
 		}
@@ -235,12 +240,16 @@ public class DesignDiffController
 			model.put("progress", taskProgressService.getProgress());
 			return (model);
 			}
+		
+		final TableSet design = designManagerService.getCurrentDesign();
+		model.put("currentDesign", design);
+		
 		final TaskCompareProgressMonitor c = taskProgressService.createCompareProgressMonitor();
 		
 		try	{
 			final Set<QualifiedName> missing = new HashSet<QualifiedName>();
-			final SQLSchema left = readSchema(connectionSettings.getLinkName(), connectionSettings.getDesign().getTableNames(), missing, c.getSourceRows());
-			final SQLSchema right = readSchema(fbo.getConnection2(), connectionSettings.getDesign().getTableNames(), missing, c.getDestinationRows());
+			final SQLSchema left = readSchema(connectionSettings.getLinkName(), design.getTableNames(), missing, c.getSourceRows());
+			final SQLSchema right = readSchema(fbo.getConnection2(), design.getTableNames(), missing, c.getDestinationRows());
 			
 			final boolean crossDialect = !StringUtils.equals(connectionSettings.getDialectName(),
 					linkService.getLink(fbo.getConnection2(), null).getDialectName());
@@ -296,7 +305,7 @@ public class DesignDiffController
 	
 	private String getHeader(String c1, String c2)
 		{
-		return (dataFormatterFactory.getMessage(MessageKeys.DDL_COMPARE_HEADER, c1, c2));
+		return (dataFormatterFactory.getMessage(JdbcMessageKeys.DDL_COMPARE_HEADER, c1, c2));
 		}
 	
 	private SQLDialect getSQLDialect()

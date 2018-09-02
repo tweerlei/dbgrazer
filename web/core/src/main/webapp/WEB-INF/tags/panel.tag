@@ -26,7 +26,7 @@
 	taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
 %><div class="dashboard<c:if test="${collapsed}"> collapsed</c:if>">
 			<div class="dashboard-title">
-				<div class="dashboard-tab">${title}<c:if test="${zoomable}"> <span class="action" title="<fmt:message key="maximize"/>" onclick="return zoomTab(event);">&#x25f1;</span></c:if
+				<div class="dashboard-tab">${title}<c:if test="${zoomable}"> <span class="action" title="<fmt:message key="maximize"/>" onclick="return zoomTab(event);"><fmt:message key="maximizeIcon"/></span></c:if
 													><c:if test="${collapsed}"> <span class="action" title="<fmt:message key="expand"/>" onclick="return expandTab(event);">&#x25ba;</span></c:if></div>
 				<hr/>
 			</div>

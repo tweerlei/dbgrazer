@@ -23,7 +23,7 @@
 		<input id="queryName" type="hidden" name="q" value="${model.query.name}"/>
 <c:forEach items="${model.params}" var="p"
 ><c:if test="${(additionalParams != null) && (p.key >= fn:length(model.query.parameters)) && (p.key < fn:length(model.query.parameters) + fn:length(additionalParams))}"
->		<em>${fn:escapeXml(additionalParams[p.key - fn:length(model.query.parameters)].name)} = ${fn:escapeXml(p.value)}</em> <span class="action" title="<fmt:message key="remove"/>" onclick="return submitFormWithout('h1-form', event, 'db/${currentConnection.linkName}/result.html', 'qparams${p.key}');">&#x2716;</span>
+>		<em>${fn:escapeXml(additionalParams[p.key - fn:length(model.query.parameters)].name)} = ${fn:escapeXml(p.value)}</em> <span class="action" title="<fmt:message key="remove"/>" onclick="return submitFormWithout('h1-form', event, 'db/${currentConnection.linkName}/result.html', 'qparams${p.key}');"><fmt:message key="removeIcon"/></span>
 		&nbsp;
 </c:if
 >		<input type="hidden" id="qparams${p.key}" name="params[${p.key}]" value="${fn:escapeXml(p.value)}"/>
@@ -52,11 +52,11 @@
 </c:when><c:otherwise
 >		<a class="action" title="<fmt:message key="${i.title}"/>" href="${fn:escapeXml(i.href)}"><fmt:message key="${i.label}"/></a>
 </c:otherwise></c:choose></c:forEach
->		<span class="action" title="<fmt:message key="refresh"/>" onclick="return reloadPage();">&#x21ba;</span>
-		<span><span class="action" title="<fmt:message key="autorefresh"/>" onclick="return toggleAutoRefresh(event);">&#x231a; <span id="next-auto-refresh"></span></span></span>
-		<a class="action" title="<fmt:message key="newWindow"/>" href="db/${currentConnection.linkName}/result.html?q=${model.query.name}${paramString}" target="_blank">&#x2750;</a>
+>		<span class="action" title="<fmt:message key="refresh"/>" onclick="return reloadPage();"><fmt:message key="refreshIcon"/></span>
+		<span><span class="action" title="<fmt:message key="autorefresh"/>" onclick="return toggleAutoRefresh(event);"><fmt:message key="autorefreshIcon"/> <span id="next-auto-refresh"></span></span></span>
+		<a class="action" title="<fmt:message key="newWindow"/>" href="db/${currentConnection.linkName}/result.html?q=${model.query.name}${paramString}" target="_blank"><fmt:message key="newWindowIcon"/></a>
 <c:if test="${currentConnection.editorActive}"
->		<a class="action" title="<fmt:message key="editQuery"/>" href="db/${currentConnection.linkName}/edit.html?q=${model.query.name}">&#x270e;</a>
+>		<a class="action" title="<fmt:message key="editQuery"/>" href="db/${currentConnection.linkName}/edit.html?q=${model.query.name}"><fmt:message key="editQueryIcon"/></a>
 </c:if
 >	</div>
 	

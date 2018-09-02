@@ -61,7 +61,7 @@
 		<span class="menu" onclick="showDbMenu(event, 'metalinks');"><fmt:message key="download"/></span>
 	</div>
 	<div class="h1-actions">
-		<a class="action" title="<fmt:message key="newWindow"/>" href="db/${currentConnection.linkName}/dbobject.html?catalog=${catalog}&amp;schema=${schema}&amp;object=${object}" target="_blank">&#x2750;</a>
+		<a class="action" title="<fmt:message key="newWindow"/>" href="db/${currentConnection.linkName}/dbobject.html?catalog=${catalog}&amp;schema=${schema}&amp;object=${object}" target="_blank"><fmt:message key="newWindowIcon"/></a>
 	</div>
 	
 	<div id="tools-1" class="hidden"><div class="menucolumn">

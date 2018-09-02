@@ -15,11 +15,9 @@
  */
 package de.tweerlei.dbgrazer.web.controller.jdbc;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -35,7 +33,6 @@ import de.tweerlei.common5.jdbc.model.QualifiedName;
 import de.tweerlei.common5.jdbc.model.TableDescription;
 import de.tweerlei.dbgrazer.extension.jdbc.MetadataService;
 import de.tweerlei.dbgrazer.extension.jdbc.MetadataService.ColumnMode;
-import de.tweerlei.dbgrazer.security.service.UserManagerService;
 import de.tweerlei.dbgrazer.web.constant.CacheClass;
 import de.tweerlei.dbgrazer.web.constant.ErrorKeys;
 import de.tweerlei.dbgrazer.web.constant.MessageKeys;
@@ -48,11 +45,12 @@ import de.tweerlei.dbgrazer.web.service.FrontendHelperService;
 import de.tweerlei.dbgrazer.web.service.FrontendNotificationService;
 import de.tweerlei.dbgrazer.web.service.SchemaTransformerService;
 import de.tweerlei.dbgrazer.web.service.SchemaTransformerService.GraphMode;
-import de.tweerlei.dbgrazer.web.service.jdbc.DesignPersister;
 import de.tweerlei.dbgrazer.web.service.VisualizationService;
+import de.tweerlei.dbgrazer.web.service.jdbc.BrowserSettingsManagerService;
+import de.tweerlei.dbgrazer.web.service.jdbc.DesignManagerService;
+import de.tweerlei.dbgrazer.web.service.jdbc.impl.TableSet;
 import de.tweerlei.dbgrazer.web.session.ConnectionSettings;
 import de.tweerlei.dbgrazer.web.session.ResultCache;
-import de.tweerlei.dbgrazer.web.session.UserSettings;
 import de.tweerlei.ermtools.dialect.SQLDialect;
 import de.tweerlei.ermtools.dialect.impl.SQLDialectFactory;
 import de.tweerlei.spring.web.view.ErrorDownloadSource;
@@ -66,8 +64,6 @@ import de.tweerlei.spring.web.view.GenericDownloadView;
 @Controller
 public class DesignController
 	{
-	private static final String DESIGN_EXTENSION = "designs";
-	
 	private static class ToplevelLinkBuilder implements SchemaTransformerService.LinkBuilder
 		{
 		private final FrontendHelperService frontendHelper;
@@ -166,46 +162,44 @@ public class DesignController
 	private final DataFormatterFactory dataFormatterFactory;
 	private final VisualizationService visualizationService;
 	private final SchemaTransformerService schemaTransformer;
-	private final UserManagerService userManagerService;
 	private final ConnectionSettings connectionSettings;
 	private final FrontendHelperService frontendHelper;
 	private final FrontendNotificationService frontendNotificationService;
-	private final DesignPersister designPersister;
-	private final UserSettings userSettings;
+	private final DesignManagerService designManagerService;
+	private final BrowserSettingsManagerService browserSettingsManager;
 	private final ResultCache resultCache;
 	private final Logger logger;
 	
 	/**
 	 * Constructor
 	 * @param metadataService MetadataService
-	 * @param userManagerService UserManagerService
 	 * @param dataFormatterFactory DataFormatterFactory
 	 * @param visualizationService VisualizationService
 	 * @param frontendHelper FrontendHelperService
 	 * @param frontendNotificationService FrontendNotificationService
 	 * @param schemaTransformer SchemaTransformerService
-	 * @param designPersister DesignPersister
+	 * @param designManagerService DesignManagerService
+	 * @param browserSettingsManager BrowserSettingsManagerService
 	 * @param connectionSettings ConnectionSettings
-	 * @param userSettings UserSettings
 	 * @param resultCache ResultCache
 	 */
 	@Autowired
-	public DesignController(MetadataService metadataService, UserManagerService userManagerService,
+	public DesignController(MetadataService metadataService,
 			DataFormatterFactory dataFormatterFactory, VisualizationService visualizationService,
 			SchemaTransformerService schemaTransformer, FrontendHelperService frontendHelper,
-			FrontendNotificationService frontendNotificationService, DesignPersister designPersister,
-			ConnectionSettings connectionSettings, UserSettings userSettings, ResultCache resultCache)
+			FrontendNotificationService frontendNotificationService, DesignManagerService designManagerService,
+			BrowserSettingsManagerService browserSettingsManager,
+			ConnectionSettings connectionSettings, ResultCache resultCache)
 		{
 		this.metadataService = metadataService;
-		this.userManagerService = userManagerService;
 		this.dataFormatterFactory = dataFormatterFactory;
 		this.visualizationService = visualizationService;
 		this.schemaTransformer = schemaTransformer;
 		this.frontendHelper = frontendHelper;
 		this.frontendNotificationService = frontendNotificationService;
-		this.designPersister = designPersister;
+		this.designManagerService = designManagerService;
+		this.browserSettingsManager = browserSettingsManager;
 		this.connectionSettings = connectionSettings;
-		this.userSettings = userSettings;
 		this.resultCache = resultCache;
 		this.logger = Logger.getLogger(getClass().getCanonicalName());
 		}
@@ -227,11 +221,12 @@ public class DesignController
 		if (!connectionSettings.isDesignerEnabled())
 			throw new AccessDeniedException();
 		
-		connectionSettings.getDesign().getTableNames().clear();
-		connectionSettings.getDesign().getTableNames().add(new QualifiedName(catalog, schema, object));
-		connectionSettings.getDesign().reset();
+		final TableSet design = designManagerService.getCurrentDesign();
+		design.getTableNames().clear();
+		design.getTableNames().add(new QualifiedName(catalog, schema, object));
+		design.reset();
 		
-		connectionSettings.setDesignerPreviewMode(false);
+		browserSettingsManager.setDesignerPreviewMode(false);
 		
 		return ("redirect:dbdesigner.html");
 		}
@@ -250,14 +245,14 @@ public class DesignController
 		
 		model.put("catalogs", metadataService.getCatalogs(connectionSettings.getLinkName()));
 		
-		if (connectionSettings.getCatalog() != null)
+		if (browserSettingsManager.getCatalog() != null)
 			{
-			model.put("catalog", connectionSettings.getCatalog());
+			model.put("catalog", browserSettingsManager.getCatalog());
 			model.put("schemas", metadataService.getSchemas(connectionSettings.getLinkName()));
-			if (connectionSettings.getSchema() != null)
+			if (browserSettingsManager.getSchema() != null)
 				{
-				model.put("schema", connectionSettings.getSchema());
-				model.put("objects", metadataService.getTables(connectionSettings.getLinkName(), connectionSettings.getCatalog(), connectionSettings.getSchema(), TableDescription.TABLE).keySet());
+				model.put("schema", browserSettingsManager.getSchema());
+				model.put("objects", metadataService.getTables(connectionSettings.getLinkName(), browserSettingsManager.getCatalog(), browserSettingsManager.getSchema(), TableDescription.TABLE).keySet());
 				}
 			}
 		
@@ -281,11 +276,12 @@ public class DesignController
 		if (!connectionSettings.isDesignerEnabled())
 			throw new AccessDeniedException();
 		
-		connectionSettings.setCatalog(catalog);
-		connectionSettings.setSchema(schema);
+		browserSettingsManager.setCatalog(catalog);
+		browserSettingsManager.setSchema(schema);
 		
-		connectionSettings.getDesign().getTableNames().add(new QualifiedName(catalog, schema, object));
-		connectionSettings.getDesign().modify();
+		final TableSet design = designManagerService.getCurrentDesign();
+		design.getTableNames().add(new QualifiedName(catalog, schema, object));
+		design.modify();
 		
 		return ("redirect:dbdesigner.html");
 		}
@@ -304,12 +300,12 @@ public class DesignController
 		
 		model.put("catalogs", metadataService.getCatalogs(connectionSettings.getLinkName()));
 		
-		if (connectionSettings.getCatalog() != null)
+		if (browserSettingsManager.getCatalog() != null)
 			{
-			model.put("catalog", connectionSettings.getCatalog());
+			model.put("catalog", browserSettingsManager.getCatalog());
 			model.put("schemas", metadataService.getSchemas(connectionSettings.getLinkName()));
-			if (connectionSettings.getSchema() != null)
-				model.put("schema", connectionSettings.getSchema());
+			if (browserSettingsManager.getSchema() != null)
+				model.put("schema", browserSettingsManager.getSchema());
 			}
 		
 		return (model);
@@ -332,13 +328,14 @@ public class DesignController
 		if (!connectionSettings.isDesignerEnabled())
 			throw new AccessDeniedException();
 		
-		connectionSettings.setCatalog(catalog);
-		connectionSettings.setSchema(schema);
+		browserSettingsManager.setCatalog(catalog);
+		browserSettingsManager.setSchema(schema);
 		
+		final TableSet design = designManagerService.getCurrentDesign();
 		for (QualifiedName qn : metadataService.getTables(connectionSettings.getLinkName(), catalog, schema, TableDescription.TABLE, object).keySet())
-			connectionSettings.getDesign().getTableNames().add(qn);
+			design.getTableNames().add(qn);
 		
-		connectionSettings.getDesign().modify();
+		design.modify();
 		
 		return ("redirect:dbdesigner.html");
 		}
@@ -360,8 +357,9 @@ public class DesignController
 		if (!connectionSettings.isDesignerEnabled())
 			throw new AccessDeniedException();
 		
-		connectionSettings.getDesign().getTableNames().remove(new QualifiedName(catalog, schema, object));
-		connectionSettings.getDesign().modify();
+		final TableSet design = designManagerService.getCurrentDesign();
+		design.getTableNames().remove(new QualifiedName(catalog, schema, object));
+		design.modify();
 		
 		return ("redirect:dbdesigner.html");
 		}
@@ -377,10 +375,11 @@ public class DesignController
 		if (!connectionSettings.isDesignerEnabled())
 			throw new AccessDeniedException();
 		
-		connectionSettings.getDesign().getTableNames().clear();
-		connectionSettings.getDesign().reset();
+		final TableSet design = designManagerService.getCurrentDesign();
+		design.getTableNames().clear();
+		design.reset();
 		
-		connectionSettings.setDesignerPreviewMode(false);
+		browserSettingsManager.setDesignerPreviewMode(false);
 		
 		return ("redirect:dbdesigner.html");
 		}
@@ -400,7 +399,7 @@ public class DesignController
 		
 		final Map<String, Object> model = new HashMap<String, Object>();
 		
-		model.put("designs", userManagerService.listExtensionObjects(userSettings.getPrincipal().getLogin(), connectionSettings.getSchemaName(), DESIGN_EXTENSION));
+		model.put("designs", designManagerService.listAvailableDesigns());
 		model.put("design", name);
 		
 		return (model);
@@ -421,7 +420,7 @@ public class DesignController
 		
 		final Map<String, Object> model = new HashMap<String, Object>();
 		
-		model.put("designs", userManagerService.listExtensionObjects(userSettings.getPrincipal().getLogin(), connectionSettings.getSchemaName(), DESIGN_EXTENSION));
+		model.put("designs", designManagerService.listAvailableDesigns());
 		model.put("design", name);
 		
 		return (model);
@@ -442,18 +441,8 @@ public class DesignController
 		
 		if (!StringUtils.empty(name))
 			{
-			try	{
-				final SortedSet<QualifiedName> tables = userManagerService.loadExtensionObject(userSettings.getPrincipal().getLogin(), connectionSettings.getSchemaName(), DESIGN_EXTENSION, name, designPersister);
-				connectionSettings.getDesign().getTableNames().clear();
-				connectionSettings.getDesign().getTableNames().addAll(tables);
-				connectionSettings.getDesign().persist(name);
-				
-				connectionSettings.setDesignerPreviewMode(true);
-				}
-			catch (IOException e)
-				{
-				logger.log(Level.WARNING, "loadDesign", e);
-				}
+			designManagerService.loadDesign(name);
+			browserSettingsManager.setDesignerPreviewMode(true);
 			}
 		
 		return ("redirect:dbdesigner.html");
@@ -473,15 +462,7 @@ public class DesignController
 			throw new AccessDeniedException();
 		
 		if (!StringUtils.empty(name))
-			{
-			try	{
-				userManagerService.removeExtensionObject(userSettings.getPrincipal().getLogin(), userSettings.getPrincipal().getLogin(), connectionSettings.getSchemaName(), DESIGN_EXTENSION, name);
-				}
-			catch (IOException e)
-				{
-				logger.log(Level.WARNING, "removeDesign", e);
-				}
-			}
+			designManagerService.removeDesign(name);
 		
 		return ("redirect:dbdesigner.html");
 		}
@@ -499,17 +480,8 @@ public class DesignController
 		if (!connectionSettings.isDesignerEnabled())
 			throw new AccessDeniedException();
 		
-		if (!StringUtils.empty(name) && !connectionSettings.getDesign().getTableNames().isEmpty())
-			{
-			try	{
-				final String dn = userManagerService.saveExtensionObject(userSettings.getPrincipal().getLogin(), userSettings.getPrincipal().getLogin(), connectionSettings.getSchemaName(), DESIGN_EXTENSION, name, connectionSettings.getDesign().getTableNames(), designPersister);
-				connectionSettings.getDesign().persist(dn);
-				}
-			catch (IOException e)
-				{
-				logger.log(Level.WARNING, "saveDesign", e);
-				}
-			}
+		if (!StringUtils.empty(name))
+			designManagerService.saveDesign(name);
 		
 		return ("redirect:dbdesigner.html");
 		}
@@ -532,26 +504,29 @@ public class DesignController
 			throw new AccessDeniedException();
 		
 		if (preview != null)
-			connectionSettings.setDesignerPreviewMode(preview);
+			browserSettingsManager.setDesignerPreviewMode(preview);
 		if (compact != null)
-			connectionSettings.setDesignerCompactMode(compact);
+			browserSettingsManager.setDesignerCompactMode(compact);
 		if (sort != null)
-			connectionSettings.setSortColumns(sort);
+			browserSettingsManager.setSortColumns(sort);
 		
 		final Map<String, Object> model = new HashMap<String, Object>();
 		
-		if (!connectionSettings.getDesign().getTableNames().isEmpty())
+		final TableSet design = designManagerService.getCurrentDesign();
+		model.put("currentDesign", design);
+		
+		if (!design.getTableNames().isEmpty())
 			{
 			final SQLDialect dialect = getSQLDialect();
 			
 			final Set<QualifiedName> missing = new TreeSet<QualifiedName>();
-			final Set<TableDescription> infos = metadataService.getTableInfos(connectionSettings.getLinkName(), connectionSettings.getDesign().getTableNames(), missing,
-					connectionSettings.isDesignerCompactMode() ? ColumnMode.PK_FK : (connectionSettings.isSortColumns() ? ColumnMode.SORTED : ColumnMode.ALL), null);
+			final Set<TableDescription> infos = metadataService.getTableInfos(connectionSettings.getLinkName(), design.getTableNames(), missing,
+					browserSettingsManager.isDesignerCompactMode() ? ColumnMode.PK_FK : (browserSettingsManager.isSortColumns() ? ColumnMode.SORTED : ColumnMode.ALL), null);
 			
 			for (QualifiedName qn : missing)
 				frontendNotificationService.logObjectError(qn, ErrorKeys.TABLE_NOT_FOUND, dialect.getQualifiedTableName(qn));
 			
-			final Visualization def = new TableDescriptionVisualizer(schemaTransformer, frontendHelper, infos, connectionSettings.getLinkName(), connectionSettings.isDesignerPreviewMode(), connectionSettings.isDesignerPreviewMode(), dialect).getVisualization();
+			final Visualization def = new TableDescriptionVisualizer(schemaTransformer, frontendHelper, infos, connectionSettings.getLinkName(), browserSettingsManager.isDesignerPreviewMode(), browserSettingsManager.isDesignerPreviewMode(), dialect).getVisualization();
 			resultCache.clearCachedObjects(CacheClass.SCHEMA_VISUALIZATION);
 			final String key = resultCache.addCachedObject(CacheClass.SCHEMA_VISUALIZATION, def);
 			
@@ -560,7 +535,8 @@ public class DesignController
 			model.put(RowSetConstants.ATTR_IMAGEMAP_ID, ViewConstants.IMAGEMAP_ID);
 			}
 		
-		model.put("extensionJS", "jdbc.js");
+		model.put("browserSettings", browserSettingsManager);
+		model.put("extensionJS", JdbcMessageKeys.EXTENSION_JS);
 		
 		return (model);
 		}
@@ -608,11 +584,12 @@ public class DesignController
 		
 		final SQLDialect dialect = getSQLDialect();
 		
+		final TableSet design = designManagerService.getCurrentDesign();
 		final Set<QualifiedName> missing = new TreeSet<QualifiedName>();
-		final Set<TableDescription> infos = metadataService.getTableInfos(connectionSettings.getLinkName(), connectionSettings.getDesign().getTableNames(), missing,
-				connectionSettings.isDesignerCompactMode() ? ColumnMode.PK_FK : (connectionSettings.isSortColumns() ? ColumnMode.SORTED : ColumnMode.ALL), null);
+		final Set<TableDescription> infos = metadataService.getTableInfos(connectionSettings.getLinkName(), design.getTableNames(), missing,
+				browserSettingsManager.isDesignerCompactMode() ? ColumnMode.PK_FK : (browserSettingsManager.isSortColumns() ? ColumnMode.SORTED : ColumnMode.ALL), null);
 		
-		final TableDescriptionVisualizer v = new TableDescriptionVisualizer(schemaTransformer, frontendHelper, infos, connectionSettings.getLinkName(), connectionSettings.isDesignerPreviewMode(), true, dialect);
+		final TableDescriptionVisualizer v = new TableDescriptionVisualizer(schemaTransformer, frontendHelper, infos, connectionSettings.getLinkName(), browserSettingsManager.isDesignerPreviewMode(), true, dialect);
 		dataFormatterFactory.doWithDefaultTheme(v);
 		model.put(GenericDownloadView.SOURCE_ATTRIBUTE, visualizationService.getSourceTextDownloadSource(v.getVisualization(), "design"));
 		
@@ -633,11 +610,12 @@ public class DesignController
 		
 		final SQLDialect dialect = getSQLDialect();
 		
+		final TableSet design = designManagerService.getCurrentDesign();
 		final Set<QualifiedName> missing = new TreeSet<QualifiedName>();
-		final Set<TableDescription> infos = metadataService.getTableInfos(connectionSettings.getLinkName(), connectionSettings.getDesign().getTableNames(), missing,
-				connectionSettings.isDesignerCompactMode() ? ColumnMode.PK_FK : (connectionSettings.isSortColumns() ? ColumnMode.SORTED : ColumnMode.ALL), null);
+		final Set<TableDescription> infos = metadataService.getTableInfos(connectionSettings.getLinkName(), design.getTableNames(), missing,
+				browserSettingsManager.isDesignerCompactMode() ? ColumnMode.PK_FK : (browserSettingsManager.isSortColumns() ? ColumnMode.SORTED : ColumnMode.ALL), null);
 		
-		final TableDescriptionVisualizer v = new TableDescriptionVisualizer(schemaTransformer, frontendHelper, infos, connectionSettings.getLinkName(), connectionSettings.isDesignerPreviewMode(), true, dialect);
+		final TableDescriptionVisualizer v = new TableDescriptionVisualizer(schemaTransformer, frontendHelper, infos, connectionSettings.getLinkName(), browserSettingsManager.isDesignerPreviewMode(), true, dialect);
 		dataFormatterFactory.doWithDefaultTheme(v);
 		model.put(GenericDownloadView.SOURCE_ATTRIBUTE, visualizationService.getImageDownloadSource(v.getVisualization(), "design"));
 		

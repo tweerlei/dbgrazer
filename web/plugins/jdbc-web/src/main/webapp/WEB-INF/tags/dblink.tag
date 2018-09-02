@@ -27,9 +27,11 @@
 %><%@
 	taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
 %><%@
+	taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
+%><%@
 	taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"
 %><c:choose
-><c:when test="${value == null}">&#x2205;</c:when
+><c:when test="${value == null}"><fmt:message key="null"/></c:when
 ><c:when test="${fk == null && (fn:startsWith(value, 'http://') || fn:startsWith(value, 'https://'))}"><a class="external" href="${fn:escapeXml(value)}" target="_blank">${fn:escapeXml(fn:substringAfter(value, '//'))}</a></c:when
 ><c:when test="${fk == null}">${fn:escapeXml((empty label) ? value : label)}</c:when
 ><c:when test="${not empty targetElement}"><a href="db/${currentConnection.linkName}/dbobject.html?catalog=${fk.tableName.catalogName}&amp;schema=${fk.tableName.schemaName}&amp;object=${fk.tableName.objectName}#!where=<c:forEach items="${fk.columns}" var="c">${dir ? c.key : c.value}!3!${fn:escapeXml(value)}</c:forEach>" onclick="return showDBObject(event, '${fk.tableName.catalogName}', '${fk.tableName.schemaName}', '${fk.tableName.objectName}', null, null, null, '<c:forEach items="${fk.columns}" var="c">${dir ? c.key : c.value}=${fn:escapeXml(value)}</c:forEach>', '', '${targetElement}');"<c:if test="${empty label}"> title="${fk.tableName.objectName}"</c:if>>${fn:escapeXml((empty label) ? value : label)}</a></c:when

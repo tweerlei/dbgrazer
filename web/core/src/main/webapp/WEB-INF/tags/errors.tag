@@ -23,5 +23,5 @@
 %><%@
 	taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
 %><c:forEach items="${currentUser.errorsForDisplay}" var="e" varStatus="st">
-		<div id="error-${label}${st.index}" class="error"><span class="action" onclick="return hideError('${label}${st.index}');">&#x2716;</span> <fmt:message key="${e.key}"><c:forEach items="${e.params}" var="p"><fmt:param value="${p}"/></c:forEach></fmt:message></div></c:forEach
+		<div id="error-${label}${st.index}" class="error"><span class="action" onclick="return hideError('${label}${st.index}');"><fmt:message key="removeIcon"/></span> <fmt:message key="${e.key}"><c:forEach items="${e.params}" var="p"><fmt:param value="${p}"/></c:forEach></fmt:message></div></c:forEach
 >

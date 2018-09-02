@@ -47,8 +47,8 @@
 	</div>
 </c:if
 >	<div class="h1-actions">
-		<span class="action" title="<fmt:message key="refresh"/>" onclick="return reloadPage();">&#x21ba;</span>
-		<span><span class="action" title="<fmt:message key="autorefresh"/>" onclick="return toggleAutoRefresh(event);">&#x231a; <span id="next-auto-refresh"></span></span></span>
+		<span class="action" title="<fmt:message key="refresh"/>" onclick="return reloadPage();"><fmt:message key="refreshIcon"/></span>
+		<span><span class="action" title="<fmt:message key="autorefresh"/>" onclick="return toggleAutoRefresh(event);"><fmt:message key="autorefreshIcon"/> <span id="next-auto-refresh"></span></span></span>
 	</div>
 	
 	<div id="tools-1" class="hidden"><div class="menucolumn">

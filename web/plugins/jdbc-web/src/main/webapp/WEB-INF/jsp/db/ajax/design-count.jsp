@@ -17,13 +17,13 @@
 %><div class="tab-body">
 		<ui:headline2 key="designer">
 		<div class="h2-actions">
-			: ${currentConnection.design.name}
+			: ${currentDesign.name}
 			<a href="db/${currentConnection.linkName}/dbdesigner.html">${currentConnection.linkName}</a>
 <c:if test="${not empty model.connection2}"
 >			<fmt:message key="to"/>
 			<a href="db/${model.connection2}/dbdesigner.html">${model.connection2}</a>
 </c:if
->			<span class="action" title="<fmt:message key="maximize"/>" onclick="return toggleElement('zoomable1');">&#x25f1;</span>
+>			<span class="action" title="<fmt:message key="maximize"/>" onclick="return toggleElement('zoomable1');"><fmt:message key="maximizeIcon"/></span>
 		</div>
 		</ui:headline2>
 

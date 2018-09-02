@@ -17,13 +17,13 @@
 %><spring:form id="f1" action="db/${currentConnection.linkName}/send-message.html" method="post" modelAttribute="model" onsubmit="return submitDML(this);" onreset="return closeDialog();">
 	<div id="dmlerror"></div>
 	<dl>
-		<dt><label for="f1-topic">Topic</label></dt>
+		<dt><label for="f1-topic"><fmt:message key="kafkaTopic"/></label></dt>
 		<dd><input type="text" id="f1-topic" name="topic" value="${fn:escapeXml(topic)}"/></dd>
-		<dt><label for="f1-partition">Partition</label></dt>
+		<dt><label for="f1-partition"><fmt:message key="kafkaPartition"/></label></dt>
 		<dd><input type="text" id="f1-partition" name="partition" value="${partition}"/></dd>
-		<dt><label for="f1-key"><fmt:message key="messageKey"/></label></dt>
+		<dt><label for="f1-key"><fmt:message key="key"/></label></dt>
 		<dd><input type="text" id="f1-key" name="key"/></dd>
-		<dt><label for="f1-message"><fmt:message key="messageBody"/></label></dt>
+		<dt><label for="f1-message"><fmt:message key="body"/></label></dt>
 		<dd><textarea id="f1-message" name="message" class="large" cols="80" rows="25"></textarea></dd>
 		<dt>&nbsp;</dt>
 		<dd><input id="f1-submit" type="submit" value="<fmt:message key="send"/>"/> <input id="f1-reset" type="reset" value="<fmt:message key="cancel"/>"/></dd>

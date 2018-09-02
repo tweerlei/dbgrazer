@@ -63,7 +63,7 @@
 	><c:set var="args" value="${args}'${row.values[pk]}'"
 /></c:forEach
 ><c:set var="args" value="${args}], '${rs.query.name}'"
-						/>&nbsp;<span class="action" title="<fmt:message key="updateRow"/>" onclick="return showUpdateDialog(${args});">&#x270d;</span>&nbsp;<span class="action" title="<fmt:message key="copyRow"/>" onclick="return showCopyDialog(${args});">&#x271a;</span>&nbsp;<span class="action" title="<fmt:message key="deleteRow"/>" onclick="return showDeleteDialog(${args});">&#x2716;</span></c:if
+						/>&nbsp;<span class="action" title="<fmt:message key="updateRow"/>" onclick="return showUpdateDialog(${args});"><fmt:message key="editIcon"/></span>&nbsp;<span class="action" title="<fmt:message key="copyRow"/>" onclick="return showCopyDialog(${args});"><fmt:message key="copyIcon"/></span>&nbsp;<span class="action" title="<fmt:message key="deleteRow"/>" onclick="return showDeleteDialog(${args});"><fmt:message key="removeIcon"/></span></c:if
 						></td>
 </c:forEach
 >				</tr>

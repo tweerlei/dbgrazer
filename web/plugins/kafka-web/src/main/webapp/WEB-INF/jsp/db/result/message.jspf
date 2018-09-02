@@ -21,9 +21,9 @@
 			<input type="hidden" id="f1-partition" name="partition" value="${partition}"/>
 			<input type="hidden" id="f1-offset" name="offset" value="${offset}"/>
 			<div class="column3"><dl class="result">
-				<dt>Topic</dt>
+				<dt><fmt:message key="kafkaTopic"/></dt>
 				<dd>${topic}</dd>
-				<dt>Partition</dt>
+				<dt><fmt:message key="kafkaPartition"/></dt>
 				<dd><a href="db/${currentConnection.linkName}/partition.html?topic=${topic}&amp;partition=${partition}"<c:if test="${not empty targetElement}"> onclick="return showPartition(event, '${topic}', '${partition}');"</c:if>>${partition}</a></dd>
 				<dt>ID</dt>
 				<dd>${offset}</dd>
@@ -34,7 +34,7 @@
 				<dd><fmt:formatDate pattern="yyyy-MM-dd HH:mm:ss" value="${rs.timestamp}"/></dd>
 				<dt>Key</dt>
 				<dd>${fn:escapeXml(rs.key)}</dd>
-				<dt>Format</dt>
+				<dt><fmt:message key="formatter"/></dt>
 				<dd><select id="f1-format" name="format" onchange="Forms.submit(form);">
 					<option value=""><fmt:message key="default"/></option>
 <c:forEach items="${formats}" var="f"

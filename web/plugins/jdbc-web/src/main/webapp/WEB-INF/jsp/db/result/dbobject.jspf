@@ -56,7 +56,7 @@
 							<td>${st.index + 1}</td>
 							<td>${c.name}</td>
 							<td>${pkIndices[st.index]}</td>
-							<td>${c.nullable ? '&#x2612;' : '&#x2610;'}</td>
+							<td><fmt:message key="${c.nullable}"/></td>
 							<td>${c.type.name}</td>
 							<td>${c.type.length}</td>
 							<td>${c.type.decimals > 0 ? c.type.decimals : ''}</td>
@@ -84,7 +84,7 @@
 							<td>${priv.privilege}</td>
 							<td>${priv.grantee}</td>
 							<td>${priv.grantor}</td>
-							<td>${priv.grantable ? '&#x2612;' : '&#x2610;'}</td>
+							<td><fmt:message key="${priv.grantable}"/></td>
 						</tr>
 </c:forEach
 >					</tbody>
@@ -108,7 +108,7 @@
 <c:forEach items="${info.indices}" var="ix"
 >						<tr>
 							<td>${ix.name}</td>
-							<td>${ix.unique ? '&#x2612;' : '&#x2610;'}</td>
+							<td><fmt:message key="${ix.unique}"/></td>
 							<td><c:forEach items="${ix.columns}" var="c" varStatus="st"><c:if test="${!st.first}"><br/></c:if>${c}</c:forEach></td>
 						</tr>
 </c:forEach
@@ -194,18 +194,18 @@
 			</form>
 <c:if test="${depth > 0}"
 >			<div class="filter">
-				<span class="button" onclick="showDBObject(event, '${catalog}', '${schema}', '${object}', ${depth-1}, ${currentConnection.expandOtherSchemas});"><fmt:message key="less"/></span>
+				<span class="button" onclick="showDBObject(event, '${catalog}', '${schema}', '${object}', ${depth-1}, ${browserSettings.expandOtherSchemas});"><fmt:message key="less"/></span>
 			</div>
 </c:if><c:if test="${depth < maxDepth}"
 >			<div class="filter">
-				<span class="button" onclick="showDBObject(event, '${catalog}', '${schema}', '${object}', ${depth+1}, ${currentConnection.expandOtherSchemas});"><fmt:message key="more"/></span>
+				<span class="button" onclick="showDBObject(event, '${catalog}', '${schema}', '${object}', ${depth+1}, ${browserSettings.expandOtherSchemas});"><fmt:message key="more"/></span>
 			</div>
 </c:if
 >			<form class="filter" action="#" method="get" onsubmit="return false;">
-				<input id="allSchemas" type="checkbox" name="allSchemas" value="true"<c:if test="${currentConnection.expandOtherSchemas}"> checked="checked"</c:if> onchange="showDBObject(event, '${catalog}', '${schema}', '${object}', ${depth}, \$('allSchemas').checked, ${currentConnection.sortColumns});"/> <label for="allSchemas"><fmt:message key="allSchemas"/></label>
+				<input id="allSchemas" type="checkbox" name="allSchemas" value="true"<c:if test="${browserSettings.expandOtherSchemas}"> checked="checked"</c:if> onchange="showDBObject(event, '${catalog}', '${schema}', '${object}', ${depth}, \$('allSchemas').checked, ${browserSettings.sortColumns});"/> <label for="allSchemas"><fmt:message key="allSchemas"/></label>
 			</form>
 			<form class="filter" action="#" method="get" onsubmit="return false;">
-				<input id="sort" type="checkbox" name="sort" value="true"<c:if test="${currentConnection.sortColumns}"> checked="checked"</c:if> onchange="showDBObject(event, '${catalog}', '${schema}', '${object}', ${depth}, ${currentConnection.expandOtherSchemas}, \$('sort').checked);"/> <label for="sort"><fmt:message key="sortColumns"/></label>
+				<input id="sort" type="checkbox" name="sort" value="true"<c:if test="${browserSettings.sortColumns}"> checked="checked"</c:if> onchange="showDBObject(event, '${catalog}', '${schema}', '${object}', ${depth}, ${browserSettings.expandOtherSchemas}, \$('sort').checked);"/> <label for="sort"><fmt:message key="sortColumns"/></label>
 			</form>
 </c:when><c:otherwise
 >			<div class="filter">
@@ -221,8 +221,8 @@
 </c:if><c:if test="${depth < maxDepth}"
 >				<input type="button" value="<fmt:message key="more"/>" onclick="form.elements['depth'].value = ${depth+1}; Forms.submit(form, event);"/>
 </c:if
->				<input id="allSchemas" type="checkbox" name="allSchemas" value="true"<c:if test="${currentConnection.expandOtherSchemas}"> checked="checked"</c:if> onchange="Forms.submit(form, event);"/> <label for="allSchemas"><fmt:message key="allSchemas"/></label>
-				<input id="sort" type="checkbox" name="sort" value="true"<c:if test="${currentConnection.sortColumns}"> checked="checked"</c:if> onchange="Forms.submit(form, event);"/> <label for="sort"><fmt:message key="sortColumns"/></label>
+>				<input id="allSchemas" type="checkbox" name="allSchemas" value="true"<c:if test="${browserSettings.expandOtherSchemas}"> checked="checked"</c:if> onchange="Forms.submit(form, event);"/> <label for="allSchemas"><fmt:message key="allSchemas"/></label>
+				<input id="sort" type="checkbox" name="sort" value="true"<c:if test="${browserSettings.sortColumns}"> checked="checked"</c:if> onchange="Forms.submit(form, event);"/> <label for="sort"><fmt:message key="sortColumns"/></label>
 			</form>
 </c:otherwise></c:choose>
 			<hr/>

@@ -20,7 +20,7 @@
 	<ui:headline1 label="${pageTitle}">
 	<div class="h1-actions">
 <c:if test="${currentConnection.editorActive}"
->		<a class="action" title="<fmt:message key="editQuery"/>" href="db/${currentConnection.linkName}/edit.html?q=${title}">&#x270e;</a>
+>		<a class="action" title="<fmt:message key="editQuery"/>" href="db/${currentConnection.linkName}/edit.html?q=${title}"><fmt:message key="editQueryIcon"/></a>
 </c:if
 >	</div>
 	</ui:headline1>

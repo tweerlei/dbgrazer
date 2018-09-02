@@ -27,11 +27,13 @@
 %><%@
 	taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
 %><%@
+	taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
+%><%@
 	taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"
 %><%@
 	taglib prefix="util" uri="http://tweerlei.de/dbgrazer/web/taglib/JspFunctions"
 %><c:choose
-><c:when test="${value == null}">&#x2205;</c:when
+><c:when test="${value == null}"><fmt:message key="null"/></c:when
 ><c:when test="${target == null}"><span class="aggfilter" onclick="return aggfilter(this, '${label}', ${column});">${fn:escapeXml(value)}</span></c:when
 ><c:when test="${target.parameter}"><span class="aggfilter" onclick="return aggfilter(this, '${label}', ${column});">${fn:escapeXml(util:getLinkTitle(value))}</span>&nbsp;<span class="action" onclick="return chooseTarget(event, '${target.parameterName}', '${util:paramEncode(value)}', '${targetElement}');">&#x25bc;</span></c:when
 ><c:when test="${not empty targetElement}"><span class="aggfilter" onclick="return aggfilter(this, '${label}', ${column});">${fn:escapeXml(util:getLinkTitle(value))}</span>&nbsp;<a class="action" href="db/${currentConnection.linkName}/result.html?q=${target.queryName}${util:paramEncode(value)}" onclick="return runQuery(event, '${target.queryName}', '${util:paramEncode(value)}', '${targetElement}');">&#x25ba;</a></c:when

@@ -57,7 +57,7 @@
 						<td>${c.groupName}</td>
 						<td>${c.type}</td>
 						<td>${c.dialectName}</td>
-						<td>${c.writable ? '&#x2612;' : '&#x2610;'}</td>
+						<td><fmt:message key="${c.writable}"/></td>
 						<td><c:forEach items="${c.querySetNames}" var="n" varStatus="st"><c:if test="${!st.first}">, </c:if>${n}</c:forEach></td>
 					</tr>
 </c:forEach

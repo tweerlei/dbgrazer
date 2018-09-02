@@ -51,13 +51,13 @@
 					<td>${fn:escapeXml(c.key)}</td>
 					<td><fmt:message key="help_${c.key}"/></td>
 <c:if test="${currentUser.configEditorEnabled}"
->					<td><span class="action" title="<fmt:message key="change"/>" onclick="showDialog(event, 'config', {q: '${fn:escapeXml(c.key)}'}, '${fn:escapeXml(c.key)}');">&#x270e;</span><c:if test="${settings[c.key] != null}"
->						<span class="action" title="<fmt:message key="delete"/>" onclick="showConfirmDialog('${fn:escapeXml(c.key)}', '<fmt:message key="deleteConfigText"/>', 'unset-config.html', '${fn:escapeXml(c.key)}');">&#x2716;</span></c:if
+>					<td><span class="action" title="<fmt:message key="change"/>" onclick="showDialog(event, 'config', {q: '${fn:escapeXml(c.key)}'}, '${fn:escapeXml(c.key)}');"><fmt:message key="editIcon"/></span><c:if test="${settings[c.key] != null}"
+>						<span class="action" title="<fmt:message key="remove"/>" onclick="showConfirmDialog('${fn:escapeXml(c.key)}', '<fmt:message key="deleteConfigText"/>', 'unset-config.html', '${fn:escapeXml(c.key)}');"><fmt:message key="removeIcon"/></span></c:if
 >						</td>
 </c:if
 >					<td><c:choose
 						><c:when test="${(settings[c.key] != null) && (settings[c.key] != c.value)}"><em>${fn:escapeXml(settings[c.key])}</em></c:when
-						><c:when test="${c.value == null}">&#x2205;</c:when
+						><c:when test="${c.value == null}"><fmt:message key="null"/></c:when
 						><c:otherwise>${fn:escapeXml(c.value)}</c:otherwise
 						></c:choose></td>
 				</tr>

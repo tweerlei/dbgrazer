@@ -17,12 +17,11 @@ package de.tweerlei.dbgrazer.web.session;
 
 import java.util.List;
 import java.util.Map;
-import java.util.SortedSet;
 
 import de.tweerlei.dbgrazer.web.model.CustomQuery;
 import de.tweerlei.dbgrazer.web.model.QueryHistoryEntry;
-import de.tweerlei.dbgrazer.web.model.TableFilterEntry;
-import de.tweerlei.dbgrazer.web.model.TableSet;
+import de.tweerlei.dbgrazer.web.model.UserObject;
+import de.tweerlei.dbgrazer.web.model.UserObjectKey;
 
 /**
  * Per-schema settings for the current user
@@ -31,30 +30,6 @@ import de.tweerlei.dbgrazer.web.model.TableSet;
  */
 public interface SchemaSettings
 	{
-	/**
-	 * Get the catalog
-	 * @return catalog
-	 */
-	public String getCatalog();
-	
-	/**
-	 * Set the catalog
-	 * @param catalog The catalog
-	 */
-	public void setCatalog(String catalog);
-	
-	/**
-	 * Get the schema
-	 * @return schema
-	 */
-	public String getSchema();
-	
-	/**
-	 * Set the schema
-	 * @param schema The schema
-	 */
-	public void setSchema(String schema);
-	
 	/**
 	 * Get the queryGroup
 	 * @return queryGroup
@@ -92,65 +67,11 @@ public interface SchemaSettings
 	public List<String> getCustomQueryHistory();
 	
 	/**
-	 * Check for expand other schemas
-	 * @return expand other schemas
-	 */
-	public boolean isExpandOtherSchemas();
-	
-	/**
-	 * Set expand other schemas
-	 * @param b expand other schemas
-	 */
-	public void setExpandOtherSchemas(boolean b);
-	
-	/**
-	 * Check for sort columns
-	 * @return sort columns
-	 */
-	public boolean isSortColumns();
-	
-	/**
-	 * Set sort columns
-	 * @param b sort columns
-	 */
-	public void setSortColumns(boolean b);
-	
-	/**
-	 * Check for designer preview mode
-	 * @return preview mode
-	 */
-	public boolean isDesignerPreviewMode();
-	
-	/**
-	 * Set designer preview mode
-	 * @param b preview mode
-	 */
-	public void setDesignerPreviewMode(boolean b);
-	
-	/**
-	 * Check for designer compact mode
-	 * @return compact mode
-	 */
-	public boolean isDesignerCompactMode();
-	
-	/**
-	 * Set designer compact mode
-	 * @param b compact mode
-	 */
-	public void setDesignerCompactMode(boolean b);
-	
-	/**
 	 * Get the queryHistory
 	 * @return the queryHistory
 	 */
 	public List<QueryHistoryEntry> getQueryHistory();
-
-	/**
-	 * Get the tableFilters
-	 * @return the tableFilters
-	 */
-	public Map<String, TableFilterEntry> getTableFilters();
-
+	
 	/**
 	 * Get the querySettings
 	 * @return the querySettings
@@ -158,22 +79,25 @@ public interface SchemaSettings
 	public Map<String, Map<String, String>> getQuerySettings();
 	
 	/**
-	 * Get the favorite queries
-	 * @return Query names
+	 * Get a user object
+	 * @param <T> User object type
+	 * @param key User object key
+	 * @return User object or null
 	 */
-	public SortedSet<String> getFavorites();
+	public <T extends UserObject> T getUserObject(UserObjectKey<T> key);
 	
 	/**
-	 * Set the favorite queries
-	 * @param favorites Query names
+	 * Set a user object
+	 * @param <T> User object type
+	 * @param key User object key
+	 * @param value User object
 	 */
-	public void setFavorites(SortedSet<String> favorites);
-
+	public <T extends UserObject> void setUserObject(UserObjectKey<T> key, T value);
+	
 	/**
-	 * Get the schema table names
-	 * @return Table names
+	 * Clear all user objects that are not persistent
 	 */
-	public TableSet getDesign();
+	public void clearUserObjects();
 	
 	/**
 	 * Get recently used parameter values

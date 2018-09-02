@@ -48,9 +48,4 @@ public interface BookmarkManager
 	 * Refresh the current user's favorites
 	 */
 	public void refreshFavorites();
-	
-	/**
-	 * Clear the current user's favorites
-	 */
-	public void clearFavorites();
 	}

@@ -28,7 +28,7 @@
 	taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
 %><%@
 	taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"
-%><div class="h1-buttons"><span class="action" title="<fmt:message key="maximize"/>" onclick="return zoomView();">&#x25f1;</span></div>
+%><div class="h1-buttons"><span class="action" title="<fmt:message key="maximize"/>" onclick="return zoomView();"><fmt:message key="maximizeIcon"/></span></div>
 	<h1><c:if test="${not empty group}"
 		><a href="db/${currentConnection.linkName}/index.html?group=${group}">${group}</a>: </c:if><c:choose
 		><c:when test="${not empty key}"><fmt:message key="${key}"/></c:when

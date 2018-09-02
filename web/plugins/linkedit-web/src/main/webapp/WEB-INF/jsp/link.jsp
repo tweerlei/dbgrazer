@@ -88,7 +88,7 @@
 					</thead>
 					<tfoot>
 						<tr>
-							<td colspan="2"><span class="action" title="<fmt:message key="more"/>" onclick="return addLine(event, 'props');">&#x271a;</span></td>
+							<td colspan="2"><span class="action" title="<fmt:message key="add"/>" onclick="return addLine(event, 'props');"><fmt:message key="addIcon"/></span></td>
 						</tr>
 					</tfoot>
 					<tbody><c:forEach begin="0" end="${fn:length(model.propNames) - 1}" var="i" varStatus="st">

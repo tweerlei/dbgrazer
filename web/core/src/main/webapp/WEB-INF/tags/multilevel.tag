@@ -58,7 +58,7 @@
 	variable name-from-attribute="varParams" alias="qparams" scope="NESTED"
 %><%@
 	variable name-from-attribute="varParamString" alias="paramString" scope="NESTED"
-%><div class="combo-head"><div class="float-right"><span class="action" title="<fmt:message key="maximize"/>" onclick="return zoomLeft();">&#x25f1;</span></div><c:set var="left" value=""
+%><div class="combo-head"><div class="float-right"><span class="action" title="<fmt:message key="maximize"/>" onclick="return zoomLeft();"><fmt:message key="maximizeIcon"/></span></div><c:set var="left" value=""
 	/><c:set var="last" value=""
 	/><c:set var="paramString" value=""
 	/><c:forEach items="${params}" var="p"
@@ -84,8 +84,8 @@
 	></c:choose> <c:choose
 			><c:when test="${links == null}"><a class="action" title="<fmt:message key="refresh"/>" href="#" onclick="return loadQueryLevel(event, '${query}', ${fn:length(params)}, '${last}', '${left}');"></c:when
 			><c:otherwise><a class="action" title="<fmt:message key="refresh"/>" href="${links[fn:length(params)]}"></c:otherwise
-		></c:choose>&#x21ba;</a><c:if test="${currentConnection.editorActive && (not empty editLinkTemplate) && (not empty subQuery)}"
-			> <span class="action" title="${editTitle}" href="${fn:replace(editLinkTemplate, '%%', subQuery)}">&#x270e;</span></c:if
+		></c:choose><fmt:message key="refreshIcon"/></a><c:if test="${currentConnection.editorActive && (not empty editLinkTemplate) && (not empty subQuery)}"
+			> <span class="action" title="${editTitle}" href="${fn:replace(editLinkTemplate, '%%', subQuery)}"><fmt:message key="editQueryIcon"/></span></c:if
 	></c:forEach
 ></c:when
 ><c:otherwise><form action="#" method="get" onsubmit="return false;"><select id="combo-${name}" name="combo" onchange="return showTab('${name}', this.selectedIndex);">
@@ -107,8 +107,8 @@
 ></select> <c:choose
 			><c:when test="${links == null}"><a class="action" title="<fmt:message key="refresh"/>" href="#" onclick="return loadQueryLevel(event, '${query}', ${fn:length(params)}, '${last}', '${left}');"></c:when
 			><c:otherwise><a class="action" title="<fmt:message key="refresh"/>" href="${links[fn:length(params)]}"></c:otherwise
-		></c:choose>&#x21ba;</a><c:if test="${currentConnection.editorActive && (not empty editLinkTemplate) && (not empty subQuery)}"
-			> <span class="action" title="${editTitle}" href="${fn:replace(editLinkTemplate, '%%', subQuery)}">&#x270e;</span></c:if
+		></c:choose><fmt:message key="refreshIcon"/></a><c:if test="${currentConnection.editorActive && (not empty editLinkTemplate) && (not empty subQuery)}"
+			> <span class="action" title="${editTitle}" href="${fn:replace(editLinkTemplate, '%%', subQuery)}"><fmt:message key="editQueryIcon"/></span></c:if
 ></form></c:otherwise
 ></c:choose><c:forEach items="${params}" var="p"></div></c:forEach></div>
 	

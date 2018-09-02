@@ -36,8 +36,10 @@ import de.tweerlei.dbgrazer.query.model.RowSetHandler;
 import de.tweerlei.dbgrazer.query.model.RowSetProducer;
 import de.tweerlei.dbgrazer.web.exception.AccessDeniedException;
 import de.tweerlei.dbgrazer.web.service.DownloadService;
+import de.tweerlei.dbgrazer.web.service.jdbc.DesignManagerService;
 import de.tweerlei.dbgrazer.web.service.jdbc.SchemaDataExportService;
 import de.tweerlei.dbgrazer.web.service.jdbc.SchemaDataExportService.TraversalMode;
+import de.tweerlei.dbgrazer.web.service.jdbc.impl.TableSet;
 import de.tweerlei.dbgrazer.web.session.ConnectionSettings;
 import de.tweerlei.ermtools.dialect.SQLDialect;
 import de.tweerlei.ermtools.dialect.impl.SQLDialectFactory;
@@ -179,6 +181,7 @@ public class DesignExportController
 	
 	private final MetadataService metadataService;
 	private final SchemaDataExportService dataExportService;
+	private final DesignManagerService designManagerService;
 	private final DownloadService downloadService;
 	private final ConnectionSettings connectionSettings;
 	
@@ -187,17 +190,19 @@ public class DesignExportController
 	 * @param metadataService MetadataService
 	 * @param dataExportService SchemaDataExportService
 	 * @param downloadService DownloadService
+	 * @param designManagerService DesignManagerService
 	 * @param connectionSettings ConnectionSettings
 	 */
 	@Autowired
 	public DesignExportController(MetadataService metadataService,
 			SchemaDataExportService dataExportService,
-			DownloadService downloadService,
+			DownloadService downloadService, DesignManagerService designManagerService,
 			ConnectionSettings connectionSettings)
 		{
 		this.metadataService = metadataService;
 		this.dataExportService = dataExportService;
 		this.downloadService = downloadService;
+		this.designManagerService = designManagerService;
 		this.connectionSettings = connectionSettings;
 		}
 	
@@ -236,8 +241,9 @@ public class DesignExportController
 		
 		final SQLDialect d = getSQLDialect();
 		
+		final TableSet design = designManagerService.getCurrentDesign();
 		final Map<String, String> tables = new TreeMap<String, String>();
-		for (QualifiedName qn : connectionSettings.getDesign().getTableNames())
+		for (QualifiedName qn : design.getTableNames())
 			tables.put(d.getQualifiedTableName(qn), qn.getCatalogName() + "/" + qn.getSchemaName() + "/" + qn.getObjectName());
 		
 		model.put("tables", tables);
@@ -264,14 +270,15 @@ public class DesignExportController
 		
 		final SQLDialect d = getSQLDialect();
 		
+		final TableSet design = designManagerService.getCurrentDesign();
 		final String[] parts = fbo.getTable().split("/");
 		final QualifiedName startTable = new QualifiedName(parts[0], parts[1], parts[2]);
-		final Set<TableDescription> infos = metadataService.getTableInfos(connectionSettings.getLinkName(), connectionSettings.getDesign().getTableNames(), null, ColumnMode.ALL, null);
+		final Set<TableDescription> infos = metadataService.getTableInfos(connectionSettings.getLinkName(), design.getTableNames(), null, ColumnMode.ALL, null);
 		
-		final String title = StringUtils.empty(connectionSettings.getDesign().getName()) ? connectionSettings.getLinkName() : connectionSettings.getDesign().getName();
+		final String title = StringUtils.empty(design.getName()) ? connectionSettings.getLinkName() : design.getName();
 		
 		final ExportRowSetProducer p = new ExportRowSetProducer(dataExportService, connectionSettings.getLinkName(), d, infos, startTable, fbo.getWhere(), fbo.getMode());
-		model.put(GenericDownloadView.SOURCE_ATTRIBUTE, downloadService.getMultiStreamDownloadSource(connectionSettings.getLinkName(), p, connectionSettings.getDesign().getName(), title, d, fbo.getFormat()));
+		model.put(GenericDownloadView.SOURCE_ATTRIBUTE, downloadService.getMultiStreamDownloadSource(connectionSettings.getLinkName(), p, design.getName(), title, d, fbo.getFormat()));
 		
 		connectionSettings.getParameterHistory().put("table", fbo.getTable());
 		connectionSettings.getParameterHistory().put("where", fbo.getWhere());

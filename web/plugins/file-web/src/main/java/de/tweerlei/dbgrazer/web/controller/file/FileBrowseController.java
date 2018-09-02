@@ -31,7 +31,6 @@ import de.tweerlei.dbgrazer.query.exception.PerformQueryException;
 import de.tweerlei.dbgrazer.query.model.ColumnDef;
 import de.tweerlei.dbgrazer.query.model.Result;
 import de.tweerlei.dbgrazer.query.model.RowSet;
-import de.tweerlei.dbgrazer.web.constant.MessageKeys;
 import de.tweerlei.dbgrazer.web.constant.file.FileConstants;
 import de.tweerlei.dbgrazer.web.exception.AccessDeniedException;
 import de.tweerlei.dbgrazer.web.formatter.DataFormatter;
@@ -91,18 +90,18 @@ public class FileBrowseController
 			resultTransformer.translateRowSet(dirs, fmt);
 			
 			final Map<String, TabItem<RowSet>> tabs = new HashMap<String, TabItem<RowSet>>(1);
-			tabs.put(MessageKeys.FOLDERS_TAB, new TabItem<RowSet>(dirs, dirs.getRows().size()));
+			tabs.put(FileMessageKeys.FOLDERS_TAB, new TabItem<RowSet>(dirs, dirs.getRows().size()));
 			
 			final Result fileResult = runner.performCustomQuery(connectionSettings.getLinkName(), FileConstants.QUERYTYPE_FILES, "", null, null, "files", true, null);
 			final RowSet files = fileResult.getFirstRowSet();
 			resultTransformer.translateRowSet(files, fmt);
 			
 			final Map<String, TabItem<RowSet>> tabs2 = new HashMap<String, TabItem<RowSet>>(1);
-			tabs2.put(MessageKeys.FILES_TAB, new TabItem<RowSet>(files, files.getRows().size()));
+			tabs2.put(FileMessageKeys.FILES_TAB, new TabItem<RowSet>(files, files.getRows().size()));
 			
 			model.put("tabs", tabs);
 			model.put("tabs2", tabs2);
-			model.put("extensionJS", "file.js");
+			model.put("extensionJS", FileMessageKeys.EXTENSION_JS);
 			
 			final List<List<ColumnDef>> tableColumns = new ArrayList<List<ColumnDef>>(1);
 			tableColumns.add(files.getColumns());
@@ -155,10 +154,10 @@ public class FileBrowseController
 			resultTransformer.translateRowSet(files, fmt);
 			
 			final Map<String, TabItem<RowSet>> tabs = new HashMap<String, TabItem<RowSet>>(1);
-			tabs.put(MessageKeys.FILES_TAB, new TabItem<RowSet>(files, files.getRows().size()));
+			tabs.put(FileMessageKeys.FILES_TAB, new TabItem<RowSet>(files, files.getRows().size()));
 			
 			model.put("tabs", tabs);
-			model.put("extensionJS", "file.js");
+			model.put("extensionJS", FileMessageKeys.EXTENSION_JS);
 			
 			final List<List<ColumnDef>> tableColumns = new ArrayList<List<ColumnDef>>(1);
 			tableColumns.add(files.getColumns());

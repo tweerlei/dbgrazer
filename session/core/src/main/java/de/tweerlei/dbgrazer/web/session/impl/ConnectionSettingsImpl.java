@@ -18,7 +18,6 @@ package de.tweerlei.dbgrazer.web.session.impl;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedSet;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -28,8 +27,8 @@ import de.tweerlei.dbgrazer.link.model.LinkType;
 import de.tweerlei.dbgrazer.web.model.CustomQuery;
 import de.tweerlei.dbgrazer.web.model.PathInfo;
 import de.tweerlei.dbgrazer.web.model.QueryHistoryEntry;
-import de.tweerlei.dbgrazer.web.model.TableFilterEntry;
-import de.tweerlei.dbgrazer.web.model.TableSet;
+import de.tweerlei.dbgrazer.web.model.UserObject;
+import de.tweerlei.dbgrazer.web.model.UserObjectKey;
 import de.tweerlei.dbgrazer.web.session.ConnectionSettings;
 import de.tweerlei.dbgrazer.web.session.SchemaSettings;
 
@@ -221,36 +220,6 @@ public class ConnectionSettingsImpl implements ConnectionSettings, Serializable
 		}
 
 	@Override
-	public String getCatalog()
-		{
-		if (schemaSettings != null)
-			return (schemaSettings.getCatalog());
-		return (null);
-		}
-
-	@Override
-	public void setCatalog(String catalog)
-		{
-		if (schemaSettings != null)
-			schemaSettings.setCatalog(catalog);
-		}
-
-	@Override
-	public String getSchema()
-		{
-		if (schemaSettings != null)
-			return (schemaSettings.getSchema());
-		return (null);
-		}
-
-	@Override
-	public void setSchema(String schema)
-		{
-		if (schemaSettings != null)
-			schemaSettings.setSchema(schema);
-		}
-	
-	@Override
 	public String getQueryGroup()
 		{
 		if (schemaSettings != null)
@@ -289,66 +258,6 @@ public class ConnectionSettingsImpl implements ConnectionSettings, Serializable
 		}
 	
 	@Override
-	public boolean isDesignerPreviewMode()
-		{
-		if (schemaSettings != null)
-			return (schemaSettings.isDesignerPreviewMode());
-		return (false);
-		}
-
-	@Override
-	public void setDesignerPreviewMode(boolean b)
-		{
-		if (schemaSettings != null)
-			schemaSettings.setDesignerPreviewMode(b);
-		}
-
-	@Override
-	public boolean isDesignerCompactMode()
-		{
-		if (schemaSettings != null)
-			return (schemaSettings.isDesignerCompactMode());
-		return (false);
-		}
-
-	@Override
-	public void setDesignerCompactMode(boolean b)
-		{
-		if (schemaSettings != null)
-			schemaSettings.setDesignerCompactMode(b);
-		}
-
-	@Override
-	public boolean isExpandOtherSchemas()
-		{
-		if (schemaSettings != null)
-			return (schemaSettings.isExpandOtherSchemas());
-		return (false);
-		}
-
-	@Override
-	public void setExpandOtherSchemas(boolean b)
-		{
-		if (schemaSettings != null)
-			schemaSettings.setExpandOtherSchemas(b);
-		}
-	
-	@Override
-	public boolean isSortColumns()
-		{
-		if (schemaSettings != null)
-			return (schemaSettings.isSortColumns());
-		return (false);
-		}
-
-	@Override
-	public void setSortColumns(boolean b)
-		{
-		if (schemaSettings != null)
-			schemaSettings.setSortColumns(b);
-		}
-	
-	@Override
 	public List<QueryHistoryEntry> getQueryHistory()
 		{
 		if (schemaSettings != null)
@@ -365,14 +274,6 @@ public class ConnectionSettingsImpl implements ConnectionSettings, Serializable
 		}
 	
 	@Override
-	public Map<String, TableFilterEntry> getTableFilters()
-		{
-		if (schemaSettings != null)
-			return (schemaSettings.getTableFilters());
-		return (null);
-		}
-	
-	@Override
 	public Map<String, Map<String, String>> getQuerySettings()
 		{
 		if (schemaSettings != null)
@@ -381,26 +282,25 @@ public class ConnectionSettingsImpl implements ConnectionSettings, Serializable
 		}
 	
 	@Override
-	public SortedSet<String> getFavorites()
+	public <T extends UserObject> T getUserObject(UserObjectKey<T> key)
 		{
 		if (schemaSettings != null)
-			return (schemaSettings.getFavorites());
+			return (schemaSettings.getUserObject(key));
 		return (null);
 		}
 	
 	@Override
-	public void setFavorites(SortedSet<String> favorites)
+	public <T extends UserObject> void setUserObject(UserObjectKey<T> key, T value)
 		{
 		if (schemaSettings != null)
-			schemaSettings.setFavorites(favorites);
+			schemaSettings.setUserObject(key, value);
 		}
 	
 	@Override
-	public TableSet getDesign()
+	public void clearUserObjects()
 		{
 		if (schemaSettings != null)
-			return (schemaSettings.getDesign());
-		return (null);
+			schemaSettings.clearUserObjects();
 		}
 	
 	@Override

@@ -38,7 +38,7 @@
 		<span class="menu" onclick="return showDbMenu(event, 'submit-history');"><fmt:message key="history"/></span>
 	</div>
 	<div class="h1-actions">
-		<a class="action" title="<fmt:message key="newWindow"/>" href="db/${currentConnection.linkName}/submitexec.html" target="_blank">&#x2750;</a>
+		<a class="action" title="<fmt:message key="newWindow"/>" href="db/${currentConnection.linkName}/submitexec.html" target="_blank"><fmt:message key="newWindowIcon"/></a>
 	</div>
 	
 	<div id="tools-1" class="hidden"><div class="menucolumn">
@@ -63,8 +63,8 @@
 				<dl>
 					<dt><label for="statement"><fmt:message key="sqlStatement"/></label></dt>
 					<dd><div>
-						<span class="action" title="<fmt:message key="delete"/>" onclick="return clearElement('statement');">&#x232b;</span>
-						<span class="action" title="<fmt:message key="maximize"/>" onclick="return zoomContent('statement');">&#x25f1;</span></div>
+						<span class="action" title="<fmt:message key="clear"/>" onclick="return clearElement('statement');"><fmt:message key="clearIcon"/></span>
+						<span class="action" title="<fmt:message key="maximize"/>" onclick="return zoomContent('statement');"><fmt:message key="maximizeIcon"/></span></div>
 						<spring:textarea id="statement" cssClass="large" path="statement" cols="80" rows="25"/>
 						<div>[ <span id="statement-row">1</span> : <span id="statement-column">1</span> ]</div></dd>
 					<dt><fmt:message key="executeAs"/></dt>

@@ -17,7 +17,7 @@
 %><fmt:message key="designer" var="pageTitle"/><%@
 	include file="../include/header.jspf"
 %><ui:objerrors label="" var="e"> <a href="db/${currentConnection.linkName}/dbdesigner-remove.html?catalog=${e.catalogName}&amp;schema=${e.schemaName}&amp;object=${e.objectName}"><fmt:message key="remove"/></a></ui:objerrors>
-	<ui:headline1 label="${pageTitle}: ${currentConnection.design.name}${currentConnection.design.modified ? '*' : ''}">
+	<ui:headline1 label="${pageTitle}: ${currentDesign.name}${currentDesign.modified ? '*' : ''}">
 	<div class="h1-actions">
 		<span class="menu" onclick="return showElementMenu(event, 'tools-1');"><fmt:message key="actions"/></span>
 	</div>
@@ -28,15 +28,15 @@
 </c:if
 >	
 	<div id="tools-1" class="hidden"><div class="menucolumn">
-		<div class="menuitem"><span onclick="return showDbDialog(event, 'design-add', null, '<fmt:message key="add"/>');"><fmt:message key="add"/></span></div>
-		<div class="menuitem"><span onclick="return showDbDialog(event, 'design-addall', null, '<fmt:message key="addAll"/>');"><fmt:message key="addAll"/></span></div>
+		<div class="menuitem"><span onclick="return showDbDialog(event, 'design-add', null, '<fmt:message key="addObject"/>');"><fmt:message key="addObject"/></span></div>
+		<div class="menuitem"><span onclick="return showDbDialog(event, 'design-addall', null, '<fmt:message key="addObjects"/>');"><fmt:message key="addObjects"/></span></div>
 <c:if test="${not empty imagemapId}"
->		<div class="menuitem"><span onclick="return showDbDialog(event, 'design-save', { q: '${currentConnection.design.name}' }, '<fmt:message key="save"/>');"><fmt:message key="save"/></span></div>
+>		<div class="menuitem"><span onclick="return showDbDialog(event, 'design-save', { q: '${currentDesign.name}' }, '<fmt:message key="save"/>');"><fmt:message key="save"/></span></div>
 </c:if
->		<div class="menuitem"><span onclick="return showDbDialog(event, 'design-load', { q: '${currentConnection.design.name}' }, '<fmt:message key="load"/>');"><fmt:message key="load"/></span></div>
+>		<div class="menuitem"><span onclick="return showDbDialog(event, 'design-load', { q: '${currentDesign.name}' }, '<fmt:message key="load"/>');"><fmt:message key="load"/></span></div>
 		<div class="menuitem"><span onclick="return showConfirmDialog('<fmt:message key="reset"/>', '<fmt:message key="resetText"/>', 'db/${currentConnection.linkName}/dbdesigner-reset.html');"><fmt:message key="reset"/></span></div>
 		<hr class="menuseparator"/>
-		<div class="menuitem"><span onclick="return showDbDialog(event, 'design-data', { q: '${currentConnection.design.name}' }, '<fmt:message key="downloadData"/>');"><fmt:message key="downloadData"/></span></div>
+		<div class="menuitem"><span onclick="return showDbDialog(event, 'design-data', { q: '${currentDesign.name}' }, '<fmt:message key="downloadData"/>');"><fmt:message key="downloadData"/></span></div>
 		<div class="menuitem"><a href="db/${currentConnection.linkName}/dbdesigner-compare.html" target="_blank"><fmt:message key="structureCompare"/></a></div>
 		<div class="menuitem"><a href="db/${currentConnection.linkName}/dbdesigner-count.html" target="_blank"><fmt:message key="countCompare"/></a></div>
 	</div></div>
@@ -57,14 +57,14 @@
 				<span class="menu" onclick="return showElementMenu(event, 'tools-2');"><fmt:message key="download"/></span>
 			</div>
 			<form id="dlform" class="filter" action="db/${currentConnection.linkName}/dbdesigner.html" method="get" onsubmit="return false;">
-				<input type="hidden" name="preview" value="${!currentConnection.designerPreviewMode}"/>
-				<input id="preview" type="checkbox" name="dummy" value="true"<c:if test="${currentConnection.designerPreviewMode}"> checked="checked"</c:if> onchange="postForm(form, event);"/> <label for="preview"><fmt:message key="previewMode"/></label>
+				<input type="hidden" name="preview" value="${!browserSettings.designerPreviewMode}"/>
+				<input id="preview" type="checkbox" name="dummy" value="true"<c:if test="${browserSettings.designerPreviewMode}"> checked="checked"</c:if> onchange="postForm(form, event);"/> <label for="preview"><fmt:message key="designerPreviewMode"/></label>
 			</form><form class="filter" action="db/${currentConnection.linkName}/dbdesigner.html" method="get" onsubmit="return false;">
-				<input type="hidden" name="compact" value="${!currentConnection.designerCompactMode}"/>
-				<input id="compact" type="checkbox" name="dummy" value="true"<c:if test="${currentConnection.designerCompactMode}"> checked="checked"</c:if> onchange="postForm(form, event);"/> <label for="compact"><fmt:message key="compactMode"/></label>
+				<input type="hidden" name="compact" value="${!browserSettings.designerCompactMode}"/>
+				<input id="compact" type="checkbox" name="dummy" value="true"<c:if test="${browserSettings.designerCompactMode}"> checked="checked"</c:if> onchange="postForm(form, event);"/> <label for="compact"><fmt:message key="compactMode"/></label>
 			</form><form class="filter" action="db/${currentConnection.linkName}/dbdesigner.html" method="get" onsubmit="return false;">
-				<input type="hidden" name="sort" value="${!currentConnection.sortColumns}"/>
-				<input id="sort" type="checkbox" name="dummy" value="true"<c:if test="${currentConnection.sortColumns}"> checked="checked"</c:if> onchange="postForm(form, event);"/> <label for="sort"><fmt:message key="sortColumns"/></label>
+				<input type="hidden" name="sort" value="${!browserSettings.sortColumns}"/>
+				<input id="sort" type="checkbox" name="dummy" value="true"<c:if test="${browserSettings.sortColumns}"> checked="checked"</c:if> onchange="postForm(form, event);"/> <label for="sort"><fmt:message key="sortColumns"/></label>
 			</form>
 			<hr/>
 		</div>

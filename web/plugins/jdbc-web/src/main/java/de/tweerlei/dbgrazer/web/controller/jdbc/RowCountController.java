@@ -251,7 +251,7 @@ public class RowCountController
 				model.put("schemas", metadataService.getSchemas(fbo.getConnection2()));
 			}
 		
-		model.put("extensionJS", "jdbc.js");
+		model.put("extensionJS", JdbcMessageKeys.EXTENSION_JS);
 		
 		return (model);
 		}

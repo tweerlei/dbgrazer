@@ -46,7 +46,7 @@
 					><c:when test="${v.type.resultType.view}"><span title="<fmt:message key="type_view"/>">&#x25a3;</span></c:when
 					><c:otherwise><span title="<fmt:message key="type_other"/>">&#x25a4;</span></c:otherwise
 				></c:choose> <a href="db/${currentConnection.linkName}/result.html?q=${v.name}${paramString}"<c:if test="${not empty targetElement}"> onclick="return runQuery(event, '${v.name}', '${paramString}${rs.attributes['parentQuery'].type.explorer ? '&amp;related=false' : ''}', '${targetElement}');"</c:if>>${v.name}</a><c:if test="${currentConnection.editorActive}"
-					> <a class="action" title="<fmt:message key="editQuery"/>" href="db/${currentConnection.linkName}/edit.html?q=${v.name}">&#x270e;</a></c:if
+					> <a class="action" title="<fmt:message key="editQuery"/>" href="db/${currentConnection.linkName}/edit.html?q=${v.name}"><fmt:message key="editQueryIcon"/></a></c:if
 				></li>
 </c:forEach
 >			</ul><hr/>
@@ -61,7 +61,7 @@
 					><c:when test="${v.type.resultType.view}"><span title="<fmt:message key="type_view"/>">&#x25a3;</span></c:when
 					><c:otherwise><span title="<fmt:message key="type_other"/>">&#x25a4;</span></c:otherwise
 				></c:choose> <a href="db/${currentConnection.linkName}/query.html?q=${v.name}${paramString}" target="_blank">${v.name}</a><c:if test="${currentConnection.editorActive}"
-					> <a class="action" title="<fmt:message key="editQuery"/>" href="db/${currentConnection.linkName}/edit.html?q=${v.name}">&#x270e;</a></c:if
+					> <a class="action" title="<fmt:message key="editQuery"/>" href="db/${currentConnection.linkName}/edit.html?q=${v.name}"><fmt:message key="editQueryIcon"/></a></c:if
 				></li>
 </c:forEach
 >			</ul><hr/>

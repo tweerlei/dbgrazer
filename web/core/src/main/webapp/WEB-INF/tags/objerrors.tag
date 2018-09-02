@@ -25,5 +25,5 @@
 %><%@
 	variable name-from-attribute="var" alias="content" scope="NESTED"
 %><c:forEach items="${currentUser.objectErrorsForDisplay}" var="e" varStatus="st">
-		<div id="error-${label}${st.index}" class="error"><span class="action" onclick="return hideError('${label}${st.index}');">&#x2716;</span> <fmt:message key="${e.key}"><c:forEach items="${e.params}" var="p"><fmt:param value="${p}"/></c:forEach></fmt:message><c:set var="content" value="${e.info}"/><jsp:doBody/></div></c:forEach
+		<div id="error-${label}${st.index}" class="error"><span class="action" onclick="return hideError('${label}${st.index}');"><fmt:message key="removeIcon"/></span> <fmt:message key="${e.key}"><c:forEach items="${e.params}" var="p"><fmt:param value="${p}"/></c:forEach></fmt:message><c:set var="content" value="${e.info}"/><jsp:doBody/></div></c:forEach
 >

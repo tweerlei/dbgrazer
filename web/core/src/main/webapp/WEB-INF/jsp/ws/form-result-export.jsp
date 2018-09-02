@@ -37,7 +37,7 @@
 					</thead>
 					<tfoot>
 						<tr>
-							<td colspan="5"><span class="action" title="<fmt:message key="more"/>" onclick="addLine(event, 'params');">&#x271a;</span></td>
+							<td colspan="5"><span class="action" title="<fmt:message key="add"/>" onclick="addLine(event, 'params');"><fmt:message key="addIcon"/></span></td>
 						</tr>
 					</tfoot>
 					<tbody><c:forEach begin="0" end="9" var="i" varStatus="st">
@@ -45,10 +45,10 @@
 							<td>${i+1}</td>
 							<td><input type="text" name="params[${i}]" id="params${i}.value"/></td>
 							<td><c:if test="${!st.last}">
-								<span class="action" title="<fmt:message key="down"/>" onclick="return moveLineDown(event, 'params', ${i});">&#x21d3;</span>
+								<span class="action" title="<fmt:message key="down"/>" onclick="return moveLineDown(event, 'params', ${i});"><fmt:message key="downIcon"/></span>
 </c:if><c:if test="${!st.first}"
->								<span class="action" title="<fmt:message key="up"/>" onclick="return moveLineUp(event, 'params', ${i});">&#x21d1;</span>
-								<span class="action" title="<fmt:message key="remove"/>" onclick="return removeLine(event, 'params', ${i});">&#x2716;</span>
+>								<span class="action" title="<fmt:message key="up"/>" onclick="return moveLineUp(event, 'params', ${i});"><fmt:message key="upIcon"/></span>
+								<span class="action" title="<fmt:message key="remove"/>" onclick="return removeLine(event, 'params', ${i});"><fmt:message key="removeIcon"/></span>
 </c:if
 >							</td>
 						</tr></c:forEach>

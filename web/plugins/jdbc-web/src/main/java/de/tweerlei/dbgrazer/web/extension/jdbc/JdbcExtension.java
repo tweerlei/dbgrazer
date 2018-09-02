@@ -28,6 +28,7 @@ import de.tweerlei.dbgrazer.web.constant.MessageKeys;
 import de.tweerlei.dbgrazer.web.extension.ExtensionLink;
 import de.tweerlei.dbgrazer.web.extension.FrontendExtensionAdapter;
 import de.tweerlei.dbgrazer.web.service.FrontendHelperService;
+import de.tweerlei.dbgrazer.web.service.jdbc.BrowserSettingsManagerService;
 import de.tweerlei.dbgrazer.web.session.ConnectionSettings;
 
 /**
@@ -40,18 +41,22 @@ import de.tweerlei.dbgrazer.web.session.ConnectionSettings;
 public class JdbcExtension extends FrontendExtensionAdapter
 	{
 	private final FrontendHelperService frontendHelper;
+	private final BrowserSettingsManagerService browserSettingsManager;
 	private final ConnectionSettings connectionSettings;
 	
 	/**
 	 * Constructor
 	 * @param frontendHelper FrontendHelperService
+	 * @param browserSettingsManager BrowserSettingsManagerService
 	 * @param connectionSettings ConnectionSettings
 	 */
 	@Autowired
-	public JdbcExtension(FrontendHelperService frontendHelper, ConnectionSettings connectionSettings)
+	public JdbcExtension(FrontendHelperService frontendHelper, BrowserSettingsManagerService browserSettingsManager,
+			ConnectionSettings connectionSettings)
 		{
 		super("JDBC");
 		this.frontendHelper = frontendHelper;
+		this.browserSettingsManager = browserSettingsManager;
 		this.connectionSettings = connectionSettings;
 		}
 	
@@ -65,8 +70,8 @@ public class JdbcExtension extends FrontendExtensionAdapter
 		
 		if (connectionSettings.isBrowserEnabled())
 			{
-			if ((connectionSettings.getCatalog() != null) && (connectionSettings.getSchema() != null))
-				ret.add(new ExtensionLink("schemaBrowser", frontendHelper.buildPath(MessageKeys.PATH_DB, connectionSettings.getLinkName(), "dbobjects.html", "catalog=" + connectionSettings.getCatalog() + "&schema=" + connectionSettings.getSchema()), null, null));
+			if ((browserSettingsManager.getCatalog() != null) && (browserSettingsManager.getSchema() != null))
+				ret.add(new ExtensionLink("schemaBrowser", frontendHelper.buildPath(MessageKeys.PATH_DB, connectionSettings.getLinkName(), "dbobjects.html", "catalog=" + browserSettingsManager.getCatalog() + "&schema=" + browserSettingsManager.getSchema()), null, null));
 			else
 				ret.add(new ExtensionLink("schemaBrowser", frontendHelper.buildPath(MessageKeys.PATH_DB, connectionSettings.getLinkName(), "dbcatalogs.html", null), null, null));
 			}

@@ -46,12 +46,13 @@ import de.tweerlei.dbgrazer.query.model.Result;
 import de.tweerlei.dbgrazer.query.model.RowSet;
 import de.tweerlei.dbgrazer.web.exception.AccessDeniedException;
 import de.tweerlei.dbgrazer.web.formatter.DataFormatter;
-import de.tweerlei.dbgrazer.web.model.TableFilterEntry;
 import de.tweerlei.dbgrazer.web.service.DataFormatterFactory;
 import de.tweerlei.dbgrazer.web.service.DownloadService;
 import de.tweerlei.dbgrazer.web.service.QueryPerformerService;
 import de.tweerlei.dbgrazer.web.service.ResultTransformerService;
+import de.tweerlei.dbgrazer.web.service.jdbc.BrowserSettingsManagerService;
 import de.tweerlei.dbgrazer.web.service.jdbc.SQLReconstructionService;
+import de.tweerlei.dbgrazer.web.service.jdbc.impl.TableFilterEntry;
 import de.tweerlei.dbgrazer.web.session.ConnectionSettings;
 import de.tweerlei.ermtools.dialect.SQLDialect;
 import de.tweerlei.ermtools.dialect.impl.SQLDialectFactory;
@@ -220,6 +221,7 @@ public class DataExportController
 	private final DataFormatterFactory factory;
 	private final DownloadService downloadService;
 	private final ResultTransformerService resultTransformer;
+	private final BrowserSettingsManagerService browserSettingsManager;
 	private final SQLReconstructionService reconstructionService;
 	private final SQLGeneratorService sqlGenerator;
 	private final Logger logger;
@@ -234,13 +236,14 @@ public class DataExportController
 	 * @param resultTransformer ResultTransformerService
 	 * @param sqlGenerator SQLGeneratorService
 	 * @param reconstructionService SQLReconstructionService
+	 * @param browserSettingsManager BrowserSettingsManagerService
 	 */
 	@Autowired
 	public DataExportController(MetadataService metadataService, QueryPerformerService runner,
 			ConnectionSettings connectionSettings,
 			DataFormatterFactory factory, DownloadService downloadService,
 			ResultTransformerService resultTransformer, SQLGeneratorService sqlGenerator,
-			SQLReconstructionService reconstructionService
+			SQLReconstructionService reconstructionService, BrowserSettingsManagerService browserSettingsManager
 			)
 		{
 		this.metadataService = metadataService;
@@ -251,6 +254,7 @@ public class DataExportController
 		this.resultTransformer = resultTransformer;
 		this.sqlGenerator = sqlGenerator;
 		this.reconstructionService = reconstructionService;
+		this.browserSettingsManager = browserSettingsManager;
 		this.logger = Logger.getLogger(getClass().getCanonicalName());
 		}
 	
@@ -341,7 +345,7 @@ public class DataExportController
 			
 			model.put("targetElement", target);
 			
-			connectionSettings.getTableFilters().put(qname.toString(), new TableFilterEntry(fbo.getWhere(), fbo.getOrder()));
+			browserSettingsManager.getTableFilters().put(qname.toString(), new TableFilterEntry(fbo.getWhere(), fbo.getOrder()));
 			}
 		catch (PerformQueryException e)
 			{
@@ -400,7 +404,7 @@ public class DataExportController
 		final TableDescription desc = metadataService.getTableInfo(connectionSettings.getLinkName(), qname, ColumnMode.ALL);
 		final String statement = sqlGenerator.generateSelect(desc, Style.INDENTED, fbo.getWhere(), fbo.getOrder(), dialect);
 		
-		connectionSettings.getTableFilters().put(qname.toString(), new TableFilterEntry(fbo.getWhere(), fbo.getOrder()));
+		browserSettingsManager.getTableFilters().put(qname.toString(), new TableFilterEntry(fbo.getWhere(), fbo.getOrder()));
 		
 		try	{
 			if (fbo.isAllRows())

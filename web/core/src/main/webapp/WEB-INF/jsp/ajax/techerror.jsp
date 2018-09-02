@@ -21,7 +21,7 @@
 		<p><fmt:message key="techError"/></p>
 		
 		<p><fmt:message key="errorQuery"/>: ${fn:escapeXml(query)}<c:if test="${currentConnection.editorEnabled}">
-			<a class="action" title="<fmt:message key="editQuery"/>" href="db/${currentConnection.linkName}/edit.html?q=${fn:escapeXml(query)}&amp;backTo=${backTo}">&#x270e;</a>
+			<a class="action" title="<fmt:message key="editQuery"/>" href="db/${currentConnection.linkName}/edit.html?q=${fn:escapeXml(query)}&amp;backTo=${backTo}"><fmt:message key="editQueryIcon"/></a>
 		</c:if></p>
 		
 		<p><span class="link" onclick="return reloadPage();"><fmt:message key="tryAgain"/></span></p>

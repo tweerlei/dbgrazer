@@ -20,7 +20,7 @@
 			<span class="menu" onclick="return showElementMenu(event, 'tools-2');"><fmt:message key="actions"/></span>
 		</div>
 		<div class="h2-actions">
-			<a class="action" title="<fmt:message key="showQuery"/>" href="db/${currentConnection.linkName}/partition.html?topic=${topic}&amp;partition=${partition}&amp;offset=${offset}">&#x279a;</a>
+			<a class="action" title="<fmt:message key="showQuery"/>" href="db/${currentConnection.linkName}/partition.html?topic=${topic}&amp;partition=${partition}&amp;offset=${offset}"><fmt:message key="showQueryIcon"/></a>
 		</div>
 		
 		<div id="tools-2" class="hidden"><div class="menucolumn">

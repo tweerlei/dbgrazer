@@ -113,7 +113,7 @@ public class SecurityServiceImpl implements SecurityService
 		userSettings.setDotDisplayEnabled(configService.get(ConfigKeys.SHOW_DOT));
 		
 		for (SchemaSettings s : userSettings.getSchemaSettings().values())
-			s.setFavorites(null);
+			s.clearUserObjects();
 		}
 	
 	private void userLoggedOut()
@@ -129,7 +129,7 @@ public class SecurityServiceImpl implements SecurityService
 		userSettings.setDotDisplayEnabled(false);
 		
 		for (SchemaSettings s : userSettings.getSchemaSettings().values())
-			s.setFavorites(null);
+			s.clearUserObjects();
 		}
 	
 	@Override

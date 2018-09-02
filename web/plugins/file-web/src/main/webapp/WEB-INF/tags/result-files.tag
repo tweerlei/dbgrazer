@@ -50,7 +50,7 @@
 <c:forEach items="${row.values}" var="v" varStatus="st" begin="0" end="2"
 >					<td><c:choose
 						><c:when test="${st.first}"><a href="db/${currentConnection.linkName}/file.html?path=${tools:urlEncode(v)}">${fn:escapeXml(file:basename(v))}</a><c:if test="${currentConnection.writable}"
-							> <span class="action" title="<fmt:message key="renameFile"/>" onclick="return showDbDialog(event, 'file-rename', {path: '${fn:escapeXml(v)}'}, '<fmt:message key="renameFile"/>');">&#x270d;</span> <span class="action" title="<fmt:message key="removeFile"/>" onclick="return showDbDialog(event, 'file-remove', {path: '${fn:escapeXml(v)}'}, '<fmt:message key="removeFile"/>');">&#x2716;</span></c:if
+							> <span class="action" title="<fmt:message key="renameFile"/>" onclick="return showDbDialog(event, 'file-rename', {path: '${fn:escapeXml(v)}'}, '<fmt:message key="renameFile"/>');"><fmt:message key="editIcon"/></span> <span class="action" title="<fmt:message key="removeFile"/>" onclick="return showDbDialog(event, 'file-remove', {path: '${fn:escapeXml(v)}'}, '<fmt:message key="removeFile"/>');"><fmt:message key="removeIcon"/></span></c:if
 						></c:when><c:otherwise>${fn:escapeXml(v)}</c:otherwise
 					></c:choose></td>
 </c:forEach

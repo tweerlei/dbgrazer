@@ -92,7 +92,7 @@
 					</thead>
 					<tfoot>
 						<tr>
-							<td colspan="5"><span class="action" title="<fmt:message key="more"/>" onclick="addLine(event, 'params');">&#x271a;</span></td>
+							<td colspan="5"><span class="action" title="<fmt:message key="add"/>" onclick="addLine(event, 'params');"><fmt:message key="addIcon"/></span></td>
 						</tr>
 					</tfoot>
 					<tbody><c:forEach begin="0" end="${fn:length(model.params) - 1}" var="i" varStatus="st">
@@ -104,11 +104,11 @@
 							></spring:select></td>
 							<td><ui:select name="params[${i}].valueQuery" id="params${i}.valueQuery" label="${noQuery}" value="${model.params[i].valueQuery}" page="db:select-valuequery"/></td>
 							<td><c:if test="${!st.last}">
-								<span class="action" title="<fmt:message key="down"/>" onclick="return moveLineDown(event, 'params', ${i});">&#x21d3;</span>
+								<span class="action" title="<fmt:message key="down"/>" onclick="return moveLineDown(event, 'params', ${i});"><fmt:message key="downIcon"/></span>
 </c:if><c:if test="${!st.first}"
->								<span class="action" title="<fmt:message key="up"/>" onclick="return moveLineUp(event, 'params', ${i});">&#x21d1;</span>
+>								<span class="action" title="<fmt:message key="up"/>" onclick="return moveLineUp(event, 'params', ${i});"><fmt:message key="upIcon"/></span>
 </c:if
->								<span class="action" title="<fmt:message key="editQuery"/>" onclick="return gotoLineTarget(event, 'params', '${i}.valueQuery', '${model.backTo}');">&#x270e;</span>
+>								<span class="action" title="<fmt:message key="editQuery"/>" onclick="return gotoLineTarget(event, 'params', '${i}.valueQuery', '${model.backTo}');"><fmt:message key="editQueryIcon"/></span>
 							</td>
 						</tr></c:forEach>
 					</tbody>
@@ -117,7 +117,7 @@
 				<dd><spring:select path="type" onchange="return switchResultType(this);">
 						<optgroup label="<fmt:message key="query"/>"><c:forEach items="${resultTypes}" var="j"><c:if test="${!j.resultType.view}"><spring:option value="${j}" cssClass="query"><fmt:message key="${j}"/></spring:option></c:if></c:forEach></optgroup>
 						<optgroup label="<fmt:message key="view"/>"><c:forEach items="${resultTypes}" var="j"><c:if test="${j.resultType.view}"><spring:option value="${j}" cssClass="view"><fmt:message key="${j}"/></spring:option></c:if></c:forEach></optgroup>
-					</spring:select> <span class="action" onclick="return showTip(event, \$F('type'));" onmouseover="return showTip(event, \$F('type'));">&#x24d8;</span></dd>
+					</spring:select> <span class="action" onclick="return showTip(event, \$F('type'));" onmouseover="return showTip(event, \$F('type'));"><fmt:message key="tooltipIcon"/></span></dd>
 <c:forEach items="${allAttributes}" var="a"
 >				<dt class="query-bytype<c:forEach items="${resultTypes}" var="j"><c:if test="${tools:containsKey(j.supportedAttributes, a.key)}"> query-${j}</c:if></c:forEach>"<c:if test="${!tools:containsKey(resultType.supportedAttributes, a.key)}"> style="display: none;"</c:if>><spring:label path="attributes[${a.key}]"><fmt:message key="${a.key}"/></spring:label></dt>
 				<dd class="query-bytype<c:forEach items="${resultTypes}" var="j"><c:if test="${tools:containsKey(j.supportedAttributes, a.key)}"> query-${j}</c:if></c:forEach>"<c:if test="${!tools:containsKey(resultType.supportedAttributes, a.key)}"> style="display: none;"</c:if>><c:choose
@@ -163,7 +163,7 @@
 					</thead>
 					<tfoot>
 						<tr>
-							<td colspan="3"><span class="action" title="<fmt:message key="more"/>" onclick="addLine(event, 'links');">&#x271a;</span></td>
+							<td colspan="3"><span class="action" title="<fmt:message key="add"/>" onclick="addLine(event, 'links');"><fmt:message key="addIcon"/></span></td>
 						</tr>
 					</tfoot>
 					<tbody><c:forEach begin="0" end="${fn:length(model.links) - 1}" var="i" varStatus="st">
@@ -171,11 +171,11 @@
 							<td>${i+1}</td>
 							<td><ui:select name="links[${i}]" id="links${i}" label="${noQuery}" text="${fn:startsWith(model.links[i], '*') ? fn:substring(model.links[i], 1, -1) : model.links[i]}" value="${model.links[i]}" page="db:select-linkquery"/></td>
 							<td><c:if test="${!st.last}">
-								<span class="action" title="<fmt:message key="down"/>" onclick="return moveLineDown(event, 'links', ${i});">&#x21d3;</span>
+								<span class="action" title="<fmt:message key="down"/>" onclick="return moveLineDown(event, 'links', ${i});"><fmt:message key="downIcon"/></span>
 </c:if><c:if test="${!st.first}"
->								<span class="action" title="<fmt:message key="up"/>" onclick="return moveLineUp(event, 'links', ${i});">&#x21d1;</span>
+>								<span class="action" title="<fmt:message key="up"/>" onclick="return moveLineUp(event, 'links', ${i});"><fmt:message key="upIcon"/></span>
 </c:if
->								<span class="action" title="<fmt:message key="editQuery"/>" onclick="return gotoLineTarget(event, 'links', ${i}, '${model.backTo}');">&#x270e;</span>
+>								<span class="action" title="<fmt:message key="editQuery"/>" onclick="return gotoLineTarget(event, 'links', ${i}, '${model.backTo}');"><fmt:message key="editQueryIcon"/></span>
 							</td>
 						</tr></c:forEach>
 					</tbody>
@@ -192,7 +192,7 @@
 					</thead>
 					<tfoot>
 						<tr>
-							<td colspan="4"><span class="action" title="<fmt:message key="more"/>" onclick="addLine(event, 'views');">&#x271a;</span>
+							<td colspan="4"><span class="action" title="<fmt:message key="add"/>" onclick="addLine(event, 'views');"><fmt:message key="addIcon"/></span>
 								<span class="button" onclick="addMatchingViews();"><fmt:message key="addMatchingQueries"/></span></td>
 						</tr>
 					</tfoot>
@@ -202,19 +202,19 @@
 							<td><ui:select name="views[${i}].name" id="views${i}" label="${noQuery}" value="${model.views[i].name}" page="db:select-viewquery"/></td>
 							<td><spring:input path="views[${i}].parameter"/></td>
 							<td><c:if test="${!st.last}">
-								<span class="action" title="<fmt:message key="down"/>" onclick="return moveLineDown(event, 'views', ${i});">&#x21d3;</span>
+								<span class="action" title="<fmt:message key="down"/>" onclick="return moveLineDown(event, 'views', ${i});"><fmt:message key="downIcon"/></span>
 </c:if><c:if test="${!st.first}"
->								<span class="action" title="<fmt:message key="up"/>" onclick="return moveLineUp(event, 'views', ${i});">&#x21d1;</span>
+>								<span class="action" title="<fmt:message key="up"/>" onclick="return moveLineUp(event, 'views', ${i});"><fmt:message key="upIcon"/></span>
 </c:if
->								<span class="action" title="<fmt:message key="editQuery"/>" onclick="return gotoLineTarget(event, 'views', ${i}, '${model.backTo}');">&#x270e;</span>
+>								<span class="action" title="<fmt:message key="editQuery"/>" onclick="return gotoLineTarget(event, 'views', ${i}, '${model.backTo}');"><fmt:message key="editQueryIcon"/></span>
 							</td>
 						</tr></c:forEach>
 					</tbody>
 					</table></dd>
 				<dt class="query-only"<c:if test="${model.viewType}"> style="display: none;"</c:if>><spring:label path="statement"><fmt:message key="sqlStatement"/></spring:label></dt>
 				<dd class="query-only"<c:if test="${model.viewType}"> style="display: none;"</c:if>><div>
-					<span class="action" title="<fmt:message key="delete"/>" onclick="return clearElement('statement');">&#x232b;</span>
-					<span class="action" title="<fmt:message key="maximize"/>" onclick="return zoomContent('statement');">&#x25f1;</span>
+					<span class="action" title="<fmt:message key="clear"/>" onclick="return clearElement('statement');"><fmt:message key="clearIcon"/></span>
+					<span class="action" title="<fmt:message key="maximize"/>" onclick="return zoomContent('statement');"><fmt:message key="maximizeIcon"/></span>
 					<ui:info name="sqlStatement"><fmt:message key="help_sqlStatement"/></ui:info></div>
 					<spring:textarea path="statement" cssClass="large" cols="80" rows="25"/></dd>
 				<dt>&nbsp;</dt>

@@ -16,10 +16,8 @@
 package de.tweerlei.dbgrazer.web.service.bookmark.impl;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.Map;
 import java.util.SortedSet;
-import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -28,6 +26,7 @@ import org.springframework.stereotype.Service;
 
 import de.tweerlei.dbgrazer.query.model.Query;
 import de.tweerlei.dbgrazer.security.service.UserManagerService;
+import de.tweerlei.dbgrazer.web.model.UserObjectKey;
 import de.tweerlei.dbgrazer.web.service.bookmark.BookmarkManager;
 import de.tweerlei.dbgrazer.web.service.bookmark.BookmarkPersister;
 import de.tweerlei.dbgrazer.web.session.ConnectionSettings;
@@ -44,7 +43,8 @@ import de.tweerlei.spring.config.ConfigAccessor;
 public class BookmarkManagerImpl implements BookmarkManager
 	{
 	private static final String BOOKMARK_EXTENSION = "bookmarks";
-	private static final SortedSet<String> EMPTY_BOOKMARKS = Collections.unmodifiableSortedSet(new TreeSet<String>());
+	private static final UserBookmarks EMPTY_BOOKMARKS = new ReadOnlyUserBookmarks();
+	private static final UserObjectKey<UserBookmarks> KEY_BOOKMARKS = UserObjectKey.create(UserBookmarks.class, false);
 	
 	private final ConfigAccessor configService;
 	private final UserManagerService userManagerService;
@@ -77,15 +77,19 @@ public class BookmarkManagerImpl implements BookmarkManager
 	@Override
 	public SortedSet<String> getFavorites()
 		{
-		if (connectionSettings.getFavorites() == null)
+		UserBookmarks ret = connectionSettings.getUserObject(KEY_BOOKMARKS);
+		
+		if (ret == null)
 			{
 			if (userSettings.getPrincipal() == null)
-				connectionSettings.setFavorites(EMPTY_BOOKMARKS);
+				ret = EMPTY_BOOKMARKS;
 			else
-				connectionSettings.setFavorites(loadBookmarks(userSettings.getPrincipal().getLogin(), connectionSettings.getSchemaName()));
+				ret = loadBookmarks(userSettings.getPrincipal().getLogin(), connectionSettings.getSchemaName());
+			
+			connectionSettings.setUserObject(KEY_BOOKMARKS, ret);
 			}
 		
-		return (connectionSettings.getFavorites());
+		return (ret.getBookmarks());
 		}
 	
 	@Override
@@ -94,7 +98,7 @@ public class BookmarkManagerImpl implements BookmarkManager
 		if ((query == null) || (userSettings.getPrincipal() == null))
 			return;
 		
-		final SortedSet<String> f = connectionSettings.getFavorites();
+		final SortedSet<String> f = getFavorites();
 		if (!f.contains(query.getName()))
 			{
 			final int l = configService.get(ConfigKeys.BOOKMARK_LIMIT);
@@ -111,7 +115,7 @@ public class BookmarkManagerImpl implements BookmarkManager
 		if (userSettings.getPrincipal() == null)
 			return;
 		
-		final SortedSet<String> f = connectionSettings.getFavorites();
+		final SortedSet<String> f = getFavorites();
 		if (f.contains(queryName))
 			{
 			f.remove(queryName);
@@ -126,25 +130,18 @@ public class BookmarkManagerImpl implements BookmarkManager
 			return;
 		
 		for (Map.Entry<String, SchemaSettings> ent : userSettings.getSchemaSettings().entrySet())
-			ent.getValue().setFavorites(loadBookmarks(userSettings.getPrincipal().getLogin(), ent.getKey()));
+			ent.getValue().setUserObject(KEY_BOOKMARKS, loadBookmarks(userSettings.getPrincipal().getLogin(), ent.getKey()));
 		}
 	
-	@Override
-	public void clearFavorites()
-		{
-		for (SchemaSettings s : userSettings.getSchemaSettings().values())
-			s.getFavorites().clear();
-		}
-	
-	private SortedSet<String> loadBookmarks(String user, String schema)
+	private UserBookmarks loadBookmarks(String user, String schema)
 		{
 		try	{
-			return (userManagerService.loadExtensionObject(user, schema, BOOKMARK_EXTENSION, BOOKMARK_EXTENSION, bookmarkPersister));
+			return (new MutableUserBookmarks(userManagerService.loadExtensionObject(user, schema, BOOKMARK_EXTENSION, BOOKMARK_EXTENSION, bookmarkPersister)));
 			}
 		catch (IOException e)
 			{
 			logger.log(Level.WARNING, "getUserBookmarks", e);
-			return (new TreeSet<String>());
+			return (new MutableUserBookmarks());
 			}
 		}
 	

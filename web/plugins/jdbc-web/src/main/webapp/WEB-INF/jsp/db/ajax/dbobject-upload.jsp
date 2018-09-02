@@ -20,7 +20,7 @@
 			<span class="button" onclick="return downloadElement('src', 'text/plain;charset=utf-8');"><fmt:message key="downloadText"/></span>
 		</div>
 		<div class="h2-actions">
-			<span class="action" title="<fmt:message key="maximize"/>" onclick="return toggleElement('zoomable1');">&#x25f1;</span>
+			<span class="action" title="<fmt:message key="maximize"/>" onclick="return toggleElement('zoomable1');"><fmt:message key="maximizeIcon"/></span>
 		</div>
 		<div class="h2-actions">
 			<span class="nowrap"><fmt:message key="duration"><fmt:param value="${rs.queryTime}"/></fmt:message></span>

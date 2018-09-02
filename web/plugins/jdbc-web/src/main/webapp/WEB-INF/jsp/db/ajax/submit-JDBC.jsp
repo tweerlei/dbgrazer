@@ -21,7 +21,7 @@
 </c:when><c:when test="${model.view == 'plan'}">
 		<div class="tab-header">
 			<span class="nowrap"><fmt:message key="rowCount"><fmt:param value="${plan.size}"/></fmt:message></span>
-			<span class="action" title="<fmt:message key="maximize"/>" onclick="return toggleElement('zoomable1');">&#x25f1;</span>
+			<span class="action" title="<fmt:message key="maximize"/>" onclick="return toggleElement('zoomable1');"><fmt:message key="maximizeIcon"/></span>
 		</div>
 		<div class="tab-body">
 			<ui:plan label="plan" plan="${plan}"/>
@@ -38,7 +38,7 @@
 			</div>
 </c:forEach
 >			<div class="filter">
-				<span class="action" title="<fmt:message key="maximize"/>" onclick="return toggleElement('zoomable1');">&#x25f1;</span>
+				<span class="action" title="<fmt:message key="maximize"/>" onclick="return toggleElement('zoomable1');"><fmt:message key="maximizeIcon"/></span>
 			</div>
 			<hr/>
 		</div>
@@ -70,7 +70,7 @@
 				<span class="nowrap"><fmt:message key="duration"><fmt:param value="${rs.queryTime}"/></fmt:message></span>
 			</div>
 			<div class="filter">
-				<span class="action" title="<fmt:message key="maximize"/>" onclick="return toggleElement('zoomable1');">&#x25f1;</span>
+				<span class="action" title="<fmt:message key="maximize"/>" onclick="return toggleElement('zoomable1');"><fmt:message key="maximizeIcon"/></span>
 			</div>
 <c:if test="${rs.moreAvailable}"
 >			<div class="filter">

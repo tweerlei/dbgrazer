@@ -23,7 +23,7 @@
 			<a href="db/${model.connection2}/dbschemas.html?catalog=${model.catalog2}"><ui:message text="${model.catalog2}" key="defaultCatalog"/></a> &raquo;
 			<a href="db/${model.connection2}/dbobjects.html?catalog=${model.catalog2}&amp;schema=${model.schema2}"><ui:message text="${model.schema2}" key="defaultSchema"/></a>
 </c:if
->			<span class="action" title="<fmt:message key="maximize"/>" onclick="return toggleElement('zoomable1');">&#x25f1;</span>
+>			<span class="action" title="<fmt:message key="maximize"/>" onclick="return toggleElement('zoomable1');"><fmt:message key="maximizeIcon"/></span>
 		</div>
 		</ui:headline2>
 		

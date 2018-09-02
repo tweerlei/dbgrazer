@@ -39,7 +39,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import de.tweerlei.dbgrazer.extension.kafka.KafkaClientService;
-import de.tweerlei.dbgrazer.web.constant.MessageKeys;
 import de.tweerlei.dbgrazer.web.exception.AccessDeniedException;
 import de.tweerlei.dbgrazer.web.model.TabItem;
 import de.tweerlei.dbgrazer.web.service.QuerySettingsManager;
@@ -229,10 +228,10 @@ public class KafkaBrowseController
 			}
 		
 		final Map<String, TabItem<Map<String, List<PartitionInfoBean>>>> tabs = new HashMap<String, TabItem<Map<String, List<PartitionInfoBean>>>>(1);
-		tabs.put(MessageKeys.TOPICS_TAB, new TabItem<Map<String, List<PartitionInfoBean>>>(sortedTopics, sortedTopics.size()));
+		tabs.put(KafkaMessageKeys.TOPICS_TAB, new TabItem<Map<String, List<PartitionInfoBean>>>(sortedTopics, sortedTopics.size()));
 		
 		model.put("tabs", tabs);
-		model.put("extensionJS", "kafka.js");
+		model.put("extensionJS", KafkaMessageKeys.EXTENSION_JS);
 		
 		return (model);
 		}
@@ -323,10 +322,10 @@ public class KafkaBrowseController
 			model.put("nextOffset", maxOffset + 1);
 		
 		final Map<String, TabItem<List<ConsumerRecordBean>>> tabs = new HashMap<String, TabItem<List<ConsumerRecordBean>>>(1);
-		tabs.put(MessageKeys.MESSAGES_TAB, new TabItem<List<ConsumerRecordBean>>(l, l.size()));
+		tabs.put(KafkaMessageKeys.MESSAGES_TAB, new TabItem<List<ConsumerRecordBean>>(l, l.size()));
 		
 		model.put("tabs", tabs);
-		model.put("extensionJS", "kafka.js");
+		model.put("extensionJS", KafkaMessageKeys.EXTENSION_JS);
 		
 		return (model);
 		}
@@ -420,7 +419,7 @@ public class KafkaBrowseController
 		tabs.put(offset.toString(), new TabItem<ConsumerRecordBean>(rec, 1));
 		
 		model.put("tabs", tabs);
-		model.put("extensionJS", "kafka.js");
+		model.put("extensionJS", KafkaMessageKeys.EXTENSION_JS);
 		
 		return (model);
 		}

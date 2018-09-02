@@ -69,9 +69,9 @@
 				></c:choose
 				><c:choose
 					><c:when test="${currentConnection.editorActive && (not empty editActionTemplate) && (not empty i.value.name)}"
-						></span> <span class="action" title="${editTitle}" onclick="${fn:replace(editActionTemplate, '%%', i.value.name)}">&#x270e;</c:when
+						></span> <span class="action" title="${editTitle}" onclick="${fn:replace(editActionTemplate, '%%', i.value.name)}"><fmt:message key="editQueryIcon"/></c:when
 					><c:when test="${currentConnection.editorActive && (not empty editLinkTemplate) && (not empty i.value.name)}"
-						></span> <span><a class="action" title="${editTitle}" href="${fn:replace(editLinkTemplate, '%%', i.value.name)}">&#x270e;</a></c:when
+						></span> <span><a class="action" title="${editTitle}" href="${fn:replace(editLinkTemplate, '%%', i.value.name)}"><fmt:message key="editQueryIcon"/></a></c:when
 				></c:choose
 			></c:otherwise
 			></c:choose></span></div>

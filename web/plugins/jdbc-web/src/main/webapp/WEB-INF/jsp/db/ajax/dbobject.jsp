@@ -27,7 +27,7 @@
 		<span class="menu" onclick="showDbMenu(event, 'metalinks');"><fmt:message key="download"/></span>
 	</form>
 	<div class="h2-actions">
-		<a class="action" title="<fmt:message key="showQuery"/>" href="db/${currentConnection.linkName}/dbobject.html?catalog=${catalog}&amp;schema=${schema}&amp;object=${object}">&#x279a;</a>
+		<a class="action" title="<fmt:message key="showQuery"/>" href="db/${currentConnection.linkName}/dbobject.html?catalog=${catalog}&amp;schema=${schema}&amp;object=${object}"><fmt:message key="showQueryIcon"/></a>
 	</div>
 	
 	<div id="tools-2" class="hidden"><div class="menucolumn">

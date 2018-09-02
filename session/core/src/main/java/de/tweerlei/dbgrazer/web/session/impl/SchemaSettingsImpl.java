@@ -17,15 +17,15 @@ package de.tweerlei.dbgrazer.web.session.impl;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedSet;
 
 import de.tweerlei.dbgrazer.web.model.CustomQuery;
 import de.tweerlei.dbgrazer.web.model.QueryHistoryEntry;
-import de.tweerlei.dbgrazer.web.model.TableFilterEntry;
-import de.tweerlei.dbgrazer.web.model.TableSet;
+import de.tweerlei.dbgrazer.web.model.UserObject;
+import de.tweerlei.dbgrazer.web.model.UserObjectKey;
 import de.tweerlei.dbgrazer.web.session.SchemaSettings;
 
 /**
@@ -35,21 +35,13 @@ import de.tweerlei.dbgrazer.web.session.SchemaSettings;
  */
 public class SchemaSettingsImpl implements SchemaSettings, Serializable
 	{
-	private String catalog;
-	private String schema;
 	private String queryGroup;
 	private String search;
-	private boolean expandOtherSchemas;
-	private boolean sortColumns;
-	private boolean previewMode;
-	private boolean compactMode;
-	private SortedSet<String> favorites;
+	private Map<UserObjectKey<?>, UserObject> userObjects;
 	private final Map<String, String> parameterHistory;
 	private final List<QueryHistoryEntry> queryHistory;
 	private final List<String> customQueryHistory;
-	private final Map<String, TableFilterEntry> tableFilters;
 	private final Map<String, Map<String, String>> querySettings;
-	private final TableSet tableNames;
 	private final CustomQuery customQuery;
 	
 	/**
@@ -57,37 +49,12 @@ public class SchemaSettingsImpl implements SchemaSettings, Serializable
 	 */
 	public SchemaSettingsImpl()
 		{
+		this.userObjects = new HashMap<UserObjectKey<?>, UserObject>();
 		this.parameterHistory = new HashMap<String, String>();
 		this.queryHistory = new LinkedList<QueryHistoryEntry>();
 		this.customQueryHistory = new LinkedList<String>();
-		this.tableFilters = new HashMap<String, TableFilterEntry>();
 		this.querySettings = new HashMap<String, Map<String, String>>();
-		this.tableNames = new TableSet();
 		this.customQuery = new CustomQuery();
-		}
-	
-	@Override
-	public String getCatalog()
-		{
-		return catalog;
-		}
-	
-	@Override
-	public void setCatalog(String catalog)
-		{
-		this.catalog = catalog;
-		}
-	
-	@Override
-	public String getSchema()
-		{
-		return schema;
-		}
-	
-	@Override
-	public void setSchema(String schema)
-		{
-		this.schema = schema;
 		}
 	
 	@Override
@@ -125,54 +92,6 @@ public class SchemaSettingsImpl implements SchemaSettings, Serializable
 		{
 		return (customQuery);
 		}
-
-	@Override
-	public boolean isDesignerPreviewMode()
-		{
-		return previewMode;
-		}
-
-	@Override
-	public void setDesignerPreviewMode(boolean b)
-		{
-		this.previewMode = b;
-		}
-
-	@Override
-	public boolean isDesignerCompactMode()
-		{
-		return compactMode;
-		}
-
-	@Override
-	public void setDesignerCompactMode(boolean b)
-		{
-		this.compactMode = b;
-		}
-
-	@Override
-	public boolean isExpandOtherSchemas()
-		{
-		return expandOtherSchemas;
-		}
-
-	@Override
-	public void setExpandOtherSchemas(boolean b)
-		{
-		this.expandOtherSchemas = b;
-		}
-	
-	@Override
-	public boolean isSortColumns()
-		{
-		return sortColumns;
-		}
-
-	@Override
-	public void setSortColumns(boolean b)
-		{
-		this.sortColumns = b;
-		}
 	
 	@Override
 	public List<QueryHistoryEntry> getQueryHistory()
@@ -185,12 +104,6 @@ public class SchemaSettingsImpl implements SchemaSettings, Serializable
 		{
 		return customQueryHistory;
 		}
-	
-	@Override
-	public Map<String, TableFilterEntry> getTableFilters()
-		{
-		return tableFilters;
-		}
 
 	@Override
 	public Map<String, Map<String, String>> getQuerySettings()
@@ -199,20 +112,26 @@ public class SchemaSettingsImpl implements SchemaSettings, Serializable
 		}
 	
 	@Override
-	public SortedSet<String> getFavorites()
+	public <T extends UserObject> T getUserObject(UserObjectKey<T> key)
 		{
-		return favorites;
+		@SuppressWarnings("unchecked")
+		final T ret = (T) userObjects.get(key);
+		return ret;
 		}
 
 	@Override
-	public void setFavorites(SortedSet<String> favorites)
+	public <T extends UserObject> void setUserObject(UserObjectKey<T> key, T value)
 		{
-		this.favorites = favorites;
+		userObjects.put(key, value);
 		}
 	
 	@Override
-	public TableSet getDesign()
+	public void clearUserObjects()
 		{
-		return (tableNames);
+		for (Iterator<UserObjectKey<?>> it = userObjects.keySet().iterator(); it.hasNext(); )
+			{
+			if (!it.next().isPersistent())
+				it.remove();
+			}
 		}
 	}

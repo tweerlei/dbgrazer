@@ -54,7 +54,7 @@
 		<span class="menu" onclick="return showDbMenu(event, 'submit-history');"><fmt:message key="history"/></span>
 	</div>
 	<div class="h1-actions">
-		<a class="action" title="<fmt:message key="newWindow"/>" href="db/${currentConnection.linkName}/submit-JDBC.html" target="_blank">&#x2750;</a>
+		<a class="action" title="<fmt:message key="newWindow"/>" href="db/${currentConnection.linkName}/submit-JDBC.html" target="_blank"><fmt:message key="newWindowIcon"/></a>
 	</div>
 	
 	<div id="tools-1" class="hidden"><div class="menucolumn">
@@ -82,8 +82,8 @@
 				<dl>
 					<dt><label for="statement"><fmt:message key="sqlStatement"/><c:if test="${currentConnection.writable}"> <fmt:message key="dmlAllowed"/></c:if></label></dt>
 					<dd><div>
-						<span class="action" title="<fmt:message key="delete"/>" onclick="return clearElement('statement');">&#x232b;</span>
-						<span class="action" title="<fmt:message key="maximize"/>" onclick="return zoomContent('statement');">&#x25f1;</span></div>
+						<span class="action" title="<fmt:message key="clear"/>" onclick="return clearElement('statement');"><fmt:message key="clearIcon"/></span>
+						<span class="action" title="<fmt:message key="maximize"/>" onclick="return zoomContent('statement');"><fmt:message key="maximizeIcon"/></span></div>
 						<spring:textarea id="statement" cssClass="medium" path="query" cols="80" rows="25"/></dd>
 					<dt><fmt:message key="queryParams"/></dt>
 					<dd><table class="props">
@@ -97,7 +97,7 @@
 						</thead>
 						<tfoot>
 							<tr>
-								<td colspan="5"><span class="action" title="<fmt:message key="more"/>" onclick="addLine(event, 'params');">&#x271a;</span></td>
+								<td colspan="5"><span class="action" title="<fmt:message key="add"/>" onclick="addLine(event, 'params');"><fmt:message key="addIcon"/></span></td>
 							</tr>
 						</tfoot>
 						<tbody><c:forEach begin="0" end="${fn:length(model.params) - 1}" var="i" varStatus="st">
@@ -108,11 +108,11 @@
 									><spring:option value="${j}"><fmt:message key="${j}"/></spring:option></c:forEach
 								></spring:select></td>
 								<td><c:if test="${!st.last}">
-									<span class="action" title="<fmt:message key="down"/>" onclick="return moveLineDown(event, 'params', ${i});">&#x21d3;</span>
+									<span class="action" title="<fmt:message key="down"/>" onclick="return moveLineDown(event, 'params', ${i});"><fmt:message key="downIcon"/></span>
 </c:if><c:if test="${!st.first}"
->									<span class="action" title="<fmt:message key="up"/>" onclick="return moveLineUp(event, 'params', ${i});">&#x21d1;</span>
+>									<span class="action" title="<fmt:message key="up"/>" onclick="return moveLineUp(event, 'params', ${i});"><fmt:message key="upIcon"/></span>
 </c:if
->									<span class="action" title="<fmt:message key="remove"/>" onclick="return removeLine(event, 'params', ${i});">&#x2716;</span>
+>									<span class="action" title="<fmt:message key="remove"/>" onclick="return removeLine(event, 'params', ${i});"><fmt:message key="removeIcon"/></span>
 								</td>
 							</tr></c:forEach>
 						</tbody>

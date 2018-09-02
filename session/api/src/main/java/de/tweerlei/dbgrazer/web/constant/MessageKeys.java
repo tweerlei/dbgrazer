@@ -68,10 +68,6 @@ public final class MessageKeys
 	public static final String DML_TAB = "$dmlTab";
 	/** Data tab title */
 	public static final String DATA_TAB = "$dataTab";
-	/** Catalog tab title */
-	public static final String CATALOG_TAB = "$catalogTab";
-	/** Schema tab title */
-	public static final String SCHEMA_TAB = "$schemaTab";
 	/** Connection tab title */
 	public static final String CONNECTION_TAB = "$connectionTab";
 	/** Ancestors tab title */
@@ -80,25 +76,6 @@ public final class MessageKeys
 	public static final String DESCENDANTS_TAB = "$descendantsTab";
 	/** Sum tab title */
 	public static final String SUM_TAB = "$sumTab";
-	/** Folders tab title */
-	public static final String FOLDERS_TAB = "$foldersTab";
-	/** Files tab title */
-	public static final String FILES_TAB = "$filesTab";
-	/** Topics tab title */
-	public static final String TOPICS_TAB = "$topicsTab";
-	/** Messages tab title */
-	public static final String MESSAGES_TAB = "$messagesTab";
-	
-	/*
-	 * Multilevel names for the DB browser
-	 */
-	
-	/** Catalog tab title */
-	public static final String CATALOG_LEVEL = "$catalogLevel";
-	/** Schema tab title */
-	public static final String SCHEMA_LEVEL = "$schemaLevel";
-	/** Schema tab title */
-	public static final String OBJECT_LEVEL = "$schemaLevel";
 	
 	/*
 	 * Other stuff
@@ -111,11 +88,6 @@ public final class MessageKeys
 	public static final String DDL_HEADER = "ddlHeader";
 	/** Header text for generated DML files */
 	public static final String DML_HEADER = "dmlHeader";
-	
-	/** Header text for generated DDL compare files */
-	public static final String DDL_COMPARE_HEADER = "ddlCompareHeader";
-	/** Header text for generated DML compare files */
-	public static final String DML_COMPARE_HEADER = "dmlCompareHeader";
 	
 	/** No data found */
 	public static final String NO_DATA_FOUND = "noData";

@@ -28,7 +28,7 @@
 >${fn:escapeXml(row.values[0])}: ${fn:escapeXml(row.values[1])}
 </c:forEach></pre></div>
 			<div class="filter">
-				<span class="action" title="<fmt:message key="maximize"/>" onclick="return toggleElement('zoomable1');">&#x25f1;</span>
+				<span class="action" title="<fmt:message key="maximize"/>" onclick="return toggleElement('zoomable1');"><fmt:message key="maximizeIcon"/></span>
 			</div>
 			<form class="filter" action="#" method="get" onsubmit="return false;">
 				<input id="format-result" type="checkbox" name="dummy1" value="true"<c:if test="${!rs.attributes['verbatim']}"> checked="checked"</c:if> onchange="toggleFormatMode('', ${rs.attributes['verbatim'] ? 'true' : 'false'});"/> <label for="format-result"><fmt:message key="format"><fmt:param value="${rs.query.attributes['formatter']}"/></fmt:message></label>

@@ -62,7 +62,6 @@ import de.tweerlei.dbgrazer.query.service.QueryService;
 import de.tweerlei.dbgrazer.web.constant.MessageKeys;
 import de.tweerlei.dbgrazer.web.exception.AccessDeniedException;
 import de.tweerlei.dbgrazer.web.model.CompareProgressMonitor;
-import de.tweerlei.dbgrazer.web.model.TableFilterEntry;
 import de.tweerlei.dbgrazer.web.model.TaskCompareProgressMonitor;
 import de.tweerlei.dbgrazer.web.model.TaskDMLProgressMonitor;
 import de.tweerlei.dbgrazer.web.model.TaskProgress;
@@ -70,7 +69,9 @@ import de.tweerlei.dbgrazer.web.service.DataFormatterFactory;
 import de.tweerlei.dbgrazer.web.service.QueryPerformerService;
 import de.tweerlei.dbgrazer.web.service.TaskProgressService;
 import de.tweerlei.dbgrazer.web.service.UserSettingsManager;
+import de.tweerlei.dbgrazer.web.service.jdbc.BrowserSettingsManagerService;
 import de.tweerlei.dbgrazer.web.service.jdbc.ResultCompareService;
+import de.tweerlei.dbgrazer.web.service.jdbc.impl.TableFilterEntry;
 import de.tweerlei.dbgrazer.web.session.ConnectionSettings;
 import de.tweerlei.dbgrazer.web.session.UserSettings;
 import de.tweerlei.ermtools.dialect.SQLDialect;
@@ -501,6 +502,7 @@ public class DataDiffController
 	private final SQLGeneratorService sqlGenerator;
 	private final DataFormatterFactory dataFormatterFactory;
 	private final ResultCompareService transformer;
+	private final BrowserSettingsManagerService browserSettingsManager;
 	private final UserSettings userSettings;
 	private final ConnectionSettings connectionSettings;
 	private final Logger logger;
@@ -517,13 +519,14 @@ public class DataDiffController
 	 * @param dataFormatterFactory DataFormatterFactory
 	 * @param transformer ResultCompareService
 	 * @param taskProgressService TaskProgressService
+	 * @param browserSettingsManager BrowserSettingsManagerService
 	 * @param userSettings UserSettings
 	 * @param connectionSettings ConnectionSettings
 	 */
 	@Autowired
 	public DataDiffController(MetadataService metadataService, QueryService queryService, QueryPerformerService runner,
 			TimeService timeService, LinkService linkService, UserSettingsManager userSettingsManager,
-			SQLGeneratorService sqlGenerator, ResultCompareService transformer,
+			SQLGeneratorService sqlGenerator, ResultCompareService transformer, BrowserSettingsManagerService browserSettingsManager,
 			DataFormatterFactory dataFormatterFactory, TaskProgressService taskProgressService,
 			UserSettings userSettings, ConnectionSettings connectionSettings)
 		{
@@ -536,6 +539,7 @@ public class DataDiffController
 		this.sqlGenerator = sqlGenerator;
 		this.dataFormatterFactory = dataFormatterFactory;
 		this.taskProgressService = taskProgressService;
+		this.browserSettingsManager = browserSettingsManager;
 		this.transformer = transformer;
 		this.userSettings = userSettings;
 		this.connectionSettings = connectionSettings;
@@ -596,7 +600,7 @@ public class DataDiffController
 		model.put("orders", OrderBy.values());
 		
 		final QualifiedName qn = new QualifiedName(fbo.getCatalog(), fbo.getSchema(), fbo.getObject());
-		final TableFilterEntry filter = connectionSettings.getTableFilters().get(qn.toString());
+		final TableFilterEntry filter = browserSettingsManager.getTableFilters().get(qn.toString());
 		if (filter != null)
 			fbo.setFilter(filter.getWhere());
 		
@@ -624,7 +628,7 @@ public class DataDiffController
 				model.put("schemas", metadataService.getSchemas(fbo.getConnection2()));
 			}
 		
-		model.put("extensionJS", "jdbc.js");
+		model.put("extensionJS", JdbcMessageKeys.EXTENSION_JS);
 		
 		return (model);
 		}
@@ -687,11 +691,11 @@ public class DataDiffController
 			connectionSettings.getParameterHistory().put("merge", String.valueOf(fbo.isMerge()));
 			connectionSettings.getParameterHistory().put("mode", fbo.getMode());
 			
-			final TableFilterEntry ent = connectionSettings.getTableFilters().get(qn.toString());
+			final TableFilterEntry ent = browserSettingsManager.getTableFilters().get(qn.toString());
 			if (ent != null)
-				connectionSettings.getTableFilters().put(qn.toString(), new TableFilterEntry(fbo.getFilter(), ent.getOrderBy()));
+				browserSettingsManager.getTableFilters().put(qn.toString(), new TableFilterEntry(fbo.getFilter(), ent.getOrderBy()));
 			else
-				connectionSettings.getTableFilters().put(qn.toString(), new TableFilterEntry(fbo.getFilter(), ""));
+				browserSettingsManager.getTableFilters().put(qn.toString(), new TableFilterEntry(fbo.getFilter(), ""));
 			}
 		catch (PerformQueryException e)
 			{
@@ -858,7 +862,7 @@ public class DataDiffController
 	
 	private String getHeader(String c1, String c2)
 		{
-		return (dataFormatterFactory.getMessage(MessageKeys.DML_COMPARE_HEADER, c1, c2));
+		return (dataFormatterFactory.getMessage(JdbcMessageKeys.DML_COMPARE_HEADER, c1, c2));
 		}
 	
 	private SQLDialect getSQLDialect()

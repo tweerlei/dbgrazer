@@ -42,8 +42,8 @@
 <c:if test="${currentConnection.writable}"
 >		<span class="menu" onclick="return showElementMenu(event, 'tools-1');"><fmt:message key="actions"/></span>
 </c:if
->		<span class="action" title="<fmt:message key="refresh"/>" onclick="return reloadPage();">&#x21ba;</span>
-		<a class="action" title="<fmt:message key="newWindow"/>" href="db/${currentConnection.linkName}/dir.html?path=${tools:urlEncode(path)}" target="_blank">&#x2750;</a>
+>		<span class="action" title="<fmt:message key="refresh"/>" onclick="return reloadPage();"><fmt:message key="refreshIcon"/></span>
+		<a class="action" title="<fmt:message key="newWindow"/>" href="db/${currentConnection.linkName}/dir.html?path=${tools:urlEncode(path)}" target="_blank"><fmt:message key="newWindowIcon"/></a>
 	</div>
 	
 	<div id="tools-1" class="hidden"><div class="menucolumn">

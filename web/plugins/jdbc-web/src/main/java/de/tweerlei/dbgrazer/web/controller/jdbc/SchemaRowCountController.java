@@ -26,7 +26,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import de.tweerlei.common5.jdbc.model.QualifiedName;
-import de.tweerlei.common5.jdbc.model.TableDescription;
 import de.tweerlei.dbgrazer.extension.jdbc.MetadataService;
 import de.tweerlei.dbgrazer.link.service.LinkService;
 import de.tweerlei.dbgrazer.web.exception.AccessDeniedException;
@@ -254,7 +253,7 @@ public class SchemaRowCountController
 				model.put("schemas", metadataService.getSchemas(fbo.getConnection2()));
 			}
 		
-		model.put("extensionJS", "jdbc.js");
+		model.put("extensionJS", JdbcMessageKeys.EXTENSION_JS);
 		
 		return (model);
 		}

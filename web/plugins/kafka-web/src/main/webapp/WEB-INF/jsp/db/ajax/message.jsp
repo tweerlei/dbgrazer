@@ -17,7 +17,7 @@
 %><c:set var="targetElement" value="explorer-right"
 /><ui:headline2 label="${topic}" zoomable="true">
 		<div class="h2-actions">
-			<a class="action" title="<fmt:message key="showQuery"/>" href="db/${currentConnection.linkName}/message.html?topic=${topic}&amp;partition=${partition}&amp;offset=${offset}">&#x279a;</a>
+			<a class="action" title="<fmt:message key="showQuery"/>" href="db/${currentConnection.linkName}/message.html?topic=${topic}&amp;partition=${partition}&amp;offset=${offset}"><fmt:message key="showQueryIcon"/></a>
 		</div>
 	</ui:headline2>
 	

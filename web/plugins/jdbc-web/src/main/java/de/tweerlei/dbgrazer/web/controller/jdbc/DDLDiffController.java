@@ -575,7 +575,7 @@ public class DDLDiffController
 				model.put("schemas", metadataService.getSchemas(fbo.getConnection2()));
 			}
 		
-		model.put("extensionJS", "jdbc.js");
+		model.put("extensionJS", JdbcMessageKeys.EXTENSION_JS);
 		
 		return (model);
 		}
@@ -721,7 +721,7 @@ public class DDLDiffController
 	
 	private String getHeader(String c1, String c2)
 		{
-		return (dataFormatterFactory.getMessage(MessageKeys.DML_COMPARE_HEADER, c1, c2));
+		return (dataFormatterFactory.getMessage(JdbcMessageKeys.DML_COMPARE_HEADER, c1, c2));
 		}
 	
 	private SQLDialect getSQLDialect()

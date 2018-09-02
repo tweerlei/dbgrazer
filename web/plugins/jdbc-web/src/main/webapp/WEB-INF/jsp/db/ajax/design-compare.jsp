@@ -17,7 +17,7 @@
 %><div class="tab-body">
 		<ui:headline2 key="designer">
 		<form class="h2-actions" action="db/${model.connection2}/dbdesigner-compare.html" method="get">
-			: ${currentConnection.design.name}
+			: ${currentDesign.name}
 			<a href="db/${currentConnection.linkName}/dbdesigner.html">${currentConnection.linkName}</a>
 			<fmt:message key="to"/>
 			<a href="db/${model.connection2}/dbdesigner.html">${model.connection2}</a>
@@ -28,7 +28,7 @@
 			<span class="button" onclick="return downloadElement('src', 'text/plain;charset=utf-8');"><fmt:message key="downloadText"/></span>
 		</div>
 		<div class="h2-actions">
-			<span class="action" title="<fmt:message key="maximize"/>" onclick="return toggleElement('zoomable1');">&#x25f1;</span>
+			<span class="action" title="<fmt:message key="maximize"/>" onclick="return toggleElement('zoomable1');"><fmt:message key="maximizeIcon"/></span>
 		</div>
 		</ui:headline2>
 		

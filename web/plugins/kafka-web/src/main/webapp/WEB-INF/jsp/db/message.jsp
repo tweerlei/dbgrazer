@@ -39,8 +39,8 @@
 	
 	<ui:headline1 label="${pageTitle}">
 	<div class="h1-actions">
-		<span class="action" title="<fmt:message key="refresh"/>" onclick="return reloadPage();">&#x21ba;</span>
-		<a class="action" title="<fmt:message key="newWindow"/>" href="db/${currentConnection.linkName}/dir.html?path=${tools:urlEncode(path)}" target="_blank">&#x2750;</a>
+		<span class="action" title="<fmt:message key="refresh"/>" onclick="return reloadPage();"><fmt:message key="refreshIcon"/></span>
+		<a class="action" title="<fmt:message key="newWindow"/>" href="db/${currentConnection.linkName}/dir.html?path=${tools:urlEncode(path)}" target="_blank"><fmt:message key="newWindowIcon"/></a>
 	</div>
 	</ui:headline1>
 	

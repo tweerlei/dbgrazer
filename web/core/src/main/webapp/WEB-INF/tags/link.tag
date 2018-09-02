@@ -23,11 +23,13 @@
 %><%@
 	taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
 %><%@
+	taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
+%><%@
 	taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"
 %><%@
 	taglib prefix="util" uri="http://tweerlei.de/dbgrazer/web/taglib/JspFunctions"
 %><c:choose
-><c:when test="${value == null}">&#x2205;</c:when
+><c:when test="${value == null}"><fmt:message key="null"/></c:when
 ><c:when test="${target == null && (fn:startsWith(value, 'http://') || fn:startsWith(value, 'https://'))}"><a class="external" href="${fn:escapeXml(value)}" target="_blank">${fn:escapeXml(fn:substringAfter(value, '//'))}</a></c:when
 ><c:when test="${target == null}">${fn:escapeXml(value)}</c:when
 ><c:when test="${target.parameter}"><span class="menu" onclick="return chooseTarget(event, '${target.parameterName}', '${util:paramEncode(value)}', '${targetElement}');">${fn:escapeXml(util:getLinkTitle(value))}</span></c:when

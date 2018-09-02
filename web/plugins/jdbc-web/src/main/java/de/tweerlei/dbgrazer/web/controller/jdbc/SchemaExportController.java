@@ -34,6 +34,9 @@ import de.tweerlei.dbgrazer.extension.jdbc.MetadataService.ColumnMode;
 import de.tweerlei.dbgrazer.web.constant.RowSetConstants;
 import de.tweerlei.dbgrazer.web.exception.AccessDeniedException;
 import de.tweerlei.dbgrazer.web.service.SchemaExportService;
+import de.tweerlei.dbgrazer.web.service.jdbc.BrowserSettingsManagerService;
+import de.tweerlei.dbgrazer.web.service.jdbc.DesignManagerService;
+import de.tweerlei.dbgrazer.web.service.jdbc.impl.TableSet;
 import de.tweerlei.dbgrazer.web.session.ConnectionSettings;
 import de.tweerlei.ermtools.dialect.SQLDialect;
 import de.tweerlei.ermtools.dialect.impl.SQLDialectFactory;
@@ -49,21 +52,28 @@ public class SchemaExportController
 	{
 	private final MetadataService metadataService;
 	private final SchemaExportService schemaExportService;
+	private final DesignManagerService designManagerService;
+	private final BrowserSettingsManagerService browserSettingsManager;
 	private final ConnectionSettings connectionSettings;
 	
 	/**
 	 * Constructor
 	 * @param metadataService MetadataService
 	 * @param schemaExportService SchemaExportService
+	 * @param designManagerService DesignManagerService
+	 * @param browserSettingsManager BrowserSettingsManagerService
 	 * @param connectionSettings ConnectionSettings
 	 */
 	@Autowired
 	public SchemaExportController(MetadataService metadataService,
-			SchemaExportService schemaExportService,
+			SchemaExportService schemaExportService, DesignManagerService designManagerService,
+			BrowserSettingsManagerService browserSettingsManager,
 			ConnectionSettings connectionSettings)
 		{
 		this.metadataService = metadataService;
 		this.schemaExportService = schemaExportService;
+		this.designManagerService = designManagerService;
+		this.browserSettingsManager = browserSettingsManager;
 		this.connectionSettings = connectionSettings;
 		}
 	
@@ -82,17 +92,17 @@ public class SchemaExportController
 		
 		final Map<String, Object> model = new HashMap<String, Object>();
 		
-		final Set<TableDescription> right = readSchema(connectionSettings.getLinkName(), connectionSettings.getCatalog(), connectionSettings.getSchema(), "");
+		final Set<TableDescription> right = readSchema(connectionSettings.getLinkName(), browserSettingsManager.getCatalog(), browserSettingsManager.getSchema(), "");
 		
 		final StringBuilder sb = new StringBuilder();
-		if (!StringUtils.empty(connectionSettings.getSchema()))
-			sb.append(connectionSettings.getSchema());
-		else if (!StringUtils.empty(connectionSettings.getCatalog()))
-			sb.append(connectionSettings.getCatalog());
+		if (!StringUtils.empty(browserSettingsManager.getSchema()))
+			sb.append(browserSettingsManager.getSchema());
+		else if (!StringUtils.empty(browserSettingsManager.getCatalog()))
+			sb.append(browserSettingsManager.getCatalog());
 		
 		final Map<String, Object> attributes = new HashMap<String, Object>();
-		attributes.put(RowSetConstants.ATTR_TABLE_CATALOG, connectionSettings.getCatalog());
-		attributes.put(RowSetConstants.ATTR_TABLE_SCHEMA, connectionSettings.getSchema());
+		attributes.put(RowSetConstants.ATTR_TABLE_CATALOG, browserSettingsManager.getCatalog());
+		attributes.put(RowSetConstants.ATTR_TABLE_SCHEMA, browserSettingsManager.getSchema());
 		
 		model.put(GenericDownloadView.SOURCE_ATTRIBUTE, schemaExportService.getExportDownloadSource(connectionSettings.getLinkName(), sb.toString(), right, getSQLDialect(), attributes, format));
 		
@@ -114,10 +124,11 @@ public class SchemaExportController
 		
 		final Map<String, Object> model = new HashMap<String, Object>();
 		
+		final TableSet design = designManagerService.getCurrentDesign();
 		final Set<QualifiedName> missing = new HashSet<QualifiedName>();
-		final Set<TableDescription> right = metadataService.getTableInfos(connectionSettings.getLinkName(), connectionSettings.getDesign().getTableNames(), missing, ColumnMode.ALL, null);
+		final Set<TableDescription> right = metadataService.getTableInfos(connectionSettings.getLinkName(), design.getTableNames(), missing, ColumnMode.ALL, null);
 		
-		final String title = StringUtils.empty(connectionSettings.getDesign().getName()) ? connectionSettings.getLinkName() : connectionSettings.getDesign().getName();
+		final String title = StringUtils.empty(design.getName()) ? connectionSettings.getLinkName() : design.getName();
 		
 		model.put(GenericDownloadView.SOURCE_ATTRIBUTE, schemaExportService.getExportDownloadSource(connectionSettings.getLinkName(), title, right, getSQLDialect(), null, format));
 		

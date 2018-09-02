@@ -43,8 +43,8 @@ import de.tweerlei.common5.jdbc.model.QualifiedName;
 import de.tweerlei.common5.jdbc.model.TableDescription;
 import de.tweerlei.dbgrazer.extension.jdbc.ConfigKeys;
 import de.tweerlei.dbgrazer.extension.jdbc.MetadataService;
-import de.tweerlei.dbgrazer.extension.jdbc.SQLGeneratorService;
 import de.tweerlei.dbgrazer.extension.jdbc.MetadataService.ColumnMode;
+import de.tweerlei.dbgrazer.extension.jdbc.SQLGeneratorService;
 import de.tweerlei.dbgrazer.extension.jdbc.SQLGeneratorService.Joins;
 import de.tweerlei.dbgrazer.extension.jdbc.SQLGeneratorService.OrderBy;
 import de.tweerlei.dbgrazer.extension.jdbc.SQLGeneratorService.Style;
@@ -62,16 +62,17 @@ import de.tweerlei.dbgrazer.web.constant.RowSetConstants;
 import de.tweerlei.dbgrazer.web.constant.ViewConstants;
 import de.tweerlei.dbgrazer.web.exception.AccessDeniedException;
 import de.tweerlei.dbgrazer.web.model.TabItem;
-import de.tweerlei.dbgrazer.web.model.TableFilterEntry;
 import de.tweerlei.dbgrazer.web.model.Visualization;
 import de.tweerlei.dbgrazer.web.service.DataFormatterFactory;
 import de.tweerlei.dbgrazer.web.service.FrontendHelperService;
 import de.tweerlei.dbgrazer.web.service.MetadataExportService;
 import de.tweerlei.dbgrazer.web.service.QuerySettingsManager;
 import de.tweerlei.dbgrazer.web.service.SchemaTransformerService;
-import de.tweerlei.dbgrazer.web.service.TextTransformerService;
 import de.tweerlei.dbgrazer.web.service.SchemaTransformerService.GraphMode;
+import de.tweerlei.dbgrazer.web.service.TextTransformerService;
 import de.tweerlei.dbgrazer.web.service.VisualizationService;
+import de.tweerlei.dbgrazer.web.service.jdbc.BrowserSettingsManagerService;
+import de.tweerlei.dbgrazer.web.service.jdbc.impl.TableFilterEntry;
 import de.tweerlei.dbgrazer.web.session.ConnectionSettings;
 import de.tweerlei.dbgrazer.web.session.ResultCache;
 import de.tweerlei.ermtools.dialect.SQLDialect;
@@ -233,6 +234,7 @@ public class BrowseController
 	private final SchemaTransformerService schemaTransformer;
 	private final FrontendHelperService frontendHelper;
 	private final QuerySettingsManager querySettingsManager;
+	private final BrowserSettingsManagerService browserSettingsManager;
 	private final ResultCache resultCache;
 	private final ConnectionSettings connectionSettings;
 	private final Logger logger;
@@ -249,6 +251,7 @@ public class BrowseController
 	 * @param frontendHelper FrontendHelperService
 	 * @param querySettingsManager QuerySettingsManager
 	 * @param textFormatterService TextFormatterService
+	 * @param browserSettingsManager BrowserSettingsManagerService
 	 * @param schemaTransformer SchemaTransformerService
 	 * @param resultCache ResultCache
 	 * @param connectionSettings ConnectionSettings
@@ -258,7 +261,7 @@ public class BrowseController
 			SQLGeneratorService sqlGenerator, DataFormatterFactory dataFormatterFactory,
 			ResultBuilderService resultBuilder, MetadataExportService exportService,
 			VisualizationService visualizationService, SchemaTransformerService schemaTransformer,
-			TextTransformerService textFormatterService,
+			TextTransformerService textFormatterService, BrowserSettingsManagerService browserSettingsManager,
 			FrontendHelperService frontendHelper, QuerySettingsManager querySettingsManager,
 			ResultCache resultCache, ConnectionSettings connectionSettings)
 		{
@@ -270,6 +273,7 @@ public class BrowseController
 		this.exportService = exportService;
 		this.visualizationService = visualizationService;
 		this.textFormatterService = textFormatterService;
+		this.browserSettingsManager = browserSettingsManager;
 		this.schemaTransformer = schemaTransformer;
 		this.frontendHelper = frontendHelper;
 		this.querySettingsManager = querySettingsManager;
@@ -293,12 +297,12 @@ public class BrowseController
 		model.put("dbinfo", metadataService.getDBInfo(connectionSettings.getLinkName()));
 		
 		final List<SubQueryDef> levels = new ArrayList<SubQueryDef>();
-		final Query query = new ViewImpl(MessageKeys.CATALOG_LEVEL, null, null, null, null, levels, null);
+		final Query query = new ViewImpl(JdbcMessageKeys.CATALOG_LEVEL, null, null, null, null, levels, null);
 		
 		final RowSet cats = buildRowSet(query, metadataService.getCatalogs(connectionSettings.getLinkName()), true);
 		
 		final Map<String, TabItem<RowSet>> tabs = new LinkedHashMap<String, TabItem<RowSet>>();
-		tabs.put(MessageKeys.CATALOG_TAB, new TabItem<RowSet>(cats, cats.getRows().size()));
+		tabs.put(JdbcMessageKeys.CATALOG_TAB, new TabItem<RowSet>(cats, cats.getRows().size()));
 		model.put("query", query);
 		model.put("tabs", tabs);
 		model.put("params", querySettingsManager.buildParameterMap(null));
@@ -324,13 +328,13 @@ public class BrowseController
 		model.put("catalog", catalog);
 		
 		final List<SubQueryDef> levels = new ArrayList<SubQueryDef>();
-		levels.add(new SubQueryDefImpl(MessageKeys.CATALOG_LEVEL, null));
-		final Query query = new ViewImpl(MessageKeys.SCHEMA_LEVEL, null, null, null, null, levels, null);
+		levels.add(new SubQueryDefImpl(JdbcMessageKeys.CATALOG_LEVEL, null));
+		final Query query = new ViewImpl(JdbcMessageKeys.SCHEMA_LEVEL, null, null, null, null, levels, null);
 		
 		final RowSet cats = buildRowSet(query, metadataService.getSchemas(connectionSettings.getLinkName()), true);
 		
 		final Map<String, TabItem<RowSet>> tabs = new LinkedHashMap<String, TabItem<RowSet>>();
-		tabs.put(MessageKeys.SCHEMA_TAB, new TabItem<RowSet>(cats, cats.getRows().size()));
+		tabs.put(JdbcMessageKeys.SCHEMA_TAB, new TabItem<RowSet>(cats, cats.getRows().size()));
 		model.put("query", query);
 		model.put("tabs", tabs);
 		model.put("params", querySettingsManager.buildParameterMap(Arrays.asList(catalog)));
@@ -494,8 +498,8 @@ public class BrowseController
 		if (!connectionSettings.isBrowserEnabled())
 			throw new AccessDeniedException();
 		
-		connectionSettings.setCatalog(catalog);
-		connectionSettings.setSchema(schema);
+		browserSettingsManager.setCatalog(catalog);
+		browserSettingsManager.setSchema(schema);
 		
 		final Map<String, Object> model = new HashMap<String, Object>();
 		
@@ -503,9 +507,9 @@ public class BrowseController
 		model.put("schema", schema);
 		
 		final List<SubQueryDef> levels = new ArrayList<SubQueryDef>();
-		levels.add(new SubQueryDefImpl(MessageKeys.CATALOG_LEVEL, null));
-		levels.add(new SubQueryDefImpl(MessageKeys.SCHEMA_LEVEL, null));
-		final Query query = new ViewImpl(MessageKeys.OBJECT_LEVEL, null, null, null, null, levels, null);
+		levels.add(new SubQueryDefImpl(JdbcMessageKeys.CATALOG_LEVEL, null));
+		levels.add(new SubQueryDefImpl(JdbcMessageKeys.SCHEMA_LEVEL, null));
+		final Query query = new ViewImpl(JdbcMessageKeys.OBJECT_LEVEL, null, null, null, null, levels, null);
 		
 		final Map<String, TabItem<RowSet>> groups = groupObjects(query, metadataService.getTables(connectionSettings.getLinkName(), catalog, schema));
 		
@@ -513,7 +517,7 @@ public class BrowseController
 		model.put("tabs", groups);
 		model.put("tableColumns", Collections.emptyList());
 		model.put("params", querySettingsManager.buildParameterMap(Arrays.asList(catalog, schema)));
-		model.put("extensionJS", "jdbc.js");
+		model.put("extensionJS", JdbcMessageKeys.EXTENSION_JS);
 		
 		return (model);
 		}
@@ -605,20 +609,20 @@ public class BrowseController
 		if (!connectionSettings.isBrowserEnabled())
 			throw new AccessDeniedException();
 		
-		connectionSettings.setCatalog(catalog);
-		connectionSettings.setSchema(schema);
+		browserSettingsManager.setCatalog(catalog);
+		browserSettingsManager.setSchema(schema);
 		if (allSchemas != null)
-			connectionSettings.setExpandOtherSchemas(allSchemas);
+			browserSettingsManager.setExpandOtherSchemas(allSchemas);
 		if (sort != null)
-			connectionSettings.setSortColumns(sort);
+			browserSettingsManager.setSortColumns(sort);
 		
 		final Map<String, Object> model = new HashMap<String, Object>();
 		
 		final int d = getEffectiveDepth(depth);
 		final QualifiedName qname = new QualifiedName(catalog, schema, object);
 		
-		final Set<TableDescription> infos = metadataService.getTableInfoRecursive(connectionSettings.getLinkName(), qname, d, connectionSettings.isExpandOtherSchemas(),
-				connectionSettings.isSortColumns() ? ColumnMode.SORTED : ColumnMode.ALL, null);
+		final Set<TableDescription> infos = metadataService.getTableInfoRecursive(connectionSettings.getLinkName(), qname, d, browserSettingsManager.isExpandOtherSchemas(),
+				browserSettingsManager.isSortColumns() ? ColumnMode.SORTED : ColumnMode.ALL, null);
 		final SQLDialect dialect = getSQLDialect();
 		final TableDescription info = schemaTransformer.findTable(infos, qname, dialect);
 		final List<PrivilegeDescription> privs = new ArrayList<PrivilegeDescription>(info.getPrivileges());
@@ -654,6 +658,7 @@ public class BrowseController
 		tabs.put(MessageKeys.DML_TAB, new TabItem<Integer>(INDEX_DML));
 		tabs.put(MessageKeys.DATA_TAB, new TabItem<Integer>(INDEX_DATA));
 		
+		model.put("browserSettings", browserSettingsManager);
 		model.put("depth", d);
 		model.put("tabs", tabs);
 		model.put("catalog", catalog);
@@ -668,10 +673,10 @@ public class BrowseController
 		model.put("dml", generateDML(info, dialect));
 		model.put("maxDepth", configService.get(ConfigKeys.ERM_LEVELS));
 		model.put("tableColumns", Collections.emptyList());
-		model.put("extensionJS", "jdbc.js");
+		model.put("extensionJS", JdbcMessageKeys.EXTENSION_JS);
 		model.put("formats", textFormatterService.getSupportedTextFormats());
 		
-		final TableFilterEntry filter = connectionSettings.getTableFilters().get(qname.toString());
+		final TableFilterEntry filter = browserSettingsManager.getTableFilters().get(qname.toString());
 		if (filter != null)
 			{
 			model.put("where", filter.getWhere());
@@ -713,8 +718,8 @@ public class BrowseController
 		final Map<String, Object> model = new HashMap<String, Object>();
 		
 		final QualifiedName qname = new QualifiedName(catalog, schema, object);
-		final Set<TableDescription> infos = metadataService.getTableInfoRecursive(connectionSettings.getLinkName(), qname, 0, connectionSettings.isExpandOtherSchemas(),
-				connectionSettings.isSortColumns() ? ColumnMode.SORTED : ColumnMode.ALL, null);
+		final Set<TableDescription> infos = metadataService.getTableInfoRecursive(connectionSettings.getLinkName(), qname, 0, browserSettingsManager.isExpandOtherSchemas(),
+				browserSettingsManager.isSortColumns() ? ColumnMode.SORTED : ColumnMode.ALL, null);
 		final SQLDialect dialect = getSQLDialect();
 		final TableDescription info = schemaTransformer.findTable(infos, qname, dialect);
 		
@@ -809,8 +814,8 @@ public class BrowseController
 		final int d = getEffectiveDepth(depth);
 		final QualifiedName qn = new QualifiedName(catalog, schema, object);
 		
-		final Set<TableDescription> infos = metadataService.getTableInfoRecursive(connectionSettings.getLinkName(), qn, d, connectionSettings.isExpandOtherSchemas(),
-				connectionSettings.isSortColumns() ? ColumnMode.SORTED : ColumnMode.ALL, null);
+		final Set<TableDescription> infos = metadataService.getTableInfoRecursive(connectionSettings.getLinkName(), qn, d, browserSettingsManager.isExpandOtherSchemas(),
+				browserSettingsManager.isSortColumns() ? ColumnMode.SORTED : ColumnMode.ALL, null);
 		final SQLDialect dialect = getSQLDialect();
 		
 		final TableDescriptionVisualizer v = new TableDescriptionVisualizer(schemaTransformer, frontendHelper, infos, qn, connectionSettings.getLinkName(), true, dialect);
@@ -844,8 +849,8 @@ public class BrowseController
 		final int d = getEffectiveDepth(depth);
 		final QualifiedName qn = new QualifiedName(catalog, schema, object);
 		
-		final Set<TableDescription> infos = metadataService.getTableInfoRecursive(connectionSettings.getLinkName(), qn, d, connectionSettings.isExpandOtherSchemas(),
-				connectionSettings.isSortColumns() ? ColumnMode.SORTED : ColumnMode.ALL, null);
+		final Set<TableDescription> infos = metadataService.getTableInfoRecursive(connectionSettings.getLinkName(), qn, d, browserSettingsManager.isExpandOtherSchemas(),
+				browserSettingsManager.isSortColumns() ? ColumnMode.SORTED : ColumnMode.ALL, null);
 		final SQLDialect dialect = getSQLDialect();
 		
 		final TableDescriptionVisualizer v = new TableDescriptionVisualizer(schemaTransformer, frontendHelper, infos, qn, connectionSettings.getLinkName(), true, dialect);

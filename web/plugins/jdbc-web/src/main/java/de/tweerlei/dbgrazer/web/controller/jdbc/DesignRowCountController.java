@@ -29,7 +29,9 @@ import de.tweerlei.common5.jdbc.model.QualifiedName;
 import de.tweerlei.dbgrazer.link.service.LinkService;
 import de.tweerlei.dbgrazer.web.exception.AccessDeniedException;
 import de.tweerlei.dbgrazer.web.service.UserSettingsManager;
+import de.tweerlei.dbgrazer.web.service.jdbc.DesignManagerService;
 import de.tweerlei.dbgrazer.web.service.jdbc.RowCountService;
+import de.tweerlei.dbgrazer.web.service.jdbc.impl.TableSet;
 import de.tweerlei.dbgrazer.web.session.ConnectionSettings;
 import de.tweerlei.dbgrazer.web.session.UserSettings;
 import de.tweerlei.ermtools.dialect.SQLDialect;
@@ -79,6 +81,7 @@ public class DesignRowCountController
 	private final LinkService linkService;
 	private final RowCountService rowCountService;
 	private final UserSettingsManager userSettingsManager;
+	private final DesignManagerService designManagerService;
 	private final UserSettings userSettings;
 	private final ConnectionSettings connectionSettings;
 	
@@ -87,17 +90,19 @@ public class DesignRowCountController
 	 * @param linkService LinkService
 	 * @param rowCountService RowCountService
 	 * @param userSettingsManager UserSettingsManager
+	 * @param designManagerService DesignManagerService
 	 * @param userSettings UserSettings
 	 * @param connectionSettings ConnectionSettings
 	 */
 	@Autowired
-	public DesignRowCountController(LinkService linkService,
+	public DesignRowCountController(LinkService linkService, DesignManagerService designManagerService,
 			RowCountService rowCountService, UserSettingsManager userSettingsManager,
 			UserSettings userSettings, ConnectionSettings connectionSettings)
 		{
 		this.linkService = linkService;
 		this.rowCountService = rowCountService;
 		this.userSettingsManager = userSettingsManager;
+		this.designManagerService = designManagerService;
 		this.userSettings = userSettings;
 		this.connectionSettings = connectionSettings;
 		}
@@ -141,7 +146,7 @@ public class DesignRowCountController
 		final Map<String, String> all = linkService.findAllLinkNames(userSettingsManager.getEffectiveUserGroups(userSettings.getPrincipal()), null, null);
 		model.put("allConnections", all);
 		
-		model.put("extensionJS", "jdbc.js");
+		model.put("extensionJS", JdbcMessageKeys.EXTENSION_JS);
 		
 		return (model);
 		}
@@ -161,7 +166,10 @@ public class DesignRowCountController
 		
 		final Map<String, Object> model = new HashMap<String, Object>();
 		
-		final Set<QualifiedName> tables = connectionSettings.getDesign().getTableNames();
+		final TableSet design = designManagerService.getCurrentDesign();
+		model.put("currentDesign", design);
+		
+		final Set<QualifiedName> tables = design.getTableNames();
 		
 		final SQLDialect dialect = getSQLDialect();
 		final Map<QualifiedName, Object> srcCounts = rowCountService.countRows(connectionSettings.getLinkName(), tables, dialect);

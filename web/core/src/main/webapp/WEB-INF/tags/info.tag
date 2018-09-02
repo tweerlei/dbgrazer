@@ -20,4 +20,4 @@
 	taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
 %><%@
 	taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
-%><span class="action" onclick="return showTip(event, '${name}');" onmouseover="return showTip(event, '${name}');">&#x24d8;</span><div class="hidden" id="tooltip-${name}"><jsp:doBody/></div>
+%><span class="action" onclick="return showTip(event, '${name}');" onmouseover="return showTip(event, '${name}');"><fmt:message key="tooltipIcon"/></span><div class="hidden" id="tooltip-${name}"><jsp:doBody/></div>

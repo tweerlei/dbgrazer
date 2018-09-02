@@ -43,7 +43,6 @@ import de.tweerlei.dbgrazer.query.model.Result;
 import de.tweerlei.dbgrazer.query.model.StatementProducer;
 import de.tweerlei.dbgrazer.query.service.QueryService;
 import de.tweerlei.dbgrazer.query.service.ResultBuilderService;
-import de.tweerlei.dbgrazer.web.constant.MessageKeys;
 import de.tweerlei.dbgrazer.web.exception.AccessDeniedException;
 import de.tweerlei.dbgrazer.web.model.TaskDMLProgressMonitor;
 import de.tweerlei.dbgrazer.web.service.DataFormatterFactory;
@@ -335,7 +334,7 @@ public class ObjectDiffController
 				model.put("schemas", metadataService.getSchemas(fbo.getConnection2()));
 			}
 		
-		model.put("extensionJS", "jdbc.js");
+		model.put("extensionJS", JdbcMessageKeys.EXTENSION_JS);
 		
 		return (model);
 		}
@@ -499,7 +498,7 @@ public class ObjectDiffController
 	
 	private String getHeader(String c1, String c2)
 		{
-		return (dataFormatterFactory.getMessage(MessageKeys.DDL_COMPARE_HEADER, c1, c2));
+		return (dataFormatterFactory.getMessage(JdbcMessageKeys.DDL_COMPARE_HEADER, c1, c2));
 		}
 	
 	private SQLDialect getSQLDialect()

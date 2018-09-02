@@ -59,7 +59,7 @@
 		></c:choose
 	></c:otherwise
 	></c:choose><c:if test="${currentConnection.editorActive && (not empty editLinkTemplate) && (not empty i.value.name)}"
-		> <a class="action" title="${editTitle}" href="${fn:replace(editLinkTemplate, '%%', i.value.name)}">&#x270e;</a></c:if
+		> <a class="action" title="${editTitle}" href="${fn:replace(editLinkTemplate, '%%', i.value.name)}"><fmt:message key="editQueryIcon"/></a></c:if
 	></div>
 	<div id="combo-body-${name}${st.index}" class="combo-body"><div class="tab-page" id="tab-page-${name}${st.index}"><c:set var="key" value="${name}${st.index}"
 		/><c:set var="content" value="${i.value.payload}"

@@ -44,14 +44,14 @@
 	
 	<ui:headline1 label="${pageTitle}">
 	<div class="h1-actions">
-		<span class="action" title="<fmt:message key="refresh"/>" onclick="return reloadPage();">&#x21ba;</span>
-		<a class="action" title="<fmt:message key="newWindow"/>" href="db/${currentConnection.linkName}/files.html" target="_blank">&#x2750;</a>
+		<span class="action" title="<fmt:message key="refresh"/>" onclick="return reloadPage();"><fmt:message key="refreshIcon"/></span>
+		<a class="action" title="<fmt:message key="newWindow"/>" href="db/${currentConnection.linkName}/files.html" target="_blank"><fmt:message key="newWindowIcon"/></a>
 	</div>
 	</ui:headline1>
 	
 	<div id="explorer-left"><ui:combo items="${tabs}" var="rs" varKey="label" varParams="detailParams" varParamString="detailParamString" name="combo"
 		><div class="tab-body"><div class="treerow" id="treerow-${label}-"><div class="treebutton"><span class="action" title="<fmt:message key="expand"/>" onclick="return toggleDirTreeItem(event, '${label}', '', '', '${targetElement}');">&#x25bc;</span></div><div class="treelabel"><a href="db/${currentConnection.linkName}/dir.html?path=%2F" onclick="return showDir(event, '/');">/</a><c:if test="${currentConnection.writable}"
-				> <span class="action" title="<fmt:message key="createDirectory"/>" onclick="return showDbDialog(event, 'file-mkdir', {path: '/', left: ''}, '<fmt:message key="createDirectory"/>');">&#x271a;</span></c:if
+				> <span class="action" title="<fmt:message key="createDirectory"/>" onclick="return showDbDialog(event, 'file-mkdir', {path: '/', left: ''}, '<fmt:message key="createDirectory"/>');"><fmt:message key="addIcon"/></span></c:if
 			></div><ui:result-dirtree rs="${rs}" label="${label}" targetElement="${targetElement}"
 	/></div></div></ui:combo></div>
 	

@@ -48,7 +48,7 @@
 	variable name-from-attribute="varParams" alias="params" scope="NESTED"
 %><%@
 	variable name-from-attribute="varParamString" alias="paramString" scope="NESTED"
-%><div class="combo-head"><div class="float-right"><span class="action" title="<fmt:message key="maximize"/>" onclick="return zoomLeft();">&#x25f1;</span></div><c:choose
+%><div class="combo-head"><div class="float-right"><span class="action" title="<fmt:message key="maximize"/>" onclick="return zoomLeft();"><fmt:message key="maximizeIcon"/></span></div><c:choose
 ><c:when test="${fn:length(items) <= 1}"><c:forEach items="${items}" var="i" varStatus="st"><c:choose
 	><c:when test="${empty i.key}"
 		><fmt:message key="emptyTab"
@@ -60,7 +60,7 @@
 		></c:choose
 	></c:otherwise
 	></c:choose><c:if test="${currentConnection.editorActive && (not empty editLinkTemplate) && (not empty i.value.name)}"
-		> <a class="action" title="${editTitle}" href="${fn:replace(editLinkTemplate, '%%', i.value.name)}">&#x270e;</a></c:if
+		> <a class="action" title="${editTitle}" href="${fn:replace(editLinkTemplate, '%%', i.value.name)}"><fmt:message key="editQueryIcon"/></a></c:if
 	></c:forEach
 ></c:when
 ><c:otherwise><form action="#" method="get" onsubmit="return false;"><select id="combo-${name}" name="combo" onchange="return showTab('${name}', this.selectedIndex);">
@@ -80,7 +80,7 @@
 		></c:choose></option>
 </c:forEach
 ></select><c:if test="${currentConnection.editorActive && (not empty editLinkTemplate) && (not empty queryName)}"
-		> <a class="action" title="${editTitle}" href="${fn:replace(editLinkTemplate, '%%', queryName)}">&#x270e;</a></c:if
+		> <a class="action" title="${editTitle}" href="${fn:replace(editLinkTemplate, '%%', queryName)}"><fmt:message key="editQueryIcon"/></a></c:if
 ></form></c:otherwise
 ></c:choose></div>
 	

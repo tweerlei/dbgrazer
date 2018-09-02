@@ -49,7 +49,7 @@
 				<span class="nowrap"><fmt:message key="rowCount"><fmt:param value="${rs.affectedRows}"/></fmt:message></span>
 			</div>
 			<div class="filter">
-				<span class="action" title="<fmt:message key="maximize"/>" onclick="return toggleElement('zoomable1');">&#x25f1;</span>
+				<span class="action" title="<fmt:message key="maximize"/>" onclick="return toggleElement('zoomable1');"><fmt:message key="maximizeIcon"/></span>
 			</div>
 			<div class="filter">
 				<span class="nowrap"><fmt:message key="duration"><fmt:param value="${rs.queryTime}"/></fmt:message></span>

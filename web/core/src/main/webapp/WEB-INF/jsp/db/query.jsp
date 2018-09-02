@@ -27,10 +27,10 @@
 >		<a class="action" title="<fmt:message key="${i.title}"/>" href="${fn:escapeXml(i.href)}"><fmt:message key="${i.label}"/></a>
 </c:otherwise></c:choose></c:forEach
 ><c:if test="${model.query.type.resultType != 'RECURSIVE'}"
->		<span class="action" title="<fmt:message key="refresh"/>" onclick="return reloadPage();">&#x21ba;</span>
-		<a class="action" title="<fmt:message key="newWindow"/>" href="db/${currentConnection.linkName}/query.html?q=${model.query.name}${paramString}" target="_blank">&#x2750;</a>
+>		<span class="action" title="<fmt:message key="refresh"/>" onclick="return reloadPage();"><fmt:message key="refreshIcon"/></span>
+		<a class="action" title="<fmt:message key="newWindow"/>" href="db/${currentConnection.linkName}/query.html?q=${model.query.name}${paramString}" target="_blank"><fmt:message key="newWindowIcon"/></a>
 </c:if><c:if test="${currentConnection.editorActive}"
->		<a class="action" title="<fmt:message key="editQuery"/>" href="db/${currentConnection.linkName}/edit.html?q=${model.query.name}">&#x270e;</a>
+>		<a class="action" title="<fmt:message key="editQuery"/>" href="db/${currentConnection.linkName}/edit.html?q=${model.query.name}"><fmt:message key="editQueryIcon"/></a>
 </c:if
 >	</div>
 	</ui:headline1>
