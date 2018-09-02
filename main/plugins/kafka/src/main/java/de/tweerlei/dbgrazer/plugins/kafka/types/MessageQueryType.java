@@ -51,7 +51,6 @@ public class MessageQueryType extends AbstractSingleQueryType
 		super(NAME, linkType);
 		
 		final Map<String, Class<?>> m = new LinkedHashMap<String, Class<?>>();
-		m.put(QueryTypeAttributes.ATTR_TOPIC, String.class);
 		m.put(QueryTypeAttributes.ATTR_FORMATTER, TextFormatter.class);
 		attributes = Collections.unmodifiableMap(m);
 		}

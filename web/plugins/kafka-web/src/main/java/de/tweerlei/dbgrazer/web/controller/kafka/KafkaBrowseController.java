@@ -323,7 +323,7 @@ public class KafkaBrowseController
 			model.put("nextOffset", maxOffset + 1);
 		
 		final Map<String, TabItem<List<ConsumerRecordBean>>> tabs = new HashMap<String, TabItem<List<ConsumerRecordBean>>>(1);
-		tabs.put(MessageKeys.FILES_TAB, new TabItem<List<ConsumerRecordBean>>(l, l.size()));
+		tabs.put(MessageKeys.MESSAGES_TAB, new TabItem<List<ConsumerRecordBean>>(l, l.size()));
 		
 		model.put("tabs", tabs);
 		model.put("extensionJS", "kafka.js");

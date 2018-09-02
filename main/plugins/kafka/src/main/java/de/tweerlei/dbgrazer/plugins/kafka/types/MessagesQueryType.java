@@ -15,17 +15,33 @@
  */
 package de.tweerlei.dbgrazer.plugins.kafka.types;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Service;
+
+import de.tweerlei.dbgrazer.plugins.kafka.impl.KafkaLinkType;
+import de.tweerlei.dbgrazer.query.model.ResultMapMode;
+import de.tweerlei.dbgrazer.query.model.impl.AbstractTableQueryType;
+
 /**
- * QueryType attribute names
+ * GET webservice request
  * 
  * @author Robert Wruck
  */
-public final class QueryTypeAttributes
+@Service
+@Order(501)
+public class MessagesQueryType extends AbstractTableQueryType
 	{
-	/** RowSet attribute for the TextFormatter name */
-	public static final String ATTR_FORMATTER = "formatter";
+	/** The NAME */
+	public static final String NAME = "KAFKA_MESSAGES";
 	
-	private QueryTypeAttributes()
+	/**
+	 * Constructor
+	 * @param linkType LinkType
+	 */
+	@Autowired
+	public MessagesQueryType(KafkaLinkType linkType)
 		{
+		super(NAME, linkType, ResultMapMode.SINGLE);
 		}
 	}

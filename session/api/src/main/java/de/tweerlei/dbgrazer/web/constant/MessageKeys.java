@@ -84,8 +84,10 @@ public final class MessageKeys
 	public static final String FOLDERS_TAB = "$foldersTab";
 	/** Files tab title */
 	public static final String FILES_TAB = "$filesTab";
-	/** Folders tab title */
+	/** Topics tab title */
 	public static final String TOPICS_TAB = "$topicsTab";
+	/** Messages tab title */
+	public static final String MESSAGES_TAB = "$messagesTab";
 	
 	/*
 	 * Multilevel names for the DB browser
