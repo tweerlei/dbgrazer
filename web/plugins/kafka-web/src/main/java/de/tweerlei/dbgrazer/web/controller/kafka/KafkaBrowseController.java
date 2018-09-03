@@ -43,6 +43,7 @@ import de.tweerlei.dbgrazer.web.exception.AccessDeniedException;
 import de.tweerlei.dbgrazer.web.model.TabItem;
 import de.tweerlei.dbgrazer.web.service.QuerySettingsManager;
 import de.tweerlei.dbgrazer.web.service.TextTransformerService;
+import de.tweerlei.dbgrazer.web.service.kafka.TopicSettingsManager;
 import de.tweerlei.dbgrazer.web.session.ConnectionSettings;
 
 /**
@@ -182,6 +183,7 @@ public class KafkaBrowseController
 	private final KafkaClientService kafkaClientService;
 	private final TextTransformerService textFormatterService;
 	private final QuerySettingsManager querySettingsManager;
+	private final TopicSettingsManager topicStateManager;
 	private final ConnectionSettings connectionSettings;
 	
 	/**
@@ -189,15 +191,17 @@ public class KafkaBrowseController
 	 * @param kafkaClientService KafkaClientService
 	 * @param textFormatterService TextFormatterService
 	 * @param querySettingsManager QuerySettingsManager
+	 * @param topicStateManager TopicStateManager
 	 * @param connectionSettings ConnectionSettings
 	 */
 	@Autowired
 	public KafkaBrowseController(KafkaClientService kafkaClientService, TextTransformerService textFormatterService,
-			QuerySettingsManager querySettingsManager, ConnectionSettings connectionSettings)
+			QuerySettingsManager querySettingsManager, TopicSettingsManager topicStateManager, ConnectionSettings connectionSettings)
 		{
 		this.kafkaClientService = kafkaClientService;
 		this.textFormatterService = textFormatterService;
 		this.querySettingsManager = querySettingsManager;
+		this.topicStateManager = topicStateManager;
 		this.connectionSettings = connectionSettings;
 		}
 	
@@ -277,9 +281,15 @@ public class KafkaBrowseController
 		
 		final Map<String, Object> model = new HashMap<String, Object>();
 		
+		final Long effectiveOffset;
+		if (offset == null)
+			effectiveOffset = topicStateManager.getLastOffset(topic, partition);
+		else
+			effectiveOffset = offset;
+		
 		model.put("topic", topic);
 		model.put("partition", partition);
-		model.put("offset", offset);
+		model.put("offset", effectiveOffset);
 		
 		final KafkaConsumer<String, String> consumer = kafkaClientService.getConsumer(connectionSettings.getLinkName());
 		final TopicPartition tp = new TopicPartition(topic, partition);
@@ -298,7 +308,7 @@ public class KafkaBrowseController
 		model.put("currentOffset", consumer.position(tp));
 		consumer.unsubscribe();
 		
-		final ConsumerRecords<String, String> records = kafkaClientService.fetchRecords(connectionSettings.getLinkName(), topic, partition, offset);
+		final ConsumerRecords<String, String> records = kafkaClientService.fetchRecords(connectionSettings.getLinkName(), topic, partition, effectiveOffset);
 		
 		final List<ConsumerRecordBean> l = new ArrayList<ConsumerRecordBean>(records.count());
 		Long minOffset = null;
@@ -315,6 +325,9 @@ public class KafkaBrowseController
 		
 		model.put("minOffset", minOffset);
 		model.put("maxOffset", maxOffset);
+		
+		if (minOffset != null)
+			topicStateManager.setLastOffset(topic, partition, minOffset);
 		
 		if ((minOffset != null) && (startOffset != null) && (minOffset > startOffset))
 			model.put("prevOffset", startOffset);	// TODO: Subtract fetch size?
