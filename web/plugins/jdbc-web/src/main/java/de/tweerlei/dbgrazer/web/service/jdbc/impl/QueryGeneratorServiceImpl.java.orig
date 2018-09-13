@@ -78,9 +78,20 @@ public class QueryGeneratorServiceImpl implements QueryGeneratorService
 	@Override
 	public Query createSelectQuery(TableDescription t, SQLDialect dialect, DataFormatter fmt)
 		{
+		final List<ParameterDef> params = new ArrayList<ParameterDef>(t.getColumns().size());
+		final Set<Integer> pk = t.getPKColumns();
+		int i = 0;
+		for (ColumnDescription c : t.getColumns())
+			{
+			final ColumnType type = ColumnType.forSQLType(c.getType());
+			if (pk.contains(i))
+				params.add(new ParameterDefImpl(sqlGenerator.formatColumnName(c.getName()), type, null));
+			i++;
+			}
+		
 		final String stmt = sqlGenerator.generatePKSelect(t, Style.INDENTED, dialect);
 		
-		return (new QueryImpl("select", null, null, stmt, queryService.findQueryType(JdbcConstants.QUERYTYPE_MULTIPLE), getPKParameters(t), null, null));
+		return (new QueryImpl("select", null, null, stmt, queryService.findQueryType(JdbcConstants.QUERYTYPE_MULTIPLE), params, null, null));
 		}
 	
 	@Override
@@ -159,13 +170,16 @@ public class QueryGeneratorServiceImpl implements QueryGeneratorService
 		final String tableName = dialect.getQualifiedTableName(t.getName());
 		final List<ColumnDef> columns = new ArrayList<ColumnDef>(t.getColumns().size());
 		final List<ParameterDef> params = new ArrayList<ParameterDef>(t.getColumns().size());
+		final List<ParameterDef> idParams = new ArrayList<ParameterDef>();
 		final Set<Integer> pk = t.getPKColumns();
 		int i = 0;
 		for (ColumnDescription c : t.getColumns())
 			{
 			final ColumnType type = ColumnType.forSQLType(c.getType());
 			columns.add(new ColumnDefImpl(c.getName(), type, dialect.dataTypeToString(c.getType()), null, t.getName(), c.getName()));
-			if (!pk.contains(i))
+			if (pk.contains(i))
+				idParams.add(new ParameterDefImpl(sqlGenerator.formatColumnName(c.getName()), type, null));
+			else
 				{
 				String fkTable = null;
 				for (ForeignKeyDescription fk : t.getReferencedKeys())
@@ -177,9 +191,9 @@ public class QueryGeneratorServiceImpl implements QueryGeneratorService
 				}
 			i++;
 			}
-		
+			
 		if (includePK)
-			params.addAll(getPKParameters(t));
+			params.addAll(idParams);
 		
 		final StringWriter sw = new StringWriter();
 		final SQLWriter sqlWriter = factory.getSQLWriter(new StatementWriter(sw), dialect, true);
@@ -194,10 +208,16 @@ public class QueryGeneratorServiceImpl implements QueryGeneratorService
 		{
 		final String tableName = dialect.getQualifiedTableName(t.getName());
 		final List<ColumnDef> columns = new ArrayList<ColumnDef>(t.getColumns().size());
+		final List<ParameterDef> params = new ArrayList<ParameterDef>(t.getColumns().size());
+		final Set<Integer> pk = t.getPKColumns();
+		int i = 0;
 		for (ColumnDescription c : t.getColumns())
 			{
 			final ColumnType type = ColumnType.forSQLType(c.getType());
 			columns.add(new ColumnDefImpl(c.getName(), type, dialect.dataTypeToString(c.getType()), null, t.getName(), c.getName()));
+			if (pk.contains(i))
+				params.add(new ParameterDefImpl(sqlGenerator.formatColumnName(c.getName()), type, null));
+			i++;
 			}
 		
 		final StringWriter sw = new StringWriter();
@@ -205,19 +225,6 @@ public class QueryGeneratorServiceImpl implements QueryGeneratorService
 		
 		sqlWriter.writeDelete(tableName, columns, null, t.getPKColumns());
 		
-		return (new QueryImpl("insert", null, null, sw.toString(), queryService.findQueryType(JdbcConstants.QUERYTYPE_DML), getPKParameters(t), null, null));
-		}
-	
-	private List<ParameterDef> getPKParameters(TableDescription t)
-		{
-		final Set<Integer> pk = t.getPKColumns();
-		final List<ParameterDef> params = new ArrayList<ParameterDef>(pk.size());
-		for (Integer i : pk)
-			{
-			final ColumnDescription c = t.getColumns().get(i);
-			final ColumnType type = ColumnType.forSQLType(c.getType());
-			params.add(new ParameterDefImpl(sqlGenerator.formatColumnName(c.getName()), type, null));
-			}
-		return (params);
+		return (new QueryImpl("insert", null, null, sw.toString(), queryService.findQueryType(JdbcConstants.QUERYTYPE_DML), params, null, null));
 		}
 	}

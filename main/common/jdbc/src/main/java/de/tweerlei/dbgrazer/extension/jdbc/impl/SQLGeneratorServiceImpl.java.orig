@@ -197,17 +197,22 @@ public class SQLGeneratorServiceImpl implements SQLGeneratorService
 				{
 				sb.appendName("WHERE");
 				first = true;
-				for (String c : t.getPrimaryKey().getColumns())
+				i = 0;
+				for (ColumnDescription c : t.getColumns())
 					{
-					if (first)
-						first = false;
-					else
-						sb.appendName("AND");
-					if (joins != Joins.NONE)
-						sb.appendName("t0").appendOperator(NAME_SEPARATOR);
-					sb.appendName(c);
-					sb.appendOperator("=");
-					sb.appendName("?");
+					if (pk.contains(i))
+						{
+						if (first)
+							first = false;
+						else
+							sb.appendName("AND");
+						if (joins != Joins.NONE)
+							sb.appendName("t0").appendOperator(NAME_SEPARATOR);
+						sb.appendName(c.getName());
+						sb.appendOperator("=");
+						sb.appendName("?");
+						}
+					i++;
 					}
 				}
 			}
