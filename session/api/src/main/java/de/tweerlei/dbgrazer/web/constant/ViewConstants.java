@@ -25,12 +25,6 @@ public final class ViewConstants
 	/** Image map ID */
 	public static final String IMAGEMAP_ID = "graphmap";
 	
-	/** Parameter base name for passing query parameters to a view query */
-	public static final String PARAM_URL_PARAMETER = "params";
-	
-	/** Separator for multiple parameters in a single String */
-	public static final String PARAM_SEPARATOR = "  ";
-	
 	/** The empty view used by AJAX handlers that don't return any data */
 	public static final String EMPTY_VIEW = "empty";
 	

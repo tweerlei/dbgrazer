@@ -29,6 +29,6 @@
 %><%@
 	taglib prefix="util" uri="http://tweerlei.de/dbgrazer/web/taglib/JspFunctions"
 %><c:choose
-><c:when test="${not empty targetElement}"><a href="db/${currentConnection.linkName}/result.html?q=${model.query.name}${paramString}&amp;params[${rs.query.attributes['dimension']}]=${tools:urlEncode(value)}" onclick="return runQuery(event, '${model.query.name}', '${paramString}&amp;params[${rs.query.attributes['dimension']}]=${tools:urlEncode(value)}', '${targetElement}');">${fn:escapeXml(util:getLinkTitle(value))}</a></c:when
-><c:otherwise><a href="db/${currentConnection.linkName}/result.html?q=${model.query.name}${paramString}&amp;params[${rs.query.attributes['dimension']}]=${tools:urlEncode(value)}">${fn:escapeXml(util:getLinkTitle(value))}</a></c:otherwise
+><c:when test="${not empty targetElement}"><a href="db/${currentConnection.linkName}/result.html?q=${model.query.name}${paramString}&amp;params%5B${rs.query.attributes['dimension']}%5D=${tools:urlEncode(value)}" onclick="return runQuery(event, '${model.query.name}', '${paramString}&amp;params%5B${rs.query.attributes['dimension']}%5D=${tools:urlEncode(value)}', '${targetElement}');">${fn:escapeXml(util:getLinkTitle(value))}</a></c:when
+><c:otherwise><a href="db/${currentConnection.linkName}/result.html?q=${model.query.name}${paramString}&amp;params%5B${rs.query.attributes['dimension']}%5D=${tools:urlEncode(value)}">${fn:escapeXml(util:getLinkTitle(value))}</a></c:otherwise
 ></c:choose>

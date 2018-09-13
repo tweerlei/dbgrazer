@@ -82,13 +82,13 @@ public class FrontendHelperServiceImplTest extends TestCase
 		final FrontendHelperService fhs = new FrontendHelperServiceImpl(new StringTransformerServiceImpl());
 		
 		assertNull(fhs.paramEncode(null, true));
-		assertEquals("&amp;params[0]=", fhs.paramEncode("", true));
-		assertEquals("&amp;params[0]=abc+def", fhs.paramEncode("abc def", true));
-		assertEquals("&amp;params[0]=abc+def&amp;params[1]=ghi", fhs.paramEncode("abc def  ghi", true));
-		assertEquals("&amp;params[0]=abc+def&amp;params[1]=ghi", fhs.paramEncode("abc def   ghi", true));
-		assertEquals("&amp;params[0]=abc+def&amp;params[1]=ghi&amp;params[2]=M%C3%BCller", fhs.paramEncode("abc def   ghi  Müller", true));
+		assertEquals("&amp;params%5B0%5D=", fhs.paramEncode("", true));
+		assertEquals("&amp;params%5B0%5D=abc+def", fhs.paramEncode("abc def", true));
+		assertEquals("&amp;params%5B0%5D=abc+def&amp;params%5B1%5D=ghi", fhs.paramEncode("abc def  ghi", true));
+		assertEquals("&amp;params%5B0%5D=abc+def&amp;params%5B1%5D=ghi", fhs.paramEncode("abc def   ghi", true));
+		assertEquals("&amp;params%5B0%5D=abc+def&amp;params%5B1%5D=ghi&amp;params%5B2%5D=M%C3%BCller", fhs.paramEncode("abc def   ghi  Müller", true));
 		
-		assertEquals("&params[0]=abc+def&params[1]=ghi&params[2]=M%C3%BCller", fhs.paramEncode("abc def   ghi  Müller", false));
+		assertEquals("&params%5B0%5D=abc+def&params%5B1%5D=ghi&params%5B2%5D=M%C3%BCller", fhs.paramEncode("abc def   ghi  Müller", false));
 		}
 	
 	/**
@@ -128,9 +128,9 @@ public class FrontendHelperServiceImplTest extends TestCase
 		final FrontendHelperService fhs = new FrontendHelperServiceImpl(new StringTransformerServiceImpl());
 		
 		assertEquals("", fhs.getQueryParams(Collections.emptyList(), true));
-		assertEquals("&amp;params[0]=Meier+&amp;params[1]=L%C3%BCdenscheid", fhs.getQueryParams(Arrays.asList("Meier ", "Lüdenscheid"), true));
+		assertEquals("&amp;params%5B0%5D=Meier+&amp;params%5B1%5D=L%C3%BCdenscheid", fhs.getQueryParams(Arrays.asList("Meier ", "Lüdenscheid"), true));
 		
-		assertEquals("&params[0]=Meier+&params[1]=L%C3%BCdenscheid", fhs.getQueryParams(Arrays.asList("Meier ", "Lüdenscheid"), false));
+		assertEquals("&params%5B0%5D=Meier+&params%5B1%5D=L%C3%BCdenscheid", fhs.getQueryParams(Arrays.asList("Meier ", "Lüdenscheid"), false));
 		}
 	
 	/**
@@ -141,7 +141,7 @@ public class FrontendHelperServiceImplTest extends TestCase
 		final FrontendHelperService fhs = new FrontendHelperServiceImpl(new StringTransformerServiceImpl());
 		
 		assertEquals("", fhs.getQueryParams(Collections.<Integer, Object>emptyMap(), true));
-		assertEquals("&amp;params[2]=L%C3%BCdenscheid", fhs.getQueryParams(Collections.<Integer, Object>singletonMap(2, "Lüdenscheid"), true));
+		assertEquals("&amp;params%5B2%5D=L%C3%BCdenscheid", fhs.getQueryParams(Collections.<Integer, Object>singletonMap(2, "Lüdenscheid"), true));
 		}
 	
 	/**

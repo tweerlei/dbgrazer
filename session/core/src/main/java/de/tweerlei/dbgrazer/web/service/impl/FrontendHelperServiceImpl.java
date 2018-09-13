@@ -33,7 +33,6 @@ import de.tweerlei.common.textdata.JSONWriter;
 import de.tweerlei.common.util.StringUtils;
 import de.tweerlei.dbgrazer.query.model.ParameterDef;
 import de.tweerlei.dbgrazer.query.model.Query;
-import de.tweerlei.dbgrazer.web.constant.ViewConstants;
 import de.tweerlei.dbgrazer.web.model.PathInfo;
 import de.tweerlei.dbgrazer.web.service.FrontendHelperService;
 import de.tweerlei.spring.service.StringTransformerService;
@@ -49,6 +48,10 @@ public class FrontendHelperServiceImpl implements FrontendHelperService
 	private static final String PATH_SEPARATOR = "/";
 	private static final String QUERY_SEPARATOR = "?";
 	private static final Pattern PATH_PATTERN = Pattern.compile("/?([^/]+)/([^/]+)/(.*)");
+	
+	private static final String PARAM_URL_PARAMETER = "params";
+	
+	private static final String PARAM_SEPARATOR = "  ";
 	
 	// Avg. menu item aspect ratio: Width 100px, height 10px
 	private static final double MENU_ASPECT = 100.0 / 10.0;
@@ -124,7 +127,7 @@ public class FrontendHelperServiceImpl implements FrontendHelperService
 			return (null);
 		
 		final StringBuilder sb = new StringBuilder();
-		final List<String> params = Arrays.asList(s.split(ViewConstants.PARAM_SEPARATOR, -1));
+		final List<String> params = Arrays.asList(s.split(PARAM_SEPARATOR, -1));
 		appendParams(sb, params, htmlEncode, true);
 		return (sb.toString());
 		}
@@ -137,7 +140,7 @@ public class FrontendHelperServiceImpl implements FrontendHelperService
 			ret = null;
 		else
 			{
-			final String[] parts = s.split(ViewConstants.PARAM_SEPARATOR, -1);
+			final String[] parts = s.split(PARAM_SEPARATOR, -1);
 			ret = parts[parts.length - 1];
 			}
 		
@@ -185,10 +188,10 @@ public class FrontendHelperServiceImpl implements FrontendHelperService
 					title.append("&amp;");
 				else
 					title.append("&");
-				title.append(ViewConstants.PARAM_URL_PARAMETER);
-				title.append("[");
+				title.append(PARAM_URL_PARAMETER);
+				title.append("%5B");
 				title.append(ent.getKey());
-				title.append("]=");
+				title.append("%5D=");
 				title.append(stringTransformerService.toURL(s));
 				}
 			}
@@ -212,10 +215,10 @@ public class FrontendHelperServiceImpl implements FrontendHelperService
 				sb.append("&amp;");
 			else
 				sb.append("&");
-			sb.append(ViewConstants.PARAM_URL_PARAMETER);
-			sb.append("[");
+			sb.append(PARAM_URL_PARAMETER);
+			sb.append("%5B");
 			sb.append(i++);
-			sb.append("]=");
+			sb.append("%5D=");
 			sb.append(stringTransformerService.toURL(s));
 			}
 		}

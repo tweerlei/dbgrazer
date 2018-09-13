@@ -17,7 +17,7 @@
 %><c:forEach items="${exportFormats}" var="f"
 ><c:set var="url" value="${baseURI}ws/${currentConnection.linkName}/result-export.html?q=${fn:escapeXml(queryName)}&amp;format=${f}"
 /><c:forEach items="${params}" var="p" varStatus="st"
-	><c:set var="url" value="${url}&amp;params[${st.index}]=${fn:escapeXml(p)}"
+	><c:set var="url" value="${url}&amp;params%5B${st.index}%5D=${fn:escapeXml(p)}"
 /></c:forEach
 ><p><em><fmt:message key="${f}"/>:</em><br/>
 	<a href="${url}" target="_blank">${url}</a></p>
