@@ -272,7 +272,7 @@ public class QueryServiceImpl implements QueryService, ConfigListener, LinkListe
 		
 		for (QueryType t : queryTypes)
 			{
-			if ((t.getLinkType() != null) && (t.getLinkType() == linkType))
+			if (!t.getResultType().isView() && ((t.getLinkType() == null) || (t.getLinkType() == linkType)))
 				ret.add(t);
 			}
 		
@@ -286,7 +286,7 @@ public class QueryServiceImpl implements QueryService, ConfigListener, LinkListe
 		
 		for (QueryType t : queryTypes)
 			{
-			if ((t.getLinkType() != null) && (t.getLinkType() == linkType) && t.isScript())
+			if (t.isScript() && ((t.getLinkType() == null) || (t.getLinkType() == linkType)))
 				ret.add(t);
 			}
 		
@@ -300,7 +300,7 @@ public class QueryServiceImpl implements QueryService, ConfigListener, LinkListe
 		
 		for (QueryType t : queryTypes)
 			{
-			if (t.getLinkType() == null)
+			if (t.getResultType().isView())
 				ret.add(t);
 			}
 		

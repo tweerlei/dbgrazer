@@ -36,6 +36,7 @@ import de.tweerlei.dbgrazer.web.constant.MessageKeys;
 import de.tweerlei.dbgrazer.web.exception.AccessDeniedException;
 import de.tweerlei.dbgrazer.web.model.TabItem;
 import de.tweerlei.dbgrazer.web.service.FrontendExtensionService;
+import de.tweerlei.dbgrazer.web.session.ConnectionSettings;
 import de.tweerlei.dbgrazer.web.session.UserSettings;
 
 /**
@@ -48,21 +49,24 @@ public class LinkController
 	{
 	private final LinkService linkService;
 	private final FrontendExtensionService extensionService;
+	private final ConnectionSettings connectionSettings;
 	private final UserSettings userSettings;
 	
 	/**
 	 * Constructor
 	 * @param linkService LinkService
 	 * @param extensionService FrontendExtensionService
+	 * @param connectionSettings ConnectionSettings
 	 * @param userSettings UserSettings
 	 */
 	@Autowired
 	public LinkController(LinkService linkService,
 			FrontendExtensionService extensionService,
-			UserSettings userSettings)
+			ConnectionSettings connectionSettings, UserSettings userSettings)
 		{
 		this.linkService = linkService;
 		this.extensionService = extensionService;
+		this.connectionSettings = connectionSettings;
 		this.userSettings = userSettings;
 		}
 	
@@ -91,6 +95,9 @@ public class LinkController
 		
 		model.put("links", tabs);
 		model.put("extensions", extensionService.getLinkOverviewExtensions());
+		
+		// Hack to enable edit icons in tabs.tag
+		connectionSettings.setEditorActive(true);
 		
 		return (model);
 		}
