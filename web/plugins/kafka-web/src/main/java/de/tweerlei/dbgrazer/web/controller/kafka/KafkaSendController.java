@@ -17,10 +17,7 @@ package de.tweerlei.dbgrazer.web.controller.kafka;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
-import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -104,24 +101,12 @@ public class KafkaSendController
 		
 		final Map<String, Object> model = new HashMap<String, Object>();
 		
-		final KafkaProducer<String, String> producer = kafkaClientService.getProducer(connectionSettings.getLinkName());
-		
-		final ProducerRecord<String, String> rec;
-		if (partition != null)
-			rec = new ProducerRecord<String, String>(topic, partition, key, message);
-		else
-			rec = new ProducerRecord<String, String>(topic, key, message);
-		
 		try	{
-			final RecordMetadata md = producer.send(rec).get();
+			final RecordMetadata md = kafkaClientService.sendRecord(connectionSettings.getLinkName(), topic, partition, key, message);
 			model.put("result", frontendHelperService.toJSONString(String.valueOf(md.offset())));
 			model.put("exceptionText", null);
 			}
-		catch (ExecutionException e)
-			{
-			model.put("exceptionText", frontendHelperService.toJSONString(e.getMessage()));
-			}
-		catch (InterruptedException e)
+		catch (RuntimeException e)
 			{
 			model.put("exceptionText", frontendHelperService.toJSONString(e.getMessage()));
 			}

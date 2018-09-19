@@ -15,10 +15,11 @@
  */
 package de.tweerlei.dbgrazer.extension.kafka;
 
+import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
-import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.Producer;
+import org.apache.kafka.clients.producer.RecordMetadata;
 
 /**
  * Perform HTTP requests
@@ -32,14 +33,14 @@ public interface KafkaClientService
 	 * @param c Link name
 	 * @return KafkaConsumer
 	 */
-	public KafkaConsumer<String, String> getConsumer(String c);
+	public Consumer<String, String> getConsumer(String c);
 	
 	/**
 	 * Get a KafkaProducer for a link
 	 * @param c Link name
 	 * @return KafkaProducer
 	 */
-	public KafkaProducer<String, String> getProducer(String c);
+	public Producer<String, String> getProducer(String c);
 	
 	/**
 	 * Fetch a single record
@@ -60,4 +61,15 @@ public interface KafkaClientService
 	 * @return ConsumerRecord or null
 	 */
 	public ConsumerRecords<String, String> fetchRecords(String c, String topic, Integer partition, Long offset);
+	
+	/**
+	 * Send a record
+	 * @param c Link name
+	 * @param topic Topic name
+	 * @param partition Partition number (null to send to any partition)
+	 * @param key Message key
+	 * @param value Message value
+	 * @return RecordMetadata
+	 */
+	public RecordMetadata sendRecord(String c, String topic, Integer partition, String key, String value);
 	}

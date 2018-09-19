@@ -26,9 +26,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
-import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.PartitionInfo;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.header.Header;
@@ -217,7 +217,7 @@ public class KafkaBrowseController
 		
 		final Map<String, Object> model = new HashMap<String, Object>();
 		
-		final KafkaConsumer<String, String> consumer = kafkaClientService.getConsumer(connectionSettings.getLinkName());
+		final Consumer<String, String> consumer = kafkaClientService.getConsumer(connectionSettings.getLinkName());
 		
 		final Map<String, List<PartitionInfo>> topics = consumer.listTopics();
 		
@@ -291,7 +291,7 @@ public class KafkaBrowseController
 		model.put("partition", partition);
 		model.put("offset", effectiveOffset);
 		
-		final KafkaConsumer<String, String> consumer = kafkaClientService.getConsumer(connectionSettings.getLinkName());
+		final Consumer<String, String> consumer = kafkaClientService.getConsumer(connectionSettings.getLinkName());
 		final TopicPartition tp = new TopicPartition(topic, partition);
 		
 		Long startOffset = null;

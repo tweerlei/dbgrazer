@@ -22,16 +22,21 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
+import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.Producer;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
@@ -59,36 +64,36 @@ public class KafkaClientServiceImpl implements KafkaClientService, LinkListener,
 	{
 	private static class KafkaConnectionHolder
 		{
-		private final List<KafkaConsumer<String, String>> allConsumers;
-		private final ThreadLocal<KafkaConsumer<String, String>> activeConsumer;
-		private final List<KafkaProducer<String, String>> allProducers;
-		private final ThreadLocal<KafkaProducer<String, String>> activeProducer;
+		private final List<Consumer<String, String>> allConsumers;
+		private final ThreadLocal<Consumer<String, String>> activeConsumer;
+		private final List<Producer<String, String>> allProducers;
+		private final ThreadLocal<Producer<String, String>> activeProducer;
 		
 		public KafkaConnectionHolder()
 			{
-			this.allConsumers = new LinkedList<KafkaConsumer<String, String>>();
-			this.activeConsumer = new ThreadLocal<KafkaConsumer<String, String>>();
-			this.allProducers = new LinkedList<KafkaProducer<String, String>>();
-			this.activeProducer = new ThreadLocal<KafkaProducer<String, String>>();
+			this.allConsumers = new LinkedList<Consumer<String, String>>();
+			this.activeConsumer = new ThreadLocal<Consumer<String, String>>();
+			this.allProducers = new LinkedList<Producer<String, String>>();
+			this.activeProducer = new ThreadLocal<Producer<String, String>>();
 			}
 		
-		public KafkaConsumer<String, String> getConsumer()
+		public Consumer<String, String> getConsumer()
 			{
 			return (activeConsumer.get());
 			}
 		
-		public synchronized void setConsumer(KafkaConsumer<String, String> consumer)
+		public synchronized void setConsumer(Consumer<String, String> consumer)
 			{
 			allConsumers.add(consumer);
 			activeConsumer.set(consumer);
 			}
 		
-		public KafkaProducer<String, String> getProducer()
+		public Producer<String, String> getProducer()
 			{
 			return (activeProducer.get());
 			}
 		
-		public synchronized void setProducer(KafkaProducer<String, String> producer)
+		public synchronized void setProducer(Producer<String, String> producer)
 			{
 			allProducers.add(producer);
 			activeProducer.set(producer);
@@ -96,9 +101,9 @@ public class KafkaClientServiceImpl implements KafkaClientService, LinkListener,
 		
 		public synchronized void close()
 			{
-			for (KafkaConsumer<String, String> consumer : allConsumers)
+			for (Consumer<String, String> consumer : allConsumers)
 				consumer.wakeup();
-			for (KafkaProducer<String, String> producer : allProducers)
+			for (Producer<String, String> producer : allProducers)
 				producer.close();
 			}
 		}
@@ -172,12 +177,12 @@ public class KafkaClientServiceImpl implements KafkaClientService, LinkListener,
 		}
 	
 	@Override
-	public KafkaConsumer<String, String> getConsumer(String c)
+	public Consumer<String, String> getConsumer(String c)
 		{
 		final KafkaConnectionHolder holder = activeConnections.get(c);
 		if (holder != null)
 			{
-			final KafkaConsumer<String, String> ret = holder.getConsumer();
+			final Consumer<String, String> ret = holder.getConsumer();
 			if (ret != null)
 				return (ret);
 			}
@@ -186,12 +191,12 @@ public class KafkaClientServiceImpl implements KafkaClientService, LinkListener,
 		}
 	
 	@Override
-	public KafkaProducer<String, String> getProducer(String c)
+	public Producer<String, String> getProducer(String c)
 		{
 		final KafkaConnectionHolder holder = activeConnections.get(c);
 		if (holder != null)
 			{
-			final KafkaProducer<String, String> ret = holder.getProducer();
+			final Producer<String, String> ret = holder.getProducer();
 			if (ret != null)
 				return (ret);
 			}
@@ -202,7 +207,7 @@ public class KafkaClientServiceImpl implements KafkaClientService, LinkListener,
 	@Override
 	public ConsumerRecord<String, String> fetchRecord(String c, String topic, int partition, long offset)
 		{
-		final KafkaConsumer<String, String> consumer = getConsumer(c);
+		final Consumer<String, String> consumer = getConsumer(c);
 		final TopicPartition tp = new TopicPartition(topic, partition);
 		
 		consumer.assign(Collections.singleton(tp));
@@ -222,7 +227,7 @@ public class KafkaClientServiceImpl implements KafkaClientService, LinkListener,
 	@Override
 	public ConsumerRecords<String, String> fetchRecords(String c, String topic, Integer partition, Long offset)
 		{
-		final KafkaConsumer<String, String> consumer = getConsumer(c);
+		final Consumer<String, String> consumer = getConsumer(c);
 		
 		if (partition != null)
 			{
@@ -242,6 +247,30 @@ public class KafkaClientServiceImpl implements KafkaClientService, LinkListener,
 		}
 	
 	@Override
+	public RecordMetadata sendRecord(String c, String topic, Integer partition, String key, String value)
+		{
+		final Producer<String, String> producer = getProducer(c);
+		
+		final ProducerRecord<String, String> rec;
+		if (partition != null)
+			rec = new ProducerRecord<String, String>(topic, partition, key, value);
+		else
+			rec = new ProducerRecord<String, String>(topic, key, value);
+		
+		try	{
+			return (producer.send(rec).get());
+			}
+		catch (ExecutionException e)
+			{
+			throw new RuntimeException(e.getCause());
+			}
+		catch (InterruptedException e)
+			{
+			throw new RuntimeException(e);
+			}
+		}
+	
+	@Override
 	public Map<String, Integer> getLinkStats()
 		{
 		final Map<String, Integer> ret = new TreeMap<String, Integer>(StringComparators.CASE_INSENSITIVE);
@@ -252,10 +281,10 @@ public class KafkaClientServiceImpl implements KafkaClientService, LinkListener,
 		return (ret);
 		}
 	
-	private synchronized KafkaConsumer<String, String> createConsumer(String c)
+	private synchronized Consumer<String, String> createConsumer(String c)
 		{
 		KafkaConnectionHolder holder = activeConnections.get(c);
-		KafkaConsumer<String, String> ret = null;
+		Consumer<String, String> ret = null;
 		if (holder != null)
 			{
 			ret = holder.getConsumer();
@@ -284,10 +313,10 @@ public class KafkaClientServiceImpl implements KafkaClientService, LinkListener,
 		return (ret);
 		}
 	
-	private synchronized KafkaProducer<String, String> createProducer(String c)
+	private synchronized Producer<String, String> createProducer(String c)
 		{
 		KafkaConnectionHolder holder = activeConnections.get(c);
-		KafkaProducer<String, String> ret = null;
+		Producer<String, String> ret = null;
 		if (holder != null)
 			{
 			ret = holder.getProducer();
