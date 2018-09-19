@@ -41,3 +41,6 @@ COPY examples/styles/*.css /usr/local/tomcat/webapps/ROOT/
 # Setup config directory
 COPY examples/*.properties /root/.dbgrazer/
 COPY examples/themes/*.properties /root/.dbgrazer/themes/
+
+# Set Tomcat options
+ENV CATALINA_OPTS -Xmx512m 

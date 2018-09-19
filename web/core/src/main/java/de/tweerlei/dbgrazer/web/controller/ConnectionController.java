@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import de.tweerlei.dbgrazer.link.model.SchemaDef;
 import de.tweerlei.dbgrazer.link.service.LinkService;
 import de.tweerlei.dbgrazer.web.constant.MessageKeys;
+import de.tweerlei.dbgrazer.web.exception.AccessDeniedException;
 import de.tweerlei.dbgrazer.web.model.PathInfo;
 import de.tweerlei.dbgrazer.web.service.FrontendHelperService;
 import de.tweerlei.dbgrazer.web.service.UserSettingsManager;
@@ -74,6 +75,9 @@ public class ConnectionController
 	@RequestMapping(value = "/ajax/connections.html", method = RequestMethod.GET)
 	public Map<String, Object> showConnections()
 		{
+		if ((userSettings.getPrincipal() == null) && userSettingsManager.isLoginRequired())
+			throw new AccessDeniedException();
+		
 		final Map<String, Object> model = new HashMap<String, Object>();
 		
 		final Map<String, Map<String, String>> all = linkService.findAllLinkSets(userSettingsManager.getEffectiveUserGroups(userSettings.getPrincipal()), null, null);
