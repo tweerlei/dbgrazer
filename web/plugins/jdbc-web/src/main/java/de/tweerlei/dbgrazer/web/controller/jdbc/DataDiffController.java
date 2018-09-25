@@ -17,8 +17,9 @@ package de.tweerlei.dbgrazer.web.controller.jdbc;
 
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -40,8 +41,8 @@ import de.tweerlei.common5.jdbc.model.QualifiedName;
 import de.tweerlei.common5.jdbc.model.TableDescription;
 import de.tweerlei.dbgrazer.extension.jdbc.JdbcConstants;
 import de.tweerlei.dbgrazer.extension.jdbc.MetadataService;
-import de.tweerlei.dbgrazer.extension.jdbc.SQLGeneratorService;
 import de.tweerlei.dbgrazer.extension.jdbc.MetadataService.ColumnMode;
+import de.tweerlei.dbgrazer.extension.jdbc.SQLGeneratorService;
 import de.tweerlei.dbgrazer.extension.jdbc.SQLGeneratorService.Joins;
 import de.tweerlei.dbgrazer.extension.jdbc.SQLGeneratorService.OrderBy;
 import de.tweerlei.dbgrazer.extension.jdbc.SQLGeneratorService.Style;
@@ -101,17 +102,8 @@ public class DataDiffController
 		private OrderBy order;
 		private boolean merge;
 		private String mode;
-		private final Set<String> pkColumns;
-		private final Set<String> dataColumns;
-		
-		/**
-		 * Constructor
-		 */
-		public FormBackingObject()
-			{
-			this.pkColumns = new LinkedHashSet<String>();
-			this.dataColumns = new LinkedHashSet<String>();
-			}
+		private String[] pkColumns;
+		private String[] dataColumns;
 		
 		/**
 		 * Get the catalog
@@ -297,18 +289,36 @@ public class DataDiffController
 		 * Get the pkColumns
 		 * @return the pkColumns
 		 */
-		public Set<String> getPkColumns()
+		public String[] getPkColumns()
 			{
 			return pkColumns;
+			}
+		
+		/**
+		 * Set the pkColumns
+		 * @param pkColumns the pkColumns to set
+		 */
+		public void setPkColumns(String[] pkColumns)
+			{
+			this.pkColumns = pkColumns;
 			}
 		
 		/**
 		 * Get the dataColumns
 		 * @return the dataColumns
 		 */
-		public Set<String> getDataColumns()
+		public String[] getDataColumns()
 			{
 			return dataColumns;
+			}
+		
+		/**
+		 * Set the dataColumns
+		 * @param dataColumns the dataColumns to set
+		 */
+		public void setDataColumns(String[] dataColumns)
+			{
+			this.dataColumns = dataColumns;
 			}
 		}
 	
@@ -558,6 +568,22 @@ public class DataDiffController
 		return (ret);
 		}
 	
+	private static String[] toArray(Collection<String> c)
+		{
+		return (c.toArray(new String[c.size()]));
+		}
+	
+	private static Set<String> toSet(String[] a)
+		{
+		final Set<String> ret = new HashSet<String>();
+		if (a != null)
+			{
+			for (String t : a)
+				ret.add(t);
+			}
+		return (ret);
+		}
+	
 	/**
 	 * Show the schema selection dialog
 	 * @param fbo FormBackingObject
@@ -607,17 +633,19 @@ public class DataDiffController
 		final TableDescription srcDesc = metadataService.getTableInfo(connectionSettings.getLinkName(), qn, ColumnMode.ALL);
 		final Set<Integer> pk = srcDesc.getPKColumns();
 		
-		fbo.getPkColumns().clear();
-		fbo.getDataColumns().clear();
+		final List<String> pkColumns = new ArrayList<String>(srcDesc.getColumns().size());
+		final List<String> dataColumns = new ArrayList<String>(srcDesc.getColumns().size());
 		int i = 0;
 		for (ColumnDescription c : srcDesc.getColumns())
 			{
 			if (pk.contains(i))
-				fbo.getPkColumns().add(c.getName());
+				pkColumns.add(c.getName());
 			else
-				fbo.getDataColumns().add(c.getName());
+				dataColumns.add(c.getName());
 			i++;
 			}
+		fbo.setPkColumns(toArray(pkColumns));
+		fbo.setDataColumns(toArray(dataColumns));
 		
 		model.put("allColumns", srcDesc.getColumns());
 		
@@ -680,7 +708,11 @@ public class DataDiffController
 		final QualifiedName qn = new QualifiedName(fbo.getCatalog(), fbo.getSchema(), fbo.getObject());
 		
 		try	{
-			final DiffResult result = runDMLInternal(fbo.getCatalog(), fbo.getSchema(), fbo.getObject(), fbo.getConnection2(), fbo.getCatalog2(), fbo.getSchema2(), fbo.getFilter(), fbo.getOrder(), fbo.isMerge(), fbo.getMode(), fbo.getPkColumns(), fbo.getDataColumns(), p, c, false);
+			final DiffResult result = runDMLInternal(fbo.getCatalog(), fbo.getSchema(), fbo.getObject(),
+					fbo.getConnection2(), fbo.getCatalog2(), fbo.getSchema2(),
+					fbo.getFilter(), fbo.getOrder(), fbo.isMerge(), fbo.getMode(),
+					toSet(fbo.getPkColumns()), toSet(fbo.getDataColumns()),
+					p, c, false);
 			
 			model.put("result", result);
 			
@@ -735,7 +767,11 @@ public class DataDiffController
 		final TaskCompareProgressMonitor c = new TaskCompareProgressMonitor();
 		
 		try	{
-			final DiffResult result = runDMLInternal(fbo.getCatalog(), fbo.getSchema(), fbo.getObject(), fbo.getConnection2(), fbo.getCatalog2(), fbo.getSchema2(), fbo.getFilter(), fbo.getOrder(), fbo.isMerge(), fbo.getMode(), fbo.getPkColumns(), fbo.getDataColumns(), p, c, true);
+			final DiffResult result = runDMLInternal(fbo.getCatalog(), fbo.getSchema(), fbo.getObject(),
+					fbo.getConnection2(), fbo.getCatalog2(), fbo.getSchema2(),
+					fbo.getFilter(), fbo.getOrder(), fbo.isMerge(), fbo.getMode(),
+					toSet(fbo.getPkColumns()), toSet(fbo.getDataColumns()),
+					p, c, true);
 			
 			model.put("result", result);
 			}

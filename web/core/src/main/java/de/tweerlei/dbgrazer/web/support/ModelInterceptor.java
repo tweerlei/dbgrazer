@@ -212,8 +212,6 @@ public class ModelInterceptor implements HandlerInterceptor, HandlerExceptionRes
 				}
 			else
 				{
-				saveSourceURL(request, pi);
-				
 				final LinkDef def = getLink(pi.getSubcategory(), userSettings.getPrincipal());
 				if (def == null)
 					{
@@ -224,12 +222,17 @@ public class ModelInterceptor implements HandlerInterceptor, HandlerExceptionRes
 						}
 					else
 						{
+						saveSourceURL(request, pi);
+						
 						// Show the "connection" view
 						final ModelAndView modelAndView = new ModelAndView(VIEW_LOGIN);
 						addAttributes(modelAndView);
 						throw new ModelAndViewDefiningException(modelAndView);
 						}
 					}
+				
+				if (!isAjax(pi.getViewName()))
+					saveSourceURL(request, pi);
 				
 				// will be reset in afterCompletion
 				connectionSettings.setLink(def, querySettingsManager.getSchemaSettings(def.getSchema().getName()));
@@ -239,8 +242,8 @@ public class ModelInterceptor implements HandlerInterceptor, HandlerExceptionRes
 		else
 			{
 			// Page requires no connection
-			
-			saveSourceURL(request, pi);
+			if (!isAjax(pi.getViewName()))
+				saveSourceURL(request, pi);
 			}
 		
 		return (true);

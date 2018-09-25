@@ -197,7 +197,7 @@ public class MetadataServiceImpl implements MetadataService, ConfigListener, Lin
 			{
 			for (Iterator<String> i = tables.values().iterator(); i.hasNext(); )
 				{
-				if (type.equals(i.next()))
+				if (!type.equals(i.next()))
 					i.remove();
 				}
 			}

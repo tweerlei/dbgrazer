@@ -387,7 +387,7 @@ public class SchemaDiffController
 		final TaskCompareProgressMonitor c = taskProgressService.createCompareProgressMonitor();
 		
 		try	{
-			if (fbo.getFile() != null)
+			if ((fbo.getFile() != null) && !fbo.getFile().isEmpty())
 				{
 				SQLSchema sch = null;
 				Exception ex = null;

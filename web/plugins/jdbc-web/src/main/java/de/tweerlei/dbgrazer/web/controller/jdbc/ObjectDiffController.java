@@ -364,7 +364,7 @@ public class ObjectDiffController
 			}
 		
 		try	{
-			if (fbo.getFile() != null)
+			if ((fbo.getFile() != null) && !fbo.getFile().isEmpty())
 				{
 				SQLSchema sch = null;
 				Exception ex = null;
