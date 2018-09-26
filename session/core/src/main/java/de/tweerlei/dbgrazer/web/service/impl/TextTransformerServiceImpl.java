@@ -44,7 +44,6 @@ public class TextTransformerServiceImpl implements TextTransformerService, Confi
 	{
 	private static final char SUFFIX_SEPARATOR = '-';
 	private static final String SYNTAX_COLOR_SUFFIX = "Highlight";
-	private static final String HUMAN_READABLE_SUFFIX = "Readable";
 	private static final String FORMATTED_SUFFIX = "Formatted";
 	
 	private final ConfigService configService;
@@ -145,26 +144,11 @@ public class TextTransformerServiceImpl implements TextTransformerService, Confi
 	
 	private String findEffectiveFormatName(String format, Set<Option> options)
 		{
-		final boolean readable = (options != null && options.contains(Option.HUMAN_READABLE));
 		final boolean formatted = (options != null && options.contains(Option.FORMATTING));
 		final boolean color = (options != null && options.contains(Option.SYNTAX_COLORING));
 		
 		final String formatPrefix = StringUtils.notNull(format);
 		final Set<String> knownFormats = formatterService.getSupportedTextFormats();
-		
-		// If human readable output requested, first check for supporting formatters (with or without coloring)
-		if (readable)
-			{
-			if (color)
-				{
-				final String formatName = formatPrefix + SUFFIX_SEPARATOR + HUMAN_READABLE_SUFFIX + SUFFIX_SEPARATOR + SYNTAX_COLOR_SUFFIX;
-				if (knownFormats.contains(formatName))
-					return (formatName);
-				}
-			final String formatName = formatPrefix + SUFFIX_SEPARATOR + HUMAN_READABLE_SUFFIX;
-			if (knownFormats.contains(formatName))
-				return (formatName);
-			}
 		
 		// If formatted output requested, check for supporting formatters (with or without coloring)
 		if (formatted)

@@ -101,6 +101,7 @@ public interface MetadataService
 	 * @param link Link name
 	 * @param catalog Catalog
 	 * @param schema Schema
+	 * @param type Table type
 	 * @param filter Filter expression
 	 * @return Map: Table name -> object type
 	 */

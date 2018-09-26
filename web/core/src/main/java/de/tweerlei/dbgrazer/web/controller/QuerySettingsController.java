@@ -226,25 +226,6 @@ public class QuerySettingsController
 		}
 	
 	/**
-	 * Toggle human readable output active/inactive
-	 * @param query Query name
-	 * @param value New setting
-	 * @return View
-	 */
-	@RequestMapping(value = "/db/*/ajax/hrmode.html", method = RequestMethod.GET)
-	public String toggleHumanReadableActive(
-			@RequestParam("q") String query,
-			@RequestParam("v") Boolean value
-			)
-		{
-		final Query q = queryService.findQueryByName(connectionSettings.getLinkName(), query);
-		
-		querySettingsManager.setHumanReadableActive(q, value);
-		
-		return (ViewConstants.EMPTY_VIEW);
-		}
-	
-	/**
 	 * Toggle the trim columns mode
 	 * @param query Query name
 	 * @param value New setting

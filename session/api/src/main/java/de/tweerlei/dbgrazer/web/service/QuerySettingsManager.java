@@ -94,20 +94,6 @@ public interface QuerySettingsManager
 	public void setLineNumbersActive(Query query, boolean b);
 	
 	/**
-	 * Check whether human readable is active
-	 * @param query Query
-	 * @return human readable active
-	 */
-	public boolean isHumanReadableActive(Query query);
-	
-	/**
-	 * Set human readable active
-	 * @param query Query
-	 * @param b human readable active
-	 */
-	public void setHumanReadableActive(Query query, boolean b);
-	
-	/**
 	 * Get the format name to use for result text formatting
 	 * @param query Query
 	 * @return Format name

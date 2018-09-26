@@ -37,9 +37,6 @@
 				<input id="coloring-result" type="checkbox" name="dummy2" value="true"<c:if test="${!rs.attributes['plainColoring']}"> checked="checked"</c:if> onchange="toggleColoringMode('', ${rs.attributes['plainColoring'] ? 'true' : 'false'});"/> <label for="coloring-result"><fmt:message key="coloring"/></label>
 			</form>
 			<form class="filter" action="#" method="get" onsubmit="return false;">
-				<input id="humanReadable-result" type="checkbox" name="dummy3" value="true"<c:if test="${rs.attributes['humanReadable']}"> checked="checked"</c:if> onchange="toggleHumanReadableMode('', ${rs.attributes['humanReadable'] ? 'false' : 'true'});"/> <label for="humanReadable-result"><fmt:message key="humanReadable"/></label>
-			</form>
-			<form class="filter" action="#" method="get" onsubmit="return false;">
 				<input id="lineno-result" type="checkbox" name="dummy4" value="true"<c:if test="${rs.attributes['lineNumbers']}"> checked="checked"</c:if> onchange="toggleLineNumberMode('', ${rs.attributes['lineNumbers'] ? 'false' : 'true'});"/> <label for="lineno-result"><fmt:message key="lineno"/></label>
 			</form>
 			<div class="filter">

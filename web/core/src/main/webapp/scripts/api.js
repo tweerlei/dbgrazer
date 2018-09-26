@@ -158,10 +158,6 @@ var WSApi = {
 		return this.getDBAsync('linemode', { q: q, v: (v ? 'true' : 'false') }, cb);
 	},
 	
-	toggleHumanReadableMode: function(q, v, cb) {
-		return this.getDBAsync('hrmode', { q: q, v: (v ? 'true' : 'false') }, cb);
-	},
-	
 	toggleTrimColumnsMode: function(q, v, cb) {
 		return this.getDBAsync('trimcols', { q: q, v: (v ? 'true' : 'false') }, cb);
 	},

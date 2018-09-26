@@ -964,11 +964,6 @@ function toggleLineNumberMode(q, v) {
 	return false;
 }
 
-function toggleHumanReadableMode(q, v) {
-	WSApi.toggleHumanReadableMode(q, v, reloadPage);
-	return false;
-}
-
 function toggleTrimColumnsMode(q, v) {
 	WSApi.toggleTrimColumnsMode(q, v, reloadPage);
 	return false;

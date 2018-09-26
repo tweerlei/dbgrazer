@@ -65,7 +65,6 @@ public class QuerySettingsManagerImpl implements QuerySettingsManager
 		m.put(RowSetConstants.ATTR_FORMATTING, Boolean.FALSE);
 		m.put(RowSetConstants.ATTR_SYNTAX_COLORING, Boolean.TRUE);
 		m.put(RowSetConstants.ATTR_LINE_NUMBERS, Boolean.FALSE);
-		m.put(RowSetConstants.ATTR_HUMAN_READABLE, Boolean.FALSE);
 		
 		ATTR_DEFAULTS = Collections.unmodifiableMap(m);
 		}
@@ -177,18 +176,6 @@ public class QuerySettingsManagerImpl implements QuerySettingsManager
 	public void setLineNumbersActive(Query query, boolean b)
 		{
 		setSetting(query, RowSetConstants.ATTR_LINE_NUMBERS, b);
-		}
-	
-	@Override
-	public boolean isHumanReadableActive(Query query)
-		{
-		return (isSettingActive(query, RowSetConstants.ATTR_HUMAN_READABLE));
-		}
-	
-	@Override
-	public void setHumanReadableActive(Query query, boolean b)
-		{
-		setSetting(query, RowSetConstants.ATTR_HUMAN_READABLE, b);
 		}
 	
 	@Override
@@ -320,8 +307,6 @@ public class QuerySettingsManagerImpl implements QuerySettingsManager
 			ret.add(TextTransformerService.Option.LINE_NUMBERS);
 		if (isSyntaxColoringActive(query))
 			ret.add(TextTransformerService.Option.SYNTAX_COLORING);
-		if (isHumanReadableActive(query))
-			ret.add(TextTransformerService.Option.HUMAN_READABLE);
 		if (isFormattingActive(query))
 			ret.add(TextTransformerService.Option.FORMATTING);
 		

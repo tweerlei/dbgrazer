@@ -28,8 +28,6 @@ public final class QueryTypeAttributes
 	public static final String ATTR_FORMATTING = "formatting";
 	/** RowSet attribute for the syntax coloring flag */
 	public static final String ATTR_SYNTAX_COLORING = "syntaxColoring";
-	/** RowSet attribute for the human readable flag */
-	public static final String ATTR_HUMAN_READABLE = "humanReadable";
 	/** RowSet attribute for the line numbers flag */
 	public static final String ATTR_LINE_NUMBERS = "lineNumbers";
 	/** RowSet attribute for the colorize flag */

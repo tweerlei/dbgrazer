@@ -31,8 +31,6 @@ public interface TextTransformerService
 		LINE_NUMBERS,
 		/** Syntax coloring */
 		SYNTAX_COLORING,
-		/** Human readable (simplified) output */
-		HUMAN_READABLE,
 		/** Formatted output */
 		FORMATTING
 		}

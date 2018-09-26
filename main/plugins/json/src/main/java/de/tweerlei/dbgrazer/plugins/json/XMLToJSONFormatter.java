@@ -36,7 +36,7 @@ public class XMLToJSONFormatter extends BaseTextFormatter
 	 */
 	public XMLToJSONFormatter()
 		{
-		super("XML-Readable");
+		super("XMLJSON-Formatted");
 		}
 	
 	@Override

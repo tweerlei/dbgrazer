@@ -37,7 +37,7 @@ public class SyntaxHighlightXMLToJSONFormatter extends BaseTextFormatter
 	 */
 	public SyntaxHighlightXMLToJSONFormatter()
 		{
-		super("XML-Readable-Highlight");
+		super("XMLJSON-Formatted-Highlight");
 		}
 	
 	@Override
