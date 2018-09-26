@@ -92,9 +92,28 @@ public class ResultTransformerServiceImpl implements ResultTransformerService
 		final String value = convertToString(rs, fmt);
 		
 		final Set<TextTransformerService.Option> opts = EnumSet.copyOf(options);
-//		opts.add(TextTransformerService.Option.LINE_NUMBERS);
 		
-		final String result = textFormatterService.format(value, format, opts);
+		final Object attrFormatting = rs.getAttributes().get(RowSetConstants.ATTR_FORMATTING);
+		if (attrFormatting != null && Boolean.parseBoolean(attrFormatting.toString()))
+			opts.add(TextTransformerService.Option.FORMATTING);
+		final Object attrSyntaxColoring = rs.getAttributes().get(RowSetConstants.ATTR_SYNTAX_COLORING);
+		if (attrSyntaxColoring != null && Boolean.parseBoolean(attrSyntaxColoring.toString()))
+			opts.add(TextTransformerService.Option.SYNTAX_COLORING);
+		final Object attrHumanReadable = rs.getAttributes().get(RowSetConstants.ATTR_HUMAN_READABLE);
+		if (attrHumanReadable != null && Boolean.parseBoolean(attrHumanReadable.toString()))
+			opts.add(TextTransformerService.Option.HUMAN_READABLE);
+		final Object attrLineNumbers = rs.getAttributes().get(RowSetConstants.ATTR_LINE_NUMBERS);
+		if (attrLineNumbers != null && Boolean.parseBoolean(attrLineNumbers.toString()))
+			opts.add(TextTransformerService.Option.LINE_NUMBERS);
+		
+		final Object attrFormatter = rs.getAttributes().get(RowSetConstants.ATTR_FORMATTER);
+		final String formatter;
+		if (attrFormatter != null)
+			formatter = attrFormatter.toString();
+		else
+			formatter = format;
+		
+		final String result = textFormatterService.format(value, formatter, opts);
 		
 		rs.getRows().clear();
 		rs.getRows().add(new DefaultResultRow(result));

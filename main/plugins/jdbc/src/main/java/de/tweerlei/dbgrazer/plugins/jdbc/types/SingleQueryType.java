@@ -51,6 +51,10 @@ public class SingleQueryType extends AbstractSingleQueryType
 		
 		final Map<String, Class<?>> m = new LinkedHashMap<String, Class<?>>();
 		m.put(QueryTypeAttributes.ATTR_FORMATTER, TextFormatter.class);
+		m.put(QueryTypeAttributes.ATTR_FORMATTING, Boolean.class);
+		m.put(QueryTypeAttributes.ATTR_SYNTAX_COLORING, Boolean.class);
+		m.put(QueryTypeAttributes.ATTR_HUMAN_READABLE, Boolean.class);
+		m.put(QueryTypeAttributes.ATTR_LINE_NUMBERS, Boolean.class);
 		attributes = Collections.unmodifiableMap(m);
 		}
 	
