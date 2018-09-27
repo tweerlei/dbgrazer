@@ -176,7 +176,7 @@ public class KafkaBrowseController
 		@Override
 		public int compareTo(ConsumerRecordBean o)
 			{
-			return ((int) (offset - o.offset));
+			return ((int) (o.offset - offset));
 			}
 		}
 	
@@ -281,15 +281,8 @@ public class KafkaBrowseController
 		
 		final Map<String, Object> model = new HashMap<String, Object>();
 		
-		final Long effectiveOffset;
-		if (offset == null)
-			effectiveOffset = topicStateManager.getLastOffset(topic, partition);
-		else
-			effectiveOffset = offset;
-		
 		model.put("topic", topic);
 		model.put("partition", partition);
-		model.put("offset", effectiveOffset);
 		
 		final Consumer<String, String> consumer = kafkaClientService.getConsumer(connectionSettings.getLinkName());
 		final TopicPartition tp = new TopicPartition(topic, partition);
@@ -307,6 +300,13 @@ public class KafkaBrowseController
 		consumer.assign(Collections.singleton(tp));
 		model.put("currentOffset", consumer.position(tp));
 		consumer.unsubscribe();
+		
+		final Long effectiveOffset;
+		if (offset == null)
+			effectiveOffset = topicStateManager.getLastOffset(topic, partition);
+		else
+			effectiveOffset = offset;
+		model.put("offset", effectiveOffset);
 		
 		final ConsumerRecords<String, String> records = kafkaClientService.fetchRecords(connectionSettings.getLinkName(), topic, partition, effectiveOffset);
 		
@@ -330,7 +330,7 @@ public class KafkaBrowseController
 			topicStateManager.setLastOffset(topic, partition, minOffset);
 		
 		if ((minOffset != null) && (startOffset != null) && (minOffset > startOffset))
-			model.put("prevOffset", startOffset);	// TODO: Subtract fetch size?
+			model.put("prevOffset", minOffset - (l.isEmpty() ? 1 : l.size()));
 		if ((maxOffset != null) && (endOffset != null) && (maxOffset < endOffset))
 			model.put("nextOffset", maxOffset + 1);
 		
