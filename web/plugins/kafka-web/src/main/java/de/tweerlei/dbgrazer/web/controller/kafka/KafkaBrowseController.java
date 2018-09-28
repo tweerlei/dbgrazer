@@ -330,7 +330,7 @@ public class KafkaBrowseController
 			topicStateManager.setLastOffset(topic, partition, minOffset);
 		
 		if ((minOffset != null) && (startOffset != null) && (minOffset > startOffset))
-			model.put("prevOffset", minOffset - (l.isEmpty() ? 1 : l.size()));
+			model.put("prevOffset", Math.max(startOffset, minOffset - (l.isEmpty() ? 1 : l.size())));
 		if ((maxOffset != null) && (endOffset != null) && (maxOffset < endOffset))
 			model.put("nextOffset", maxOffset + 1);
 		
