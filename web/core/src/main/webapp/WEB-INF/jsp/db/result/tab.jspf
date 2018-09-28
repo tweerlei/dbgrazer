@@ -65,8 +65,10 @@
 ><c:choose><c:when test="${not empty rs.query.attributes['formatter']}"
 >				<div id="outline-${label}" class="hidden"><div class="menuitem"><fmt:message key="noOutline"/></div></div>
 				&nbsp; <span class="menu" onclick="return showOutline(event, '${label}');"><fmt:message key="outline"/></span>
-				&nbsp; <input id="format-${label}" type="checkbox" name="dummy1" value="true"<c:if test="${rs.attributes['formatting']}"> checked="checked"</c:if> onchange="toggleFormatMode('${rs.query.name}', ${rs.attributes['formatting'] ? 'false' : 'true'});"/> <label for="format-${label}"><fmt:message key="format"><fmt:param value="${rs.query.attributes['formatter']}"/></fmt:message></label>
-</c:when><c:otherwise
+<c:if test="${empty rs.query.attributes['formatting']}"
+>				&nbsp; <input id="format-${label}" type="checkbox" name="dummy1" value="true"<c:if test="${rs.attributes['formatting']}"> checked="checked"</c:if> onchange="toggleFormatMode('${rs.query.name}', ${rs.attributes['formatting'] ? 'false' : 'true'});"/> <label for="format-${label}"><fmt:message key="format"><fmt:param value="${rs.query.attributes['formatter']}"/></fmt:message></label>
+</c:if
+></c:when><c:otherwise
 >				&nbsp; <label for="formatter-${label}"><fmt:message key="formatter"/></label> <select id="formatter-${label}" name="dummy0" onchange="toggleFormatter('${rs.query.name}', 'formatter-${label}');">
 					<option value=""><fmt:message key="default"/></option>
 <c:forEach items="${formatters}" var="v"
