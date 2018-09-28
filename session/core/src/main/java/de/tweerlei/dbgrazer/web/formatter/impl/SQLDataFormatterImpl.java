@@ -49,12 +49,6 @@ public class SQLDataFormatterImpl extends AbstractDataFormatter
 		}
 	
 	@Override
-	protected String formatUnknown(Object value)
-		{
-		return ("NULL");
-		}
-	
-	@Override
 	protected String formatEmptyString()
 		{
 		return ("''");

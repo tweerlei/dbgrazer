@@ -49,12 +49,6 @@ public class XMLDataFormatterImpl extends AbstractDataFormatter
 		}
 	
 	@Override
-	protected String formatUnknown(Object value)
-		{
-		return (value.toString());
-		}
-	
-	@Override
 	protected String formatEmptyString()
 		{
 		return ("");

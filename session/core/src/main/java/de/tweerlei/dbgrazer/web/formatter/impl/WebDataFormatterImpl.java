@@ -55,12 +55,6 @@ public class WebDataFormatterImpl extends AbstractDataFormatter
 		}
 	
 	@Override
-	protected String formatUnknown(Object value)
-		{
-		return ("\u00ab" + value.getClass().getName() + "\u00bb");
-		}
-	
-	@Override
 	protected String formatEmptyString()
 		{
 		return ("\u00a0");

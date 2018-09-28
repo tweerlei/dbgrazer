@@ -51,12 +51,6 @@ public class ExportDataFormatterImpl extends AbstractDataFormatter
 		}
 	
 	@Override
-	protected String formatUnknown(Object value)
-		{
-		return ("<" + value.getClass().getName() + ">");
-		}
-	
-	@Override
 	protected String formatEmptyString()
 		{
 		return ("");

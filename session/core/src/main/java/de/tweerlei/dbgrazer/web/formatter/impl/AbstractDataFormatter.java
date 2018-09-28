@@ -191,7 +191,7 @@ public abstract class AbstractDataFormatter implements DataFormatter
 						return (formatException(value, e));
 						}
 				default:
-					return (formatUnknown(value));
+					return (formatString(value.toString()));
 				}
 			}
 		catch (RuntimeException e)
@@ -210,13 +210,6 @@ public abstract class AbstractDataFormatter implements DataFormatter
 	 * @return String representation
 	 */
 	protected abstract String formatNull();
-	
-	/**
-	 * Format an unknown value
-	 * @param value Value
-	 * @return String representation
-	 */
-	protected abstract String formatUnknown(Object value);
 	
 	private String formatString(String s)
 		{
