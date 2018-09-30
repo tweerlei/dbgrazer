@@ -24,7 +24,7 @@
 				<dt><fmt:message key="kafkaTopic"/></dt>
 				<dd>${topic}</dd>
 				<dt><fmt:message key="kafkaPartition"/></dt>
-				<dd><a href="db/${currentConnection.linkName}/partition.html?topic=${topic}&amp;partition=${partition}"<c:if test="${not empty targetElement}"> onclick="return showPartition(event, '${topic}', '${partition}');"</c:if>>${partition}</a></dd>
+				<dd><a href="db/${currentConnection.linkName}/messages.html?topic=${topic}&amp;partition=${partition}&amp;offset=${offset}"<c:if test="${not empty targetElement}"> onclick="return showPartition(event, '${topic}', '${partition}');"</c:if>>${partition}</a></dd>
 				<dt>ID</dt>
 				<dd>${offset}</dd>
 			</dl><hr/></div>

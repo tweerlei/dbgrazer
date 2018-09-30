@@ -17,18 +17,22 @@ package de.tweerlei.dbgrazer.web.controller.kafka;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.common.Node;
 import org.apache.kafka.common.PartitionInfo;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.header.Header;
@@ -38,7 +42,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import de.tweerlei.common.util.StringJoiner;
 import de.tweerlei.dbgrazer.extension.kafka.KafkaClientService;
+import de.tweerlei.dbgrazer.query.model.ColumnDef;
+import de.tweerlei.dbgrazer.query.model.ColumnType;
+import de.tweerlei.dbgrazer.query.model.Query;
+import de.tweerlei.dbgrazer.query.model.RowSet;
+import de.tweerlei.dbgrazer.query.model.SubQueryDef;
+import de.tweerlei.dbgrazer.query.model.impl.ColumnDefImpl;
+import de.tweerlei.dbgrazer.query.model.impl.DefaultResultRow;
+import de.tweerlei.dbgrazer.query.model.impl.RowSetImpl;
+import de.tweerlei.dbgrazer.query.model.impl.SubQueryDefImpl;
+import de.tweerlei.dbgrazer.query.model.impl.ViewImpl;
+import de.tweerlei.dbgrazer.query.service.ResultBuilderService;
+import de.tweerlei.dbgrazer.web.constant.RowSetConstants;
 import de.tweerlei.dbgrazer.web.exception.AccessDeniedException;
 import de.tweerlei.dbgrazer.web.model.TabItem;
 import de.tweerlei.dbgrazer.web.service.QuerySettingsManager;
@@ -59,6 +76,7 @@ public class KafkaBrowseController
 		{
 		private final String topic;
 		private final int partition;
+		private final String replicas;
 		
 		/**
 		 * Constructor
@@ -68,6 +86,10 @@ public class KafkaBrowseController
 			{
 			this.topic = pi.topic();
 			this.partition = pi.partition();
+			final StringJoiner sb = new StringJoiner(",");
+			for (Node n : pi.replicas())
+				sb.append(String.valueOf(n.id()));
+			this.replicas = sb.toString();
 			}
 
 		/**
@@ -84,6 +106,14 @@ public class KafkaBrowseController
 		public int getPartition()
 			{
 			return partition;
+			}
+		
+		/**
+		 * @return the replicas
+		 */
+		public String getReplicas()
+			{
+			return replicas;
 			}
 		
 		@Override
@@ -181,6 +211,7 @@ public class KafkaBrowseController
 		}
 	
 	private final KafkaClientService kafkaClientService;
+	private final ResultBuilderService resultBuilder;
 	private final TextTransformerService textFormatterService;
 	private final QuerySettingsManager querySettingsManager;
 	private final TopicSettingsManager topicStateManager;
@@ -189,6 +220,7 @@ public class KafkaBrowseController
 	/**
 	 * Constructor
 	 * @param kafkaClientService KafkaClientService
+	 * @param resultBuilder ResultBuilderService
 	 * @param textFormatterService TextFormatterService
 	 * @param querySettingsManager QuerySettingsManager
 	 * @param topicStateManager TopicStateManager
@@ -196,9 +228,11 @@ public class KafkaBrowseController
 	 */
 	@Autowired
 	public KafkaBrowseController(KafkaClientService kafkaClientService, TextTransformerService textFormatterService,
-			QuerySettingsManager querySettingsManager, TopicSettingsManager topicStateManager, ConnectionSettings connectionSettings)
+			ResultBuilderService resultBuilder, QuerySettingsManager querySettingsManager,
+			TopicSettingsManager topicStateManager, ConnectionSettings connectionSettings)
 		{
 		this.kafkaClientService = kafkaClientService;
+		this.resultBuilder = resultBuilder;
 		this.textFormatterService = textFormatterService;
 		this.querySettingsManager = querySettingsManager;
 		this.topicStateManager = topicStateManager;
@@ -210,7 +244,7 @@ public class KafkaBrowseController
 	 * @return Model
 	 */
 	@RequestMapping(value = "/db/*/topics.html", method = RequestMethod.GET)
-	public Map<String, Object> showBrowser()
+	public Map<String, Object> showTopics()
 		{
 		if (!connectionSettings.isBrowserEnabled())
 			throw new AccessDeniedException();
@@ -221,60 +255,137 @@ public class KafkaBrowseController
 		
 		final Map<String, List<PartitionInfo>> topics = consumer.listTopics();
 		
-		final Map<String, List<PartitionInfoBean>> sortedTopics = new TreeMap<String, List<PartitionInfoBean>>();
-		for (Map.Entry<String, List<PartitionInfo>> ent : topics.entrySet())
-			{
-			final List<PartitionInfoBean> l = new ArrayList<PartitionInfoBean>(ent.getValue().size());
-			for (PartitionInfo pi : ent.getValue())
-				l.add(new PartitionInfoBean(pi));
-			Collections.sort(l);
-			sortedTopics.put(ent.getKey(), l);
-			}
+		final List<SubQueryDef> levels = new ArrayList<SubQueryDef>();
+		final Query query = new ViewImpl(KafkaMessageKeys.TOPIC_LEVEL, null, null, null, null, levels, null);
 		
-		final Map<String, TabItem<Map<String, List<PartitionInfoBean>>>> tabs = new HashMap<String, TabItem<Map<String, List<PartitionInfoBean>>>>(1);
-		tabs.put(KafkaMessageKeys.TOPICS_TAB, new TabItem<Map<String, List<PartitionInfoBean>>>(sortedTopics, sortedTopics.size()));
+		final RowSet cats = buildRowSet(query, topics.keySet());
 		
+		final Map<String, TabItem<RowSet>> tabs = new LinkedHashMap<String, TabItem<RowSet>>();
+		tabs.put(KafkaMessageKeys.TOPICS_TAB, new TabItem<RowSet>(cats, cats.getRows().size()));
+		model.put("query", query);
 		model.put("tabs", tabs);
+		model.put("params", querySettingsManager.buildParameterMap(null));
 		model.put("extensionJS", KafkaMessageKeys.EXTENSION_JS);
 		
 		return (model);
 		}
 	
+	private RowSet buildRowSet(Query query, Set<String> values)
+		{
+		if (values.isEmpty())
+			return (resultBuilder.createEmptyRowSet(query, RowSetConstants.INDEX_MULTILEVEL, 0));
+		
+		final List<ColumnDef> columns = new ArrayList<ColumnDef>(2);
+		columns.add(new ColumnDefImpl("ID", ColumnType.STRING, null, null, null, null));
+		columns.add(new ColumnDefImpl("Name", ColumnType.STRING, null, null, null, null));
+		final RowSetImpl rs = new RowSetImpl(query, RowSetConstants.INDEX_MULTILEVEL, columns);
+		
+		final Set<String> sortedTopics = new TreeSet<String>(values);
+		for (String value : sortedTopics)
+			rs.getRows().add(new DefaultResultRow(value, value));
+		
+		rs.getAttributes().put(RowSetConstants.ATTR_MORE_LEVELS, true);
+		return (rs);
+		}
+	
 	/**
 	 * Show the file browser
 	 * @param topic Topic name
-	 * @param partition Partition number
-	 * @param offset Starting offset
 	 * @return Model
 	 */
-	@RequestMapping(value = "/db/*/partition.html", method = RequestMethod.GET)
-	public Map<String, Object> showPartition(
-			@RequestParam("topic") String topic,
-			@RequestParam("partition") Integer partition,
-			@RequestParam(value = "offset", required = false) Long offset
+	@RequestMapping(value = "/db/*/partitions.html", method = RequestMethod.GET)
+	public Map<String, Object> showPartitions(
+			@RequestParam("topic") String topic
 			)
 		{
-		return (showPartitionInternal(topic, partition, offset));
+		if (!connectionSettings.isBrowserEnabled())
+			throw new AccessDeniedException();
+		
+		final Map<String, Object> model = new HashMap<String, Object>();
+		
+		model.put("topic", topic);
+		
+		final Consumer<String, String> consumer = kafkaClientService.getConsumer(connectionSettings.getLinkName());
+		
+		final List<PartitionInfo> partitions = consumer.partitionsFor(topic);
+		
+		final List<SubQueryDef> levels = new ArrayList<SubQueryDef>();
+		levels.add(new SubQueryDefImpl(KafkaMessageKeys.TOPIC_LEVEL, null));
+		final Query query = new ViewImpl(KafkaMessageKeys.PARTITION_LEVEL, null, null, null, null, levels, null);
+		
+		final RowSet cats = buildRowSet(query, partitions);
+		
+		final Map<String, TabItem<RowSet>> tabs = new LinkedHashMap<String, TabItem<RowSet>>();
+		tabs.put(KafkaMessageKeys.TOPICS_TAB, new TabItem<RowSet>(cats, cats.getRows().size()));
+		model.put("query", query);
+		model.put("tabs", tabs);
+		model.put("params", querySettingsManager.buildParameterMap(Arrays.asList(topic)));
+		model.put("extensionJS", KafkaMessageKeys.EXTENSION_JS);
+		
+		return (model);
+		}
+	
+	private RowSet buildRowSet(Query query, List<PartitionInfo> partitions)
+		{
+		if (partitions.isEmpty())
+			return (resultBuilder.createEmptyRowSet(query, RowSetConstants.INDEX_MULTILEVEL, 0));
+		
+		final List<ColumnDef> columns = new ArrayList<ColumnDef>(2);
+		columns.add(new ColumnDefImpl("ID", ColumnType.STRING, null, null, null, null));
+		columns.add(new ColumnDefImpl("Name", ColumnType.STRING, null, null, null, null));
+		columns.add(new ColumnDefImpl("Replicas", ColumnType.STRING, null, null, null, null));
+		final RowSetImpl rs = new RowSetImpl(query, RowSetConstants.INDEX_MULTILEVEL, columns);
+		
+		final Set<PartitionInfoBean> sortedPartitions = new TreeSet<PartitionInfoBean>();
+		for (PartitionInfo pi : partitions)
+			sortedPartitions.add(new PartitionInfoBean(pi));
+		
+		for (PartitionInfoBean p : sortedPartitions)
+			rs.getRows().add(new DefaultResultRow(p.getPartition(), "Partition " + p.getPartition(), p.getReplicas()));
+		
+		rs.getAttributes().put(RowSetConstants.ATTR_MORE_LEVELS, true);
+		return (rs);
 		}
 	
 	/**
 	 * Show the file browser
 	 * @param topic Topic name
 	 * @param partition Partition number
-	 * @param offset Starting offset
+	 * @param offset Message offset
 	 * @return Model
 	 */
-	@RequestMapping(value = "/db/*/ajax/partition.html", method = RequestMethod.GET)
-	public Map<String, Object> showAjaxPartition(
+	@RequestMapping(value = "/db/*/messages.html", method = RequestMethod.GET)
+	public Map<String, Object> showMessages(
 			@RequestParam("topic") String topic,
-			@RequestParam("partition") Integer partition,
+			@RequestParam("partition") int partition,
 			@RequestParam(value = "offset", required = false) Long offset
 			)
 		{
-		return (showPartitionInternal(topic, partition, offset));
+		return (showMessagesInternal(topic, partition, offset));
 		}
 	
-	private Map<String, Object> showPartitionInternal(String topic, Integer partition, Long offset)
+	/**
+	 * Show the file browser
+	 * @param topic Topic name
+	 * @param partition Partition number
+	 * @param offset Message offset
+	 * @return Model
+	 */
+	@RequestMapping(value = "/db/*/ajax/messages.html", method = RequestMethod.GET)
+	public Map<String, Object> showAjaxMessages(
+			@RequestParam("topic") String topic,
+			@RequestParam("partition") int partition,
+			@RequestParam(value = "offset", required = false) Long offset
+			)
+		{
+		return (showMessagesInternal(topic, partition, offset));
+		}
+	
+	private Map<String, Object> showMessagesInternal(
+			String topic,
+			int partition,
+			Long offset
+			)
 		{
 		if (!connectionSettings.isBrowserEnabled())
 			throw new AccessDeniedException();
@@ -334,10 +445,17 @@ public class KafkaBrowseController
 		if ((maxOffset != null) && (endOffset != null) && (maxOffset < endOffset))
 			model.put("nextOffset", maxOffset + 1);
 		
+		final List<SubQueryDef> levels = new ArrayList<SubQueryDef>();
+		levels.add(new SubQueryDefImpl(KafkaMessageKeys.TOPIC_LEVEL, null));
+		levels.add(new SubQueryDefImpl(KafkaMessageKeys.PARTITION_LEVEL, null));
+		final Query query = new ViewImpl(KafkaMessageKeys.MESSAGE_LEVEL, null, null, null, null, levels, null);
+		
 		final Map<String, TabItem<List<ConsumerRecordBean>>> tabs = new HashMap<String, TabItem<List<ConsumerRecordBean>>>(1);
 		tabs.put(KafkaMessageKeys.MESSAGES_TAB, new TabItem<List<ConsumerRecordBean>>(l, l.size()));
 		
+		model.put("query", query);
 		model.put("tabs", tabs);
+		model.put("params", querySettingsManager.buildParameterMap(Arrays.asList(topic, String.valueOf(partition))));
 		model.put("extensionJS", KafkaMessageKeys.EXTENSION_JS);
 		
 		return (model);

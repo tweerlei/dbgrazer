@@ -17,11 +17,12 @@
 	Tab panel for directory contents
 	
 --%><div class="tab-header">
-			<form action="db/${currentConnection.linkName}/partition.html" method="get"<c:if test="${not empty targetElement}"> onsubmit="return showPartition(event, $F('f1-topic'), $F('f1-partition'), $F('f1-offset'));"</c:if>>
+			<form action="db/${currentConnection.linkName}/messages.html" method="get"<c:if test="${not empty targetElement}"> onsubmit="return showPartition(event, $F('f1-topic'), $F('f1-partition'), $F('f1-offset'));"</c:if>>
 				<input type="hidden" id="f1-topic" name="topic" value="${topic}"/>
 				<input type="hidden" id="f1-partition" name="partition" value="${partition}"/>
-				<fmt:message key="topicIDRange"><fmt:param value="${startOffset}"/><fmt:param value="${endOffset}"/></fmt:message> &nbsp;
-				<fmt:message key="topicPosition"><fmt:param value="${currentOffset}"/></fmt:message> &nbsp;
+				<div class="filter"><fmt:message key="topicIDRange"><fmt:param value="${startOffset}"/><fmt:param value="${endOffset}"/></fmt:message> &nbsp;
+				<fmt:message key="topicPosition"><fmt:param value="${currentOffset}"/></fmt:message></div>
+				<div class="filter">
 <c:choose><c:when test="${minOffset != null}"
 ><c:if test="${prevOffset != null}"
 >				<input type="button" value="<fmt:message key="previous"/>" onclick="$('f1-offset').value = ${prevOffset}; Forms.submit(form);"/>
@@ -33,24 +34,26 @@
 ></c:when><c:otherwise
 >				<fmt:message key="noData"/>
 </c:otherwise></c:choose
->				&nbsp; <label for="f1-offset"><fmt:message key="seek"/>:</label> <input type="text" id="f1-offset" name="offset" value="${offset}"/>
-				<input type="submit"/>
+>				</div>
+				<div class="filter"><label for="f1-offset"><fmt:message key="seek"/>:</label> <input type="text" id="f1-offset" name="offset" value="${offset}" size="10"/>
+				<input type="submit"/></div>
+				<div class="filter"><ui:filter id="filter-table-${label}" target="table-${label}"/></div>
 			</form>
 			<hr/>
 		</div><div class="tab-body"><table id="table-${label}" class="multiple table-autosort">
 			<thead>
 				<tr>
 					<th class="table-sortable table-sortable:numeric">ID</th>
-					<th class="table-sortable table-sortable:ignorecase">Key</th>
 					<th class="table-sortable table-sortable:ignorecase">Timestamp</th>
+					<th class="table-sortable table-sortable:ignorecase">Key</th>
 				</tr>
 			</thead>
 			<tbody>
 <c:forEach items="${rs}" var="row"
 >				<tr>
 					<td><a href="db/${currentConnection.linkName}/message.html?topic=${topic}&amp;partition=${partition}&amp;offset=${row.offset}"<c:if test="${not empty targetElement}"> onclick="return showMessage(event, '${topic}', '${partition}', '${row.offset}');"</c:if>>${row.offset}</a></td>
-					<td>${fn:escapeXml(row.key)}</td>
 					<td><fmt:formatDate value="${row.timestamp}" pattern="yyyy-MM-dd HH:mm:ss" /></td>
+					<td>${fn:escapeXml(row.key)}</td>
 				</tr>
 </c:forEach
 >			</tbody>

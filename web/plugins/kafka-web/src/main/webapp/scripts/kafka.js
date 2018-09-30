@@ -3,13 +3,13 @@ function showPartition(ev, topic, partition, offset) {
 		Event.stop(ev);
 	}
 	AutoRefresh.stop();
-	var el = $('explorer-right');
+	var el = $('tab-page-combo0');
 	if (el) {
 		var params = { topic: topic, partition: partition };
 		if (!Object.isUndefined(offset)) {
 			params.offset = offset;
 		}
-		WSApi.getDBAsync('partition', params, function(txt) {
+		WSApi.getDBAsync('messages', params, function(txt) {
 			el.innerHTML = extractLocalStyles(txt);
 			tw_contentChanged();
 			HashMonitor.set(params);
@@ -103,7 +103,7 @@ function refreshTopic() {
 				});
 			} else if (topic && partition) {
 				var params = { topic: topic, partition: partition };
-				WSApi.getDBAsync('partition', params, function(txt) {
+				WSApi.getDBAsync('messages', params, function(txt) {
 					el.innerHTML = extractLocalStyles(txt);
 					tw_contentChanged();
 					Tabs.hashChanged(HashMonitor.values);

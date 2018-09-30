@@ -26,6 +26,17 @@ public final class KafkaMessageKeys
 	public static final String EXTENSION_JS = "kafka.js";
 	
 	/*
+	 * Multilevel names for the DB browser
+	 */
+	
+	/** Topic tab title */
+	public static final String TOPIC_LEVEL = "$topicLevel";
+	/** Partition tab title */
+	public static final String PARTITION_LEVEL = "$partitionLevel";
+	/** Message tab title */
+	public static final String MESSAGE_LEVEL = "$partitionLevel";
+	
+	/*
 	 * Tab titles, prefixed with "$" for detection by tabs.tag
 	 */
 	
