@@ -43,9 +43,10 @@
 		</div><div class="tab-body"><table id="table-${label}" class="multiple table-autosort">
 			<thead>
 				<tr>
-					<th class="table-sortable table-sortable:numeric">ID</th>
-					<th class="table-sortable table-sortable:ignorecase">Timestamp</th>
-					<th class="table-sortable table-sortable:ignorecase">Key</th>
+					<th class="table-sortable table-sortable:numeric"><fmt:message key="id"/></th>
+					<th class="table-sortable table-sortable:ignorecase"><fmt:message key="timestamp"/></th>
+					<th class="table-sortable table-sortable:numeric"><fmt:message key="size"/></th>
+					<th class="table-sortable table-sortable:ignorecase"><fmt:message key="key"/></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -53,6 +54,7 @@
 >				<tr>
 					<td><a href="db/${currentConnection.linkName}/message.html?topic=${topic}&amp;partition=${partition}&amp;offset=${row.offset}"<c:if test="${not empty targetElement}"> onclick="return showMessage(event, '${topic}', '${partition}', '${row.offset}');"</c:if>>${row.offset}</a></td>
 					<td><fmt:formatDate value="${row.timestamp}" pattern="yyyy-MM-dd HH:mm:ss" /></td>
+					<td>${row.valueSize}</td>
 					<td>${fn:escapeXml(row.key)}</td>
 				</tr>
 </c:forEach

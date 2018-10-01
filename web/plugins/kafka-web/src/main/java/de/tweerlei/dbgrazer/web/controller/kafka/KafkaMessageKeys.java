@@ -42,8 +42,26 @@ public final class KafkaMessageKeys
 	
 	/** Topics tab title */
 	public static final String TOPICS_TAB = "$kafkaTopicsTab";
+	/** Partitions tab title */
+	public static final String PARTITIONS_TAB = "$kafkaPartitionsTab";
 	/** Messages tab title */
 	public static final String MESSAGES_TAB = "$kafkaMessagesTab";
+	
+	/*
+	 * Column names
+	 */
+	/** ID column */
+	public static final String ID = "id";
+	/** Name column */
+	public static final String TOPIC = "kafkaTopic";
+	/** Name column */
+	public static final String PARTITION = "kafkaPartition";
+	/** ID column */
+	public static final String REPLICAS = "replicas";
+	/** ID column */
+	public static final String IN_SYNC_REPLICAS = "inSyncReplicas";
+	/** ID column */
+	public static final String LEADER = "leader";
 	
 	
 	private KafkaMessageKeys()

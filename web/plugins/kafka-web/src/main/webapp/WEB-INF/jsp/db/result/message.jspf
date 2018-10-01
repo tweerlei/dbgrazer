@@ -25,14 +25,14 @@
 				<dd>${topic}</dd>
 				<dt><fmt:message key="kafkaPartition"/></dt>
 				<dd><a href="db/${currentConnection.linkName}/messages.html?topic=${topic}&amp;partition=${partition}&amp;offset=${offset}"<c:if test="${not empty targetElement}"> onclick="return showPartition(event, '${topic}', '${partition}');"</c:if>>${partition}</a></dd>
-				<dt>ID</dt>
+				<dt><fmt:message key="id"/></dt>
 				<dd>${offset}</dd>
 			</dl><hr/></div>
 <c:if test="${rs != null}"
 >			<div class="column3"><dl class="result">
-				<dt>Timestamp</dt>
+				<dt><fmt:message key="timestamp"/></dt>
 				<dd><fmt:formatDate pattern="yyyy-MM-dd HH:mm:ss" value="${rs.timestamp}"/></dd>
-				<dt>Key</dt>
+				<dt><fmt:message key="key"/></dt>
 				<dd>${fn:escapeXml(rs.key)}</dd>
 				<dt><fmt:message key="formatter"/></dt>
 				<dd><select id="f1-format" name="format" onchange="Forms.submit(form);">

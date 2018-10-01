@@ -77,6 +77,8 @@ public class KafkaBrowseController
 		private final String topic;
 		private final int partition;
 		private final String replicas;
+		private final String inSync;
+		private final String leader;
 		
 		/**
 		 * Constructor
@@ -86,10 +88,18 @@ public class KafkaBrowseController
 			{
 			this.topic = pi.topic();
 			this.partition = pi.partition();
+			
 			final StringJoiner sb = new StringJoiner(",");
 			for (Node n : pi.replicas())
 				sb.append(String.valueOf(n.id()));
 			this.replicas = sb.toString();
+			
+			final StringJoiner sb2 = new StringJoiner(",");
+			for (Node n : pi.inSyncReplicas())
+				sb2.append(String.valueOf(n.id()));
+			this.inSync = sb2.toString();
+			
+			this.leader = pi.leader() == null ? "" : String.valueOf(pi.leader().id());
 			}
 
 		/**
@@ -116,6 +126,22 @@ public class KafkaBrowseController
 			return replicas;
 			}
 		
+		/**
+		 * @return the in sync replicas
+		 */
+		public String getInSyncReplicas()
+			{
+			return inSync;
+			}
+		
+		/**
+		 * @return the replicas
+		 */
+		public String getLeader()
+			{
+			return leader;
+			}
+		
 		@Override
 		public int compareTo(PartitionInfoBean o)
 			{
@@ -128,7 +154,9 @@ public class KafkaBrowseController
 		{
 	    private final long offset;
 	    private final Date timestamp;
+	    private int keySize;
 	    private final String key;
+	    private int valueSize;
 	    private final String value;
 	    private final Map<String, String> headers;
 	    
@@ -141,7 +169,9 @@ public class KafkaBrowseController
 			{
 			this.offset = r.offset();
 			this.timestamp = new Date(r.timestamp());
+			this.keySize = r.serializedKeySize();
 			this.key = r.key();
+			this.valueSize = r.serializedValueSize();
 			this.value = value;
 			this.headers = new TreeMap<String, String>();
 			try {
@@ -180,11 +210,27 @@ public class KafkaBrowseController
 			}
 		
 		/**
+		 * @return the key size
+		 */
+		public int getKeySize()
+			{
+			return keySize;
+			}
+		
+		/**
 		 * @return the key
 		 */
 		public String getKey()
 			{
 			return key;
+			}
+		
+		/**
+		 * @return the offset
+		 */
+		public int getValueSize()
+			{
+			return valueSize;
 			}
 		
 		/**
@@ -276,8 +322,8 @@ public class KafkaBrowseController
 			return (resultBuilder.createEmptyRowSet(query, RowSetConstants.INDEX_MULTILEVEL, 0));
 		
 		final List<ColumnDef> columns = new ArrayList<ColumnDef>(2);
-		columns.add(new ColumnDefImpl("ID", ColumnType.STRING, null, null, null, null));
-		columns.add(new ColumnDefImpl("Name", ColumnType.STRING, null, null, null, null));
+		columns.add(new ColumnDefImpl(KafkaMessageKeys.ID, ColumnType.STRING, null, null, null, null));
+		columns.add(new ColumnDefImpl(KafkaMessageKeys.TOPIC, ColumnType.STRING, null, null, null, null));
 		final RowSetImpl rs = new RowSetImpl(query, RowSetConstants.INDEX_MULTILEVEL, columns);
 		
 		final Set<String> sortedTopics = new TreeSet<String>(values);
@@ -316,7 +362,7 @@ public class KafkaBrowseController
 		final RowSet cats = buildRowSet(query, partitions);
 		
 		final Map<String, TabItem<RowSet>> tabs = new LinkedHashMap<String, TabItem<RowSet>>();
-		tabs.put(KafkaMessageKeys.TOPICS_TAB, new TabItem<RowSet>(cats, cats.getRows().size()));
+		tabs.put(KafkaMessageKeys.PARTITIONS_TAB, new TabItem<RowSet>(cats, cats.getRows().size()));
 		model.put("query", query);
 		model.put("tabs", tabs);
 		model.put("params", querySettingsManager.buildParameterMap(Arrays.asList(topic)));
@@ -330,10 +376,12 @@ public class KafkaBrowseController
 		if (partitions.isEmpty())
 			return (resultBuilder.createEmptyRowSet(query, RowSetConstants.INDEX_MULTILEVEL, 0));
 		
-		final List<ColumnDef> columns = new ArrayList<ColumnDef>(2);
-		columns.add(new ColumnDefImpl("ID", ColumnType.STRING, null, null, null, null));
-		columns.add(new ColumnDefImpl("Name", ColumnType.STRING, null, null, null, null));
-		columns.add(new ColumnDefImpl("Replicas", ColumnType.STRING, null, null, null, null));
+		final List<ColumnDef> columns = new ArrayList<ColumnDef>(5);
+		columns.add(new ColumnDefImpl(KafkaMessageKeys.ID, ColumnType.STRING, null, null, null, null));
+		columns.add(new ColumnDefImpl(KafkaMessageKeys.PARTITION, ColumnType.STRING, null, null, null, null));
+		columns.add(new ColumnDefImpl(KafkaMessageKeys.REPLICAS, ColumnType.STRING, null, null, null, null));
+		columns.add(new ColumnDefImpl(KafkaMessageKeys.IN_SYNC_REPLICAS, ColumnType.STRING, null, null, null, null));
+		columns.add(new ColumnDefImpl(KafkaMessageKeys.LEADER, ColumnType.STRING, null, null, null, null));
 		final RowSetImpl rs = new RowSetImpl(query, RowSetConstants.INDEX_MULTILEVEL, columns);
 		
 		final Set<PartitionInfoBean> sortedPartitions = new TreeSet<PartitionInfoBean>();
@@ -341,7 +389,7 @@ public class KafkaBrowseController
 			sortedPartitions.add(new PartitionInfoBean(pi));
 		
 		for (PartitionInfoBean p : sortedPartitions)
-			rs.getRows().add(new DefaultResultRow(p.getPartition(), "Partition " + p.getPartition(), p.getReplicas()));
+			rs.getRows().add(new DefaultResultRow(p.getPartition(), p.getPartition(), p.getReplicas(), p.getInSyncReplicas(), p.getLeader()));
 		
 		rs.getAttributes().put(RowSetConstants.ATTR_MORE_LEVELS, true);
 		return (rs);
