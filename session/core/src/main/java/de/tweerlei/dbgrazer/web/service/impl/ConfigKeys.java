@@ -32,7 +32,7 @@ public final class ConfigKeys
 	private static final String PACKAGE_NAME = "dbgrazer.web";
 	
 	/** Whether to enable login */
-	public static final ConfigKey<Boolean> ENABLE_LOGIN = ConfigKey.create(PACKAGE_NAME, "enableLogin", Boolean.class, Boolean.FALSE);
+	public static final ConfigKey<Boolean> ENABLE_LOGIN = ConfigKey.create(PACKAGE_NAME, "enableLogin", Boolean.class, Boolean.TRUE);
 	
 	/** Whether to require login */
 	public static final ConfigKey<Boolean> REQUIRE_LOGIN = ConfigKey.create(PACKAGE_NAME, "requireLogin", Boolean.class, Boolean.FALSE);
@@ -75,7 +75,7 @@ public final class ConfigKeys
 	public static final ConfigKey<Boolean> ENABLE_USERS = ConfigKey.create(PACKAGE_NAME, "security.enableUserEditor", Boolean.class, Boolean.FALSE);
 	
 	/** Whether to enable the config editor */
-	public static final ConfigKey<Boolean> ENABLE_CONFIG = ConfigKey.create(PACKAGE_NAME, "security.enableConfigEditor", Boolean.class, Boolean.FALSE);
+	public static final ConfigKey<Boolean> ENABLE_CONFIG = ConfigKey.create(PACKAGE_NAME, "security.enableConfigEditor", Boolean.class, Boolean.TRUE);
 	
 	/** Expose SQL statements */
 	public static final ConfigKey<Boolean> SHOW_SQL = ConfigKey.create(PACKAGE_NAME, "security.showSQL", Boolean.class, Boolean.FALSE);
