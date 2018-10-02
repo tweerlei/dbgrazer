@@ -31,7 +31,7 @@ public final class ConfigKeys
 	private static final String PACKAGE_NAME = "dbgrazer.backend";
 	
 	/** Module prefix for the config loader impl. */
-	public static final ConfigKey<String> CONFIG_LOADER = ConfigKey.create(PACKAGE_NAME, "configLoader", String.class, "dummy");
+	public static final ConfigKey<String> CONFIG_LOADER = ConfigKey.create(PACKAGE_NAME, "configLoader", String.class, "file");
 	
 	
 	private ConfigKeys()

@@ -100,6 +100,7 @@ public abstract class AbstractFileConfigLoader implements ConfigLoader
 	
 	private final ConfigFileStore store;
 	private final FileAccess fileAccess;
+	private final String configFilePath;
 	private final Logger logger;
 	
 	/**
@@ -113,6 +114,12 @@ public abstract class AbstractFileConfigLoader implements ConfigLoader
 		this.store = store;
 		this.fileAccess = fileAccess;
 		this.logger = Logger.getLogger(getClass().getCanonicalName());
+		
+		final String configFileProperty = System.getProperty(ConfigKeys.CONFIG_FILE.getKey());
+		if (configFileProperty != null)
+			this.configFilePath = configFileProperty;
+		else
+			this.configFilePath = ConfigKeys.CONFIG_FILE.getDefaultValue();
 		}
 	
 	@Override
@@ -168,8 +175,7 @@ public abstract class AbstractFileConfigLoader implements ConfigLoader
 	
 	private File getFile()
 		{
-		final String configPath = store.getConfigFilePath();
-		final File configFile = store.getFileLocation(configPath);
+		final File configFile = store.getFileLocation(configFilePath);
 		return (configFile);
 		}
 	}

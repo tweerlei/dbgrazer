@@ -36,7 +36,6 @@ public class ConfigFileStoreImpl implements ConfigFileStore
 	private static final String CHARSET = "UTF-8";
 	
 	private final File configPath;
-	private final String configFile;
 	
 	/**
 	 * Constructor
@@ -48,18 +47,6 @@ public class ConfigFileStoreImpl implements ConfigFileStore
 			this.configPath = new File(configPathProperty);
 		else
 			this.configPath = new File(System.getProperty("user.home"), CONFIG_DIR);
-		
-		final String configFileProperty = System.getProperty(ConfigKeys.CONFIG_FILE.getKey());
-		if (configFileProperty != null)
-			this.configFile = configFileProperty;
-		else
-			this.configFile = ConfigKeys.CONFIG_FILE.getDefaultValue();
-		}
-	
-	@Override
-	public String getConfigFilePath()
-		{
-		return (configFile);
 		}
 	
 	@Override

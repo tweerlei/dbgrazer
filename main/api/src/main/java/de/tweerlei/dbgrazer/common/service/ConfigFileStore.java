@@ -25,12 +25,6 @@ import java.io.File;
 public interface ConfigFileStore
 	{
 	/**
-	 * Get the relative path to the main configuration file
-	 * @return Path
-	 */
-	public String getConfigFilePath();
-	
-	/**
 	 * Create an absolute File object for a configuration file
 	 * @param path File path
 	 * @return File object (never null but not checked for existence)
