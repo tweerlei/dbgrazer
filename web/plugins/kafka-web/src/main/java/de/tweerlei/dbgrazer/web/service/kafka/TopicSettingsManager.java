@@ -28,7 +28,7 @@ public interface TopicSettingsManager
 	 * @param partition Partition number
 	 * @param offset Offset
 	 */
-	public void setLastOffset(String topic, int partition, long offset);
+	public void setLastOffset(String topic, Integer partition, long offset);
 	
 	/**
 	 * Get the last offset for a TopicPartition
@@ -36,7 +36,7 @@ public interface TopicSettingsManager
 	 * @param partition Partition number
 	 * @return Offset or null
 	 */
-	public Long getLastOffset(String topic, int partition);
+	public Long getLastOffset(String topic, Integer partition);
 	
 	/**
 	 * Clear all saved offsets

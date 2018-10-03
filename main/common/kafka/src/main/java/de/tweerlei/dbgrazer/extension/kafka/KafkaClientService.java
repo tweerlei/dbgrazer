@@ -29,6 +29,56 @@ import org.apache.kafka.clients.producer.RecordMetadata;
 public interface KafkaClientService
 	{
 	/**
+	 * Offset information
+	 */
+	public static final class OffsetInfo
+		{
+		private final Long minOffset;
+		private final Long maxOffset;
+		private final Long currentOffset;
+		
+		/**
+		 * Constructor
+		 * @param minOffset Minimum valid offset
+		 * @param maxOffset Maximum valid offset
+		 * @param currentOffset Current offset
+		 */
+		public OffsetInfo(Long minOffset, Long maxOffset, Long currentOffset)
+			{
+			this.minOffset = minOffset;
+			this.maxOffset = maxOffset;
+			this.currentOffset = currentOffset;
+			}
+		
+		/**
+		 * Get the minOffset
+		 * @return the minOffset
+		 */
+		public Long getMinOffset()
+			{
+			return minOffset;
+			}
+		
+		/**
+		 * Get the maxOffset
+		 * @return the maxOffset
+		 */
+		public Long getMaxOffset()
+			{
+			return maxOffset;
+			}
+		
+		/**
+		 * Get the currentOffset
+		 * @return the currentOffset
+		 */
+		public Long getCurrentOffset()
+			{
+			return currentOffset;
+			}
+		}	
+	
+	/**
 	 * Get a KafkaConsumer for a link
 	 * @param c Link name
 	 * @return KafkaConsumer
@@ -41,6 +91,15 @@ public interface KafkaClientService
 	 * @return KafkaProducer
 	 */
 	public Producer<String, String> getProducer(String c);
+	
+	/**
+	 * Get offset information
+	 * @param c Link name
+	 * @param topic Topic name
+	 * @param partition Partition number (null to fetch from all partitions)
+	 * @return ConsumerRecord or null
+	 */
+	public OffsetInfo getOffsetInfo(String c, String topic, Integer partition);
 	
 	/**
 	 * Fetch a single record

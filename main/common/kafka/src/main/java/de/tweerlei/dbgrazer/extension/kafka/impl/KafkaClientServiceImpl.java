@@ -15,6 +15,8 @@
  */
 package de.tweerlei.dbgrazer.extension.kafka.impl;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -37,6 +39,7 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
+import org.apache.kafka.common.PartitionInfo;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
@@ -205,6 +208,49 @@ public class KafkaClientServiceImpl implements KafkaClientService, LinkListener,
 		}
 	
 	@Override
+	public OffsetInfo getOffsetInfo(String c, String topic, Integer partition)
+		{
+		final Consumer<String, String> consumer = getConsumer(c);
+		
+		final Collection<TopicPartition> partitions;
+		if (partition != null)
+			partitions = Collections.singleton(new TopicPartition(topic, partition));
+		else
+			{
+			final List<PartitionInfo> pinfos = consumer.partitionsFor(topic);
+			partitions = new ArrayList<TopicPartition>(pinfos.size());
+			for (PartitionInfo pi : pinfos)
+				partitions.add(new TopicPartition(topic, pi.partition()));
+			}
+		
+		Long startOffset = null;
+		for (Long l : consumer.beginningOffsets(partitions).values())
+			{
+			if (startOffset == null || startOffset > l)
+				startOffset = l;
+			}
+		
+		Long endOffset = null;
+		for (Long l : consumer.endOffsets(partitions).values())
+			{
+			if (endOffset == null || endOffset < l)
+				endOffset = l - 1;
+			}
+		
+		Long currentOffset = null;
+		consumer.assign(partitions);
+		for (TopicPartition tp : partitions)
+			{
+			final Long l = consumer.position(tp);
+			if (currentOffset == null || currentOffset > l)
+				currentOffset = l;
+			}
+		consumer.unsubscribe();
+		
+		return (new OffsetInfo(startOffset, endOffset, currentOffset));
+		}
+	
+	@Override
 	public ConsumerRecord<String, String> fetchRecord(String c, String topic, int partition, long offset)
 		{
 		final Consumer<String, String> consumer = getConsumer(c);
@@ -306,6 +352,10 @@ public class KafkaClientServiceImpl implements KafkaClientService, LinkListener,
 		// Don't commit offsets, start at earliest message
 		props.setProperty("enable.auto.commit", "false");
 		props.setProperty("auto.offset.reset", "earliest");
+		
+		// Group ID is required for subscribe()
+		if (!props.containsKey("group.id"))
+			props.setProperty("group.id", holder.toString());
 		
 		ret = new KafkaConsumer<String, String>(props);
 		

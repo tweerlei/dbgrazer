@@ -60,13 +60,13 @@ public class TopicSettingsManagerImpl implements TopicSettingsManager
 		}
 	
 	@Override
-	public void setLastOffset(String topic, int partition, long offset)
+	public void setLastOffset(String topic, Integer partition, long offset)
 		{
 		getOffsets().put(topic + ":" + partition, offset);
 		}
 	
 	@Override
-	public Long getLastOffset(String topic, int partition)
+	public Long getLastOffset(String topic, Integer partition)
 		{
 		return (getOffsets().get(topic + ":" + partition));
 		}

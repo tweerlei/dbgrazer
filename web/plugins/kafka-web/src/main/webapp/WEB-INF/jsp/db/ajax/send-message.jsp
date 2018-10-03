@@ -14,18 +14,18 @@
  * limitations under the License.
 --%><%@
 	include file="../../include/include.jspf"
-%><spring:form id="f1" action="db/${currentConnection.linkName}/send-message.html" method="post" modelAttribute="model" onsubmit="return submitDML(this);" onreset="return closeDialog();">
+%><spring:form id="f3" action="db/${currentConnection.linkName}/send-message.html" method="post" modelAttribute="model" onsubmit="return submitDML(this);" onreset="return closeDialog();">
 	<div id="dmlerror"></div>
 	<dl>
-		<dt><label for="f1-topic"><fmt:message key="kafkaTopic"/></label></dt>
-		<dd><input type="text" id="f1-topic" name="topic" value="${fn:escapeXml(topic)}"/></dd>
-		<dt><label for="f1-partition"><fmt:message key="kafkaPartition"/></label></dt>
-		<dd><input type="text" id="f1-partition" name="partition" value="${partition}"/></dd>
-		<dt><label for="f1-key"><fmt:message key="key"/></label></dt>
-		<dd><input type="text" id="f1-key" name="key"/></dd>
-		<dt><label for="f1-message"><fmt:message key="body"/></label></dt>
-		<dd><textarea id="f1-message" name="message" class="large" cols="80" rows="25"></textarea></dd>
+		<dt><label for="f3-topic"><fmt:message key="kafkaTopic"/></label></dt>
+		<dd><input type="text" id="f3-topic" name="topic" value="${fn:escapeXml(topic)}"/></dd>
+		<dt><label for="f3-partition"><fmt:message key="kafkaPartition"/></label></dt>
+		<dd><input type="text" id="f3-partition" name="partition" value="${partition}"/></dd>
+		<dt><label for="f3-key"><fmt:message key="key"/></label></dt>
+		<dd><input type="text" id="f3-key" name="key"/></dd>
+		<dt><label for="f3-message"><fmt:message key="body"/></label></dt>
+		<dd><textarea id="f3-message" name="message" class="large" cols="80" rows="25"></textarea></dd>
 		<dt>&nbsp;</dt>
-		<dd><input id="f1-submit" type="submit" value="<fmt:message key="send"/>"/> <input id="f1-reset" type="reset" value="<fmt:message key="cancel"/>"/></dd>
+		<dd><input id="f3-submit" type="submit" value="<fmt:message key="send"/>"/> <input id="f3-reset" type="reset" value="<fmt:message key="cancel"/>"/></dd>
 	</dl><hr/>
 </spring:form>

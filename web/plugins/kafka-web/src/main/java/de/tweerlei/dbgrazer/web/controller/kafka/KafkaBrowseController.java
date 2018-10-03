@@ -34,7 +34,6 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.common.Node;
 import org.apache.kafka.common.PartitionInfo;
-import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.header.Header;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -44,6 +43,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import de.tweerlei.common.util.StringJoiner;
 import de.tweerlei.dbgrazer.extension.kafka.KafkaClientService;
+import de.tweerlei.dbgrazer.extension.kafka.KafkaClientService.OffsetInfo;
 import de.tweerlei.dbgrazer.query.model.ColumnDef;
 import de.tweerlei.dbgrazer.query.model.ColumnType;
 import de.tweerlei.dbgrazer.query.model.Query;
@@ -152,6 +152,7 @@ public class KafkaBrowseController
 	/** Re-package Kafka objects as Java Beans */
 	public static class ConsumerRecordBean implements Comparable<ConsumerRecordBean>
 		{
+	    private final int partition;
 	    private final long offset;
 	    private final Date timestamp;
 	    private int keySize;
@@ -167,6 +168,7 @@ public class KafkaBrowseController
 	     */
 		public ConsumerRecordBean(ConsumerRecord<String, String> r, String value)
 			{
+			this.partition = r.partition();
 			this.offset = r.offset();
 			this.timestamp = new Date(r.timestamp());
 			this.keySize = r.serializedKeySize();
@@ -183,7 +185,7 @@ public class KafkaBrowseController
 				// should not happen for UTF-8
 				}
 			}
-
+		
 	    /**
 	     * Constructor
 	     * @param r ConsumerRecord
@@ -192,7 +194,15 @@ public class KafkaBrowseController
 			{
 			this(r, r.value());
 			}
-
+		
+		/**
+		 * @return the partition
+		 */
+		public int getPartition()
+			{
+			return partition;
+			}
+		
 		/**
 		 * @return the offset
 		 */
@@ -388,6 +398,7 @@ public class KafkaBrowseController
 		for (PartitionInfo pi : partitions)
 			sortedPartitions.add(new PartitionInfoBean(pi));
 		
+		rs.getRows().add(new DefaultResultRow(null, "All", "&nbsp;", "&nbsp;", "&nbsp;"));
 		for (PartitionInfoBean p : sortedPartitions)
 			rs.getRows().add(new DefaultResultRow(p.getPartition(), p.getPartition(), p.getReplicas(), p.getInSyncReplicas(), p.getLeader()));
 		
@@ -405,7 +416,7 @@ public class KafkaBrowseController
 	@RequestMapping(value = "/db/*/messages.html", method = RequestMethod.GET)
 	public Map<String, Object> showMessages(
 			@RequestParam("topic") String topic,
-			@RequestParam("partition") int partition,
+			@RequestParam(value = "partition", required = false) Integer partition,
 			@RequestParam(value = "offset", required = false) Long offset
 			)
 		{
@@ -422,7 +433,7 @@ public class KafkaBrowseController
 	@RequestMapping(value = "/db/*/ajax/messages.html", method = RequestMethod.GET)
 	public Map<String, Object> showAjaxMessages(
 			@RequestParam("topic") String topic,
-			@RequestParam("partition") int partition,
+			@RequestParam(value = "partition", required = false) Integer partition,
 			@RequestParam(value = "offset", required = false) Long offset
 			)
 		{
@@ -431,7 +442,7 @@ public class KafkaBrowseController
 	
 	private Map<String, Object> showMessagesInternal(
 			String topic,
-			int partition,
+			Integer partition,
 			Long offset
 			)
 		{
@@ -443,22 +454,10 @@ public class KafkaBrowseController
 		model.put("topic", topic);
 		model.put("partition", partition);
 		
-		final Consumer<String, String> consumer = kafkaClientService.getConsumer(connectionSettings.getLinkName());
-		final TopicPartition tp = new TopicPartition(topic, partition);
-		
-		Long startOffset = null;
-		Long endOffset = null;
-		for (Long l : consumer.beginningOffsets(Collections.singleton(tp)).values())
-			startOffset = l;
-		for (Long l : consumer.endOffsets(Collections.singleton(tp)).values())
-			endOffset = l - 1;
-		
-		model.put("startOffset", startOffset);
-		model.put("endOffset", endOffset);
-		
-		consumer.assign(Collections.singleton(tp));
-		model.put("currentOffset", consumer.position(tp));
-		consumer.unsubscribe();
+		final OffsetInfo offsets = kafkaClientService.getOffsetInfo(connectionSettings.getLinkName(), topic, partition);
+		model.put("startOffset", offsets.getMinOffset());
+		model.put("endOffset", offsets.getMaxOffset());
+		model.put("currentOffset", offsets.getCurrentOffset());
 		
 		final Long effectiveOffset;
 		if (offset == null)
@@ -488,9 +487,9 @@ public class KafkaBrowseController
 		if (minOffset != null)
 			topicStateManager.setLastOffset(topic, partition, minOffset);
 		
-		if ((minOffset != null) && (startOffset != null) && (minOffset > startOffset))
-			model.put("prevOffset", Math.max(startOffset, minOffset - (l.isEmpty() ? 1 : l.size())));
-		if ((maxOffset != null) && (endOffset != null) && (maxOffset < endOffset))
+		if ((minOffset != null) && (offsets.getMinOffset() != null) && (minOffset > offsets.getMinOffset()))
+			model.put("prevOffset", Math.max(offsets.getMinOffset(), minOffset - (l.isEmpty() ? 1 : l.size())));
+		if ((maxOffset != null) && (offsets.getMaxOffset() != null) && (maxOffset < offsets.getMaxOffset()))
 			model.put("nextOffset", maxOffset + 1);
 		
 		final List<SubQueryDef> levels = new ArrayList<SubQueryDef>();
@@ -503,7 +502,7 @@ public class KafkaBrowseController
 		
 		model.put("query", query);
 		model.put("tabs", tabs);
-		model.put("params", querySettingsManager.buildParameterMap(Arrays.asList(topic, String.valueOf(partition))));
+		model.put("params", querySettingsManager.buildParameterMap(Arrays.asList(topic, (partition == null) ? "" : String.valueOf(partition))));
 		model.put("extensionJS", KafkaMessageKeys.EXTENSION_JS);
 		
 		return (model);
