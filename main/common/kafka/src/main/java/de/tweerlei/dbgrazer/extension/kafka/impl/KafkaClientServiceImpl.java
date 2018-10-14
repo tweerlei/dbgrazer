@@ -31,6 +31,7 @@ import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
+import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
@@ -71,6 +72,8 @@ public class KafkaClientServiceImpl implements KafkaClientService, LinkListener,
 		private final ThreadLocal<Consumer<String, String>> activeConsumer;
 		private final List<Producer<String, String>> allProducers;
 		private final ThreadLocal<Producer<String, String>> activeProducer;
+		private final List<AdminClient> allAdminClients;
+		private final ThreadLocal<AdminClient> activeAdminClient;
 		
 		public KafkaConnectionHolder()
 			{
@@ -78,6 +81,8 @@ public class KafkaClientServiceImpl implements KafkaClientService, LinkListener,
 			this.activeConsumer = new ThreadLocal<Consumer<String, String>>();
 			this.allProducers = new LinkedList<Producer<String, String>>();
 			this.activeProducer = new ThreadLocal<Producer<String, String>>();
+			this.allAdminClients = new LinkedList<AdminClient>();
+			this.activeAdminClient = new ThreadLocal<AdminClient>();
 			}
 		
 		public Consumer<String, String> getConsumer()
@@ -102,12 +107,25 @@ public class KafkaClientServiceImpl implements KafkaClientService, LinkListener,
 			activeProducer.set(producer);
 			}
 		
+		public AdminClient getAdminClient()
+			{
+			return (activeAdminClient.get());
+			}
+		
+		public synchronized void setAdminClient(AdminClient adminClient)
+			{
+			allAdminClients.add(adminClient);
+			activeAdminClient.set(adminClient);
+			}
+		
 		public synchronized void close()
 			{
 			for (Consumer<String, String> consumer : allConsumers)
 				consumer.wakeup();
 			for (Producer<String, String> producer : allProducers)
 				producer.close();
+			for (AdminClient adminClient : allAdminClients)
+				adminClient.close();
 			}
 		}
 	
@@ -205,6 +223,20 @@ public class KafkaClientServiceImpl implements KafkaClientService, LinkListener,
 			}
 		
 		return (createProducer(c));
+		}
+	
+	@Override
+	public AdminClient getAdminClient(String c)
+		{
+		final KafkaConnectionHolder holder = activeConnections.get(c);
+		if (holder != null)
+			{
+			final AdminClient ret = holder.getAdminClient();
+			if (ret != null)
+				return (ret);
+			}
+
+		return (createAdminClient(c));
 		}
 	
 	@Override
@@ -393,7 +425,31 @@ public class KafkaClientServiceImpl implements KafkaClientService, LinkListener,
 		holder.setProducer(ret);
 		return (ret);
 		}
-	
+
+	private synchronized AdminClient createAdminClient(String c)
+		{
+		KafkaConnectionHolder holder = activeConnections.get(c);
+		AdminClient ret = null;
+		if (holder != null)
+			{
+			ret = holder.getAdminClient();
+			if (ret != null)
+				return (ret);
+			}
+		else
+			{
+			holder = new KafkaConnectionHolder();
+			activeConnections.put(c, holder);
+			}
+
+		final Properties props = initKafkaProperties(c);
+
+		ret = AdminClient.create(props);
+
+		holder.setAdminClient(ret);
+		return (ret);
+		}
+
 	private Properties initKafkaProperties(String c)
 		{
 		final LinkDef def = linkService.getLink(c, null);

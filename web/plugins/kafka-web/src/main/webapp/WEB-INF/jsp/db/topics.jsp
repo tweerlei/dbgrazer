@@ -37,6 +37,7 @@
 	
 	<div id="tools-1" class="hidden"><div class="menucolumn">
 		<div class="menuitem"><span onclick="return showDbDialog(event, 'send-message', null, '<fmt:message key="send"/>');"><fmt:message key="send"/></span></div>
+		<div class="menuitem"><span onclick="return showDbDialog(event, 'create-topic', null, '<fmt:message key="createTopic"/>');"><fmt:message key="createTopic"/></span></div>
 	</div></div>
 	</ui:headline1>
 	

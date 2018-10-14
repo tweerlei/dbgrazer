@@ -15,6 +15,7 @@
  */
 package de.tweerlei.dbgrazer.extension.kafka;
 
+import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
@@ -91,6 +92,13 @@ public interface KafkaClientService
 	 * @return KafkaProducer
 	 */
 	public Producer<String, String> getProducer(String c);
+	
+	/**
+	 * Get a AdminClient for a link
+	 * @param c Link name
+	 * @return AdminClient
+	 */
+	public AdminClient getAdminClient(String c);
 	
 	/**
 	 * Get offset information
