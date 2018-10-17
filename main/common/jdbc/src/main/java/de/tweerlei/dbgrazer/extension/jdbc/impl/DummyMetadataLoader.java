@@ -63,9 +63,9 @@ public class DummyMetadataLoader implements MetadataLoader
 	@Override
 	public Map<String, String> getDBInfo()
 		{
-		return (Collections.emptyMap());
+		return (Collections.singletonMap("notice", "No metadata loaded (dummy)"));
 		}
-
+	
 	@Override
 	public SortedSet<String> getCatalogs()
 		{
