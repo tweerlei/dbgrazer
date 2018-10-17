@@ -18,6 +18,7 @@ package de.tweerlei.dbgrazer.web.controller.kafka;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.EnumSet;
@@ -29,12 +30,18 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.common.Node;
 import org.apache.kafka.common.PartitionInfo;
+import org.apache.kafka.common.acl.AccessControlEntryFilter;
+import org.apache.kafka.common.acl.AclBinding;
+import org.apache.kafka.common.acl.AclBindingFilter;
 import org.apache.kafka.common.header.Header;
+import org.apache.kafka.common.resource.ResourceFilter;
+import org.apache.kafka.common.resource.ResourceType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -101,7 +108,7 @@ public class KafkaBrowseController
 			
 			this.leader = pi.leader() == null ? "" : String.valueOf(pi.leader().id());
 			}
-
+		
 		/**
 		 * @return the topic
 		 */
@@ -109,7 +116,7 @@ public class KafkaBrowseController
 			{
 			return topic;
 			}
-
+		
 		/**
 		 * @return the partition
 		 */
@@ -152,20 +159,20 @@ public class KafkaBrowseController
 	/** Re-package Kafka objects as Java Beans */
 	public static class ConsumerRecordBean implements Comparable<ConsumerRecordBean>
 		{
-	    private final int partition;
-	    private final long offset;
-	    private final Date timestamp;
-	    private int keySize;
-	    private final String key;
-	    private int valueSize;
-	    private final String value;
-	    private final Map<String, String> headers;
-	    
-	    /**
-	     * Constructor
-	     * @param r ConsumerRecord
-	     * @param value Preformatted Value
-	     */
+		private final int partition;
+		private final long offset;
+		private final Date timestamp;
+		private int keySize;
+		private final String key;
+		private int valueSize;
+		private final String value;
+		private final Map<String, String> headers;
+		
+		/**
+		 * Constructor
+		 * @param r ConsumerRecord
+		 * @param value Preformatted Value
+		 */
 		public ConsumerRecordBean(ConsumerRecord<String, String> r, String value)
 			{
 			this.partition = r.partition();
@@ -186,10 +193,10 @@ public class KafkaBrowseController
 				}
 			}
 		
-	    /**
-	     * Constructor
-	     * @param r ConsumerRecord
-	     */
+		/**
+		 * Constructor
+		 * @param r ConsumerRecord
+		 */
 		public ConsumerRecordBean(ConsumerRecord<String, String> r)
 			{
 			this(r, r.value());
@@ -307,8 +314,18 @@ public class KafkaBrowseController
 		
 		final Map<String, Object> model = new HashMap<String, Object>();
 		
-		final Consumer<String, String> consumer = kafkaClientService.getConsumer(connectionSettings.getLinkName());
+		final AdminClient adminClient = kafkaClientService.getAdminClient(connectionSettings.getLinkName());
+		Collection<Node> nodes;
+		try	{
+			nodes = adminClient.describeCluster().nodes().get();
+			}
+		catch (Exception e)
+			{
+			nodes = Collections.emptyList();
+			}
+		model.put("results", Collections.singletonMap(KafkaMessageKeys.NODES, new TabItem<RowSet>(buildNodeRowSet(nodes), nodes.size())));
 		
+		final Consumer<String, String> consumer = kafkaClientService.getConsumer(connectionSettings.getLinkName());
 		final Map<String, List<PartitionInfo>> topics = consumer.listTopics();
 		
 		final List<SubQueryDef> levels = new ArrayList<SubQueryDef>();
@@ -344,6 +361,26 @@ public class KafkaBrowseController
 		return (rs);
 		}
 	
+	private RowSet buildNodeRowSet(Collection<Node> nodes)
+		{
+		final Query query = new ViewImpl(KafkaMessageKeys.NODES, null, null, null, null, null, null);
+		
+		if (nodes.isEmpty())
+			return (resultBuilder.createEmptyRowSet(query, 0, 0));
+		
+		final List<ColumnDef> columns = new ArrayList<ColumnDef>(5);
+		columns.add(new ColumnDefImpl(KafkaMessageKeys.ID, ColumnType.INTEGER, null, null, null, null));
+		columns.add(new ColumnDefImpl(KafkaMessageKeys.HOST, ColumnType.STRING, null, null, null, null));
+		columns.add(new ColumnDefImpl(KafkaMessageKeys.PORT, ColumnType.INTEGER, null, null, null, null));
+		columns.add(new ColumnDefImpl(KafkaMessageKeys.RACK, ColumnType.STRING, null, null, null, null));
+		final RowSetImpl rs = new RowSetImpl(query, 0, columns);
+		
+		for (Node node : nodes)
+			rs.getRows().add(new DefaultResultRow(node.id(), node.host(), node.port(), node.rack()));
+		
+		return (rs);
+		}
+	
 	/**
 	 * Show the file browser
 	 * @param topic Topic name
@@ -360,6 +397,18 @@ public class KafkaBrowseController
 		final Map<String, Object> model = new HashMap<String, Object>();
 		
 		model.put("topic", topic);
+		
+		final AdminClient adminClient = kafkaClientService.getAdminClient(connectionSettings.getLinkName());
+		Collection<AclBinding> acls;
+		try	{
+			final AclBindingFilter filter = new AclBindingFilter(new ResourceFilter(ResourceType.TOPIC, topic), AccessControlEntryFilter.ANY);
+			acls = adminClient.describeAcls(filter).values().get();
+			}
+		catch (Exception e)
+			{
+			acls = Collections.emptyList();
+			}
+		model.put("results", Collections.singletonMap(KafkaMessageKeys.ACLS, new TabItem<RowSet>(buildAclRowSet(acls), acls.size())));
 		
 		final Consumer<String, String> consumer = kafkaClientService.getConsumer(connectionSettings.getLinkName());
 		
@@ -403,6 +452,26 @@ public class KafkaBrowseController
 			rs.getRows().add(new DefaultResultRow(p.getPartition(), p.getPartition(), p.getReplicas(), p.getInSyncReplicas(), p.getLeader()));
 		
 		rs.getAttributes().put(RowSetConstants.ATTR_MORE_LEVELS, true);
+		return (rs);
+		}
+
+	private RowSet buildAclRowSet(Collection<AclBinding> acls)
+		{
+		final Query query = new ViewImpl(KafkaMessageKeys.ACLS, null, null, null, null, null, null);
+		
+		if (acls.isEmpty())
+			return (resultBuilder.createEmptyRowSet(query, 0, 0));
+		
+		final List<ColumnDef> columns = new ArrayList<ColumnDef>(5);
+		columns.add(new ColumnDefImpl(KafkaMessageKeys.PRINCIPAL, ColumnType.STRING, null, null, null, null));
+		columns.add(new ColumnDefImpl(KafkaMessageKeys.HOST, ColumnType.STRING, null, null, null, null));
+		columns.add(new ColumnDefImpl(KafkaMessageKeys.OPERATION, ColumnType.STRING, null, null, null, null));
+		columns.add(new ColumnDefImpl(KafkaMessageKeys.PERMISSION_TYPE, ColumnType.STRING, null, null, null, null));
+		final RowSetImpl rs = new RowSetImpl(query, 0, columns);
+		
+		for (AclBinding acl : acls)
+			rs.getRows().add(new DefaultResultRow(acl.entry().principal(), acl.entry().host(), acl.entry().operation().toString(), acl.entry().permissionType().toString()));
+		
 		return (rs);
 		}
 	

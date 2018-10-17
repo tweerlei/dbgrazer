@@ -62,6 +62,22 @@ public final class KafkaMessageKeys
 	public static final String IN_SYNC_REPLICAS = "inSyncReplicas";
 	/** ID column */
 	public static final String LEADER = "leader";
+	/** ID column */
+	public static final String NODES = "$nodes";
+	/** ID column */
+	public static final String HOST = "nodeHost";
+	/** ID column */
+	public static final String PORT = "nodePort";
+	/** ID column */
+	public static final String RACK = "nodeRack";
+	/** ID column */
+	public static final String ACLS = "$acls";
+	/** ID column */
+	public static final String PRINCIPAL = "aclPrincipal";
+	/** ID column */
+	public static final String OPERATION = "aclOperation";
+	/** ID column */
+	public static final String PERMISSION_TYPE = "aclPermissionType";
 	
 	
 	private KafkaMessageKeys()
