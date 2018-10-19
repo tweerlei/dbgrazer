@@ -15,10 +15,11 @@
  */
 package de.tweerlei.dbgrazer.extension.kafka;
 
+import java.util.List;
+
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.RecordMetadata;
 
@@ -124,10 +125,11 @@ public interface KafkaClientService
 	 * @param c Link name
 	 * @param topic Topic name
 	 * @param partition Partition number (null to fetch from all partitions)
-	 * @param offset Record offset (null to fetch from current offset)
+	 * @param startOffset Record offset (null to fetch from current offset)
+	 * @param endOffset Max. Record offset (null to fetch from current offset)
 	 * @return ConsumerRecord or null
 	 */
-	public ConsumerRecords<String, String> fetchRecords(String c, String topic, Integer partition, Long offset);
+	public List<ConsumerRecord<String, String>> fetchRecords(String c, String topic, Integer partition, Long startOffset, Long endOffset);
 	
 	/**
 	 * Send a record

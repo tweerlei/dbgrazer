@@ -33,7 +33,6 @@ import java.util.TreeSet;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.common.Node;
 import org.apache.kafka.common.PartitionInfo;
 import org.apache.kafka.common.acl.AccessControlEntryFilter;
@@ -535,9 +534,9 @@ public class KafkaBrowseController
 			effectiveOffset = offset;
 		model.put("offset", effectiveOffset);
 		
-		final ConsumerRecords<String, String> records = kafkaClientService.fetchRecords(connectionSettings.getLinkName(), topic, partition, effectiveOffset);
+		final List<ConsumerRecord<String, String>> records = kafkaClientService.fetchRecords(connectionSettings.getLinkName(), topic, partition, effectiveOffset, null);
 		
-		final List<ConsumerRecordBean> l = new ArrayList<ConsumerRecordBean>(records.count());
+		final List<ConsumerRecordBean> l = new ArrayList<ConsumerRecordBean>(records.size());
 		Long minOffset = null;
 		Long maxOffset = null;
 		for (ConsumerRecord<String, String> record : records)

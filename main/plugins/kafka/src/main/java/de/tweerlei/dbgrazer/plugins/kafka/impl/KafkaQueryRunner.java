@@ -25,7 +25,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.common.header.Header;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -158,7 +157,7 @@ public class KafkaQueryRunner extends BaseQueryRunner
 			final String topic = fields[0];
 			final int partition;
 			final long startOffset;
-			final long endOffset;
+			final Long endOffset;
 			if (fields.length > 2)
 				{
 				partition = Integer.parseInt(fields[1]);
@@ -167,7 +166,7 @@ public class KafkaQueryRunner extends BaseQueryRunner
 				if (offsets.length > 1)
 					endOffset = Long.parseLong(offsets[1]);
 				else
-					endOffset = -1;
+					endOffset = null;
 				}
 			else if (fields.length > 1)
 				{
@@ -177,17 +176,17 @@ public class KafkaQueryRunner extends BaseQueryRunner
 				if (offsets.length > 1)
 					endOffset = Long.parseLong(offsets[1]);
 				else
-					endOffset = -1;
+					endOffset = null;
 				}
 			else
 				{
 				partition = 0;
 				startOffset = 0;
-				endOffset = -1;
+				endOffset = null;
 				}
 			
 			final long start = timeService.getCurrentTime();
-			final ConsumerRecords<String, String> recs = kafkaClient.fetchRecords(link, topic, partition, startOffset);
+			final List<ConsumerRecord<String, String>> recs = kafkaClient.fetchRecords(link, topic, partition, startOffset, endOffset);
 			final long end = timeService.getCurrentTime();
 			
 			res.getRowSets().put(query.getName(), createListRowSet(query, subQueryIndex, recs, end - start));
@@ -248,7 +247,7 @@ public class KafkaQueryRunner extends BaseQueryRunner
 		return (rs);
 		}
 	
-	private RowSet createListRowSet(Query query, int subQueryIndex, ConsumerRecords<String, String> recs, long time)
+	private RowSet createListRowSet(Query query, int subQueryIndex, List<ConsumerRecord<String, String>> recs, long time)
 		{
 		final RowSetImpl rs;
 		if (recs == null || recs.isEmpty())

@@ -32,6 +32,8 @@ public final class ConfigKeys
 	
 	/** Timeout for poll() */
 	public static final ConfigKey<Long> KAFKA_FETCH_TIMEOUT = ConfigKey.create(PACKAGE_NAME, "fetchTimeout", Long.class, 100L);
+	/** Limit for poll() */
+	public static final ConfigKey<Integer> KAFKA_FETCH_LIMIT = ConfigKey.create(PACKAGE_NAME, "fetchLimit", Integer.class, 100);
 	
 	
 	private ConfigKeys()

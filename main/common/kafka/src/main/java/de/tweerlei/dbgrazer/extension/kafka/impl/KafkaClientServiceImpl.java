@@ -303,7 +303,7 @@ public class KafkaClientServiceImpl implements KafkaClientService, LinkListener,
 		}
 	
 	@Override
-	public ConsumerRecords<String, String> fetchRecords(String c, String topic, Integer partition, Long offset)
+	public List<ConsumerRecord<String, String>> fetchRecords(String c, String topic, Integer partition, Long startOffset, Long endOffset)
 		{
 		final Consumer<String, String> consumer = getConsumer(c);
 		
@@ -311,17 +311,31 @@ public class KafkaClientServiceImpl implements KafkaClientService, LinkListener,
 			{
 			final TopicPartition tp = new TopicPartition(topic, partition);
 			consumer.assign(Collections.singleton(tp));
-			if (offset != null)
-				consumer.seek(tp, offset);
+			if (startOffset != null)
+				consumer.seek(tp, startOffset);
 			}
 		else
 			consumer.subscribe(Collections.singleton(topic));
 		
-		final ConsumerRecords<String, String> records = consumer.poll(configService.get(ConfigKeys.KAFKA_FETCH_TIMEOUT));
+		final List<ConsumerRecord<String, String>> ret = new LinkedList<ConsumerRecord<String, String>>();
+		final int limit = configService.get(ConfigKeys.KAFKA_FETCH_LIMIT);
+		int n = 0;
+		while (n < limit)
+			{
+			final ConsumerRecords<String, String> records = consumer.poll(configService.get(ConfigKeys.KAFKA_FETCH_TIMEOUT));
+			if (records.isEmpty())
+				break;
+			for (ConsumerRecord<String, String> rec : records)
+				{
+				if ((endOffset == null) || (rec.offset() <= endOffset))
+					ret.add(rec);
+				n++;
+				}
+			}
 		
 		consumer.unsubscribe();
 		
-		return (records);
+		return (ret);
 		}
 	
 	@Override
@@ -425,7 +439,7 @@ public class KafkaClientServiceImpl implements KafkaClientService, LinkListener,
 		holder.setProducer(ret);
 		return (ret);
 		}
-
+	
 	private synchronized AdminClient createAdminClient(String c)
 		{
 		KafkaConnectionHolder holder = activeConnections.get(c);
@@ -449,7 +463,7 @@ public class KafkaClientServiceImpl implements KafkaClientService, LinkListener,
 		holder.setAdminClient(ret);
 		return (ret);
 		}
-
+	
 	private Properties initKafkaProperties(String c)
 		{
 		final LinkDef def = linkService.getLink(c, null);
