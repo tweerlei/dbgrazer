@@ -25,9 +25,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import de.tweerlei.common.util.StringUtils;
 import de.tweerlei.dbgrazer.extension.kafka.KafkaClientService;
 import de.tweerlei.dbgrazer.web.exception.AccessDeniedException;
 import de.tweerlei.dbgrazer.web.service.FrontendHelperService;
+import de.tweerlei.dbgrazer.web.service.QuerySettingsManager;
 import de.tweerlei.dbgrazer.web.session.ConnectionSettings;
 
 /**
@@ -38,21 +40,26 @@ import de.tweerlei.dbgrazer.web.session.ConnectionSettings;
 @Controller
 public class KafkaSendController
 	{
+	private static final String ATTR_KEY = "key";
+	
 	private final KafkaClientService kafkaClientService;
+	private final QuerySettingsManager querySettingsManager;
 	private final FrontendHelperService frontendHelperService;
 	private final ConnectionSettings connectionSettings;
 	
 	/**
 	 * Constructor
 	 * @param kafkaClientService KafkaClientService
+	 * @param querySettingsManager QuerySettingsManager
 	 * @param frontendHelperService FrontendHelperService
 	 * @param connectionSettings ConnectionSettings
 	 */
 	@Autowired
 	public KafkaSendController(KafkaClientService kafkaClientService, FrontendHelperService frontendHelperService,
-			ConnectionSettings connectionSettings)
+			QuerySettingsManager querySettingsManager, ConnectionSettings connectionSettings)
 		{
 		this.kafkaClientService = kafkaClientService;
+		this.querySettingsManager = querySettingsManager;
 		this.frontendHelperService = frontendHelperService;
 		this.connectionSettings = connectionSettings;
 		}
@@ -77,6 +84,9 @@ public class KafkaSendController
 		model.put("topic", topic);
 		model.put("partition", partition);
 		
+		model.put("key", connectionSettings.getCustomQuery().getAttributes().get(ATTR_KEY));
+		model.put("message", connectionSettings.getCustomQuery().getQuery());
+		
 		return (model);
 		}
 	
@@ -98,6 +108,14 @@ public class KafkaSendController
 		{
 		if (!connectionSettings.isBrowserEnabled() || !connectionSettings.isWritable())
 			throw new AccessDeniedException();
+		
+		if (!StringUtils.empty(message))
+			{
+			querySettingsManager.addCustomHistoryEntry(message);
+			connectionSettings.getCustomQuery().setQuery(message);
+			connectionSettings.getCustomQuery().modify();
+			}
+		connectionSettings.getCustomQuery().getAttributes().put(ATTR_KEY, key);
 		
 		final Map<String, Object> model = new HashMap<String, Object>();
 		
