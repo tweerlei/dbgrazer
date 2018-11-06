@@ -327,9 +327,11 @@ public class KafkaClientServiceImpl implements KafkaClientService, LinkListener,
 				break;
 			for (ConsumerRecord<String, String> rec : records)
 				{
-				if ((endOffset == null) || (rec.offset() <= endOffset))
+				if (((startOffset == null) || (rec.offset() >= startOffset)) && ((endOffset == null) || (rec.offset() <= endOffset)))
+					{
 					ret.add(rec);
-				n++;
+					n++;
+					}
 				}
 			}
 		
