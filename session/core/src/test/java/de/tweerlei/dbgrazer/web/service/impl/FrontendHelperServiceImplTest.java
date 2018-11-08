@@ -36,7 +36,7 @@ public class FrontendHelperServiceImplTest extends TestCase
 	 */
 	public void testParsePath()
 		{
-		final FrontendHelperService fhs = new FrontendHelperServiceImpl(new StringTransformerServiceImpl());
+		final FrontendHelperService fhs = new FrontendHelperServiceImpl(new StringTransformerServiceImpl(), null);
 		
 		assertPathInfo(fhs.parsePath("", null), null, null, "");
 		assertPathInfo(fhs.parsePath("test.html", null), null, null, "test.html");
@@ -59,7 +59,7 @@ public class FrontendHelperServiceImplTest extends TestCase
 	 */
 	public void testBuildPath()
 		{
-		final FrontendHelperService fhs = new FrontendHelperServiceImpl(new StringTransformerServiceImpl());
+		final FrontendHelperService fhs = new FrontendHelperServiceImpl(new StringTransformerServiceImpl(), null);
 		
 		assertEquals("", fhs.buildPath(null, null, null, null));
 		assertEquals("test.html", fhs.buildPath(null, null, "test.html", null));
@@ -79,7 +79,7 @@ public class FrontendHelperServiceImplTest extends TestCase
 	 */
 	public void testParamEncode()
 		{
-		final FrontendHelperService fhs = new FrontendHelperServiceImpl(new StringTransformerServiceImpl());
+		final FrontendHelperService fhs = new FrontendHelperServiceImpl(new StringTransformerServiceImpl(), null);
 		
 		assertNull(fhs.paramEncode(null, true));
 		assertEquals("&amp;params%5B0%5D=", fhs.paramEncode("", true));
@@ -96,7 +96,7 @@ public class FrontendHelperServiceImplTest extends TestCase
 	 */
 	public void testGetLinkTitle()
 		{
-		final FrontendHelperService fhs = new FrontendHelperServiceImpl(new StringTransformerServiceImpl());
+		final FrontendHelperService fhs = new FrontendHelperServiceImpl(new StringTransformerServiceImpl(), null);
 		
 		assertEquals("\u2205", fhs.getLinkTitle(null));
 		assertEquals("\u2205", fhs.getLinkTitle(""));
@@ -114,7 +114,7 @@ public class FrontendHelperServiceImplTest extends TestCase
 	 */
 	public void testGetQueryTitle()
 		{
-		final FrontendHelperService fhs = new FrontendHelperServiceImpl(new StringTransformerServiceImpl());
+		final FrontendHelperService fhs = new FrontendHelperServiceImpl(new StringTransformerServiceImpl(), null);
 		
 		assertEquals("Müller", fhs.getQueryTitle("Müller", Collections.emptyList()));
 		assertEquals("Müller: Meier , Lüdenscheid", fhs.getQueryTitle("Müller", Arrays.asList("Meier ", "Lüdenscheid")));
@@ -125,7 +125,7 @@ public class FrontendHelperServiceImplTest extends TestCase
 	 */
 	public void testGetQueryParams()
 		{
-		final FrontendHelperService fhs = new FrontendHelperServiceImpl(new StringTransformerServiceImpl());
+		final FrontendHelperService fhs = new FrontendHelperServiceImpl(new StringTransformerServiceImpl(), null);
 		
 		assertEquals("", fhs.getQueryParams(Collections.emptyList(), true));
 		assertEquals("&amp;params%5B0%5D=Meier+&amp;params%5B1%5D=L%C3%BCdenscheid", fhs.getQueryParams(Arrays.asList("Meier ", "Lüdenscheid"), true));
@@ -138,7 +138,7 @@ public class FrontendHelperServiceImplTest extends TestCase
 	 */
 	public void testGetQueryParamsMap()
 		{
-		final FrontendHelperService fhs = new FrontendHelperServiceImpl(new StringTransformerServiceImpl());
+		final FrontendHelperService fhs = new FrontendHelperServiceImpl(new StringTransformerServiceImpl(), null);
 		
 		assertEquals("", fhs.getQueryParams(Collections.<Integer, Object>emptyMap(), true));
 		assertEquals("&amp;params%5B2%5D=L%C3%BCdenscheid", fhs.getQueryParams(Collections.<Integer, Object>singletonMap(2, "Lüdenscheid"), true));
@@ -149,7 +149,7 @@ public class FrontendHelperServiceImplTest extends TestCase
 	 */
 	public void testGetMenuRows()
 		{
-		final FrontendHelperService fhs = new FrontendHelperServiceImpl(new StringTransformerServiceImpl());
+		final FrontendHelperService fhs = new FrontendHelperServiceImpl(new StringTransformerServiceImpl(), null);
 		
 		final Rational r = new Rational(4, 3);
 		
@@ -171,7 +171,7 @@ public class FrontendHelperServiceImplTest extends TestCase
 	 */
 	public void testBasename()
 		{
-		final FrontendHelperService fhs = new FrontendHelperServiceImpl(new StringTransformerServiceImpl());
+		final FrontendHelperService fhs = new FrontendHelperServiceImpl(new StringTransformerServiceImpl(), null);
 		
 		assertEquals("", fhs.basename(null));
 		assertEquals("", fhs.basename(""));
@@ -187,7 +187,7 @@ public class FrontendHelperServiceImplTest extends TestCase
 	 */
 	public void testDirname()
 		{
-		final FrontendHelperService fhs = new FrontendHelperServiceImpl(new StringTransformerServiceImpl());
+		final FrontendHelperService fhs = new FrontendHelperServiceImpl(new StringTransformerServiceImpl(), null);
 		
 		assertEquals("", fhs.dirname(null));
 		assertEquals("", fhs.dirname(""));
@@ -203,7 +203,7 @@ public class FrontendHelperServiceImplTest extends TestCase
 	 */
 	public void testFilename()
 		{
-		final FrontendHelperService fhs = new FrontendHelperServiceImpl(new StringTransformerServiceImpl());
+		final FrontendHelperService fhs = new FrontendHelperServiceImpl(new StringTransformerServiceImpl(), null);
 		
 		assertEquals("", fhs.filename(null, null));
 		assertEquals("", fhs.filename("", null));

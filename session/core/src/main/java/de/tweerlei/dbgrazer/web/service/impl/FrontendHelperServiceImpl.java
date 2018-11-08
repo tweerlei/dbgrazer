@@ -34,6 +34,7 @@ import de.tweerlei.common.util.StringUtils;
 import de.tweerlei.dbgrazer.query.model.ParameterDef;
 import de.tweerlei.dbgrazer.query.model.Query;
 import de.tweerlei.dbgrazer.web.model.PathInfo;
+import de.tweerlei.dbgrazer.web.service.DataFormatterFactory;
 import de.tweerlei.dbgrazer.web.service.FrontendHelperService;
 import de.tweerlei.spring.service.StringTransformerService;
 
@@ -57,15 +58,18 @@ public class FrontendHelperServiceImpl implements FrontendHelperService
 	private static final double MENU_ASPECT = 100.0 / 10.0;
 	
 	private final StringTransformerService stringTransformerService;
+	private final DataFormatterFactory factory;
 	
 	/**
 	 * Constructor
 	 * @param stringTransformerService StringTransformerService
+	 * @param factory DataFormatterFactory
 	 */
 	@Autowired
-	public FrontendHelperServiceImpl(StringTransformerService stringTransformerService)
+	public FrontendHelperServiceImpl(StringTransformerService stringTransformerService, DataFormatterFactory factory)
 		{
 		this.stringTransformerService = stringTransformerService;
+		this.factory = factory;
 		}
 	
 	@Override
@@ -227,7 +231,10 @@ public class FrontendHelperServiceImpl implements FrontendHelperService
 	public String getQueryTitle(String queryName, Collection<?> params)
 		{
 		final StringBuilder title = new StringBuilder();
-		title.append(queryName);
+		if (queryName.startsWith("$"))
+			title.append(factory.getMessage(queryName.substring(1)));
+		else
+			title.append(queryName);
 		if (!params.isEmpty())
 			{
 			title.append(": ");

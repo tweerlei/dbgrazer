@@ -45,6 +45,7 @@ import de.tweerlei.dbgrazer.web.constant.CacheClass;
 import de.tweerlei.dbgrazer.web.constant.MessageKeys;
 import de.tweerlei.dbgrazer.web.constant.ViewConstants;
 import de.tweerlei.dbgrazer.web.exception.AccessDeniedException;
+import de.tweerlei.dbgrazer.web.exception.RedirectException;
 import de.tweerlei.dbgrazer.web.extension.ExtensionGroup;
 import de.tweerlei.dbgrazer.web.extension.ExtensionLink;
 import de.tweerlei.dbgrazer.web.model.QueryHistoryEntry;
@@ -137,13 +138,18 @@ public class QueryController
 	 * @param term Optional search term
 	 * @param group Selected group
 	 * @return Model
+	 * @throws RedirectException if a welcome query is defined
 	 */
 	@RequestMapping(value = "/db/*/index.html", method = RequestMethod.GET)
 	public Map<String, Object> showIndexPage(
 			@RequestParam(value = "q", required = false) String term,
 			@RequestParam(value = "group", required = false) String group
-			)
+			) throws RedirectException
 		{
+		final Query welcome = queryService.findQueryByName(connectionSettings.getLinkName(), MessageKeys.WELCOME_TAB);
+		if (welcome != null)
+			throw new RedirectException("result.html?q=" + MessageKeys.WELCOME_TAB);
+		
 		final Map<String, Object> model = new HashMap<String, Object>();
 		
 		final Map<String, TabItem<QueryGroup>> groups = new LinkedHashMap<String, TabItem<QueryGroup>>();

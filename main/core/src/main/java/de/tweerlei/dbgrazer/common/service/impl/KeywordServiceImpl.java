@@ -38,7 +38,7 @@ public class KeywordServiceImpl implements KeywordService
 	// Disallow URL special characters: :/?&%#=
 	// Disallow SVN special characters: @
 	// Disallow SPLIT_DELIM
-	private static final Pattern ILLEGAL_NAME_CHARS = Pattern.compile("[^-+._() \\p{javaLetterOrDigit}]+");
+	private static final Pattern ILLEGAL_NAME_CHARS = Pattern.compile("[^-+._()$ \\p{javaLetterOrDigit}]+");
 	
 	// Names for parameters (and their values):
 	// Allow (unicode) letters, digits and certain special characters.
