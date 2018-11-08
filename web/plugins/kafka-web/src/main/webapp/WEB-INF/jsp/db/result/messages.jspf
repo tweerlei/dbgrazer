@@ -44,6 +44,7 @@
 			<thead>
 				<tr>
 					<th class="table-sortable table-sortable:numeric"><fmt:message key="id"/></th>
+					<th class="table-sortable table-sortable:numeric"><fmt:message key="kafkaPartitionNo"/></th>
 					<th class="table-sortable table-sortable:ignorecase"><fmt:message key="timestamp"/></th>
 					<th class="table-sortable table-sortable:numeric"><fmt:message key="size"/></th>
 					<th class="table-sortable table-sortable:ignorecase"><fmt:message key="key"/></th>
@@ -53,6 +54,7 @@
 <c:forEach items="${rs}" var="row"
 >				<tr>
 					<td><a href="db/${currentConnection.linkName}/message.html?topic=${topic}&amp;partition=${row.partition}&amp;offset=${row.offset}"<c:if test="${not empty targetElement}"> onclick="return showMessage(event, '${topic}', '${row.partition}', '${row.offset}');"</c:if>>${row.offset}</a></td>
+					<td>${row.partition}</td>
 					<td><fmt:formatDate value="${row.timestamp}" pattern="yyyy-MM-dd HH:mm:ss" /></td>
 					<td>${row.valueSize}</td>
 					<td>${fn:escapeXml(row.key)}</td>

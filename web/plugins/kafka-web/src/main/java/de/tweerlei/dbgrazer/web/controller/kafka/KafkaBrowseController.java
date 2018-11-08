@@ -268,7 +268,12 @@ public class KafkaBrowseController
 		@Override
 		public int compareTo(ConsumerRecordBean o)
 			{
-			return ((int) (o.offset - offset));
+			final int d = (int) (o.offset - offset);
+			
+			if (d == 0)
+				return (o.partition - partition);
+			else
+				return (d);
 			}
 		}
 	
