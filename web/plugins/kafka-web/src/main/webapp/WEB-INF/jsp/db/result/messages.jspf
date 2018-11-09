@@ -54,8 +54,12 @@
 <c:forEach items="${rs}" var="row"
 >				<tr>
 					<td><a href="db/${currentConnection.linkName}/message.html?topic=${topic}&amp;partition=${row.partition}&amp;offset=${row.offset}"<c:if test="${not empty targetElement}"> onclick="return showMessage(event, '${topic}', '${row.partition}', '${row.offset}');"</c:if>>${row.offset}</a></td>
-					<td>${row.partition}</td>
-					<td><fmt:formatDate value="${row.timestamp}" pattern="yyyy-MM-dd HH:mm:ss" /></td>
+<c:choose><c:when test="${row.partition == partition}"
+>					<td>${row.partition}</td>
+</c:when><c:otherwise
+>					<td><a href="db/${currentConnection.linkName}/messages.html?topic=${topic}&amp;partition=${row.partition}">${row.partition}</a></td>
+</c:otherwise></c:choose
+>					<td><fmt:formatDate value="${row.timestamp}" pattern="yyyy-MM-dd HH:mm:ss" /></td>
 					<td>${row.valueSize}</td>
 					<td>${fn:escapeXml(row.key)}</td>
 				</tr>
