@@ -18,6 +18,7 @@ package de.tweerlei.dbgrazer.web.controller.kafka;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -68,12 +69,14 @@ public class KafkaSendController
 	 * Show the send dialog
 	 * @param topic Topic name
 	 * @param partition Partition number
+	 * @param offset Message to copy from
 	 * @return Model
 	 */
 	@RequestMapping(value = "/db/*/ajax/send-message.html", method = RequestMethod.GET)
 	public Map<String, Object> showSendDialog(
 			@RequestParam(value = "topic", required = false) String topic,
-			@RequestParam(value = "partition", required = false) Integer partition
+			@RequestParam(value = "partition", required = false) Integer partition,
+			@RequestParam(value = "offset", required = false) Long offset
 			)
 		{
 		if (!connectionSettings.isBrowserEnabled() || !connectionSettings.isWritable())
@@ -84,8 +87,20 @@ public class KafkaSendController
 		model.put("topic", topic);
 		model.put("partition", partition);
 		
-		model.put("key", connectionSettings.getCustomQuery().getAttributes().get(ATTR_KEY));
-		model.put("message", connectionSettings.getCustomQuery().getQuery());
+		if ((topic != null) && (partition != null) && (offset != null))
+			{
+			final ConsumerRecord<String, String> record = kafkaClientService.fetchRecord(connectionSettings.getLinkName(), topic, partition, offset);
+			if (record != null)
+				{
+				model.put("key", record.key());
+				model.put("message", record.value());
+				}
+			}
+		else
+			{
+			model.put("key", connectionSettings.getCustomQuery().getAttributes().get(ATTR_KEY));
+			model.put("message", connectionSettings.getCustomQuery().getQuery());
+			}
 		
 		return (model);
 		}

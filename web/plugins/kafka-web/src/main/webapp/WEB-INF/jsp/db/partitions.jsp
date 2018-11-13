@@ -20,7 +20,7 @@
 </c:if
 >	<div class="h1-actions">
 		<span class="action" title="<fmt:message key="refresh"/>" onclick="return reloadPage();"><fmt:message key="refreshIcon"/></span>
-		<a class="action" title="<fmt:message key="newWindow"/>" href="db/${currentConnection.linkName}/files.html" target="_blank"><fmt:message key="newWindowIcon"/></a>
+		<a class="action" title="<fmt:message key="newWindow"/>" href="db/${currentConnection.linkName}/partitions.html?topic=${topic}" target="_blank"><fmt:message key="newWindowIcon"/></a>
 	</div>
 	
 <c:if test="${currentConnection.writable}"

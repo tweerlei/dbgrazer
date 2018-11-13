@@ -16,10 +16,21 @@
 	include file="../../include/include.jspf"
 %><c:set var="targetElement" value="explorer-right"
 /><ui:headline2 label="${topic}" zoomable="true">
-		<div class="h2-actions">
+<c:if test="${currentConnection.writable}"
+>		<div class="h2-actions">
+			<span class="menu" onclick="return showElementMenu(event, 'tools-2');"><fmt:message key="actions"/></span>
+		</div>
+</c:if
+>		<div class="h2-actions">
 			<a class="action" title="<fmt:message key="showQuery"/>" href="db/${currentConnection.linkName}/message.html?topic=${topic}&amp;partition=${partition}&amp;offset=${offset}"><fmt:message key="showQueryIcon"/></a>
 		</div>
-	</ui:headline2>
+		
+<c:if test="${currentConnection.writable}"
+>		<div id="tools-2" class="hidden"><div class="menucolumn">
+			<div class="menuitem"><span onclick="return showDbDialog(event, 'send-message', { topic: '${topic}', partition: '${partition}', offset: '${offset}' }, '<fmt:message key="copy"/>');"><fmt:message key="copy"/></span></div>
+		</div></div>
+</c:if
+>	</ui:headline2>
 	
 	<ui:tabs items="${tabs}" var="rs" varKey="label" varLink="detailLink" varParams="detailParams" varParamString="detailParamString" name="result"><%@
 		include file="../result/message.jspf"
