@@ -268,12 +268,15 @@ public class KafkaBrowseController
 		@Override
 		public int compareTo(ConsumerRecordBean o)
 			{
-			final int d = (int) (o.offset - offset);
-			
-			if (d == 0)
-				return (o.partition - partition);
-			else
+			final int d = o.timestamp.compareTo(timestamp);
+			if (d != 0)
 				return (d);
+			
+			final int d2 = (int) (o.offset - offset);
+			if (d2 != 0)
+				return (d2);
+			
+			return (o.partition - partition);
 			}
 		}
 	
@@ -425,7 +428,7 @@ public class KafkaBrowseController
 		final RowSet cats = buildRowSet(query, partitions);
 		
 		final Map<String, TabItem<RowSet>> tabs = new LinkedHashMap<String, TabItem<RowSet>>();
-		tabs.put(KafkaMessageKeys.PARTITIONS_TAB, new TabItem<RowSet>(cats, cats.getRows().size()));
+		tabs.put(KafkaMessageKeys.PARTITIONS_TAB, new TabItem<RowSet>(cats, cats.getRows().size() - 1));
 		model.put("query", query);
 		model.put("tabs", tabs);
 		model.put("params", querySettingsManager.buildParameterMap(Arrays.asList(topic)));
