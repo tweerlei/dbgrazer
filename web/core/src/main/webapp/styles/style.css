@@ -803,6 +803,11 @@ img.unscaled {
 	margin-bottom: 0.5em;
 }
 
+.notice {
+	padding: 0.5em;
+	margin-bottom: 0.5em;
+}
+
 .message {
 	white-space: pre-line;
 }

@@ -109,7 +109,7 @@ function submitDMLError(txt) {
 	var fld = $('dmlerror');
 	if (fld) {
 		if (txt) {
-			fld.innerHTML = '<p class="error">' + txt + '</p>';
+			fld.innerHTML = '<div class="error">' + txt + '</div>';
 		} else {
 			fld.innerHTML = '';
 		}
@@ -120,7 +120,7 @@ function submitDMLSuccess(txt) {
 	var fld = $('submitresult');
 	if (fld) {
 		if (txt) {
-			fld.innerHTML = '<p class="notice">' + txt + '</p>';
+			fld.innerHTML = '<div id="error-1000" class="notice"><span class="action" onclick="return hideError(\'1000\');">✖</span> ' + txt + '</div>';
 		} else {
 			fld.innerHTML = '';
 		}
