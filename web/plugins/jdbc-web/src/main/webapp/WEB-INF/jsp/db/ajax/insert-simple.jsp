@@ -21,7 +21,7 @@
 	<spring:hidden path="backTo"/>
 	<div id="dmlerror"></div>
 	<dl>
-<ui:params items="${parameters}" fkTables="${fkTables}" path="params"
+<ui:params items="${parameters}" fkTables="${fkTables}" path="params" nulls="${model.nulls}" nullPath="nulls"
 />		<dt>&nbsp;</dt>
 		<dd><input id="f1-submit" type="submit" value="<fmt:message key="insertRow"/>"/> <input id="f1-reset" type="reset" value="<fmt:message key="cancel"/>"/></dd>
 	</dl><hr/>

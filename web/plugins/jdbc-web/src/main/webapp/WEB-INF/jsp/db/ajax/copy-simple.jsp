@@ -21,7 +21,7 @@
 	<spring:hidden path="backTo"/>
 	<div id="dmlerror"><c:if test="${not empty exceptionText}"><p class="error">${fn:escapeXml(exceptionText)}</p></c:if></div>
 	<dl>
-<ui:params items="${parameters}" fkTables="${fkTables}" path="params"
+<ui:params items="${parameters}" fkTables="${fkTables}" path="params" nulls="${model.nulls}" nullPath="nulls"
 />		<dt>&nbsp;</dt>
 		<dd><input id="f1-submit" type="submit" value="<fmt:message key="copyRow"/>"/> <input id="f1-reset" type="reset" value="<fmt:message key="cancel"/>"/></dd>
 	</dl><hr/>

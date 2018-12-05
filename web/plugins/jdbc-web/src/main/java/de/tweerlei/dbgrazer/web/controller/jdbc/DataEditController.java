@@ -70,6 +70,7 @@ public class DataEditController
 		private String backTo;
 		private final Map<Integer, String> ids;
 		private final Map<Integer, String> params;
+		private final Map<Integer, Boolean> nulls;
 		
 		/**
 		 * Constructor
@@ -78,6 +79,7 @@ public class DataEditController
 			{
 			this.ids = new TreeMap<Integer, String>();
 			this.params = new TreeMap<Integer, String>();
+			this.nulls = new TreeMap<Integer, Boolean>();
 			}
 		
 		/**
@@ -87,6 +89,15 @@ public class DataEditController
 		public Map<Integer, String> getParams()
 			{
 			return params;
+			}
+
+		/**
+		 * Get the settings
+		 * @return the settings
+		 */
+		public Map<Integer, Boolean> getNulls()
+			{
+			return nulls;
 			}
 
 		/**
@@ -226,7 +237,7 @@ public class DataEditController
 		final QualifiedName qname = new QualifiedName(fbo.getCatalog(), fbo.getSchema(), fbo.getObject());
 		final TableDescription info = metadataService.getTableInfo(connectionSettings.getLinkName(), qname, ColumnMode.ALL);
 		
-		final DataFormatter fmt = factory.getWebFormatter();
+		final DataFormatter fmt = factory.getExportFormatter();
 		
 		final Query src = queryService.findQueryByName(connectionSettings.getLinkName(), fbo.getBackTo());
 		final Query query;
@@ -237,6 +248,8 @@ public class DataEditController
 		
 		model.put("parameters", query.getParameters());
 		model.put("fkTables", extractFkTables(query));
+		for (int i = 0, n = query.getParameters().size(); i < n; i++)
+			fbo.getNulls().put(i, true);
 		
 		return (model);
 		}
@@ -256,10 +269,16 @@ public class DataEditController
 		
 		final Map<String, Object> model = new HashMap<String, Object>();
 		
+		for (Map.Entry<Integer, String> ent : fbo.getParams().entrySet())
+			{
+			if (fbo.getNulls().get(ent.getKey()) != Boolean.TRUE)
+				ent.setValue(null);
+			}
+		
 		final QualifiedName qname = new QualifiedName(fbo.getCatalog(), fbo.getSchema(), fbo.getObject());
 		final TableDescription t = metadataService.getTableInfo(connectionSettings.getLinkName(), qname, ColumnMode.ALL);
 		
-		final DataFormatter fmt = factory.getWebFormatter();
+		final DataFormatter fmt = factory.getExportFormatter();
 		
 		final Query src = queryService.findQueryByName(connectionSettings.getLinkName(), fbo.getBackTo());
 		final Query q;
@@ -299,7 +318,7 @@ public class DataEditController
 		final QualifiedName qname = new QualifiedName(fbo.getCatalog(), fbo.getSchema(), fbo.getObject());
 		final TableDescription info = metadataService.getTableInfo(connectionSettings.getLinkName(), qname, ColumnMode.ALL);
 		
-		final DataFormatter fmt = factory.getWebFormatter();
+		final DataFormatter fmt = factory.getExportFormatter();
 		
 		try	{
 			final Query sel = queryGeneratorService.createSelectQuery(info, getSQLDialect(), fmt);
@@ -318,6 +337,7 @@ public class DataEditController
 						fbo.getParams().put(i, String.valueOf(o));
 					else
 						fbo.getParams().put(i, fmt.format(type, o));
+					fbo.getNulls().put(i, o != null);
 					i++;
 					}
 				}
@@ -331,6 +351,11 @@ public class DataEditController
 		
 		model.put("parameters", query.getParameters());
 		model.put("fkTables", extractFkTables(query));
+		for (int i = 0, n = query.getParameters().size(); i < n; i++)
+			{
+			if (!fbo.getNulls().containsKey(i))
+				fbo.getNulls().put(i, fbo.getParams().get(i) != null);
+			}
 		
 		return (model);
 		}
@@ -350,10 +375,16 @@ public class DataEditController
 		
 		final Map<String, Object> model = new HashMap<String, Object>();
 		
+		for (Map.Entry<Integer, String> ent : fbo.getParams().entrySet())
+			{
+			if (fbo.getNulls().get(ent.getKey()) != Boolean.TRUE)
+				ent.setValue(null);
+			}
+		
 		final QualifiedName qname = new QualifiedName(fbo.getCatalog(), fbo.getSchema(), fbo.getObject());
 		final TableDescription t = metadataService.getTableInfo(connectionSettings.getLinkName(), qname, ColumnMode.ALL);
 		
-		final DataFormatter fmt = factory.getWebFormatter();
+		final DataFormatter fmt = factory.getExportFormatter();
 		
 		final Query q = queryGeneratorService.createUpdateQuery(t, getSQLDialect(), fmt, true);
 		
@@ -395,7 +426,7 @@ public class DataEditController
 		final QualifiedName qname = new QualifiedName(fbo.getCatalog(), fbo.getSchema(), fbo.getObject());
 		final TableDescription info = metadataService.getTableInfo(connectionSettings.getLinkName(), qname, ColumnMode.ALL);
 		
-		final DataFormatter fmt = factory.getWebFormatter();
+		final DataFormatter fmt = factory.getExportFormatter();
 		
 		final Query src = queryService.findQueryByName(connectionSettings.getLinkName(), fbo.getBackTo());
 		final Query query;
@@ -435,6 +466,7 @@ public class DataEditController
 							// Copy the PK values from the FBO
 							final String keyValue = fbo.getIds().get(k);
 							fbo.getParams().put(j, StringUtils.notNull(keyValue));
+							fbo.getNulls().put(j, Boolean.TRUE);
 							j++;
 							k++;
 							}
@@ -447,6 +479,7 @@ public class DataEditController
 							fbo.getParams().put(j, String.valueOf(o));
 						else
 							fbo.getParams().put(j, fmt.format(type, o));
+						fbo.getNulls().put(j, o != null);
 						i++;
 						j++;
 						}
@@ -460,6 +493,11 @@ public class DataEditController
 		
 		model.put("parameters", query.getParameters());
 		model.put("fkTables", extractFkTables(query));
+		for (int i = 0, n = query.getParameters().size(); i < n; i++)
+			{
+			if (!fbo.getNulls().containsKey(i))
+				fbo.getNulls().put(i, fbo.getParams().get(i) != null);
+			}
 		
 		return (model);
 		}
@@ -482,7 +520,7 @@ public class DataEditController
 		final QualifiedName qname = new QualifiedName(fbo.getCatalog(), fbo.getSchema(), fbo.getObject());
 		final TableDescription info = metadataService.getTableInfo(connectionSettings.getLinkName(), qname, ColumnMode.ALL);
 		
-		final DataFormatter fmt = factory.getWebFormatter();
+		final DataFormatter fmt = factory.getExportFormatter();
 		
 		final Query query = queryGeneratorService.createDeleteQuery(info, getSQLDialect(), fmt);
 		
@@ -509,7 +547,7 @@ public class DataEditController
 		final QualifiedName qname = new QualifiedName(fbo.getCatalog(), fbo.getSchema(), fbo.getObject());
 		final TableDescription t = metadataService.getTableInfo(connectionSettings.getLinkName(), qname, ColumnMode.ALL);
 		
-		final DataFormatter fmt = factory.getWebFormatter();
+		final DataFormatter fmt = factory.getExportFormatter();
 		
 		final Query q = queryGeneratorService.createDeleteQuery(t, getSQLDialect(), fmt);
 		
