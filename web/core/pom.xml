@@ -265,6 +265,35 @@
 			</dependencies>
 		</profile>
 		<profile>
+			<id>ldap</id>
+			<dependencies>
+				<dependency>
+					<groupId>de.tweerlei</groupId>
+					<artifactId>dbgrazer-plugin-ldap</artifactId>
+					<version>${project.version}</version>
+					<scope>runtime</scope>
+				</dependency>
+				<dependency>
+					<groupId>de.tweerlei</groupId>
+					<artifactId>dbgrazer-web-ldap</artifactId>
+					<version>${project.version}</version>
+					<type>war</type>
+					<scope>runtime</scope>
+				</dependency>
+			</dependencies>
+		</profile>
+		<profile>
+			<id>ldif</id>
+			<dependencies>
+				<dependency>
+					<groupId>de.tweerlei</groupId>
+					<artifactId>dbgrazer-session-ldif</artifactId>
+					<version>${project.version}</version>
+					<scope>runtime</scope>
+				</dependency>
+			</dependencies>
+		</profile>
+		<profile>
 			<id>linkedit</id>
 			<dependencies>
 				<dependency>

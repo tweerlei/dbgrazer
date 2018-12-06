@@ -23,6 +23,7 @@
 		<module>json</module>
 		<module>kafka</module>
 		<module>lang</module>
+		<module>ldap</module>
 		<module>spring</module>
 		<module>sql</module>
 		<module>web</module>

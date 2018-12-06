@@ -22,6 +22,7 @@
 		<module>http-web</module>
 		<module>jdbc-web</module>
 		<module>kafka-web</module>
+		<module>ldap-web</module>
 		<module>linkedit-web</module>
 		<module>tnsnames-web</module>
 		<module>useredit-web</module>

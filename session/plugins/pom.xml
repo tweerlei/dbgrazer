@@ -20,5 +20,6 @@
 		<module>dbunit</module>
 		<module>dml</module>
 		<module>js</module>
+		<module>ldif</module>
 	</modules>
 </project>

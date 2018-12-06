@@ -24,6 +24,7 @@
 		<module>jdbc</module>
 		<module>json</module>
 		<module>kafka</module>
+		<module>ldap</module>
 		<module>sql</module>
 		<module>wiki</module>
 		<module>xml</module>
