@@ -65,6 +65,8 @@ public class LdapQueryRunner extends BaseQueryRunner
 	{
 	private static final String DN_ATTRIBUTE = "dn";
 	private static final String RDN_ATTRIBUTE = "rdn";
+	private static final String RDN_NAME_ATTRIBUTE = "rdn.name";
+	private static final String RDN_PARENT_ATTRIBUTE = "rdn.parent";
 	
 	private static abstract class RowSetMapper implements ContextMapper
 		{
@@ -167,9 +169,11 @@ public class LdapQueryRunner extends BaseQueryRunner
 				{
 				if (attrIds == null)
 					{
-					columns = new ArrayList<ColumnDef>(attributes.size() + 2);
+					columns = new ArrayList<ColumnDef>(attributes.size() + 4);
 					columns.add(new ColumnDefImpl(DN_ATTRIBUTE, ColumnType.STRING, null, getQuery().getTargetQueries().get(0), null, null));
 					columns.add(new ColumnDefImpl(RDN_ATTRIBUTE, ColumnType.STRING, null, getQuery().getTargetQueries().get(1), null, null));
+					columns.add(new ColumnDefImpl(RDN_NAME_ATTRIBUTE, ColumnType.STRING, null, getQuery().getTargetQueries().get(2), null, null));
+					columns.add(new ColumnDefImpl(RDN_PARENT_ATTRIBUTE, ColumnType.STRING, null, getQuery().getTargetQueries().get(3), null, null));
 					final NamingEnumeration<? extends Attribute> all = attributes.getAll();
 					try	{
 						while (all.hasMore())
@@ -192,10 +196,17 @@ public class LdapQueryRunner extends BaseQueryRunner
 							columns.add(new ColumnDefImpl(DN_ATTRIBUTE, ColumnType.STRING, null, getQuery().getTargetQueries().get(columns.size()), null, null));
 						else if (RDN_ATTRIBUTE.equalsIgnoreCase(attrId))
 							columns.add(new ColumnDefImpl(RDN_ATTRIBUTE, ColumnType.STRING, null, getQuery().getTargetQueries().get(columns.size()), null, null));
+						else if (RDN_NAME_ATTRIBUTE.equalsIgnoreCase(attrId))
+							columns.add(new ColumnDefImpl(RDN_NAME_ATTRIBUTE, ColumnType.STRING, null, getQuery().getTargetQueries().get(columns.size()), null, null));
+						else if (RDN_PARENT_ATTRIBUTE.equalsIgnoreCase(attrId))
+							columns.add(new ColumnDefImpl(RDN_PARENT_ATTRIBUTE, ColumnType.STRING, null, getQuery().getTargetQueries().get(columns.size()), null, null));
 						else
 							{
 							final Attribute a = attributes.get(attrId);
-							columns.add(new ColumnDefImpl(attrId, ColumnType.forObject(a.get()), null, getQuery().getTargetQueries().get(columns.size()), null, null));
+							if (a == null)
+								columns.add(new ColumnDefImpl(attrId, ColumnType.STRING, null, getQuery().getTargetQueries().get(columns.size()), null, null));
+							else
+								columns.add(new ColumnDefImpl(attrId, ColumnType.forObject(a.get()), null, getQuery().getTargetQueries().get(columns.size()), null, null));
 							}
 						}
 					}
@@ -224,14 +235,23 @@ public class LdapQueryRunner extends BaseQueryRunner
 					}
 				else if (RDN_ATTRIBUTE.equals(c.getName()))
 					{
-					if (getBaseDN() != null)
-						{
-						final DistinguishedName rdn = new DistinguishedName(ctx.getDn());
-						rdn.prepend(getBaseDN());
-						row.getValues().add(rdn.toString());
-						}
+					row.getValues().add(getRdn(ctx).toString());
+					}
+				else if (RDN_NAME_ATTRIBUTE.equals(c.getName()))
+					{
+					final Name rdn = getRdn(ctx);
+					if (rdn.isEmpty())
+						row.getValues().add("");
 					else
-						row.getValues().add(ctx.getDn().toString());
+						row.getValues().add(rdn.getSuffix(rdn.size() - 1).toString());
+					}
+				else if (RDN_PARENT_ATTRIBUTE.equals(c.getName()))
+					{
+					final Name rdn = getRdn(ctx);
+					if (rdn.isEmpty())
+						row.getValues().add("");
+					else
+						row.getValues().add(rdn.getPrefix(rdn.size() - 1).toString());
 					}
 				else
 					{
@@ -263,6 +283,18 @@ public class LdapQueryRunner extends BaseQueryRunner
 			rows.add(row);
 			
 			return (null);
+			}
+		
+		private Name getRdn(DirContextOperations ctx)
+			{
+			if (getBaseDN() != null)
+				{
+				final DistinguishedName rdn = new DistinguishedName(ctx.getDn());
+				rdn.prepend(getBaseDN());
+				return (rdn);
+				}
+			else
+				return (ctx.getDn());
 			}
 		}
 	
@@ -307,7 +339,10 @@ public class LdapQueryRunner extends BaseQueryRunner
 				{
 				columns = new ArrayList<ColumnDef>(1);
 				final Attribute a = attributes.get(attrId);
-				columns.add(new ColumnDefImpl(attrId, ColumnType.forObject(a.get()), null, getQuery().getTargetQueries().get(columns.size()), null, null));
+				if (a == null)
+					columns.add(new ColumnDefImpl(attrId, ColumnType.STRING, null, getQuery().getTargetQueries().get(columns.size()), null, null));
+				else
+					columns.add(new ColumnDefImpl(attrId, ColumnType.forObject(a.get()), null, getQuery().getTargetQueries().get(columns.size()), null, null));
 				}
 			
 			for (ColumnDef c : columns)

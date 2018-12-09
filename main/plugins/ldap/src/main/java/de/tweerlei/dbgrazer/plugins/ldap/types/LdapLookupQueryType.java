@@ -20,7 +20,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
 import de.tweerlei.dbgrazer.plugins.ldap.impl.LdapLinkType;
-import de.tweerlei.dbgrazer.query.model.impl.AbstractKeyValueQueryType;
+import de.tweerlei.dbgrazer.query.model.impl.AbstractRowQueryType;
 
 /**
  * Lookup an LDAP entry
@@ -29,7 +29,7 @@ import de.tweerlei.dbgrazer.query.model.impl.AbstractKeyValueQueryType;
  */
 @Service
 @Order(400)
-public class LdapLookupQueryType extends AbstractKeyValueQueryType
+public class LdapLookupQueryType extends AbstractRowQueryType
 	{
 	private static final String NAME = "LDAP_LOOKUP";
 	
