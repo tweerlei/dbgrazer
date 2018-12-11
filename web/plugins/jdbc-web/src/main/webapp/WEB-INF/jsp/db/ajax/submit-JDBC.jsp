@@ -58,12 +58,12 @@
 </c:forEach
 >	/*]]>*/</style>
 		<div class="tab-header">
-			<div id="sql" class="hidden"><pre>${fn:escapeXml(sql)}</pre></div>
 			<ui:filter id="filter-table-result0" target="table-result0" form="true"/>
+<%--			<div id="sql" class="hidden"><pre>${fn:escapeXml(sql)}</pre></div>
 			<div class="filter">
 				<span class="button" onclick="return showElementDialog(event, '<fmt:message key="columnTypes"/>', 'sql');"><fmt:message key="showColumnTypes"/></span>
 			</div>
-			<div class="filter">
+--%>			<div class="filter">
 				<span class="nowrap"><fmt:message key="rowCount"><fmt:param value="${rs.affectedRows}"/></fmt:message></span>
 			</div>
 			<div class="filter">
