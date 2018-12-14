@@ -89,7 +89,7 @@ public interface Visualizer extends Named
 	 * Check whether this ResultVisualizer supports the writeSourceTo() method
 	 * @return true if source text is available
 	 */
-	public boolean hasSourceText();
+	public boolean supportsSourceText();
 	
 	/**
 	 * Get the MIME type of images created by the writeSourceTextTo method
@@ -110,6 +110,19 @@ public interface Visualizer extends Named
 	 * @throws IOException on error
 	 */
 	public void writeSourceTextTo(Visualization obj, OutputStream stream) throws IOException;
+	
+	/**
+	 * Check whether this ResultVisualizer supports the getSourceSVG() method
+	 * @return true if source text is available
+	 */
+	public boolean supportsSourceSVG();
+	
+	/**
+	 * Render the image as SVG
+	 * @param obj Opaque container returned from build()
+	 * @return SVG source
+	 */
+	public String getSourceSVG(Visualization obj);
 	
 	/**
 	 * Get the HTML map source code

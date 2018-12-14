@@ -631,7 +631,7 @@ public class ChartResultVisualizer extends NamedBase implements Visualizer
 		}
 	
 	@Override
-	public boolean hasSourceText()
+	public boolean supportsSourceText()
 		{
 		return (false);
 		}
@@ -650,6 +650,18 @@ public class ChartResultVisualizer extends NamedBase implements Visualizer
 	
 	@Override
 	public void writeSourceTextTo(Visualization obj, OutputStream stream) throws IOException
+		{
+		throw new UnsupportedOperationException();
+		}
+	
+	@Override
+	public boolean supportsSourceSVG()
+		{
+		return (false);
+		}
+	
+	@Override
+	public String getSourceSVG(Visualization obj)
 		{
 		throw new UnsupportedOperationException();
 		}

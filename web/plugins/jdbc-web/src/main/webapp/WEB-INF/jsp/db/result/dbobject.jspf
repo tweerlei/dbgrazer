@@ -228,9 +228,13 @@
 			<hr/>
 		</div>
 		<div class="tab-body">
-			${imagemap}
+<c:choose><c:when test="${not empty svg}"
+>			${svg}
+</c:when><c:otherwise
+>			${imagemap}
 			<img src="db/${currentConnection.linkName}/dbgraph.html?catalog=${catalog}&amp;schema=${schema}&amp;object=${object}&amp;depth=${depth}&amp;key=${imageId}&amp;t=${currentDate.time}" usemap="#${imagemapId}" style="max-width: 100%;" onclick="return toggleScaling(this);" alt="<fmt:message key="imageLoading"/>" onload="imageLoaded(event);" onerror="imageLoadingFailed(event);" title="${object}"/>
-		</div>
+</c:otherwise></c:choose
+>		</div>
 </c:when><%--
 ***********************************************************************
 *

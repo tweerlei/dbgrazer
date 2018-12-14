@@ -353,41 +353,47 @@ public class SchemaTransformerServiceImpl implements SchemaTransformerService
 			
 			label.append("<td align=\"left\" port=\"").append(c.getName()).append(IN_PORT_SUFFIX).append("\"");
 			if (partOfPK)
-				label.append("><font face=\"").append(graphStyle.getBoldFont()).append("\">");
+				label.append("><font face=\"").append(graphStyle.getNormalFont()).append("\"><b>");
 			else if (c.isNullable())
-				label.append("><font face=\"").append(graphStyle.getItalicFont()).append("\">");
+				label.append("><font face=\"").append(graphStyle.getNormalFont()).append("\"><i>");
 			else
 				label.append(">");
 			label.append(c.getName());
-			if (partOfPK || c.isNullable())
-				label.append("</font>");
+			if (partOfPK)
+				label.append("</b></font>");
+			else if (c.isNullable())
+				label.append("</i></font>");
 			label.append("</td>");
 			
 			label.append("<td align=\"left\"");
 			if (partOfPK)
-				label.append("><font face=\"").append(graphStyle.getBoldFont()).append("\">");
+				label.append("><font face=\"").append(graphStyle.getNormalFont()).append("\"><b>");
 			else if (c.isNullable())
-				label.append("><font face=\"").append(graphStyle.getItalicFont()).append("\">");
+				label.append("><font face=\"").append(graphStyle.getNormalFont()).append("\"><i>");
 			else
 				label.append(">");
 			if (StringUtils.empty(pkIndex))
 				label.append(" ");
 			else
 				label.append(pkIndex);
-			if (partOfPK || c.isNullable())
-				label.append("</font>");
+			if (partOfPK)
+				label.append("</b></font>");
+			else if (c.isNullable())
+				label.append("</i></font>");
 			label.append("</td>");
 			
 			label.append("<td align=\"left\" port=\"").append(c.getName()).append(OUT_PORT_SUFFIX).append("\"");
 			if (partOfPK)
-				label.append("><font face=\"").append(graphStyle.getBoldFont()).append("\">");
+				label.append("><font face=\"").append(graphStyle.getNormalFont()).append("\"><b>");
 			else if (c.isNullable())
-				label.append("><font face=\"").append(graphStyle.getItalicFont()).append("\">");
+				label.append("><font face=\"").append(graphStyle.getNormalFont()).append("\"><i>");
 			else
 				label.append(">");
 			label.append(dialect.dataTypeToString(c.getType()));
-			if (partOfPK || c.isNullable())
-				label.append("</font>");
+			if (partOfPK)
+				label.append("</b></font>");
+			else if (c.isNullable())
+				label.append("</i></font>");
 			label.append("</td>");
 			
 			label.append("</tr>");
@@ -427,7 +433,7 @@ public class SchemaTransformerServiceImpl implements SchemaTransformerService
 		if (link != null)
 			sb.append(" href=\"").append(link).append("\"");
 		sb.append(" tooltip=\"").append(plainName).append("\">");
-		sb.append("<tr><td align=\"left\" cellpadding=\"8\"><font face=\"").append(graphStyle.getBoldItalicFont()).append("\">").append(plainName).append("</font></td></tr>");
+		sb.append("<tr><td align=\"left\" cellpadding=\"8\"><font face=\"").append(graphStyle.getNormalFont()).append("\"><b><i>").append(plainName).append("</i></b></font></td></tr>");
 		sb.append("<tr><td cellpadding=\"4\"><table border=\"0\" cellborder=\"0\" cellspacing=\"0\" cellpadding=\"4\">");
 		}
 	

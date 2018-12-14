@@ -529,10 +529,15 @@ public class DesignController
 			final Visualization def = new TableDescriptionVisualizer(schemaTransformer, frontendHelper, infos, connectionSettings.getLinkName(), browserSettingsManager.isDesignerPreviewMode(), browserSettingsManager.isDesignerPreviewMode(), dialect).getVisualization();
 			resultCache.clearCachedObjects(CacheClass.SCHEMA_VISUALIZATION);
 			final String key = resultCache.addCachedObject(CacheClass.SCHEMA_VISUALIZATION, def);
-			
 			model.put(RowSetConstants.ATTR_IMAGE_ID, key);
-			model.put(RowSetConstants.ATTR_IMAGEMAP, visualizationService.getHtmlMap(def));
-			model.put(RowSetConstants.ATTR_IMAGEMAP_ID, ViewConstants.IMAGEMAP_ID);
+			
+			if (visualizationService.supportsSourceSVG(def))
+				model.put(RowSetConstants.ATTR_SVG, visualizationService.getSourceSVG(def));
+			else
+				{
+				model.put(RowSetConstants.ATTR_IMAGEMAP, visualizationService.getHtmlMap(def));
+				model.put(RowSetConstants.ATTR_IMAGEMAP_ID, ViewConstants.IMAGEMAP_ID);
+				}
 			}
 		
 		model.put("browserSettings", browserSettingsManager);

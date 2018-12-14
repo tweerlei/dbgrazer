@@ -124,6 +124,9 @@ public final class ConfigKeys
 	/** Selectable autorefresh intervals */
 	public static final ConfigKey<String> AUTOREFRESH_INTERVALS = ConfigKey.create(PACKAGE_NAME, "ui.autorefreshIntervals", String.class, "5,10,15,30,60");
 	
+	/** Render graphs as inline SVG (HTML5) */
+	public static final ConfigKey<Boolean> INLINE_SVG = ConfigKey.create(PACKAGE_NAME, "ui.inlineSVG", Boolean.class, Boolean.FALSE);
+	
 	
 	private ConfigKeys()
 		{

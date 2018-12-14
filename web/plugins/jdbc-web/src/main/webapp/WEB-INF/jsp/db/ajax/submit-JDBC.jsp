@@ -43,9 +43,13 @@
 			<hr/>
 		</div>
 		<div class="tab-body">
-			${imagemap}
+<c:choose><c:when test="${not empty svg}"
+>			${svg}
+</c:when><c:otherwise
+>			${imagemap}
 			<img src="db/${currentConnection.linkName}/submit-chart.html?key=${imageId}&amp;t=${currentDate.time}" usemap="#${imagemapId}" style="max-width: 100%;" onclick="return toggleScaling(this);" alt="<fmt:message key="imageLoading"/>" onload="imageLoaded(event);" onerror="imageLoadingFailed(event);"/>
-		</div>
+</c:otherwise></c:choose
+>		</div>
 </c:when><c:otherwise><style>/*<![CDATA[*/
 <c:forEach items="${tableColumns}" var="tc" varStatus="st1"><c:forEach items="${tc}" var="col" varStatus="st2"><c:choose
 ><c:when test="${col.type.name == 'INTEGER'}"

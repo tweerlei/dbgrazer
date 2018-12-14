@@ -21,7 +21,7 @@
 	<div class="h1-actions">
 		<span class="menu" onclick="return showElementMenu(event, 'tools-1');"><fmt:message key="actions"/></span>
 	</div>
-<c:if test="${not empty imagemapId}"
+<c:if test="${not empty imageId}"
 >	<div class="h1-actions">
 		<span class="menu" onclick="showDbMenu(event, 'designlinks');"><fmt:message key="download"/></span>
 	</div>
@@ -30,7 +30,7 @@
 	<div id="tools-1" class="hidden"><div class="menucolumn">
 		<div class="menuitem"><span onclick="return showDbDialog(event, 'design-add', null, '<fmt:message key="addObject"/>');"><fmt:message key="addObject"/></span></div>
 		<div class="menuitem"><span onclick="return showDbDialog(event, 'design-addall', null, '<fmt:message key="addObjects"/>');"><fmt:message key="addObjects"/></span></div>
-<c:if test="${not empty imagemapId}"
+<c:if test="${not empty imageId}"
 >		<div class="menuitem"><span onclick="return showDbDialog(event, 'design-save', { q: '${currentDesign.name}' }, '<fmt:message key="save"/>');"><fmt:message key="save"/></span></div>
 </c:if
 >		<div class="menuitem"><span onclick="return showDbDialog(event, 'design-load', { q: '${currentDesign.name}' }, '<fmt:message key="load"/>');"><fmt:message key="load"/></span></div>
@@ -43,7 +43,7 @@
 	</ui:headline1>
 	
 	<div class="tab-page">
-<c:choose><c:when test="${empty imagemapId}"
+<c:choose><c:when test="${empty imageId}"
 >		<div class="tab-body"><fmt:message key="noData"/></div>
 </c:when><c:otherwise
 >		<div class="tab-header">
@@ -69,9 +69,13 @@
 			<hr/>
 		</div>
 		<div class="tab-body">
-			${imagemap}
+<c:choose><c:when test="${not empty svg}"
+>			${svg}
+</c:when><c:otherwise
+>			${imagemap}
 			<img src="db/${currentConnection.linkName}/designgraph.html?key=${imageId}&amp;t=${currentDate.time}" usemap="#${imagemapId}" style="max-width: 100%;" onclick="return toggleScaling(this);" alt="<fmt:message key="imageLoading"/>" onload="imageLoaded(event);" onerror="imageLoadingFailed(event);"/>
-		</div>
+</c:otherwise></c:choose
+>		</div>
 </c:otherwise></c:choose
 >	</div>
 <%@

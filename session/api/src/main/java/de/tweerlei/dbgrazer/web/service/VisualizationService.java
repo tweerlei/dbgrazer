@@ -87,7 +87,7 @@ public interface VisualizationService
 	 * @param v Visualization
 	 * @return true if source text is available
 	 */
-	public boolean hasSourceText(Visualization v);
+	public boolean supportsSourceText(Visualization v);
 	
 	/**
 	 * Get the MIME type of images created by the writeSourceTextTo method
@@ -110,6 +110,20 @@ public interface VisualizationService
 	 * @throws IOException on error
 	 */
 	public void writeSourceTextTo(Visualization v, OutputStream stream) throws IOException;
+	
+	/**
+	 * Check whether this ResultVisualizer supports the getSourceSVG() method
+	 * @param v Visualization
+	 * @return true if source text is available
+	 */
+	public boolean supportsSourceSVG(Visualization v);
+	
+	/**
+	 * Render the image as SVG
+	 * @param v Visualization
+	 * @return SVG source
+	 */
+	public String getSourceSVG(Visualization v);
 	
 	/**
 	 * Get the HTML map source code

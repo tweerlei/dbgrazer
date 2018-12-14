@@ -511,7 +511,9 @@ public class QueryRunController
 						final String key = resultCache.addCachedObject(CacheClass.RESULT_VISUALIZATION, dotString);
 						rowSet.getAttributes().put(RowSetConstants.ATTR_IMAGE_ID, key);
 						
-						if (!r.getQuery().getType().getName().equals(VisualizationSettings.GRAPH_QUERY_TYPE) || (nodeLink != null))
+						if (visualizationService.supportsSourceSVG(dotString))
+							rowSet.getAttributes().put(RowSetConstants.ATTR_SVG, visualizationService.getSourceSVG(dotString));
+						else if (!r.getQuery().getType().getName().equals(VisualizationSettings.GRAPH_QUERY_TYPE) || (nodeLink != null))
 							{
 							final String map = visualizationService.getHtmlMap(dotString);
 							rowSet.getAttributes().put(RowSetConstants.ATTR_IMAGEMAP, map);
@@ -520,7 +522,7 @@ public class QueryRunController
 						
 						rowSet.getAttributes().put(RowSetConstants.ATTR_OPTION_CODE, dotString.getOptionCode());
 						rowSet.getAttributes().put(RowSetConstants.ATTR_OPTION_NAMES, visualizationService.getOptionNames(r.getQuery().getType().getName()));
-						rowSet.getAttributes().put(RowSetConstants.ATTR_SOURCE_TEXT, visualizationService.hasSourceText(dotString));
+						rowSet.getAttributes().put(RowSetConstants.ATTR_SOURCE_TEXT, visualizationService.supportsSourceText(dotString));
 						}
 					}
 				

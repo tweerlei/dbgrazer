@@ -485,14 +485,19 @@ public class SQLController
 							final String key = resultCache.addCachedObject(CacheClass.RESULT_VISUALIZATION, c);
 							model.put(RowSetConstants.ATTR_IMAGE_ID, key);
 							
-							// No link - no html map
-	//						final String map = visualizationService.getHtmlMap(c);
-	//						model.put(RowSetConstants.ATTR_IMAGEMAP, map);
-	//						model.put(RowSetConstants.ATTR_IMAGEMAP_ID, VisualizationSettings.IMAGEMAP_ID);
+							if (visualizationService.supportsSourceSVG(c))
+								model.put(RowSetConstants.ATTR_SVG, visualizationService.getSourceSVG(c));
+							else
+								{
+								// No link - no html map
+	//							final String map = visualizationService.getHtmlMap(c);
+	//							model.put(RowSetConstants.ATTR_IMAGEMAP, map);
+	//							model.put(RowSetConstants.ATTR_IMAGEMAP_ID, VisualizationSettings.IMAGEMAP_ID);
+								}
 							
 							model.put(RowSetConstants.ATTR_OPTION_CODE, c.getOptionCode());
 							model.put(RowSetConstants.ATTR_OPTION_NAMES, visualizationService.getOptionNames(r.getQuery().getType().getName()));
-							model.put(RowSetConstants.ATTR_SOURCE_TEXT, visualizationService.hasSourceText(c));
+							model.put(RowSetConstants.ATTR_SOURCE_TEXT, visualizationService.supportsSourceText(c));
 							}
 						}
 					}

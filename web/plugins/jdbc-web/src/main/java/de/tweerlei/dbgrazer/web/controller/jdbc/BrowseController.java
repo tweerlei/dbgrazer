@@ -641,13 +641,17 @@ public class BrowseController
 		final List<String> pkIndices = schemaTransformer.getKeyIndices(info);
 		
 		final Visualization def = new TableDescriptionVisualizer(schemaTransformer, frontendHelper, infos, qname, connectionSettings.getLinkName(), toplevel, dialect).getVisualization();
-		
 		resultCache.clearCachedObjects(CacheClass.SCHEMA_VISUALIZATION);
 		final String key = resultCache.addCachedObject(CacheClass.SCHEMA_VISUALIZATION, def);
-		
 		model.put(RowSetConstants.ATTR_IMAGE_ID, key);
-		model.put(RowSetConstants.ATTR_IMAGEMAP, visualizationService.getHtmlMap(def));
-		model.put(RowSetConstants.ATTR_IMAGEMAP_ID, ViewConstants.IMAGEMAP_ID);
+		
+		if (visualizationService.supportsSourceSVG(def))
+			model.put(RowSetConstants.ATTR_SVG, visualizationService.getSourceSVG(def));
+		else
+			{
+			model.put(RowSetConstants.ATTR_IMAGEMAP, visualizationService.getHtmlMap(def));
+			model.put(RowSetConstants.ATTR_IMAGEMAP_ID, ViewConstants.IMAGEMAP_ID);
+			}
 		
 		final Map<String, TabItem<Integer>> tabs = new LinkedHashMap<String, TabItem<Integer>>();
 		tabs.put(MessageKeys.GRAPH_TAB, new TabItem<Integer>(INDEX_GRAPH));

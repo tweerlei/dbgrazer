@@ -99,10 +99,15 @@ public class QueryGraphController
 					frontendHelper.buildPath(MessageKeys.PATH_DB, connectionSettings.getLinkName(), "querygraph.html", "q="));
 			resultCache.clearCachedObjects(CacheClass.SCHEMA_VISUALIZATION);
 			final String key = resultCache.addCachedObject(CacheClass.SCHEMA_VISUALIZATION, def);
-			
 			model.put(RowSetConstants.ATTR_IMAGE_ID, key);
-			model.put(RowSetConstants.ATTR_IMAGEMAP, visualizationService.getHtmlMap(def));
-			model.put(RowSetConstants.ATTR_IMAGEMAP_ID, ViewConstants.IMAGEMAP_ID);
+			
+			if (visualizationService.supportsSourceSVG(def))
+				model.put(RowSetConstants.ATTR_SVG, visualizationService.getSourceSVG(def));
+			else
+				{
+				model.put(RowSetConstants.ATTR_IMAGEMAP, visualizationService.getHtmlMap(def));
+				model.put(RowSetConstants.ATTR_IMAGEMAP_ID, ViewConstants.IMAGEMAP_ID);
+				}
 			
 			model.put("title", query);
 			}

@@ -44,6 +44,14 @@ public interface GraphService
 	public void createImage(GraphDefinition def, OutputStream dest) throws IOException;
 	
 	/**
+	 * Create an SVG image of a graph
+	 * @param def Graph definition
+	 * @return SVG source
+	 * @throws IOException on error
+	 */
+	public String createSVG(GraphDefinition def) throws IOException;
+	
+	/**
 	 * Get the DOT source for a graph
 	 * @param def Graph definition
 	 * @return DOT source

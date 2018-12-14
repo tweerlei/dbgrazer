@@ -244,7 +244,7 @@ public class GraphResultVisualizer extends NamedBase implements Visualizer
 		}
 	
 	@Override
-	public boolean hasSourceText()
+	public boolean supportsSourceText()
 		{
 		return (true);
 		}
@@ -274,6 +274,27 @@ public class GraphResultVisualizer extends NamedBase implements Visualizer
 		finally
 			{
 			osw.flush();
+			}
+		}
+	
+	@Override
+	public boolean supportsSourceSVG()
+		{
+		return (true);
+		}
+	
+	@Override
+	public String getSourceSVG(Visualization obj)
+		{
+		final GraphDefinition def = (GraphDefinition) obj.getDefinition();
+		
+		try	{
+			return (graphService.createSVG(def));
+			}
+		catch (IOException e)
+			{
+			logger.log(Level.WARNING, "createSVG for graph " + def.getName(), e);
+			return ("");
 			}
 		}
 	

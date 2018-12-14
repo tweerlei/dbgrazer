@@ -35,6 +35,7 @@ import de.tweerlei.dbgrazer.web.download.VisualizationSourceDownloadSource;
 import de.tweerlei.dbgrazer.web.formatter.DataFormatter;
 import de.tweerlei.dbgrazer.web.model.Visualization;
 import de.tweerlei.dbgrazer.web.service.VisualizationService;
+import de.tweerlei.spring.config.ConfigAccessor;
 import de.tweerlei.spring.web.view.DownloadSource;
 
 /**
@@ -46,16 +47,19 @@ import de.tweerlei.spring.web.view.DownloadSource;
 public class VisualizationServiceImpl implements VisualizationService
 	{
 	private final Logger logger;
+	private final ConfigAccessor configService;
 	private final Set<Visualizer> formats;
 	
 	/**
 	 * Constructor
+	 * @param configService ConfigAccessor
 	 * @param formats Known Visualizers
 	 */
 	@Autowired(required = false)
-	public VisualizationServiceImpl(List<Visualizer> formats)
+	public VisualizationServiceImpl(ConfigAccessor configService, List<Visualizer> formats)
 		{
 		this.logger = Logger.getLogger(getClass().getCanonicalName());
+		this.configService = configService;
 		this.formats = Collections.unmodifiableSet(new NamedSet<Visualizer>(formats));
 		
 		this.logger.log(Level.INFO, "Visualizer: " + this.formats);
@@ -63,10 +67,11 @@ public class VisualizationServiceImpl implements VisualizationService
 	
 	/**
 	 * Constructor
+	 * @param configService ConfigAccessor
 	 */
-	public VisualizationServiceImpl()
+	public VisualizationServiceImpl(ConfigAccessor configService)
 		{
-		this(Collections.<Visualizer>emptyList());
+		this(configService, Collections.<Visualizer>emptyList());
 		}
 	
 	@Override
@@ -106,9 +111,9 @@ public class VisualizationServiceImpl implements VisualizationService
 		}
 
 	@Override
-	public boolean hasSourceText(Visualization v)
+	public boolean supportsSourceText(Visualization v)
 		{
-		return (findVisualizer(v).hasSourceText());
+		return (findVisualizer(v).supportsSourceText());
 		}
 	
 	@Override
@@ -127,6 +132,18 @@ public class VisualizationServiceImpl implements VisualizationService
 	public void writeSourceTextTo(Visualization v, OutputStream stream) throws IOException
 		{
 		findVisualizer(v).writeSourceTextTo(v, stream);
+		}
+	
+	@Override
+	public boolean supportsSourceSVG(Visualization v)
+		{
+		return (configService.get(ConfigKeys.INLINE_SVG) && findVisualizer(v).supportsSourceSVG());
+		}
+	
+	@Override
+	public String getSourceSVG(Visualization v)
+		{
+		return (findVisualizer(v).getSourceSVG(v));
 		}
 	
 	@Override

@@ -19,11 +19,15 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import de.tweerlei.common.util.ProcessUtils;
+import de.tweerlei.common5.util.FindReplace;
+import de.tweerlei.common5.util.SimpleFindReplace;
 import de.tweerlei.dbgrazer.visualization.model.GraphDefinition;
 import de.tweerlei.dbgrazer.visualization.service.GraphService;
 import de.tweerlei.dbgrazer.visualization.service.GraphType;
@@ -42,6 +46,7 @@ public class GraphServiceImpl implements GraphService
 	private static final String DOT_IMAGE_TYPE = "png";
 	private static final String MIME_TYPE = "image/png";
 	private static final String EXTENSION = ".png";
+	private static final SvgRepairer REPAIR_SVG = new SvgRepairer();
 	
 	private final ConfigAccessor configService;
 	
@@ -98,6 +103,40 @@ public class GraphServiceImpl implements GraphService
 		final int rc = ProcessUtils.exec(cmd, null, null, is, dest, null, 0);
 		if (rc != 0)
 			throw new IOException(dotPath + " returned " + rc);
+		}
+	
+	@Override
+	public String createSVG(GraphDefinition def) throws IOException
+		{
+		final String dotPath = getCommand(def.getType());
+		if (dotPath == null)
+			return ("");
+		
+		final Integer dotDpi = configService.get(ConfigKeys.DOT_DPI);
+		
+		final String svg = renderSVG(def, dotPath, dotDpi);
+		
+		final String ret = REPAIR_SVG.replaceAll(svg);
+		
+		return (ret);
+		}
+	
+	private String renderSVG(GraphDefinition def, String dotPath, Integer dotDpi) throws IOException
+		{
+		final String[] cmd;
+		if (dotDpi != null)
+			cmd = new String[] { dotPath, "-Tsvg", "-Gstart=1", "-Gdpi=" + dotDpi };
+		else
+			cmd = new String[] { dotPath, "-Tsvg", "-Gstart=1" };
+		
+		final ByteArrayInputStream is = new ByteArrayInputStream(def.getGraph().toString().getBytes(DOT_CHARSET));
+		final ByteArrayOutputStream os = new ByteArrayOutputStream(65536);
+		
+		final int rc = ProcessUtils.exec(cmd, null, null, is, os, null, 0);
+		if (rc != 0)
+			throw new IOException(dotPath + " returned " + rc);
+		
+		return (os.toString(DOT_CHARSET));
 		}
 	
 	@Override

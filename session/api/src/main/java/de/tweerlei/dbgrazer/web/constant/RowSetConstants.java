@@ -45,6 +45,8 @@ public final class RowSetConstants
 	public static final String ATTR_IMAGEMAP = "imagemap";
 	/** RowSet attribute for the image map ID */
 	public static final String ATTR_IMAGEMAP_ID = "imagemapId";
+	/** RowSet attribute for the SVG source */
+	public static final String ATTR_SVG = "svg";
 	/** RowSet attribute for the option code */
 	public static final String ATTR_OPTION_CODE = "optionCode";
 	/** RowSet attribute for the option names */

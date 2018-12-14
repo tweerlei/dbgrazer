@@ -26,9 +26,13 @@
 	</ui:headline1>
 	
 	<div class="tab-page"><div class="tab-body">
-		${imagemap}
+<c:choose><c:when test="${not empty svg}"
+>		${svg}
+</c:when><c:otherwise
+>		${imagemap}
 		<img src="db/${currentConnection.linkName}/qgraph.html?q=${title}&amp;key=${imageId}&amp;t=${currentDate.time}" usemap="#${imagemapId}" class="scaled" onclick="return toggleScaling(this);" alt="<fmt:message key="imageLoading"/>" onload="imageLoaded(event);" onerror="imageLoadingFailed(event);" title="${title}"/>
-	</div></div>
+</c:otherwise></c:choose
+>	</div></div>
 <%@
 	include file="../include/footer.jspf"
 %>

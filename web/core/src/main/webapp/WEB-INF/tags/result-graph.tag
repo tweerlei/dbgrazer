@@ -58,7 +58,9 @@
 >			</form><hr/>
 		</div>
 		<div<c:if test="${tab}"> class="tab-body"</c:if>>
-<c:choose><c:when test="${not empty rs.attributes['imagemap']}"
+<c:choose><c:when test="${not empty rs.attributes['svg']}"
+>			${rs.attributes['svg']}
+</c:when><c:when test="${not empty rs.attributes['imagemap']}"
 >			${rs.attributes['imagemap']}
 			<c:if test="${not empty detailLink}"><a href="${detailLink}"></c:if
 				><img src="db/${currentConnection.linkName}/graph.html?q=${rs.query.name}&amp;key=${rs.attributes['imageId']}&amp;t=${currentDate.time}${paramString}" usemap="#${rs.attributes['imagemapId']}" class="scaled"<c:if test="${empty detailLink}"> onclick="return toggleScaling(this);"</c:if> alt="<fmt:message key="imageLoading"/>" onload="imageLoaded(event);" onerror="imageLoadingFailed(event);" title="${rs.query.name}"/><c:if test="${not empty detailLink}"
