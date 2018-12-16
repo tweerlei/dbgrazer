@@ -67,6 +67,7 @@ public class LdapQueryRunner extends BaseQueryRunner
 	private static final String RDN_ATTRIBUTE = "rdn";
 	private static final String RDN_NAME_ATTRIBUTE = "rdn.name";
 	private static final String RDN_PARENT_ATTRIBUTE = "rdn.parent";
+	private static final String RDN_LINK_ATTRIBUTE = "rdn.link";
 	
 	private static abstract class RowSetMapper implements ContextMapper
 		{
@@ -170,10 +171,10 @@ public class LdapQueryRunner extends BaseQueryRunner
 				if (attrIds == null)
 					{
 					columns = new ArrayList<ColumnDef>(attributes.size() + 4);
-					columns.add(new ColumnDefImpl(DN_ATTRIBUTE, ColumnType.STRING, null, getQuery().getTargetQueries().get(0), null, null));
-					columns.add(new ColumnDefImpl(RDN_ATTRIBUTE, ColumnType.STRING, null, getQuery().getTargetQueries().get(1), null, null));
-					columns.add(new ColumnDefImpl(RDN_NAME_ATTRIBUTE, ColumnType.STRING, null, getQuery().getTargetQueries().get(2), null, null));
-					columns.add(new ColumnDefImpl(RDN_PARENT_ATTRIBUTE, ColumnType.STRING, null, getQuery().getTargetQueries().get(3), null, null));
+//					columns.add(new ColumnDefImpl(DN_ATTRIBUTE, ColumnType.STRING, null, getQuery().getTargetQueries().get(0), null, null));
+//					columns.add(new ColumnDefImpl(RDN_ATTRIBUTE, ColumnType.STRING, null, getQuery().getTargetQueries().get(1), null, null));
+//					columns.add(new ColumnDefImpl(RDN_NAME_ATTRIBUTE, ColumnType.STRING, null, getQuery().getTargetQueries().get(2), null, null));
+//					columns.add(new ColumnDefImpl(RDN_PARENT_ATTRIBUTE, ColumnType.STRING, null, getQuery().getTargetQueries().get(3), null, null));
 					final NamingEnumeration<? extends Attribute> all = attributes.getAll();
 					try	{
 						while (all.hasMore())
@@ -200,6 +201,8 @@ public class LdapQueryRunner extends BaseQueryRunner
 							columns.add(new ColumnDefImpl(RDN_NAME_ATTRIBUTE, ColumnType.STRING, null, getQuery().getTargetQueries().get(columns.size()), null, null));
 						else if (RDN_PARENT_ATTRIBUTE.equalsIgnoreCase(attrId))
 							columns.add(new ColumnDefImpl(RDN_PARENT_ATTRIBUTE, ColumnType.STRING, null, getQuery().getTargetQueries().get(columns.size()), null, null));
+						else if (RDN_LINK_ATTRIBUTE.equalsIgnoreCase(attrId))
+							columns.add(new ColumnDefImpl(RDN_LINK_ATTRIBUTE, ColumnType.STRING, null, getQuery().getTargetQueries().get(columns.size()), null, null));
 						else
 							{
 							final Attribute a = attributes.get(attrId);
@@ -252,6 +255,14 @@ public class LdapQueryRunner extends BaseQueryRunner
 						row.getValues().add("");
 					else
 						row.getValues().add(rdn.getPrefix(rdn.size() - 1).toString());
+					}
+				else if (RDN_LINK_ATTRIBUTE.equals(c.getName()))
+					{
+					final Name rdn = getRdn(ctx);
+					if (rdn.isEmpty())
+						row.getValues().add("");
+					else
+						row.getValues().add(getRdn(ctx).toString() + "  " + rdn.getSuffix(rdn.size() - 1).toString());
 					}
 				else
 					{
@@ -424,7 +435,10 @@ public class LdapQueryRunner extends BaseQueryRunner
 			{
 			final LdapSearchQueryType sqt = (LdapSearchQueryType) res.getQuery().getType();
 			mapper = new RowListMapper(query, subQueryIndex, p.getAttributes(), limit);
-			ldap.search(p.getBaseDN(), p.getFilter(), sqt.getScope(), mapper);
+			if (p.getAttributes() != null)
+				ldap.search(p.getBaseDN(), p.getFilter(), sqt.getScope(), p.getAttributes(), mapper);
+			else
+				ldap.search(p.getBaseDN(), p.getFilter(), sqt.getScope(), mapper);
 			}
 		else if (res.getQuery().getType() instanceof LdapListQueryType)
 			{
@@ -442,12 +456,18 @@ public class LdapQueryRunner extends BaseQueryRunner
 		else if ((res.getQuery().getType() instanceof LdapAttributesQueryType) && (p.getAttributes() != null) && (p.getAttributes().length == 1))
 			{
 			mapper = new AttributeListMapper(query, subQueryIndex, p.getAttributes()[0]);
-			ldap.lookup(p.getBaseDN(), mapper);
+			if (p.getAttributes() != null)
+				ldap.lookup(p.getBaseDN(), p.getAttributes(), mapper);
+			else
+				ldap.lookup(p.getBaseDN(), mapper);
 			}
 		else
 			{
 			mapper = new RowListMapper(query, subQueryIndex, p.getAttributes(), limit);
-			ldap.lookup(p.getBaseDN(), mapper);
+			if (p.getAttributes() != null)
+				ldap.lookup(p.getBaseDN(), p.getAttributes(), mapper);
+			else
+				ldap.lookup(p.getBaseDN(), mapper);
 			}
 		
 		final long end = timeService.getCurrentTime();

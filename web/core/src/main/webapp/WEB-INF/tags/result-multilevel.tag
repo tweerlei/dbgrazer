@@ -31,13 +31,15 @@
 %><%@
 	taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"
 %><%@
+	taglib prefix="util" uri="http://tweerlei.de/dbgrazer/web/taglib/JspFunctions"
+%><%@
 	taglib prefix="ui" tagdir="/WEB-INF/tags"
 %><c:set var="offset" value="${(rs.query.attributes['colorize'] ? 1 : 0) + (rs.attributes['parentQuery'].attributes['hideId'] ? 1 : 0)}"
 /><div class="tab-header">
 			<ui:filter id="filter-table-${label}" target="table-${label}" form="true"/><hr/>
 		</div>
 		<div class="tab-body"><div id="mlselection"><c:forEach items="${rs.attributes['expandLevels']}" var="l" varStatus="st"
-			><c:set var="rowid" value="${fn:contains(l, ' ') ? fn:substringBefore(l, ' ') : l}"
+			><c:set var="rowid" value="${util:paramExtract(l)}"
 			/><c:if test="${!st.first}">-</c:if
 			>${fn:escapeXml(rowid)}</c:forEach></div>
 		<table id="table-${label}" class="multiple table-autosort">
@@ -61,7 +63,7 @@
 <c:choose><c:when test="${rs.query.attributes['colorize']}"
 ><c:forEach items="${rs.rows}" var="row"
 >				<tr class="colored-${row.values[0]}">
-<c:if test="${rs.attributes['moreLevels']}"><c:set var="rowid" value="${fn:contains(row.values[1], ' ') ? fn:substringBefore(row.values[1], ' ') : row.values[1]}"
+<c:if test="${rs.attributes['moreLevels']}"><c:set var="rowid" value="${util:paramExtract(row.values[1])}"
 />					<td><span class="action" title="<fmt:message key="expand"/>" onclick="return loadQueryLevel(event, '${rs.attributes['parentQuery'].name}', ${level}, '${rowid}', '${left}${rowid}');">&#x25ba;</span></td>
 </c:if
 ><c:forEach items="${row.values}" var="v" varStatus="st" begin="${0 + offset}" end="${1 + offset}"
@@ -77,7 +79,7 @@
 ></c:when><c:otherwise
 ><c:forEach items="${rs.rows}" var="row"
 >				<tr>
-<c:set var="rowid" value="${fn:contains(row.values[0], ' ') ? fn:substringBefore(row.values[0], ' ') : row.values[0]}"
+<c:set var="rowid" value="${util:paramExtract(row.values[0])}"
 /><c:if test="${rs.attributes['moreLevels']}"
 >					<td><span class="action" title="<fmt:message key="expand"/>" onclick="return loadQueryLevel(event, '${rs.attributes['parentQuery'].name}', ${level}, '${rowid}', '${left}${rowid}');">&#x25ba;</span></td>
 </c:if><c:forEach items="${row.values}" var="v" varStatus="st" begin="${0 + offset}" end="${1 + offset}"

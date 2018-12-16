@@ -137,6 +137,19 @@ public class FrontendHelperServiceImpl implements FrontendHelperService
 		}
 	
 	@Override
+	public String paramExtract(String s)
+		{
+		if (s == null)
+			return (null);
+		
+		final int i = s.indexOf(' ');
+		if (i < 0)
+			return (StringUtils.trim(s));
+		else
+			return (StringUtils.trim(s.substring(0, i)));
+		}
+	
+	@Override
 	public String getLinkTitle(String s)
 		{
 		final String ret;
@@ -211,7 +224,7 @@ public class FrontendHelperServiceImpl implements FrontendHelperService
 			if (p == null)
 				s = "";
 			else if (trim)
-				s = String.valueOf(p).trim();
+				s = StringUtils.trim(String.valueOf(p));
 			else
 				s = String.valueOf(p);
 			

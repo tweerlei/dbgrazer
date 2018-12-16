@@ -33,6 +33,8 @@
 %><%@
 	taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"
 %><%@
+	taglib prefix="util" uri="http://tweerlei.de/dbgrazer/web/taglib/JspFunctions"
+%><%@
 	taglib prefix="ui" tagdir="/WEB-INF/tags"
 %><c:set var="offset" value="${rs.attributes['parentQuery'].attributes['hideId'] ? 1 : 0}"
 /><c:set var="rowoffset" value="${fn:startsWith(rs.columns[0].name, '--') ? 1 : 0}"
@@ -46,7 +48,7 @@
 >			</tr>
 		</thead>
 		<tbody><c:forEach items="${rs.rows}" var="row"
-			><c:set var="rowid" value="${fn:contains(row.values[rowoffset], ' ') ? fn:substringBefore(row.values[rowoffset], ' ') : row.values[rowoffset]}"
+			><c:set var="rowid" value="${util:paramExtract(row.values[rowoffset])}"
 			/><tr class="treerow" id="treerow-${label}-${left}${rowid}"><td class="treebutton"><c:choose
 					><c:when test="${first && rs.attributes['moreLevels']}"><span class="action" title="<fmt:message key="expand"/>" onclick="return toggleTreeItem(event, '${label}', '${rs.attributes['parentQuery'].name}', ${level}, '${rowid}', '${left}${rowid}', '${targetElement}');">&#x25ba;</span></c:when
 					><c:when test="${first}">&#x25b7;</c:when

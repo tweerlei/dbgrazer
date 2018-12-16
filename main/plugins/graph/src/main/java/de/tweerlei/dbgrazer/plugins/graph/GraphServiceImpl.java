@@ -26,8 +26,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import de.tweerlei.common.util.ProcessUtils;
-import de.tweerlei.common5.util.FindReplace;
-import de.tweerlei.common5.util.SimpleFindReplace;
 import de.tweerlei.dbgrazer.visualization.model.GraphDefinition;
 import de.tweerlei.dbgrazer.visualization.service.GraphService;
 import de.tweerlei.dbgrazer.visualization.service.GraphType;

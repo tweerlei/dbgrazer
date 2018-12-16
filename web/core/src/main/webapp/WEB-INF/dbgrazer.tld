@@ -19,6 +19,13 @@
     </function>
 
     <function>
+        <description>Extract a single query parameter from a String.</description>
+        <name>paramExtract</name>
+        <function-class>de.tweerlei.dbgrazer.web.taglib.JspFunctions</function-class>
+        <function-signature>java.lang.String paramExtract(java.lang.String)</function-signature>
+    </function>
+
+    <function>
         <description>Format a String as link title.</description>
         <name>getLinkTitle</name>
         <function-class>de.tweerlei.dbgrazer.web.taglib.JspFunctions</function-class>

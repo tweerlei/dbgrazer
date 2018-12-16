@@ -171,6 +171,9 @@ public class LdapAccessServiceImpl implements LdapAccessService, LinkListener, L
 			}
 		
 		final LdapTemplate tmp = new LdapTemplate(src);
+		// Workaround for ActiveDirectory servers
+		tmp.setIgnorePartialResultException(true);
+		
 		try	{
 			tmp.afterPropertiesSet();
 			}

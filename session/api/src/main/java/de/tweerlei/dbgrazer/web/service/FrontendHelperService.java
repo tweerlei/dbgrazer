@@ -69,6 +69,15 @@ public interface FrontendHelperService
 	public String paramEncode(String s, boolean htmlEncode);
 	
 	/**
+	 * Extract a query parameter from a String.
+	 * This will return the first non-whitespace word from the String,
+	 * e.g. "123 Label" will become "123".
+	 * @param s Parameter string
+	 * @return Query String
+	 */
+	public String paramExtract(String s);
+	
+	/**
 	 * Format a String as link title.
 	 * Only the last component is returned:
 	 * "123  456" will yield "456".

@@ -196,4 +196,48 @@ public final class StringUtils
 			return (new String[] { "" });
 		return (s.split(sep, -1));
 		}
+	
+	/**
+	 * Like String.trim() but also removes latin-1 controls
+	 * and non-breaking spaces
+	 * @param s String
+	 * @return Trimmed String
+	 */
+	public static String trim(String s)
+		{
+		if (s == null)
+			return (null);
+		
+		final int l = s.length();
+		
+		int start;
+		for (start = 0; start < l; start++)
+			{
+			if (!isSpaceOrControl(s.charAt(start)))
+				break;
+			}
+		
+		int end;
+		for (end = l - 1; end > start; end--)
+			{
+			if (!isSpaceOrControl(s.charAt(end)))
+				break;
+			}
+		
+		if ((start == 0) && (end == l - 1))
+			return (s);
+		
+		return (s.substring(start, end + 1));
+		}
+	
+	/**
+	 * Determine whether the argument is a space (0x20, 0xa0)
+	 * or a latin-1 control character (0x00-0x1f, 0x7f-0x9f)
+	 * @param c Character to test
+	 * @return true if space or control
+	 */
+	public static boolean isSpaceOrControl(char c)
+		{
+		return ((c <= 0x20) || ((c >= 0x7f) && (c <= 0xa0)));
+		}
 	}

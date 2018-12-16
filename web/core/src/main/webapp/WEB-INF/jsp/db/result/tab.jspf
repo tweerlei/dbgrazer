@@ -248,7 +248,7 @@
 			><c:when test="${fn:length(rs.rows) == 0}"
 				><strong><fmt:message key="noData"/></strong></c:when
 			><c:otherwise><div id="treeselection">${label}-<c:forEach items="${rs.attributes['expandLevels']}" var="l" varStatus="st"
-				><c:set var="rowid" value="${fn:contains(l, ' ') ? fn:substringBefore(l, ' ') : l}"
+				><c:set var="rowid" value="${util:paramExtract(l)}"
 				/><c:if test="${!st.first}">-</c:if
 					>${fn:escapeXml(rowid)}</c:forEach
 				></div>

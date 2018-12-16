@@ -83,12 +83,25 @@ public class FrontendHelperServiceImplTest extends TestCase
 		
 		assertNull(fhs.paramEncode(null, true));
 		assertEquals("&amp;params%5B0%5D=", fhs.paramEncode("", true));
-		assertEquals("&amp;params%5B0%5D=abc+def", fhs.paramEncode("abc def", true));
+		assertEquals("&amp;params%5B0%5D=abc+def", fhs.paramEncode("abc def\u00a0\n", true));
 		assertEquals("&amp;params%5B0%5D=abc+def&amp;params%5B1%5D=ghi", fhs.paramEncode("abc def  ghi", true));
 		assertEquals("&amp;params%5B0%5D=abc+def&amp;params%5B1%5D=ghi", fhs.paramEncode("abc def   ghi", true));
 		assertEquals("&amp;params%5B0%5D=abc+def&amp;params%5B1%5D=ghi&amp;params%5B2%5D=M%C3%BCller", fhs.paramEncode("abc def   ghi  Müller", true));
 		
 		assertEquals("&params%5B0%5D=abc+def&params%5B1%5D=ghi&params%5B2%5D=M%C3%BCller", fhs.paramEncode("abc def   ghi  Müller", false));
+		}
+	
+	/**
+	 * Test method paramExtract
+	 */
+	public void testParamExtract()
+		{
+		final FrontendHelperService fhs = new FrontendHelperServiceImpl(new StringTransformerServiceImpl(), null);
+		
+		assertNull(fhs.paramExtract(null));
+		assertEquals("", fhs.paramExtract(""));
+		assertEquals("123", fhs.paramExtract("123 456"));
+		assertEquals("123", fhs.paramExtract("123\u00a0 456"));
 		}
 	
 	/**
