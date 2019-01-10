@@ -38,23 +38,21 @@
 	taglib prefix="ui" tagdir="/WEB-INF/tags"
 %><c:set var="offset" value="${rs.attributes['parentQuery'].attributes['hideId'] ? 1 : 0}"
 /><c:set var="rowoffset" value="${fn:startsWith(rs.columns[0].name, '--') ? 1 : 0}"
-/><table class="multiple">
-		<thead>
+/><table class="multiple"><thead>
 			<tr>
 				<th>&nbsp;</th>
 <c:forEach items="${rs.columns}" var="c" begin="${0 + offset + rowoffset}"
 >				<th title="${fn:escapeXml(c.typeName)}">${fn:escapeXml(c.name)}</th>
 </c:forEach
 >			</tr>
-		</thead>
-		<tbody><c:forEach items="${rs.rows}" var="row"
-			><c:set var="rowid" value="${util:paramExtract(row.values[rowoffset])}"
-			/><tr class="treerow" id="treerow-${label}-${left}${rowid}"><td class="treebutton"><c:choose
-					><c:when test="${first && rs.attributes['moreLevels']}"><span class="action" title="<fmt:message key="expand"/>" onclick="return toggleTreeItem(event, '${label}', '${rs.attributes['parentQuery'].name}', ${level}, '${rowid}', '${left}${rowid}', '${targetElement}');">&#x25ba;</span></c:when
+		</thead><tbody><c:forEach items="${rs.rows}" var="row" varStatus="rst"
+			><c:set var="rowid" value="${left}${rst.index}"
+			/><tr class="treerow" id="treerow-${label}-${rowid}" data-param="${fn:escapeXml(util:paramExtract(row.values[0])[0])}"><td class="treebutton"><c:choose
+					><c:when test="${first && rs.attributes['moreLevels']}"><span class="action" title="<fmt:message key="expand"/>" onclick="return toggleTreeItem(event, '${label}', '${rowid}', '${rs.attributes['parentQuery'].name}', '${targetElement}');">&#x25ba;</span></c:when
 					><c:when test="${first}">&#x25b7;</c:when
 					><c:otherwise>&#x25ab;</c:otherwise
 				></c:choose></td><c:forEach items="${row.values}" var="v" varStatus="st" begin="${0 + offset + rowoffset}"
 				><td><c:if test="${st.first && not empty rs.columns[st.index].targetQuery.queryName}">${rs.columns[st.index].targetQuery.queryName}: </c:if><ui:link value="${row.values[st.index]}" target="${rs.columns[st.index].targetQuery}" targetElement="${targetElement}"/></td></c:forEach
-			></tr><tr style="display: none;"><td>&nbsp;</td><td colspan="${fn:length(rs.columns) - offset - rowoffset}">&nbsp;</td></tr></c:forEach
+			></tr><tr style="display: none;"><td>&nbsp;</td><td id="treechild-${label}-${rowid}" colspan="${fn:length(rs.columns) - offset - rowoffset}">&nbsp;</td></tr></c:forEach
 		></tbody>
 	</table>

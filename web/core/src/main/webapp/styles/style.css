@@ -572,6 +572,11 @@ dl.result dt {
 dl.result dd {
 	width: 66%;
 	white-space: pre-line;
+	overflow-x: hidden;
+}
+
+span.zoomable {
+	cursor: zoom-in;
 }
 
 iframe.result {
@@ -645,7 +650,7 @@ pre.code span.errmsg {
  *
  ********************************************************************/
 
-#treeselection {
+#treeselection, #mlselection, #mlparams {
 	display: none;
 }
 

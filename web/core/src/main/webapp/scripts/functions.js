@@ -1254,13 +1254,16 @@ function toggleStaticTreeItem(ev, label, left) {
 	return false;
 }
 
-function toggleTreeItem(ev, label, query, level, param, left, target) {
+function toggleTreeItem(ev, label, left, query, target) {
 	var e = Tree.getItem(label, left);
 	if (e && !Tree.collapseItem(e)) {
-		WSApi.getTreeItem(query, level, label, left, target, param, function(txt) {
-			Tree.expandItem(e, txt);
-			HashMonitor.set({ node: label+'-'+left }, true);
-		});
+		var params = Tree.getPath(e);
+		if (params) {
+			WSApi.getTreeItem(query, params.length, label, left, target, params, function(txt) {
+				Tree.expandItem(e, txt);
+				HashMonitor.set({ node: label+'-'+left }, true);
+			});
+		}
 	}
 	return false;
 }
@@ -1272,27 +1275,56 @@ function selectTreeItem() {
 	} else {
 		var e = $('treeselection');
 		if (e) {
-			l = e.textContent;
-			if (l) {
-				Tree.selectPath(l, true);
+			l = e.childElements().map(function(n) {
+				return (n.textContent);
+			});
+			if (l.length > 1) {
+				Tree.selectParamPath(l[0], l.slice(1), true);
 			}
 		}
 	}
 }
 
-function loadQueryLevel(ev, query, level, param, left) {
+function getQueryLevel(query, level, params) {
+	WSApi.getQueryLevel(query, level, params, 'explorer-right', function(txt) {
+		var el = $('explorer-left');
+		el.innerHTML = txt;
+		tw_contentChanged();
+		HashMonitor.set({ level: level }, true);
+	});
+}
+
+function getMultilevelParams(level) {
+	var p = $('mlparams')
+	if (!p) {
+		return [];
+	}
+	var params = p.childElements().map(function(n) {
+		return (n.textContent);
+	});
+	return params.slice(0, level);
+}
+
+function loadQueryLevel(ev, query, level) {
 	if (ev) {
 		Event.stop(ev);
 	}
 	AutoRefresh.stop();
-	var el = $('explorer-left');
-	if (el) {
-		WSApi.getQueryLevel(query, level, param, left, 'explorer-right', function(txt) {
-			el.innerHTML = txt;
-			tw_contentChanged();
-			HashMonitor.set({ level: left }, true);
-		});
+	var params = getMultilevelParams(level);
+	if (params.length == level) {
+		getQueryLevel(query, level, params.reverse());
 	}
+	return false;
+}
+
+function expandQueryLevel(ev, query, level, param) {
+	if (ev) {
+		Event.stop(ev);
+	}
+	AutoRefresh.stop();
+	var params = getMultilevelParams(level);
+	params.push(param);
+	getQueryLevel(query, level, params.reverse());
 	return false;
 }
 
@@ -1336,17 +1368,15 @@ function selectQueryLevel() {
 	if (qn) {
 		var l = HashMonitor.get('level');
 		if (l) {
-			var path = l.split('-');
-			var param = path[path.length - 1];
-			loadQueryLevel(null, qn.value, path.length, param, l);
+			loadQueryLevel(null, qn.value, l);
 		} else {
 			var e = $('mlselection');
 			if (e) {
-				l = e.textContent;
-				if (l) {
-					var path = l.split('-');
-					var param = path[path.length - 1];
-					loadQueryLevel(null, qn.value, path.length, param, l);
+				l = e.childElements().map(function(n) {
+					return (n.textContent);
+				});
+				if (l.length > 0) {
+					getQueryLevel(qn.value, l.length, l);
 				}
 			}
 		}

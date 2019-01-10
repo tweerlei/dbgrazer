@@ -34,7 +34,7 @@
 	taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"
 %><%@
 	taglib prefix="ui" tagdir="/WEB-INF/tags"
-%><c:choose
+%><c:if test="${level == 1}"><div id="tree-${label}"></c:if><c:choose
 	><c:when test="${empty rs.rows}"
 	></c:when><c:when test="${rs.attributes['parentQuery'].attributes['tables']}"
 		><ui:result-tree-table rs="${rs}" label="${label}" level="${level}" targetElement="${targetElement}" left="${left}" first="${first}"
@@ -42,4 +42,4 @@
 		><ui:result-tree-div rs="${rs}" label="${label}" level="${level}" targetElement="${targetElement}" left="${left}" first="${first}"
 	/></c:otherwise
 ></c:choose
->
+><c:if test="${level == 1}"></div></c:if>

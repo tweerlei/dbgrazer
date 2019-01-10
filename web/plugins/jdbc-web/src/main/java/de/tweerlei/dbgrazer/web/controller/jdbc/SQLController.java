@@ -519,12 +519,12 @@ public class SQLController
 			}
 		catch (PerformQueryException e)
 			{
-			logger.log(Level.WARNING, "runCompareIDs", e.getCause());
+			logger.log(Level.WARNING, "performQuery", e.getCause());
 			model.put("exception", e.getCause());
 			}
 		catch (RuntimeException e)
 			{
-			logger.log(Level.WARNING, "runCompareIDs", e);
+			logger.log(Level.WARNING, "performQuery", e);
 			model.put("exception", e);
 			}
 		
@@ -612,11 +612,12 @@ public class SQLController
 			}
 		catch (PerformQueryException e)
 			{
+			logger.log(Level.WARNING, "performCSVQuery", e);
 			model.put(GenericDownloadView.SOURCE_ATTRIBUTE, new ErrorDownloadSource());
 			}
 		catch (RuntimeException e)
 			{
-			logger.log(Level.WARNING, "runCompareIDs", e);
+			logger.log(Level.WARNING, "performCSVQuery", e);
 			model.put(GenericDownloadView.SOURCE_ATTRIBUTE, new ErrorDownloadSource());
 			}
 		
@@ -643,7 +644,7 @@ public class SQLController
 			}
 		catch (RuntimeException e)
 			{
-			logger.log(Level.WARNING, "runCompareIDs", e);
+			logger.log(Level.WARNING, "performCSVExportQuery", e);
 			model.put("exception", e);
 			}
 		

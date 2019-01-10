@@ -16,7 +16,6 @@
 package de.tweerlei.dbgrazer.web.controller;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -1017,7 +1016,7 @@ public class QueryRunController
 		
 		try	{
 			final Query q = queryService.findQueryByName(connectionSettings.getLinkName(), fbo.getQuery().getSubQueries().get(level).getName());
-			final Result r = performQuery(connectionSettings.getLinkName(), q, getTreeQueryParameters(q, fbo.getParams(), left));
+			final Result r = performQuery(connectionSettings.getLinkName(), q, fbo.getParams());
 			
 			boolean allEmpty = true;
 			for (RowSet rs : r.getRowSets().values())
@@ -1050,14 +1049,12 @@ public class QueryRunController
 	 * Show a parameter input form
 	 * @param fbo FormBackingObject
 	 * @param level Current tree level
-	 * @param left Tree lines
 	 * @param target Target DOM element
 	 * @return Model
 	 */
 	@RequestMapping(value = "/db/*/ajax/multilevel.html", method = RequestMethod.GET)
 	public Map<String, Object> performMultilevelQuery(@ModelAttribute("model") FormBackingObject fbo,
 			@RequestParam("level") Integer level,
-			@RequestParam("left") String left,
 			@RequestParam(value = "target", required = false) String target
 			)
 		{
@@ -1070,10 +1067,15 @@ public class QueryRunController
 			}
 		
 		final DataFormatter fmt = factory.getWebFormatter();
+		final List<String> allParams = new ArrayList<String>(fbo.getParams().size());
+		allParams.addAll(querySettingsManager.getEffectiveParameters(fbo.getQuery(), fbo.getParams()));
+		allParams.addAll(querySettingsManager.getAdditionalParameters(fbo.getQuery(), fbo.getParams()));
+		Collections.reverse(allParams);
+		final Map<Integer, String> params = querySettingsManager.buildParameterMap(allParams);
 		
 		try	{
 			final Query q = queryService.findQueryByName(connectionSettings.getLinkName(), fbo.getQuery().getSubQueries().get(level).getName());
-			final Result r = performQuery(connectionSettings.getLinkName(), q, getTreeQueryParameters(q, fbo.getParams(), left));
+			final Result r = performQuery(connectionSettings.getLinkName(), q, fbo.getParams());
 			final Map<String, TabItem<RowSet>> rowSets = new LinkedHashMap<String, TabItem<RowSet>>();
 			
 			boolean allEmpty = true;
@@ -1099,8 +1101,8 @@ public class QueryRunController
 			model.put("results", rowSets);
 			model.put("allEmpty", allEmpty);
 			model.put("level", level + 1);
-			model.put("left", StringUtils.empty(left) ? left : (left + "-"));
-			model.put("params", parseHierarchyParams(left));
+			model.put("params", params);
+			model.put("levelParams", frontendHelper.getQueryParams(params, true));
 			model.put("targetElement", target);
 			}
 		catch (QueryException e)
@@ -1109,25 +1111,6 @@ public class QueryRunController
 			}
 		
 		return (model);
-		}
-	
-	private Map<Integer, String> getTreeQueryParameters(Query query, Map<Integer, String> params, String left)
-		{
-		// If there are enough explicit parameters, use them.
-		// Otherwise use the given hierarchy
-		if ((query.getParameters().size() <= params.size()) || StringUtils.empty(left))
-			return (params);
-		else
-			return (parseHierarchyParams(left));
-		}
-	
-	private Map<Integer, String> parseHierarchyParams(String left)
-		{
-		if (StringUtils.empty(left))
-			return (Collections.emptyMap());
-		
-		final String[] ids = left.split("-");
-		return (querySettingsManager.buildParameterMap(Arrays.asList(ids)));
 		}
 	
 	private String getLink(Result r)

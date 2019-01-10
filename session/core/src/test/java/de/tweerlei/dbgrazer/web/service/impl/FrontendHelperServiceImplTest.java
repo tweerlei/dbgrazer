@@ -98,10 +98,11 @@ public class FrontendHelperServiceImplTest extends TestCase
 		{
 		final FrontendHelperService fhs = new FrontendHelperServiceImpl(new StringTransformerServiceImpl(), null);
 		
-		assertNull(fhs.paramExtract(null));
-		assertEquals("", fhs.paramExtract(""));
-		assertEquals("123", fhs.paramExtract("123 456"));
-		assertEquals("123", fhs.paramExtract("123\u00a0 456"));
+		assertTrue(fhs.paramExtract(null).isEmpty());
+		assertEquals(Arrays.asList(""), fhs.paramExtract(""));
+		assertEquals(Arrays.asList("123 456"), fhs.paramExtract("123 456"));
+		assertEquals(Arrays.asList("123", "456"), fhs.paramExtract("123  456"));
+		assertEquals(Arrays.asList("123", "456", ""), fhs.paramExtract("123\u00a0  456  \u00a0"));
 		}
 	
 	/**

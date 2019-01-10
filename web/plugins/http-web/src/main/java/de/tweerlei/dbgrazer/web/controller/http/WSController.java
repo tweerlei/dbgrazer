@@ -21,6 +21,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -48,6 +50,7 @@ import de.tweerlei.dbgrazer.web.service.ResultDownloadService;
 import de.tweerlei.dbgrazer.web.service.ResultTransformerService;
 import de.tweerlei.dbgrazer.web.service.TextTransformerService;
 import de.tweerlei.dbgrazer.web.session.ConnectionSettings;
+import de.tweerlei.spring.web.view.ErrorDownloadSource;
 import de.tweerlei.spring.web.view.GenericDownloadView;
 
 /**
@@ -148,6 +151,7 @@ public class WSController
 	private final ResultDownloadService downloadService;
 	private final ResultTransformerService resultTransformer;
 	private final QuerySettingsManager querySettingsManager;
+	private final Logger logger;
 	
 	/**
 	 * Constructor
@@ -175,6 +179,7 @@ public class WSController
 		this.downloadService = downloadService;
 		this.resultTransformer = resultTransformer;
 		this.querySettingsManager = querySettingsManager;
+		this.logger = Logger.getLogger(getClass().getCanonicalName());
 		}
 	
 	/**
@@ -286,6 +291,7 @@ public class WSController
 			}
 		catch (RuntimeException e)
 			{
+			logger.log(Level.WARNING, "performQuery", e);
 			model.put("exception", e);
 			}
 		
@@ -316,10 +322,17 @@ public class WSController
 		
 		final String queryName = factory.getMessage(MessageKeys.DEFAULT_CHART_TITLE);
 		
-		final Result r = performQuery(fbo.getStatement(), fbo.getType(), queryName, fbo.getAttributes(), Integer.MAX_VALUE);
-		final RowSet rs = r.getFirstRowSet();
-		
-		model.put(GenericDownloadView.SOURCE_ATTRIBUTE, downloadService.getDownloadSource(connectionSettings.getLinkName(), rs, fbo.getFormat()));
+		try	{
+			final Result r = performQuery(fbo.getStatement(), fbo.getType(), queryName, fbo.getAttributes(), Integer.MAX_VALUE);
+			final RowSet rs = r.getFirstRowSet();
+			
+			model.put(GenericDownloadView.SOURCE_ATTRIBUTE, downloadService.getDownloadSource(connectionSettings.getLinkName(), rs, fbo.getFormat()));
+			}
+		catch (RuntimeException e)
+			{
+			logger.log(Level.WARNING, "performCSVQuery", e);
+			model.put(GenericDownloadView.SOURCE_ATTRIBUTE, new ErrorDownloadSource());
+			}
 		
 		return (model);
 		}

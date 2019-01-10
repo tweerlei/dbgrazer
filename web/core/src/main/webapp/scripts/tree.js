@@ -22,6 +22,90 @@ var Tree = {
 		return true;
 	},
 	
+	getTablePath: function(e, a) {
+		a.push(e.getAttribute('data-param'));
+		var td = e.parentNode.parentNode.parentNode;	// TBODY -> TABLE -> parent
+		if (td.tagName == 'TD') {
+			var p = td.parentNode.previousSibling;	// TR -> previous row
+			if (p && p.className == 'treerow') {
+				this.getTablePath(p, a);
+			}
+		}
+	},
+	
+	getSimplePath: function(e, a) {
+		a.push(e.getAttribute('data-param'));
+		var p = e.parentNode;
+		if (p.className == 'treerow') {
+			this.getSimplePath(p, a);
+		}
+	},
+	
+	getPath: function(e) {
+		var ret = [];
+		if (e.tagName == 'TR') {
+			this.getTablePath(e, ret);
+		} else {
+			this.getSimplePath(e, ret);
+		}
+		return ret;
+	},
+	
+	resolveTablePath: function(e, path, a) {
+		if (path.length == 0) {
+			return;
+		}
+		if (e.nodeType != 1 || e.tagName != 'TABLE') {
+			return;
+		}
+		var param = path[0];
+		var tb = e.firstChild.nextSibling;	// THEAD -> TBODY
+		var row = tb.childElements().find(function(n) {
+			return (n.getAttribute('data-param') == param);
+		});
+		if (row) {
+			a.push(row.id);
+			var t = row.nextSibling.firstChild.firstChild;	// next TR -> TD -> child
+			this.resolveTablePath(t, path.slice(1), a);
+		}
+	},
+	
+	resolveSimplePath: function(e, path, a) {
+		if (path.length == 0) {
+			return;
+		}
+		var param = path[0];
+		var row = e.childElements().find(function(n) {
+			return (n.getAttribute('data-param') == param);
+		});
+		if (row) {
+			a.push(row.id);
+			this.resolveSimplePath(row, path.slice(1), a);
+		}
+	},
+	
+	resolvePath: function(label, path) {
+		var ret = [];
+		var root = $('tree-'+label);
+		if (root) {
+			var e = root.firstChild;
+			if (e.tagName == 'TABLE') {
+				this.resolveTablePath(e, path, ret);
+			} else {
+				this.resolveSimplePath(e, path, ret);
+			}
+		}
+		return ret;
+	},
+	
+	selectParamPath: function(label, path, activate) {
+		var ids = this.resolvePath(label, path);
+		var offset = label.length + 1;
+		for (var i = 0; i < ids.length; i++) {
+			WSApi.scheduler.add(this.processItem.bind(this), label, ids[i].substr(offset), activate && (i == ids.length - 1));
+		}
+	},
+	
 	selectPath: function(l, activate) {
 		var path = l.split('-');
 		var label = path[0];

@@ -17,8 +17,10 @@ package de.tweerlei.dbgrazer.web.service.impl;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -137,16 +139,16 @@ public class FrontendHelperServiceImpl implements FrontendHelperService
 		}
 	
 	@Override
-	public String paramExtract(String s)
+	public List<String> paramExtract(String s)
 		{
 		if (s == null)
-			return (null);
+			return (Collections.emptyList());
 		
-		final int i = s.indexOf(' ');
-		if (i < 0)
-			return (StringUtils.trim(s));
-		else
-			return (StringUtils.trim(s.substring(0, i)));
+		final String[] params = s.split(PARAM_SEPARATOR, -1);
+		final List<String> ret = new ArrayList<String>(params.length);
+		for (String p : params)
+			ret.add(StringUtils.trim(p));
+		return (ret);
 		}
 	
 	@Override

@@ -36,13 +36,11 @@
 %><%@
 	taglib prefix="tools" uri="http://tweerlei.de/springtools/tags"
 %><%@
-	taglib prefix="util" uri="http://tweerlei.de/dbgrazer/web/taglib/JspFunctions"
-%><%@
 	taglib prefix="ui" tagdir="/WEB-INF/tags"
 %><c:set var="offset" value="${rs.query.attributes['hideId'] ? 1 : 0}"
 /><c:set var="rowoffset" value="${fn:startsWith(root.columns[0].name, '--') ? 1 : 0}"
-/><c:forEach items="${root.rows}" var="row"
-		><c:set var="rowid" value="${left}${util:paramExtract(row.values[rowoffset])}"
+/><c:forEach items="${root.rows}" var="row" varStatus="rst"
+		><c:set var="rowid" value="${left}${rst.index}"
 		/><div class="treerow" id="treerow-${label}-${rowid}"><div class="treebutton"><c:choose
 			><c:when test="${not empty row.rows}"><span class="action" title="<fmt:message key="expand"/>" onclick="return toggleStaticTreeItem(event, '${label}', '${rowid}');">&#x25bc;</span></c:when
 			><c:otherwise>&#x25b7;</c:otherwise

@@ -16,6 +16,7 @@
 package de.tweerlei.dbgrazer.web.service;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import de.tweerlei.common.math.Rational;
@@ -69,13 +70,13 @@ public interface FrontendHelperService
 	public String paramEncode(String s, boolean htmlEncode);
 	
 	/**
-	 * Extract a query parameter from a String.
-	 * This will return the first non-whitespace word from the String,
-	 * e.g. "123 Label" will become "123".
+	 * Extract query parameters from a String.
+	 * The String "123  456" is split into multiple parameters like:
+	 * '123', '456'
 	 * @param s Parameter string
-	 * @return Query String
+	 * @return Parameter list
 	 */
-	public String paramExtract(String s);
+	public List<String> paramExtract(String s);
 	
 	/**
 	 * Format a String as link title.

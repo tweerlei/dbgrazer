@@ -19,10 +19,10 @@
     </function>
 
     <function>
-        <description>Extract a single query parameter from a String.</description>
+        <description>Extract query parameters from a String.</description>
         <name>paramExtract</name>
         <function-class>de.tweerlei.dbgrazer.web.taglib.JspFunctions</function-class>
-        <function-signature>java.lang.String paramExtract(java.lang.String)</function-signature>
+        <function-signature>java.util.List paramExtract(java.lang.String)</function-signature>
     </function>
 
     <function>

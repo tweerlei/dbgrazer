@@ -162,7 +162,7 @@ var WSApi = {
 		return this.getDBAsync('trimcols', { q: q, v: (v ? 'true' : 'false') }, cb);
 	},
 	
-	getTreeItem: function(query, level, label, left, target, param, cb) {
+	getTreeItem: function(query, level, label, left, target, params, cb) {
 		var p = {
 			q: query,
 			level: level,
@@ -170,7 +170,10 @@ var WSApi = {
 			left: left,
 			target: target
 		};
-		p['params[0]'] = param;
+		
+		for (var i = 0; i < params.length; i++)
+			p['params['+i+']'] = params[i];
+		
 		return this.getDBAsync('tree', p, cb);
 	},
 	
@@ -226,20 +229,17 @@ var WSApi = {
 		return this.getDBAsync('drilldown', 'level='+level+'&q='+query+param, cb);
 	},
 	
-	getQueryLevel: function(query, level, param, left, target, cb) {
+	getQueryLevel: function(query, level, params, target, cb) {
 		var p = {
 			q: query,
 			level: level,
-			left: left,
 			target: target
 		};
 		
-		if (level) {
-			p['params[0]'] = param;
-			return this.getDBAsync('multilevel', p, cb);
-		} else {
-			return this.getDBAsync('multilevel', p, cb);
-		}
+		for (var i = 0; i < params.length; i++)
+			p['params['+i+']'] = params[i];
+		
+		return this.getDBAsync('multilevel', p, cb);
 	},
 	
 	getMenuRows: function(n, cb) {

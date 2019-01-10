@@ -23,8 +23,6 @@
 %><%@
 	attribute name="targetElement" required="false" type="java.lang.String" rtexprvalue="true" description="The link target element"
 %><%@
-	attribute name="left" required="false" type="java.lang.String" rtexprvalue="true" description="The parent IDs, separated by dashes"
-%><%@
 	taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
 %><%@
 	taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
@@ -38,10 +36,7 @@
 /><div class="tab-header">
 			<ui:filter id="filter-table-${label}" target="table-${label}" form="true"/><hr/>
 		</div>
-		<div class="tab-body"><div id="mlselection"><c:forEach items="${rs.attributes['expandLevels']}" var="l" varStatus="st"
-			><c:set var="rowid" value="${util:paramExtract(l)}"
-			/><c:if test="${!st.first}">-</c:if
-			>${fn:escapeXml(rowid)}</c:forEach></div>
+		<div class="tab-body">
 		<table id="table-${label}" class="multiple table-autosort">
 			<thead>
 				<tr>
@@ -61,32 +56,32 @@
 			</thead>
 			<tbody>
 <c:choose><c:when test="${rs.query.attributes['colorize']}"
-><c:forEach items="${rs.rows}" var="row"
+><c:forEach items="${rs.rows}" var="row" varStatus="rst"
 >				<tr class="colored-${row.values[0]}">
-<c:if test="${rs.attributes['moreLevels']}"><c:set var="rowid" value="${util:paramExtract(row.values[1])}"
-/>					<td><span class="action" title="<fmt:message key="expand"/>" onclick="return loadQueryLevel(event, '${rs.attributes['parentQuery'].name}', ${level}, '${rowid}', '${left}${rowid}');">&#x25ba;</span></td>
+<c:if test="${rs.attributes['moreLevels']}"><c:set var="rowid" value="${rst.index}"
+/>					<td><span class="action" title="<fmt:message key="expand"/>" onclick="return expandQueryLevel(event, '${rs.attributes['parentQuery'].name}', ${level}, '${fn:escapeXml(util:paramExtract(row.values[1])[0])}');">&#x25ba;</span></td>
 </c:if
 ><c:forEach items="${row.values}" var="v" varStatus="st" begin="${0 + offset}" end="${1 + offset}"
 >					<td><ui:link value="${v}" target="${rs.columns[st.index].targetQuery}" targetElement="${targetElement}"/></td>
 </c:forEach
 ><c:if test="${fn:length(row.values) > 2 + offset}"
->					<td><ui:info name="info-${rowid}"><c:forEach items="${row.values}" var="v" varStatus="st" begin="${2 + offset}"
+>					<td><ui:info name="info-${label}-${rowid}"><c:forEach items="${row.values}" var="v" varStatus="st" begin="${2 + offset}"
 						>${fn:escapeXml(rs.columns[st.index].name)} = <ui:link value="${v}" target="${rs.columns[st.index].targetQuery}" targetElement="${targetElement}"/>
 </c:forEach></ui:info></td>
 </c:if
 >				</tr>
 </c:forEach
 ></c:when><c:otherwise
-><c:forEach items="${rs.rows}" var="row"
+><c:forEach items="${rs.rows}" var="row" varStatus="rst"
 >				<tr>
-<c:set var="rowid" value="${util:paramExtract(row.values[0])}"
+<c:set var="rowid" value="${rst.index}"
 /><c:if test="${rs.attributes['moreLevels']}"
->					<td><span class="action" title="<fmt:message key="expand"/>" onclick="return loadQueryLevel(event, '${rs.attributes['parentQuery'].name}', ${level}, '${rowid}', '${left}${rowid}');">&#x25ba;</span></td>
+>					<td><span class="action" title="<fmt:message key="expand"/>" onclick="return expandQueryLevel(event, '${rs.attributes['parentQuery'].name}', ${level}, '${fn:escapeXml(util:paramExtract(row.values[0])[0])}');">&#x25ba;</span></td>
 </c:if><c:forEach items="${row.values}" var="v" varStatus="st" begin="${0 + offset}" end="${1 + offset}"
 >					<td><ui:link value="${v}" target="${rs.columns[st.index].targetQuery}" targetElement="${targetElement}"/></td>
 </c:forEach
 ><c:if test="${fn:length(row.values) > 2 + offset}"
->					<td><ui:info name="info-${rowid}"><c:forEach items="${row.values}" var="v" varStatus="st" begin="${2 + offset}"
+>					<td><ui:info name="info-${label}-${rowid}"><c:forEach items="${row.values}" var="v" varStatus="st" begin="${2 + offset}"
 						>${fn:escapeXml(rs.columns[st.index].name)} = <ui:link value="${v}" target="${rs.columns[st.index].targetQuery}" targetElement="${targetElement}"/>
 </c:forEach></ui:info></td>
 </c:if

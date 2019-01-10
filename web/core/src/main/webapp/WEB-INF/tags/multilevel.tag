@@ -58,20 +58,18 @@
 	variable name-from-attribute="varParams" alias="qparams" scope="NESTED"
 %><%@
 	variable name-from-attribute="varParamString" alias="paramString" scope="NESTED"
-%><div class="combo-head"><div class="float-right"><span class="action" title="<fmt:message key="maximize"/>" onclick="return zoomLeft();"><fmt:message key="maximizeIcon"/></span></div><c:set var="left" value=""
-	/><c:set var="last" value=""
-	/><c:set var="paramString" value=""
-	/><c:forEach items="${params}" var="p"
+%><div class="combo-head"><div class="float-right"><span class="action" title="<fmt:message key="maximize"/>" onclick="return zoomLeft();"><fmt:message key="maximizeIcon"/></span></div><c:set var="paramString" value=""
+	/><div id="mlparams" data-param="${levelParams}"><c:forEach items="${params}" var="p"
+		><span>${fn:escapeXml(p.value)}</span></c:forEach
+	></div><c:forEach items="${params}" var="p"
 		><c:choose
-			><c:when test="${links == null}"><a href="#" onclick="return loadQueryLevel(event, '${query}', ${p.key}, '${last}', '${left}');"></c:when
+			><c:when test="${links == null}"><a href="#" onclick="return loadQueryLevel(event, '${query}', ${p.key});"></c:when
 			><c:otherwise><a href="${links[p.key]}"></c:otherwise
 		></c:choose><c:choose
 			><c:when test="${fn:startsWith(levels[p.key].name, '$')}"><fmt:message key="${fn:substring(levels[p.key].name, 1, -1)}"><fmt:param value="${fn:length(p.value)}"/><fmt:param value="${p.value}"/></fmt:message></c:when
 			><c:otherwise><fmt:message key="customLevel"><fmt:param value="${levels[p.key].name}"/><fmt:param value="${fn:length(p.value)}"/><fmt:param value="${p.value}"/></fmt:message></c:otherwise
-		></c:choose></a><br/><div class="combo-head-level"><c:set var="left" value="${left}${empty left ? '' : '-'}${p.value}"
-		/><c:set var="last" value="${p.value}"
-	/></c:forEach><c:choose
-><c:when test="${fn:length(items) <= 1}"><c:forEach items="${items}" var="i" varStatus="st"><c:choose
+		></c:choose></a><br/><div class="combo-head-level"></c:forEach
+><c:choose><c:when test="${fn:length(items) <= 1}"><c:forEach items="${items}" var="i" varStatus="st"><c:choose
 	><c:when test="${empty i.key}"
 		><fmt:message key="emptyTab"
 	/></c:when
@@ -82,13 +80,13 @@
 		></c:choose
 	></c:otherwise
 	></c:choose> <c:choose
-			><c:when test="${links == null}"><a class="action" title="<fmt:message key="refresh"/>" href="#" onclick="return loadQueryLevel(event, '${query}', ${fn:length(params)}, '${last}', '${left}');"></c:when
+			><c:when test="${links == null}"><a class="action" title="<fmt:message key="refresh"/>" href="#" onclick="return loadQueryLevel(event, '${query}', ${fn:length(params)});"></c:when
 			><c:otherwise><a class="action" title="<fmt:message key="refresh"/>" href="${links[fn:length(params)]}"></c:otherwise
 		></c:choose><fmt:message key="refreshIcon"/></a><c:if test="${currentConnection.editorActive && (not empty editLinkTemplate) && (not empty subQuery)}"
 			> <span class="action" title="${editTitle}" href="${fn:replace(editLinkTemplate, '%%', subQuery)}"><fmt:message key="editQueryIcon"/></span></c:if
 	></c:forEach
-></c:when
-><c:otherwise><form action="#" method="get" onsubmit="return false;"><select id="combo-${name}" name="combo" onchange="return showTab('${name}', this.selectedIndex);">
+></c:when><c:otherwise
+	><form action="#" method="get" onsubmit="return false;"><select id="combo-${name}" name="combo" onchange="return showTab('${name}', this.selectedIndex);">
 <c:forEach items="${items}" var="i" varStatus="st"
 ><c:if test="${empty queryName}"
 	><c:set var="queryName" value="${i.value.name}"
@@ -105,12 +103,12 @@
 		></c:choose></option>
 </c:forEach
 ></select> <c:choose
-			><c:when test="${links == null}"><a class="action" title="<fmt:message key="refresh"/>" href="#" onclick="return loadQueryLevel(event, '${query}', ${fn:length(params)}, '${last}', '${left}');"></c:when
+			><c:when test="${links == null}"><a class="action" title="<fmt:message key="refresh"/>" href="#" onclick="return loadQueryLevel(event, '${query}', ${fn:length(params)});"></c:when
 			><c:otherwise><a class="action" title="<fmt:message key="refresh"/>" href="${links[fn:length(params)]}"></c:otherwise
 		></c:choose><fmt:message key="refreshIcon"/></a><c:if test="${currentConnection.editorActive && (not empty editLinkTemplate) && (not empty subQuery)}"
 			> <span class="action" title="${editTitle}" href="${fn:replace(editLinkTemplate, '%%', subQuery)}"><fmt:message key="editQueryIcon"/></span></c:if
-></form></c:otherwise
-></c:choose><c:forEach items="${params}" var="p"></div></c:forEach></div>
+></form></c:otherwise></c:choose
+><c:forEach items="${params}" var="p"></div></c:forEach></div>
 	
 	<div id="left-content"><div id="combo-body-${name}" class="combo-body">
 <c:forEach items="${items}" var="i" varStatus="st"

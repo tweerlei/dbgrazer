@@ -247,10 +247,8 @@
 		<div class="tab-body"><c:choose
 			><c:when test="${fn:length(rs.rows) == 0}"
 				><strong><fmt:message key="noData"/></strong></c:when
-			><c:otherwise><div id="treeselection">${label}-<c:forEach items="${rs.attributes['expandLevels']}" var="l" varStatus="st"
-				><c:set var="rowid" value="${util:paramExtract(l)}"
-				/><c:if test="${!st.first}">-</c:if
-					>${fn:escapeXml(rowid)}</c:forEach
+			><c:otherwise><div id="treeselection"><span>${label}</span><c:forEach items="${rs.attributes['expandLevels']}" var="l"
+				><span>${fn:escapeXml(l)}</span></c:forEach
 				></div>
 				<ui:result-tree rs="${rs}" label="${label}" level="1" first="true" targetElement="${targetElement}"/></c:otherwise
 		></c:choose></div></c:when><%--
@@ -260,5 +258,7 @@
 *
 ***********************************************************************
 --%><c:when test="${rs.subQueryIndex == -4}"
-><ui:result-multilevel rs="${rs}" level="${(level == null) ? 1 : level}" left="${left}" label="${label}" targetElement="${targetElement}"/></c:when
+><div id="mlselection"><c:forEach items="${rs.attributes['expandLevels']}" var="l"
+	><span>${fn:escapeXml(l)}</span></c:forEach></div>
+<ui:result-multilevel rs="${rs}" level="${(level == null) ? 1 : level}" label="${label}" targetElement="${targetElement}"/></c:when
 ></c:choose>
