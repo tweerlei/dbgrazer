@@ -162,4 +162,11 @@ public interface FrontendHelperService
 	 * @return JSON string
 	 */
 	public String toJSONString(String s);
+	
+	/**
+	 * Handle an error
+	 * @param error Throwable
+	 * @return Error message to display
+	 */
+	public String handleError(Throwable error);
 	}

@@ -24,6 +24,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -61,6 +63,7 @@ public class FrontendHelperServiceImpl implements FrontendHelperService
 	
 	private final StringTransformerService stringTransformerService;
 	private final DataFormatterFactory factory;
+	private final Logger logger;
 	
 	/**
 	 * Constructor
@@ -72,6 +75,7 @@ public class FrontendHelperServiceImpl implements FrontendHelperService
 		{
 		this.stringTransformerService = stringTransformerService;
 		this.factory = factory;
+		this.logger = Logger.getLogger(getClass().getCanonicalName());
 		}
 	
 	@Override
@@ -375,5 +379,12 @@ public class FrontendHelperServiceImpl implements FrontendHelperService
 			// unlikely for StringWriter
 			}
 		return (sw.toString());
+		}
+	
+	@Override
+	public String handleError(Throwable error)
+		{
+		logger.log(Level.SEVERE, "Error in view", error);
+		return (error.getMessage());
 		}
 	}

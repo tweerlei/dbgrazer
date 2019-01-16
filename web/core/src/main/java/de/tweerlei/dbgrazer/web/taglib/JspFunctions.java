@@ -90,4 +90,14 @@ public class JspFunctions
 		{
 		return (frontendHelper.getMenuRows(n, r));
 		}
+	
+	/**
+	 * Handle an error
+	 * @param error Throwable
+	 * @return Error message to display
+	 */
+	public String handleError(Throwable error)
+		{
+		return (frontendHelper.handleError(error));
+		}
 	}

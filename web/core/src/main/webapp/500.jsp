@@ -16,8 +16,10 @@
 	page isErrorPage="true" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"
 %><%@
 	taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"
+%><%@
+	taglib prefix="util" uri="http://tweerlei.de/dbgrazer/web/taglib/JspFunctions"
 %><%--
 	HTTP 500 (internal server error) error page referenced from web.xml
 	
 	We just print the exception message instead of rendering a whole page because the content might be used as AJAX response
---%>${fn:escapeXml(pageContext.exception.message)}
+--%>${fn:escapeXml(util:handleError(pageContext.exception))}

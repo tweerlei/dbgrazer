@@ -39,4 +39,11 @@
         <function-signature>int getMenuRows(int, de.tweerlei.common.math.Rational)</function-signature>
     </function>
 
+    <function>
+        <description>Handle a JSP error.</description>
+        <name>handleError</name>
+        <function-class>de.tweerlei.dbgrazer.web.taglib.JspFunctions</function-class>
+        <function-signature>java.lang.String handleError(java.lang.Throwable)</function-signature>
+    </function>
+
 </taglib>
