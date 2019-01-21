@@ -41,7 +41,7 @@
 		<div class="subheading">${fn:escapeXml(row.values[1])}</div>
 		<dl class="result">
 </c:when><c:otherwise
->			<dt><ui:link value="${row.values[0]}" target="${rs.columns[0].targetQuery}" targetElement="${targetElement}"/></dt>
+>			<dt title="${fn:escapeXml(row.values[0])}"><ui:link value="${row.values[0]}" target="${rs.columns[0].targetQuery}" targetElement="${targetElement}"/></dt>
 			<dd><ui:link value="${row.values[1]}" target="${rs.columns[1].targetQuery}" targetElement="${targetElement}"/></dd>
 </c:otherwise></c:choose></c:forEach
 >		</dl><hr/></div><hr/></c:when
@@ -53,7 +53,7 @@
 >		</dl><hr/></div>
 		<div class="column${columns}"><dl class="result">
 </c:if
->			<dt><ui:link value="${row.values[0]}" target="${rs.columns[0].targetQuery}" targetElement="${targetElement}"/></dt>
+>			<dt title="${fn:escapeXml(row.values[0])}"><ui:link value="${row.values[0]}" target="${rs.columns[0].targetQuery}" targetElement="${targetElement}"/></dt>
 			<dd><ui:link value="${row.values[1]}" target="${rs.columns[1].targetQuery}" targetElement="${targetElement}"/></dd>
 </c:forEach
 >		</dl><hr/></div><hr/></c:otherwise

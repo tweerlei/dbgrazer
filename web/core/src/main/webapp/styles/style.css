@@ -579,8 +579,8 @@ dl.result dt {
 dl.result dd {
 	width: 66%;
 	white-space: pre-line;
-	overflow: hidden;
-	text-overflow: ellipsis;
+	overflow: auto;
+	max-height: 6em;
 }
 
 span.zoomable {

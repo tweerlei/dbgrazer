@@ -41,7 +41,7 @@
 		<div class="subheading">${fn:escapeXml(v)}</div>
 		<dl class="result">
 </c:when><c:otherwise
->			<dt title="${fn:escapeXml(rs.columns[st.index].typeName)}">${fn:escapeXml(rs.columns[st.index].name)}</dt>
+>			<dt title="${fn:escapeXml(empty rs.columns[st.index].typeName ? rs.columns[st.index].name : rs.columns[st.index].typeName)}">${fn:escapeXml(rs.columns[st.index].name)}</dt>
 			<dd><ui:link value="${v}" target="${rs.columns[st.index].targetQuery}" targetElement="${targetElement}"/></dd>
 </c:otherwise></c:choose></c:forEach
 >		</dl><hr/></div><hr/></c:when
@@ -53,7 +53,7 @@
 >		</dl><hr/></div>
 		<div class="column${columns}"><dl class="result">
 </c:if
->			<dt title="${fn:escapeXml(rs.columns[st.index].typeName)}">${fn:escapeXml(rs.columns[st.index].name)}</dt>
+>			<dt title="${fn:escapeXml(empty rs.columns[st.index].typeName ? rs.columns[st.index].name : rs.columns[st.index].typeName)}">${fn:escapeXml(rs.columns[st.index].name)}</dt>
 			<dd><ui:link value="${v}" target="${rs.columns[st.index].targetQuery}" targetElement="${targetElement}"/></dd>
 </c:forEach
 >		</dl><hr/></div><hr/></c:otherwise
