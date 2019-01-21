@@ -249,6 +249,10 @@ hr {
 .menuitem {
 	padding: 0.3em 0.5em 0.3em 0.5em;
 	cursor: pointer;
+	max-width: 30em;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 
 .menutext {
@@ -567,13 +571,16 @@ div.subheading {
 dl.result dt {
 	width: 30%;
 	padding-bottom: 0.3em;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 
 dl.result dd {
 	width: 66%;
 	white-space: pre-line;
 	overflow: hidden;
-	text-overflow: ellipse;
+	text-overflow: ellipsis;
 }
 
 span.zoomable {

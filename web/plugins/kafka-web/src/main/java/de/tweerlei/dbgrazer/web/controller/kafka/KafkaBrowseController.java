@@ -383,7 +383,7 @@ public class KafkaBrowseController
 		final RowSetImpl rs = new RowSetImpl(query, 0, columns);
 		
 		for (Node node : nodes)
-			rs.getRows().add(new DefaultResultRow(node.id(), node.host(), node.port(), node.rack()));
+			rs.getRows().add(new DefaultResultRow(String.valueOf(node.id()), node.host(), String.valueOf(node.port()), node.rack()));
 		
 		return (rs);
 		}
@@ -443,8 +443,8 @@ public class KafkaBrowseController
 			return (resultBuilder.createEmptyRowSet(query, RowSetConstants.INDEX_MULTILEVEL, 0));
 		
 		final List<ColumnDef> columns = new ArrayList<ColumnDef>(5);
-		columns.add(new ColumnDefImpl(KafkaMessageKeys.ID, ColumnType.STRING, null, null, null, null));
-		columns.add(new ColumnDefImpl(KafkaMessageKeys.PARTITION, ColumnType.STRING, null, null, null, null));
+		columns.add(new ColumnDefImpl(KafkaMessageKeys.ID, ColumnType.INTEGER, null, null, null, null));
+		columns.add(new ColumnDefImpl(KafkaMessageKeys.PARTITION, ColumnType.INTEGER, null, null, null, null));
 		columns.add(new ColumnDefImpl(KafkaMessageKeys.REPLICAS, ColumnType.STRING, null, null, null, null));
 		columns.add(new ColumnDefImpl(KafkaMessageKeys.IN_SYNC_REPLICAS, ColumnType.STRING, null, null, null, null));
 		columns.add(new ColumnDefImpl(KafkaMessageKeys.LEADER, ColumnType.STRING, null, null, null, null));
@@ -456,7 +456,7 @@ public class KafkaBrowseController
 		
 		rs.getRows().add(new DefaultResultRow(null, "All", "&nbsp;", "&nbsp;", "&nbsp;"));
 		for (PartitionInfoBean p : sortedPartitions)
-			rs.getRows().add(new DefaultResultRow(p.getPartition(), p.getPartition(), p.getReplicas(), p.getInSyncReplicas(), p.getLeader()));
+			rs.getRows().add(new DefaultResultRow(String.valueOf(p.getPartition()), String.valueOf(p.getPartition()), p.getReplicas(), p.getInSyncReplicas(), p.getLeader()));
 		
 		rs.getAttributes().put(RowSetConstants.ATTR_MORE_LEVELS, true);
 		return (rs);

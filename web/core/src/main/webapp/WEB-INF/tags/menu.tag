@@ -34,8 +34,6 @@
 	taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"
 %><%@
 	taglib prefix="util" uri="http://tweerlei.de/dbgrazer/web/taglib/JspFunctions"
-%><%@
-	taglib prefix="ui" tagdir="/WEB-INF/tags"
 %><div class="menucolumn">
 <c:choose><c:when test="${empty items}"
 	><div class="menutext"><fmt:message key="noEntry"/></div>
@@ -57,15 +55,15 @@
 			><c:set var="itemStart" value="${fn:substring(c.key, 0, 1)}"
 			/><c:set var="itemCount" value="0"
 		/></c:when></c:choose
-		><div class="menuitem"><c:choose><c:when test="${subitems && fn:length(c.value) == 1}"
-			><c:forEach items="${c.value}" var="d"><a href="${url}${fn:escapeXml(d.value)}"<c:if test="${not empty action}"> onclick="${fn:replace(action, '%%', fn:escapeXml(d.value))}"</c:if>><ui:shorten value="${c.key}" length="50"/></a></c:forEach></c:when
+		><c:choose><c:when test="${subitems && fn:length(c.value) == 1}"
+			><div class="menuitem"><c:forEach items="${c.value}" var="d"><a href="${url}${fn:escapeXml(d.value)}"<c:if test="${not empty action}"> onclick="${fn:replace(action, '%%', fn:escapeXml(d.value))}"</c:if>>${fn:escapeXml(c.key)}</a></c:forEach></div></c:when
 		><c:when test="${subitems}"
 			><div class="hidden" id="submenu-${st.index}"><div class="menucolumn"><c:forEach items="${c.value}" var="d"
-				><div class="menuitem"><a href="${url}${fn:escapeXml(d.value)}"<c:if test="${not empty action}"> onclick="${fn:replace(action, '%%', fn:escapeXml(d.value))}"</c:if>><ui:shorten value="${d.key}" length="50"/></a></div></c:forEach
-			></div></div><span onclick="return showElementMenu(event, 'submenu-${st.index}');"><ui:shorten value="${c.key}" length="50"/> &#x25ba;</span></c:when
+				><div class="menuitem"><a href="${url}${fn:escapeXml(d.value)}"<c:if test="${not empty action}"> onclick="${fn:replace(action, '%%', fn:escapeXml(d.value))}"</c:if>>${fn:escapeXml(d.key)}</a></div></c:forEach
+			></div></div><div class="menuitem" onclick="return showElementMenu(event, 'submenu-${st.index}');">${fn:escapeXml(c.key)} &#x25ba;</div></c:when
 		><c:otherwise
-			><a href="${url}${fn:escapeXml(c.value)}"<c:if test="${not empty action}"> onclick="${fn:replace(action, '%%', fn:escapeXml(c.value))}"</c:if>><ui:shorten value="${c.key}" length="50"/></a></c:otherwise
-		></c:choose></div>
+			><div class="menuitem"><a href="${url}${fn:escapeXml(c.value)}"<c:if test="${not empty action}"> onclick="${fn:replace(action, '%%', fn:escapeXml(c.value))}"</c:if>>${fn:escapeXml(c.key)}</a></div></c:otherwise
+		></c:choose>
 <c:set var="itemCount" value="${itemCount + 1}"
 	/></c:forEach
 ></c:otherwise></c:choose
