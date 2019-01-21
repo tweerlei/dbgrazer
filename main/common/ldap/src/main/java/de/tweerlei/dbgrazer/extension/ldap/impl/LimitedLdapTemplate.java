@@ -18,6 +18,8 @@ package de.tweerlei.dbgrazer.extension.ldap.impl;
 import javax.naming.Name;
 import javax.naming.directory.SearchControls;
 
+import org.springframework.ldap.SizeLimitExceededException;
+import org.springframework.ldap.TimeLimitExceededException;
 import org.springframework.ldap.core.ContextSource;
 import org.springframework.ldap.core.DirContextProcessor;
 import org.springframework.ldap.core.LdapTemplate;
@@ -87,28 +89,68 @@ public class LimitedLdapTemplate extends LdapTemplate
 	@Override
 	public void search(Name base, String filter, SearchControls controls, NameClassPairCallbackHandler handler)
 		{
-		prepareSearchControls(controls);
-		super.search(base, filter, controls, handler);
+		try	{
+			prepareSearchControls(controls);
+			super.search(base, filter, controls, handler);
+			}
+		catch (SizeLimitExceededException e)
+			{
+			// ignore
+			}
+		catch (TimeLimitExceededException e)
+			{
+			// ignore
+			}
 		}
 	
 	@Override
 	public void search(String base, String filter, SearchControls controls, NameClassPairCallbackHandler handler)
 		{
-		prepareSearchControls(controls);
-		super.search(base, filter, controls, handler);
+		try	{
+			prepareSearchControls(controls);
+			super.search(base, filter, controls, handler);
+			}
+		catch (SizeLimitExceededException e)
+			{
+			// ignore
+			}
+		catch (TimeLimitExceededException e)
+			{
+			// ignore
+			}
 		}
 	
 	@Override
 	public void search(Name base, String filter, SearchControls controls, NameClassPairCallbackHandler handler, DirContextProcessor processor)
 		{
-		prepareSearchControls(controls);
-		super.search(base, filter, controls, handler, processor);
+		try	{
+			prepareSearchControls(controls);
+			super.search(base, filter, controls, handler, processor);
+			}
+		catch (SizeLimitExceededException e)
+			{
+			// ignore
+			}
+		catch (TimeLimitExceededException e)
+			{
+			// ignore
+			}
 		}
 	
 	@Override
 	public void search(String base, String filter, SearchControls controls, NameClassPairCallbackHandler handler, DirContextProcessor processor)
 		{
-		prepareSearchControls(controls);
-		super.search(base, filter, controls, handler, processor);
+		try	{
+			prepareSearchControls(controls);
+			super.search(base, filter, controls, handler, processor);
+			}
+		catch (SizeLimitExceededException e)
+			{
+			// ignore
+			}
+		catch (TimeLimitExceededException e)
+			{
+			// ignore
+			}
 		}
 	}
