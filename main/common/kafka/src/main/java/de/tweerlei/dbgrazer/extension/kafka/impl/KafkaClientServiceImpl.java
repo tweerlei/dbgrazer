@@ -240,6 +240,12 @@ public class KafkaClientServiceImpl implements KafkaClientService, LinkListener,
 		}
 	
 	@Override
+	public int getMaxRows(String c)
+		{
+		return (configService.get(ConfigKeys.KAFKA_FETCH_LIMIT));
+		}
+	
+	@Override
 	public OffsetInfo getOffsetInfo(String c, String topic, Integer partition)
 		{
 		final Consumer<String, String> consumer = getConsumer(c);
@@ -318,7 +324,7 @@ public class KafkaClientServiceImpl implements KafkaClientService, LinkListener,
 			consumer.subscribe(Collections.singleton(topic));
 		
 		final List<ConsumerRecord<String, String>> ret = new LinkedList<ConsumerRecord<String, String>>();
-		final int limit = configService.get(ConfigKeys.KAFKA_FETCH_LIMIT);
+		final int limit = getMaxRows(c);
 		int n = 0;
 		while (n < limit)
 			{

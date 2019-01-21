@@ -39,4 +39,11 @@ public interface LdapAccessService
 	 * @return LdapTemplate or null
 	 */
 	public LdapTemplate getLdapTemplate(String c, String username, String password);
+	
+	/**
+	 * Get the configured max. rows to fetch
+	 * @param c Link name
+	 * @return Max row count
+	 */
+	public int getMaxRows(String c);
 	}

@@ -102,6 +102,13 @@ public interface KafkaClientService
 	public AdminClient getAdminClient(String c);
 	
 	/**
+	 * Get the configured max. rows to fetch
+	 * @param c Link name
+	 * @return Max row count
+	 */
+	public int getMaxRows(String c);
+	
+	/**
 	 * Get offset information
 	 * @param c Link name
 	 * @param topic Topic name

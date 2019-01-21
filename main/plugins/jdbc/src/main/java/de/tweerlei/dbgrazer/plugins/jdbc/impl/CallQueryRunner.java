@@ -396,13 +396,13 @@ public class CallQueryRunner extends BaseQueryRunner
 	
 	private Map<String, RowSetImpl> performDMLKeyQuery(TransactionTemplate tx, JdbcTemplate template, SQLDialect dialect, Query query, int subQueryIndex, List<Object> params, int limit, String preDMLStatement, String postDMLStatement)
 		{
-		final int maxRows = template.getMaxRows();
+		final int maxRows = Math.min(limit, template.getMaxRows());
 		
 		final JdbcParamReplacer rep = new JdbcParamReplacer(params, keywordService);
 		final String statement = rep.replaceAll(query.getStatement());
 		final List<Object> args = rep.getRemainingParams();
 		
-		final RowSetMapper mapper = new SingleRowSetMapper(sqlGenerator, dialect, query, subQueryIndex, limit);
+		final RowSetMapper mapper = new SingleRowSetMapper(sqlGenerator, dialect, query, subQueryIndex);
 		final LimitedResultSetExtractor extractor = new LimitedResultSetExtractor(mapper, maxRows);
 		final TransactionCallback cb = new DMLKeyQueryCallback(template, statement, args, query.getParameters(), preDMLStatement, postDMLStatement, extractor);
 		

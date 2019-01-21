@@ -244,9 +244,9 @@ public class JdbcQueryRunner extends BaseQueryRunner
 	
 	private Map<String, RowSetImpl> performQuery(TransactionTemplate tx, JdbcTemplate template, SQLDialect dialect, Query query, int subQueryIndex, List<Object> params, int limit)
 		{
-		final int maxRows = template.getMaxRows();
+		final int maxRows = Math.min(limit, template.getMaxRows());
 		
-		final RowSetMapper mapper = getRowSetMapper(dialect, query, subQueryIndex, limit);
+		final RowSetMapper mapper = getRowSetMapper(dialect, query, subQueryIndex);
 		
 		final LimitedResultSetExtractor extractor = new LimitedResultSetExtractor(mapper, maxRows);
 		final Query runQuery;
@@ -284,16 +284,16 @@ public class JdbcQueryRunner extends BaseQueryRunner
 		return (ret);
 		}
 	
-	private RowSetMapper getRowSetMapper(SQLDialect dialect, Query query, int subQueryIndex, int limit)
+	private RowSetMapper getRowSetMapper(SQLDialect dialect, Query query, int subQueryIndex)
 		{
 		switch (query.getType().getMapMode())
 			{
 			case GROUPED:
-				return (new GroupingRowSetMapper(sqlGenerator, dialect, query, subQueryIndex, limit));
+				return (new GroupingRowSetMapper(sqlGenerator, dialect, query, subQueryIndex));
 			case SPLIT:
-				return (new ColumnSplitMapper(sqlGenerator, dialect, query, subQueryIndex, limit));
+				return (new ColumnSplitMapper(sqlGenerator, dialect, query, subQueryIndex));
 			default:
-				return (new SingleRowSetMapper(sqlGenerator, dialect, query, subQueryIndex, limit));
+				return (new SingleRowSetMapper(sqlGenerator, dialect, query, subQueryIndex));
 			}
 		}
 	

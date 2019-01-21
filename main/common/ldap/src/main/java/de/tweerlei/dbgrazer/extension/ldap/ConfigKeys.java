@@ -30,7 +30,14 @@ public final class ConfigKeys
 	
 	private static final String PACKAGE_NAME = "dbgrazer.backend.ldap";
 	
-	/** LDAP: Attribute names whose content should be treated as binary.
+	/** Fetch limit */
+	public static final ConfigKey<Integer> MAX_ROWS = ConfigKey.create(PACKAGE_NAME, "maxRows", Integer.class, 100);
+	
+	/** Query timeout */
+	public static final ConfigKey<Integer> QUERY_TIMEOUT = ConfigKey.create(PACKAGE_NAME, "timeout", Integer.class, 60);
+	
+	/**
+	 * LDAP: Attribute names whose content should be treated as binary.
 	 * The JNDI LDAP provider detects:
 	 * photo
 	 * personalSignature

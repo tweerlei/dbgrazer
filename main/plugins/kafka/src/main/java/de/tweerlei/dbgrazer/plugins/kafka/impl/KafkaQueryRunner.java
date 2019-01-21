@@ -104,7 +104,7 @@ public class KafkaQueryRunner extends BaseQueryRunner
 		if (query.getType() instanceof MessageQueryType)
 			fetchSingleMessage(res, link, query, subQueryIndex, params);
 		else
-			fetchMessages(res, link, query, subQueryIndex, params);
+			fetchMessages(res, link, query, subQueryIndex, params, limit);
 		
 		return (res);
 		}
@@ -148,7 +148,7 @@ public class KafkaQueryRunner extends BaseQueryRunner
 			}
 		}
 	
-	private void fetchMessages(Result res, String link, Query query, int subQueryIndex, List<Object> params) throws PerformQueryException
+	private void fetchMessages(Result res, String link, Query query, int subQueryIndex, List<Object> params, int limit) throws PerformQueryException
 		{
 		try	{
 			final String q = buildQuery(query, params);
@@ -185,11 +185,15 @@ public class KafkaQueryRunner extends BaseQueryRunner
 				endOffset = null;
 				}
 			
+			final int maxRows = Math.min(limit, kafkaClient.getMaxRows(link));
+			
 			final long start = timeService.getCurrentTime();
 			final List<ConsumerRecord<String, String>> recs = kafkaClient.fetchRecords(link, topic, partition, startOffset, endOffset);
 			final long end = timeService.getCurrentTime();
 			
-			res.getRowSets().put(query.getName(), createListRowSet(query, subQueryIndex, recs, end - start));
+			final RowSet rs = createListRowSet(query, subQueryIndex, recs, maxRows, end - start);
+			
+			res.getRowSets().put(query.getName(), rs);
 			}
 		catch (RuntimeException e)
 			{
@@ -247,7 +251,7 @@ public class KafkaQueryRunner extends BaseQueryRunner
 		return (rs);
 		}
 	
-	private RowSet createListRowSet(Query query, int subQueryIndex, List<ConsumerRecord<String, String>> recs, long time)
+	private RowSet createListRowSet(Query query, int subQueryIndex, List<ConsumerRecord<String, String>> recs, int limit, long time)
 		{
 		final RowSetImpl rs;
 		if (recs == null || recs.isEmpty())
@@ -270,6 +274,9 @@ public class KafkaQueryRunner extends BaseQueryRunner
 				row.getValues().add(rec.serializedValueSize());
 				rs.getRows().add(row);
 				}
+			rs.setQueryTime(time);
+			if (rs.getRows().size() >= limit)
+				rs.setMoreAvailable(true);
 			}
 		return (rs);
 		}

@@ -409,11 +409,12 @@ public class LdapQueryRunner extends BaseQueryRunner
 		if (ldap == null)
 			throw new PerformQueryException(query.getName(), new RuntimeException("Unknown link " + link));
 		
+		final int maxRows = Math.min(limit, ldapAccessService.getMaxRows(link));
 		final Result res = new ResultImpl(query);
 		
 		try	{
 			final String stmt = new ParamReplacer(params).replaceAll(query.getStatement());
-			performLdapQuery(ldap, stmt, query, subQueryIndex, res, limit);
+			performLdapQuery(ldap, stmt, query, subQueryIndex, res, maxRows);
 			}
 		catch (RuntimeException e)
 			{
@@ -474,6 +475,8 @@ public class LdapQueryRunner extends BaseQueryRunner
 		
 		final RowSetImpl rs = mapper.getRowSet();
 		rs.setQueryTime(end - start);
+		if (rs.getRows().size() >= limit)
+			rs.setMoreAvailable(true);
 		
 		res.getRowSets().put(res.getQuery().getName(), rs);
 		}

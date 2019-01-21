@@ -40,7 +40,6 @@ public class SingleRowSetMapper extends RowSetMapper
 	{
 	private final Query query;
 	private final int subQueryIndex;
-	private final int limit;
 	private final Map<String, RowSetImpl> rowSets;
 	
 	/**
@@ -49,14 +48,12 @@ public class SingleRowSetMapper extends RowSetMapper
 	 * @param dialect SQLDialect
 	 * @param query Query
 	 * @param subQueryIndex Subquery index
-	 * @param limit Fetch limit
 	 */
-	public SingleRowSetMapper(SQLGeneratorService sqlGenerator, SQLDialect dialect, Query query, int subQueryIndex, int limit)
+	public SingleRowSetMapper(SQLGeneratorService sqlGenerator, SQLDialect dialect, Query query, int subQueryIndex)
 		{
 		super(sqlGenerator, dialect);
 		this.query = query;
 		this.subQueryIndex = subQueryIndex;
-		this.limit = limit;
 		this.rowSets = new LinkedHashMap<String, RowSetImpl>();
 		}
 	
@@ -82,16 +79,11 @@ public class SingleRowSetMapper extends RowSetMapper
 			rowSets.put(query.getName(), rowSet);
 			}
 		
-		if (rowSet.getRows().size() < limit)
-			{
-			final int c = rowSet.getColumns().size();
-			final ResultRow row = new DefaultResultRow(c);
-			for (int i = 1; i <= c; i++)
-				row.getValues().add(rs.getObject(i));
-			
-			rowSet.getRows().add(row);
-			}
-		else
-			rowSet.setMoreAvailable(true);
+		final int c = rowSet.getColumns().size();
+		final ResultRow row = new DefaultResultRow(c);
+		for (int i = 1; i <= c; i++)
+			row.getValues().add(rs.getObject(i));
+		
+		rowSet.getRows().add(row);
 		}
 	}

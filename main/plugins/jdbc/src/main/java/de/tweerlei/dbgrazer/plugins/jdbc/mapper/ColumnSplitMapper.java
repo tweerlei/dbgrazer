@@ -39,7 +39,6 @@ import de.tweerlei.ermtools.dialect.SQLDialect;
 public class ColumnSplitMapper extends RowSetMapper
 	{
 	private final Query query;
-	private final int limit;
 	private final Map<String, RowSetImpl> rowSets;
 	private int subQueryIndex;
 	private boolean first;
@@ -50,13 +49,11 @@ public class ColumnSplitMapper extends RowSetMapper
 	 * @param dialect SQLDialect
 	 * @param query Query
 	 * @param subQueryIndex Base subquery index
-	 * @param limit Fetch limit
 	 */
-	public ColumnSplitMapper(SQLGeneratorService sqlGenerator, SQLDialect dialect, Query query, int subQueryIndex, int limit)
+	public ColumnSplitMapper(SQLGeneratorService sqlGenerator, SQLDialect dialect, Query query, int subQueryIndex)
 		{
 		super(sqlGenerator, dialect);
 		this.query = query;
-		this.limit = limit;
 		this.rowSets = new LinkedHashMap<String, RowSetImpl>();
 		this.subQueryIndex = subQueryIndex;
 		this.first = true;
@@ -90,15 +87,8 @@ public class ColumnSplitMapper extends RowSetMapper
 		int i = 2;
 		for (RowSetImpl rowSet : rowSets.values())
 			{
-			if (rowSet.getRows().size() < limit)
-				{
-				final ResultRow row = new DefaultResultRow(
-						key,
-						rs.getObject(i++));
-				rowSet.getRows().add(row);
-				}
-			else
-				rowSet.setMoreAvailable(true);
+			final ResultRow row = new DefaultResultRow(key, rs.getObject(i++));
+			rowSet.getRows().add(row);
 			}
 		}
 	}

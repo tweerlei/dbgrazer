@@ -39,7 +39,6 @@ import de.tweerlei.ermtools.dialect.SQLDialect;
 public class GroupingRowSetMapper extends RowSetMapper
 	{
 	private final Query query;
-	private final int limit;
 	private final Map<String, RowSetImpl> rowSets;
 	private int subQueryIndex;
 	
@@ -49,13 +48,11 @@ public class GroupingRowSetMapper extends RowSetMapper
 	 * @param dialect SQLDialect
 	 * @param query Query
 	 * @param subQueryIndex Base subquery index
-	 * @param limit Fetch limit
 	 */
-	public GroupingRowSetMapper(SQLGeneratorService sqlGenerator, SQLDialect dialect, Query query, int subQueryIndex, int limit)
+	public GroupingRowSetMapper(SQLGeneratorService sqlGenerator, SQLDialect dialect, Query query, int subQueryIndex)
 		{
 		super(sqlGenerator, dialect);
 		this.query = query;
-		this.limit = limit;
 		this.rowSets = new LinkedHashMap<String, RowSetImpl>();
 		this.subQueryIndex = subQueryIndex;
 		}
@@ -83,16 +80,11 @@ public class GroupingRowSetMapper extends RowSetMapper
 			rowSets.put(key, rowSet);
 			}
 		
-		if (rowSet.getRows().size() < limit)
-			{
-			final int c = rowSet.getColumns().size();
-			final ResultRow row = new DefaultResultRow(c);
-			for (int i = 1; i <= c; i++)
-				row.getValues().add(rs.getObject(i + 1));
-			
-			rowSet.getRows().add(row);
-			}
-		else
-			rowSet.setMoreAvailable(true);
+		final int c = rowSet.getColumns().size();
+		final ResultRow row = new DefaultResultRow(c);
+		for (int i = 1; i <= c; i++)
+			row.getValues().add(rs.getObject(i + 1));
+		
+		rowSet.getRows().add(row);
 		}
 	}

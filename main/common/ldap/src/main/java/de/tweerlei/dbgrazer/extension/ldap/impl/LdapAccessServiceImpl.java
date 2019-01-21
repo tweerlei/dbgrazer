@@ -39,6 +39,10 @@ import de.tweerlei.dbgrazer.link.model.LinkDef;
 import de.tweerlei.dbgrazer.link.service.LinkListener;
 import de.tweerlei.dbgrazer.link.service.LinkManager;
 import de.tweerlei.dbgrazer.link.service.LinkService;
+import de.tweerlei.spring.config.impl.CompositeConfigProvider;
+import de.tweerlei.spring.config.impl.ConfigProviderAccessor;
+import de.tweerlei.spring.config.impl.MapBasedConfigProvider;
+import de.tweerlei.spring.service.SerializerFactory;
 
 /**
  * Manage LDAP connections
@@ -48,6 +52,7 @@ import de.tweerlei.dbgrazer.link.service.LinkService;
 @Service
 public class LdapAccessServiceImpl implements LdapAccessService, LinkListener, LinkManager
 	{
+	private final SerializerFactory serializerFactory;
 	private final ConfigService configService;
 	private final LinkService linkService;
 	private final Map<String, LdapTemplate> activeConnections;
@@ -55,12 +60,15 @@ public class LdapAccessServiceImpl implements LdapAccessService, LinkListener, L
 	
 	/**
 	 * Constructor
+	 * @param serializerFactory SerializerFactory
 	 * @param configService ConfigService
 	 * @param linkService LinkService
 	 */
 	@Autowired
-	public LdapAccessServiceImpl(ConfigService configService, LinkService linkService)
+	public LdapAccessServiceImpl(SerializerFactory serializerFactory, ConfigService configService,
+			LinkService linkService)
 		{
+		this.serializerFactory = serializerFactory;
 		this.configService = configService;
 		this.linkService = linkService;
 		this.activeConnections = new ConcurrentHashMap<String, LdapTemplate>();
@@ -125,7 +133,15 @@ public class LdapAccessServiceImpl implements LdapAccessService, LinkListener, L
 		if ((def == null) /*|| !(def.getType() instanceof LdapLinkType)*/)
 			throw new RuntimeException("Unknown link " + c);
 		
-		return (createLdapTemplate(def.getUrl(), def.getDriver(), username, password));
+		return (createLdapTemplate(def, username, password));
+		}
+	
+	@Override
+	public int getMaxRows(String c)
+		{
+		final LimitedLdapTemplate template = (LimitedLdapTemplate) getLdapTemplate(c);
+		
+		return (template.getCountLimit());
 		}
 	
 	private synchronized LdapTemplate createConnection(String c)
@@ -138,27 +154,32 @@ public class LdapAccessServiceImpl implements LdapAccessService, LinkListener, L
 		if ((def == null) /*|| !(def.getType() instanceof LdapLinkType)*/)
 			throw new RuntimeException("Unknown link " + c);
 		
-		ldapTemplate = createLdapTemplate(def.getUrl(), def.getDriver(), def.getUsername(), def.getPassword());
+		ldapTemplate = createLdapTemplate(def, def.getUsername(), def.getPassword());
 		activeConnections.put(c, ldapTemplate);
 		
 		return (ldapTemplate);
 		}
 	
-	private LdapTemplate createLdapTemplate(String url, String base, String user, String pass)
+	private LdapTemplate createLdapTemplate(LinkDef def, String user, String pass)
 		{
-		if (url == null)
+		if (def.getUrl() == null)
 			throw new RuntimeException("Missing LDAP url");
 		
-		logger.log(Level.INFO, "Creating LDAP connection: [" + url + "] [" + base + "] [" + user + "]");
+		logger.log(Level.INFO, "Creating LDAP connection: [" + def.getUrl() + "] [" + def.getDriver() + "] [" + user + "]");
+		
+		final ConfigProviderAccessor accessor = new ConfigProviderAccessor(new CompositeConfigProvider(
+				new MapBasedConfigProvider(def.getProperties()),
+				configService.getConfigProvider()
+				), serializerFactory);
 		
 		final LdapContextSource src = new LdapContextSource();
-		src.setUrl(url);
-		src.setBase(base);
+		src.setUrl(def.getUrl());
+		src.setBase(def.getDriver());
 		src.setUserDn(user);
 		src.setPassword(pass);
 //		src.setPooled(true);
 		
-		final String binaryAttributes = configService.get(ConfigKeys.LDAP_BINARY_ATTRIBUTES);
+		final String binaryAttributes = accessor.get(ConfigKeys.LDAP_BINARY_ATTRIBUTES);
 		if (!StringUtils.empty(binaryAttributes))
 			src.setBaseEnvironmentProperties(Collections.singletonMap("java.naming.ldap.attributes.binary", binaryAttributes));
 		
@@ -170,7 +191,9 @@ public class LdapAccessServiceImpl implements LdapAccessService, LinkListener, L
 			logger.log(Level.WARNING, "createLdapTemplate", e);
 			}
 		
-		final LdapTemplate tmp = new LdapTemplate(src);
+		final LimitedLdapTemplate tmp = new LimitedLdapTemplate(src);
+		tmp.setCountLimit(accessor.get(ConfigKeys.MAX_ROWS));
+		tmp.setTimeLimit(accessor.get(ConfigKeys.QUERY_TIMEOUT) * 1000);
 		// Workaround for ActiveDirectory servers
 		tmp.setIgnorePartialResultException(true);
 		
