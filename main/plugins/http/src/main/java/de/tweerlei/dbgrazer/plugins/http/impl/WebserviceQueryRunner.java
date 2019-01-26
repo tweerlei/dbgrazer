@@ -106,7 +106,7 @@ public class WebserviceQueryRunner extends BaseQueryRunner
 		{
 		final Result res = new ResultImpl(query);
 		
-		final String endpoint = StringUtils.notNull(query.getAttributes().get(QueryTypeAttributes.ATTR_ENDPOINT));
+		final String endpoint = buildRequestURL(query, params);
 		
 		if (query.getType() instanceof PostQueryType)
 			performPOST(res, link, endpoint, query, subQueryIndex, params);
@@ -243,6 +243,19 @@ public class WebserviceQueryRunner extends BaseQueryRunner
 			{
 			logger.log(Level.SEVERE, "performSOAP", e);
 			throw new PerformQueryException(query.getName(), new RuntimeException("performSOAP: " + e.getMessage(), e));
+			}
+		}
+	
+	private String buildRequestURL(Query query, List<Object> params) throws PerformQueryException
+		{
+		try	{
+			final String url = StringUtils.notNull(query.getAttributes().get(QueryTypeAttributes.ATTR_ENDPOINT));
+			return (new FormParamReplacer(params).replaceAll(url));
+			}
+		catch (RuntimeException e)
+			{
+			logger.log(Level.SEVERE, "buildRequestURL", e);
+			throw new PerformQueryException(query.getName(), e);
 			}
 		}
 	
