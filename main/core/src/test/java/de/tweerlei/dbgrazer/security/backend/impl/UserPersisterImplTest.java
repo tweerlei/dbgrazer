@@ -68,7 +68,7 @@ public class UserPersisterImplTest extends TestCase
 		final KeywordService kw = EasyMock.createMock(KeywordService.class);
 		EasyMock.expect(kw.normalizeName("test1")).andReturn("test2");
 		EasyMock.expect(kw.normalizeParam("prop1")).andReturn("prop2");
-		EasyMock.expect(kw.normalizeParam("value 1")).andReturn("value 2");
+		EasyMock.expect(kw.normalizeValue("value 1")).andReturn("value 2");
 		EasyMock.expect(kw.extractValues("login , edit")).andReturn(Arrays.asList("login", "edit"));
 		EasyMock.expect(kw.extractValues("edit, login")).andReturn(Arrays.asList("login", "edit"));
 		EasyMock.expect(kw.extractValues(null)).andReturn(Collections.<String>emptyList()).times(2);

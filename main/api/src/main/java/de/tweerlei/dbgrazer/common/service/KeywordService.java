@@ -39,6 +39,13 @@ public interface KeywordService
 	public String normalizeParam(String name);
 	
 	/**
+	 * Normalize a parameter value
+	 * @param name Parameter value
+	 * @return Normalized value
+	 */
+	public String normalizeValue(String name);
+	
+	/**
 	 * Normalize a group name
 	 * @param name Group name
 	 * @return Normalized name

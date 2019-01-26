@@ -259,9 +259,9 @@ public class QueryPersisterImplTest extends TestCase
 		EasyMock.expect(kwMock.normalizeName("q8")).andReturn("q_8");
 		EasyMock.expect(kwMock.normalizeName("p9")).andReturn("p_9");
 		EasyMock.expect(kwMock.normalizeParam("key1")).andReturn("key_1");
-		EasyMock.expect(kwMock.normalizeParam("value1")).andReturn("value_1");
+		EasyMock.expect(kwMock.normalizeValue("value1")).andReturn("value_1");
 		EasyMock.expect(kwMock.normalizeParam("key2")).andReturn("key_2");
-		EasyMock.expect(kwMock.normalizeParam("value2")).andReturn("value_2");
+		EasyMock.expect(kwMock.normalizeValue("value2")).andReturn("value_2");
 		EasyMock.expect(kwMock.combineValues(Arrays.asList("key_1:value_1", "key_2:value_2"))).andReturn("key_1:value_1, key_2:value_2");
 		EasyMock.expect(kwMock.combineValues(Arrays.asList("p_1:INTEGER", "p_2:FLOAT:q_7"))).andReturn("p_1:INTEGER, p_2:FLOAT:q_7");
 		EasyMock.expect(kwMock.combineValues(Arrays.asList("2:q_8", "4:*p_9"))).andReturn("2:q_8, 4:*p_9");
@@ -308,10 +308,10 @@ public class QueryPersisterImplTest extends TestCase
 		EasyMock.expect(kwMock.normalizeName("q8")).andReturn("q_8");
 		EasyMock.expect(kwMock.normalizeName("q9")).andReturn("q_9");
 		EasyMock.expect(kwMock.normalizeParam("key1")).andReturn("key_1");
-		EasyMock.expect(kwMock.normalizeParam("value1")).andReturn("value_1");
+		EasyMock.expect(kwMock.normalizeValue("value1")).andReturn("value_1");
 		EasyMock.expect(kwMock.normalizeParam("key2")).andReturn("key_2");
-		EasyMock.expect(kwMock.normalizeParam("value2")).andReturn("value_2");
-		EasyMock.expect(kwMock.normalizeParam("p9")).andReturn("p_9");
+		EasyMock.expect(kwMock.normalizeValue("value2")).andReturn("value_2");
+		EasyMock.expect(kwMock.normalizeValue("p9")).andReturn("p_9");
 		EasyMock.expect(kwMock.combineValues(Arrays.asList("key_1:value_1", "key_2:value_2"))).andReturn("key_1:value_1, key_2:value_2");
 		EasyMock.expect(kwMock.combineValues(Arrays.asList("p_1:INTEGER", "p_2:FLOAT:q_7"))).andReturn("p_1:INTEGER, p_2:FLOAT:q_7");
 		EasyMock.expect(kwMock.combineValues(Arrays.asList("q_8", "q_9:p_9"))).andReturn("q_8, q_9:p_9");

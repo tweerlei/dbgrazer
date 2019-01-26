@@ -40,13 +40,21 @@ public class KeywordServiceImpl implements KeywordService
 	// Disallow SPLIT_DELIM
 	private static final Pattern ILLEGAL_NAME_CHARS = Pattern.compile("[^-+._()$ \\p{javaLetterOrDigit}]+");
 	
-	// Names for parameters (and their values):
+	// Names for parameters:
 	// Allow (unicode) letters, digits and certain special characters.
 	// Disallow XML special characters: <>&"'
 	// Disallow SPLIT_DELIM
 	// Disallow internal separator :
 	// Disallow special marker *
 	private static final Pattern ILLEGAL_PARAM_CHARS = Pattern.compile("[^-+._()@/ \\p{javaLetterOrDigit}]+");
+	
+	// Parameter values:
+	// Allow (unicode) letters, digits and certain special characters.
+	// Allow special characters !#()*+-./;?@[]{|}
+	// Disallow XML special characters: <>&"'
+	// Disallow SPLIT_DELIM
+	// Disallow internal separator :
+	private static final Pattern ILLEGAL_VALUE_CHARS = Pattern.compile("[^-!#*+._()@/;?\\[\\]\\{\\} \\p{javaLetterOrDigit}]+");
 	
 	// Names for groups:
 	// Allow (unicode) letters, digits and certain special characters.
@@ -81,6 +89,15 @@ public class KeywordServiceImpl implements KeywordService
 			return ("");
 		
 		return (ILLEGAL_PARAM_CHARS.matcher(name).replaceAll("").trim());
+		}
+	
+	@Override
+	public String normalizeValue(String name)
+		{
+		if (name == null)
+			return ("");
+		
+		return (ILLEGAL_VALUE_CHARS.matcher(name).replaceAll("").trim());
 		}
 	
 	@Override

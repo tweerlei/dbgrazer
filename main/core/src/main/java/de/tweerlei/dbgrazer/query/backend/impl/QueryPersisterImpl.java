@@ -351,7 +351,7 @@ public class QueryPersisterImpl implements QueryPersister
 		for (ParameterDef s : params)
 			{
 			final StringBuilder sb = new StringBuilder();
-			sb.append(sanitizeParam(s.getName(), false));
+			sb.append(sanitizeParam(s.getName()));
 			sb.append(PART_SEPARATOR);
 			sb.append(s.getType().name());
 			if (!StringUtils.empty(s.getValueQuery()))
@@ -406,7 +406,7 @@ public class QueryPersisterImpl implements QueryPersister
 			for (String p : s.getParameterValues())
 				{
 				sb.append(PART_SEPARATOR);
-				sb.append(sanitizeParam(p, true));
+				sb.append(sanitizeValue(p));
 				}
 			values.add(sb.toString());
 			}
@@ -425,9 +425,9 @@ public class QueryPersisterImpl implements QueryPersister
 		for (Map.Entry<String, String> ent : attributes.entrySet())
 			{
 			final StringBuilder sb = new StringBuilder();
-			sb.append(sanitizeParam(ent.getKey(), false));
+			sb.append(sanitizeParam(ent.getKey()));
 			sb.append(PART_SEPARATOR);
-			sb.append(sanitizeParam(ent.getValue(), false));
+			sb.append(sanitizeValue(ent.getValue()));
 			values.add(sb.toString());
 			}
 		
@@ -450,15 +450,19 @@ public class QueryPersisterImpl implements QueryPersister
 		return (s);
 		}
 	
-	private String sanitizeParam(String name, boolean allowEmpty) throws IOException
+	private String sanitizeParam(String name) throws IOException
 		{
 		final String s = keywordService.normalizeParam(name);
 		if (StringUtils.empty(s))
-			{
-			if (!allowEmpty)
-				throw new IOException("Invalid name: " + name);
+			throw new IOException("Invalid name: " + name);
+		return (s);
+		}
+	
+	private String sanitizeValue(String name)
+		{
+		final String s = keywordService.normalizeValue(name);
+		if (StringUtils.empty(s))
 			return ("");
-			}
 		return (s);
 		}
 	}

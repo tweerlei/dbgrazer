@@ -128,7 +128,7 @@ public class UserPersisterImpl implements UserPersister
 		final Properties props = new Properties();
 		
 		for (Map.Entry<String, String> ent : user.getAttributes().entrySet())
-			props.setProperty(sanitizeParam(ent.getKey(), false), sanitizeParam(ent.getValue(), false));
+			props.setProperty(sanitizeParam(ent.getKey()), sanitizeValue(ent.getValue()));
 		
 		props.setProperty(PROP_NAME, sanitizeName(user.getName(), true));
 		props.setProperty(PROP_PASSWORD, user.getPassword());
@@ -175,15 +175,19 @@ public class UserPersisterImpl implements UserPersister
 		return (s);
 		}
 	
-	private String sanitizeParam(String name, boolean allowEmpty) throws IOException
+	private String sanitizeParam(String name) throws IOException
 		{
 		final String s = keywordService.normalizeParam(name);
 		if (StringUtils.empty(s))
-			{
-			if (!allowEmpty)
-				throw new IOException("Invalid name: " + name);
+			throw new IOException("Invalid name: " + name);
+		return (s);
+		}
+	
+	private String sanitizeValue(String name)
+		{
+		final String s = keywordService.normalizeValue(name);
+		if (StringUtils.empty(s))
 			return ("");
-			}
 		return (s);
 		}
 	

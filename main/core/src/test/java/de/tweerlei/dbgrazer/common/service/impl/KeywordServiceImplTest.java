@@ -54,6 +54,19 @@ public class KeywordServiceImplTest extends TestCase
 		}
 	
 	/**
+	 * Test normalizeParam
+	 */
+	public void testNormalizeValue()
+		{
+		final KeywordService svc = new KeywordServiceImpl();
+		
+		assertEquals("", svc.normalizeValue(null));
+		assertEquals("", svc.normalizeValue(""));
+		assertEquals("abcäD12-a (g)", svc.normalizeValue(" abcäD12-a (g) "));
+		assertEquals("a_b/cäD?1*2-a! (g)", svc.normalizeValue(" a_b/c$äD?\n1*2-a! (g) "));
+		}
+	
+	/**
 	 * Test normalizeGroup
 	 */
 	public void testNormalizeGroup()
