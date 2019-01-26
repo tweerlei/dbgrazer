@@ -61,4 +61,10 @@ public class PostQueryType extends AbstractSingleQueryType
 		{
 		return (attributes);
 		}
+	
+	@Override
+	protected boolean requiresStatement()
+		{
+		return (false);
+		}
 	}

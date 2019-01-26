@@ -30,7 +30,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import de.tweerlei.common.util.StringUtils;
-import de.tweerlei.common5.collections.CollectionUtils;
 import de.tweerlei.dbgrazer.common.service.KeywordService;
 import de.tweerlei.dbgrazer.common.util.impl.NamedMap;
 import de.tweerlei.dbgrazer.link.model.SchemaDef;
@@ -156,16 +155,16 @@ public class QueryPersisterImpl implements QueryPersister
 		
 		if (type.getResultType().isView())
 			{
-			if (CollectionUtils.empty(views))
-				throw new IOException("Invalid view definition");
+//			if (CollectionUtils.empty(views))
+//				throw new IOException("Invalid view definition");
 			
 			return (new ViewImpl(name, scope, groupName, type, params, views, attributes));
 			}
 		else
 			{
 			final String s = stmt.toString().trim();
-			if (StringUtils.empty(s))
-				throw new IOException("Invalid query definition");
+//			if (StringUtils.empty(s))
+//				throw new IOException("Invalid query definition");
 			
 			return (new QueryImpl(name, scope, groupName, s, type, params, targets, attributes));
 			}

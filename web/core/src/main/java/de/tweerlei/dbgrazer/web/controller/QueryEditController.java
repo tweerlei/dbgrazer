@@ -227,6 +227,7 @@ public class QueryEditController
 		private final Map<Integer, String> links;
 		private final Map<Integer, SubQueryFBO> views;
 		private String statement;
+		private QueryType resultType;
 		
 		/**
 		 * Constructor
@@ -415,6 +416,24 @@ public class QueryEditController
 		public void setViewType(boolean viewType)
 			{
 			this.viewType = viewType;
+			}
+
+		/**
+		 * Get the resultType
+		 * @return the resultType
+		 */
+		public QueryType getResultType()
+			{
+			return resultType;
+			}
+		
+		/**
+		 * Set the resultType
+		 * @param resultType the resultType to set
+		 */
+		public void setResultType(QueryType resultType)
+			{
+			this.resultType = resultType;
 			}
 		}
 	
@@ -704,7 +723,7 @@ public class QueryEditController
 		final Map<String, Object> model = new HashMap<String, Object>();
 		
 		final QueryType type = queryService.findQueryType(fbo.getType());
-		model.put("resultType", type);
+		fbo.setResultType(type);
 		
 		return (model);
 		}
@@ -785,6 +804,7 @@ public class QueryEditController
 			result.reject(QueryErrorKeys.UNKNOWN_TYPE);
 			return ("db/edit");
 			}
+		fbo.setResultType(type);
 		
 		final Query q;
 		if (type.getResultType().isView())

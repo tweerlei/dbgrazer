@@ -38,4 +38,10 @@ public class HeadQueryType extends AbstractKeyValueQueryType
 		{
 		super(NAME, linkType);
 		}
+	
+	@Override
+	protected boolean requiresStatement()
+		{
+		return (false);
+		}
 	}

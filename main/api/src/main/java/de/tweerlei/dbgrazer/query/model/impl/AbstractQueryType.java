@@ -45,7 +45,16 @@ public abstract class AbstractQueryType extends BaseQueryType
 		if (StringUtils.empty(query.getName()))
 			errors.rejectValue("name", QueryErrorKeys.EMPTY_NAME);
 		
-		if (StringUtils.empty(query.getStatement()))
+		if (requiresStatement() && StringUtils.empty(query.getStatement()))
 			errors.rejectValue("statement", QueryErrorKeys.EMPTY_STATEMENT);
+		}
+	
+	/**
+	 * Whether this query type requires a non-empty statement
+	 * @return Whether this query type requires a non-empty statement
+	 */
+	protected boolean requiresStatement()
+		{
+		return (true);
 		}
 	}
