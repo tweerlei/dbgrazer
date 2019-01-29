@@ -69,16 +69,14 @@ public class LdapQueryRunner extends BaseQueryRunner
 	private static final String RDN_PARENT_ATTRIBUTE = "rdn.parent";
 	private static final String RDN_LINK_ATTRIBUTE = "rdn.link";
 	
-	private static abstract class RowSetMapper implements ContextMapper
+	private static abstract class RowMapper implements ContextMapper
 		{
 		private final Query query;
-		private final int subQueryIndex;
 		private DistinguishedName base;
 		
-		public RowSetMapper(Query query, int subQueryIndex)
+		public RowMapper(Query query)
 			{
 			this.query = query;
-			this.subQueryIndex = subQueryIndex;
 			this.base = null;
 			}
 		
@@ -97,16 +95,11 @@ public class LdapQueryRunner extends BaseQueryRunner
 			return (query);
 			}
 		
-		public RowSetImpl getRowSet()
-			{
-			final RowSetImpl rs = new RowSetImpl(query, subQueryIndex, getColumns());
-			rs.getRows().addAll(getRows());
-			return (rs);
-			}
+		public abstract List<ColumnDef> getColumns();
 		
-		protected abstract List<ColumnDef> getColumns();
+		public abstract List<ResultRow> getRows();
 		
-		protected abstract List<ResultRow> getRows();
+		public abstract boolean isMoreAvailable();
 		
 		@Override
 		public Object mapFromContext(Object ctx)
@@ -125,7 +118,7 @@ public class LdapQueryRunner extends BaseQueryRunner
 		protected abstract Object mapFromDirContext(DirContextOperations ctx) throws NamingException;
 		}
 	
-	private static class RowListMapper extends RowSetMapper
+	private static class RowListMapper extends RowMapper
 		{
 		private static final String VALUE_SEPARATOR = "\n";
 		
@@ -135,9 +128,9 @@ public class LdapQueryRunner extends BaseQueryRunner
 		private List<ColumnDef> columns;
 		private int count;
 		
-		public RowListMapper(Query query, int subQueryIndex, String[] attrIds, int limit)
+		public RowListMapper(Query query, String[] attrIds, int limit)
 			{
-			super(query, subQueryIndex);
+			super(query);
 			this.attrIds = attrIds;
 			this.limit = limit;
 			this.rows = new LinkedList<ResultRow>();
@@ -146,23 +139,29 @@ public class LdapQueryRunner extends BaseQueryRunner
 			}
 		
 		@Override
-		protected List<ColumnDef> getColumns()
+		public List<ColumnDef> getColumns()
 			{
 			return (columns);
 			}
 		
 		@Override
-		protected List<ResultRow> getRows()
+		public List<ResultRow> getRows()
 			{
 			return (rows);
 			}
 		
 		@Override
+		public boolean isMoreAvailable()
+			{
+			return (count > limit);
+			}
+		
+		@Override
 		protected Object mapFromDirContext(DirContextOperations ctx) throws NamingException
 			{
-			if (count >= limit)
-				return (null);
 			count++;
+			if (isMoreAvailable())
+				return (null);
 			
 			final Attributes attributes = ctx.getAttributes();
 			
@@ -309,20 +308,19 @@ public class LdapQueryRunner extends BaseQueryRunner
 			}
 		}
 	
-	private static class AttributeListMapper extends RowSetMapper
+	private static class AttributeListMapper extends RowMapper
 		{
 		private final String attrId;
 		private final List<ResultRow> rows;
 		private List<ColumnDef> columns;
 		private int count;
 		
-		public AttributeListMapper(Query query, int subQueryIndex, String attrId)
+		public AttributeListMapper(Query query, String attrId)
 			{
-			super(query, subQueryIndex);
+			super(query);
 			this.attrId = attrId;
 			this.rows = new LinkedList<ResultRow>();
 			this.columns = null;
-			this.count = 0;
 			}
 		
 		@Override
@@ -332,17 +330,23 @@ public class LdapQueryRunner extends BaseQueryRunner
 			}
 		
 		@Override
-		protected List<ResultRow> getRows()
+		public List<ResultRow> getRows()
 			{
 			return (rows);
 			}
 		
 		@Override
+		public boolean isMoreAvailable()
+			{
+			return (count > 1);
+			}
+		
+		@Override
 		protected Object mapFromDirContext(DirContextOperations ctx) throws NamingException
 			{
-			if (count >= 1)
-				return (null);
 			count++;
+			if (isMoreAvailable())
+				return (null);
 			
 			final Attributes attributes = ctx.getAttributes();
 			
@@ -430,12 +434,12 @@ public class LdapQueryRunner extends BaseQueryRunner
 		
 		final LdapQueryParser p = new LdapQueryParser(statement);
 		
-		final RowSetMapper mapper;
+		final RowMapper mapper;
 		
 		if (res.getQuery().getType() instanceof LdapSearchQueryType)
 			{
 			final LdapSearchQueryType sqt = (LdapSearchQueryType) res.getQuery().getType();
-			mapper = new RowListMapper(query, subQueryIndex, p.getAttributes(), limit);
+			mapper = new RowListMapper(query, p.getAttributes(), limit);
 			if (p.getAttributes() != null)
 				ldap.search(p.getBaseDN(), p.getFilter(), sqt.getScope(), p.getAttributes(), mapper);
 			else
@@ -443,7 +447,7 @@ public class LdapQueryRunner extends BaseQueryRunner
 			}
 		else if (res.getQuery().getType() instanceof LdapListQueryType)
 			{
-			mapper = new RowListMapper(query, subQueryIndex, p.getAttributes(), limit);
+			mapper = new RowListMapper(query, p.getAttributes(), limit);
 			if (!StringUtils.empty(p.getBaseDN()))
 				{
 				// Spring-LDAP bug:
@@ -456,7 +460,7 @@ public class LdapQueryRunner extends BaseQueryRunner
 			}
 		else if ((res.getQuery().getType() instanceof LdapAttributesQueryType) && (p.getAttributes() != null) && (p.getAttributes().length == 1))
 			{
-			mapper = new AttributeListMapper(query, subQueryIndex, p.getAttributes()[0]);
+			mapper = new AttributeListMapper(query, p.getAttributes()[0]);
 			if (p.getAttributes() != null)
 				ldap.lookup(p.getBaseDN(), p.getAttributes(), mapper);
 			else
@@ -464,7 +468,7 @@ public class LdapQueryRunner extends BaseQueryRunner
 			}
 		else
 			{
-			mapper = new RowListMapper(query, subQueryIndex, p.getAttributes(), limit);
+			mapper = new RowListMapper(query, p.getAttributes(), limit);
 			if (p.getAttributes() != null)
 				ldap.lookup(p.getBaseDN(), p.getAttributes(), mapper);
 			else
@@ -473,10 +477,10 @@ public class LdapQueryRunner extends BaseQueryRunner
 		
 		final long end = timeService.getCurrentTime();
 		
-		final RowSetImpl rs = mapper.getRowSet();
+		final RowSetImpl rs = new RowSetImpl(query, subQueryIndex, mapper.getColumns());
+		rs.getRows().addAll(mapper.getRows());
+		rs.setMoreAvailable(mapper.isMoreAvailable());
 		rs.setQueryTime(end - start);
-		if (rs.getRows().size() >= limit)
-			rs.setMoreAvailable(true);
 		
 		res.getRowSets().put(res.getQuery().getName(), rs);
 		}

@@ -33,6 +33,7 @@ public class LimitedResultSetExtractor implements ResultSetExtractor
 	private final RowCallbackHandler handler;
 	private final int limit;
 	private int rows;
+	private boolean moreAvailable;
 	
 	/**
 	 * Constructor
@@ -44,6 +45,7 @@ public class LimitedResultSetExtractor implements ResultSetExtractor
 		this.handler = handler;
 		this.limit = limit;
 		this.rows = 0;
+		this.moreAvailable = false;
 		}
 	
 	/**
@@ -55,11 +57,26 @@ public class LimitedResultSetExtractor implements ResultSetExtractor
 		return (rows);
 		}
 	
+	/**
+	 * Get whether more than the actually extracted rows were available
+	 * @return true if more available
+	 */
+	public boolean isMoreAvailable()
+		{
+		return (moreAvailable);
+		}
+	
 	@Override
 	public Object extractData(ResultSet rs) throws SQLException, DataAccessException
 		{
-		while ((rows < limit) && rs.next())
+		while (rs.next())
 			{
+			if (rows >= limit)
+				{
+				moreAvailable = true;
+				break;
+				}
+			
 			handler.processRow(rs);
 			rows++;
 			}

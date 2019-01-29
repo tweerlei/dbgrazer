@@ -265,19 +265,26 @@ public class KafkaQueryRunner extends BaseQueryRunner
 			columns.add(new ColumnDefImpl(SIZE_HEADER, ColumnType.INTEGER, null, query.getTargetQueries().get(3), null, null));
 			
 			rs = new RowSetImpl(query, subQueryIndex, columns);
+			int count = 0;
 			for (ConsumerRecord<String, String> rec : recs)
 				{
+				if (count >= limit)
+					{
+					rs.setMoreAvailable(true);
+					break;
+					}
+				
 				final ResultRow row = new DefaultResultRow(columns.size());
 				row.getValues().add(rec.offset());
 				row.getValues().add(rec.key());
 				row.getValues().add(new Date(rec.timestamp()));
 				row.getValues().add(rec.serializedValueSize());
 				rs.getRows().add(row);
+				count++;
 				}
-			rs.setQueryTime(time);
-			if (rs.getRows().size() >= limit)
-				rs.setMoreAvailable(true);
 			}
+		
+		rs.setQueryTime(time);
 		return (rs);
 		}
 	}

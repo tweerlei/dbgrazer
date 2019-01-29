@@ -422,9 +422,8 @@ public class CallQueryRunner extends BaseQueryRunner
 			{
 			for (RowSetImpl rs : ret.values())
 				{
+				rs.setMoreAvailable(extractor.isMoreAvailable());
 				rs.setQueryTime(end - start);
-				if (extractor.getRowCount() >= maxRows)
-					rs.setMoreAvailable(true);
 				}
 			}
 		
