@@ -16,7 +16,6 @@
 package de.tweerlei.dbgrazer.web.controller;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -468,7 +467,7 @@ public class QueryDiffController
 			}
 		
 		if (ret.getRowSets().isEmpty())
-			ret.getRowSets().put(query.getName(), new RowSetImpl(query, 0, Collections.<ColumnDef>emptyList()));
+			ret.getRowSets().put(query.getName(), new RowSetImpl(query, 0, null));
 		
 		return (ret);
 		}

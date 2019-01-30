@@ -25,7 +25,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import de.tweerlei.dbgrazer.query.exception.PerformQueryException;
-import de.tweerlei.dbgrazer.query.model.ColumnDef;
 import de.tweerlei.dbgrazer.query.model.Query;
 import de.tweerlei.dbgrazer.query.model.Result;
 import de.tweerlei.dbgrazer.query.model.ResultMapMode;
@@ -220,7 +219,7 @@ public class RecursiveQueryRunnerImpl implements RecursiveQueryRunnerService
 		if (r.getRowSets().isEmpty())
 			{
 			// Return at least one empty RowSet
-			r.getRowSets().put(r.getQuery().getName(), new RowSetImpl(r.getQuery(), 0, Collections.<ColumnDef>emptyList()));
+			r.getRowSets().put(r.getQuery().getName(), new RowSetImpl(r.getQuery(), 0, null));
 			}
 		}
 	}

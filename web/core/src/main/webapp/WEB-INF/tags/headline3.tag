@@ -27,7 +27,7 @@
 %><%@
 	taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"
 %><h3><c:choose
-	><c:when test="${not empty key}"><fmt:message key="${key}"/></c:when
 	><c:when test="${not empty label}">${fn:escapeXml(label)}</c:when
+	><c:when test="${not empty key}"><fmt:message key="${key}"/></c:when
 	><c:otherwise>${content}</c:otherwise
 ></c:choose></h3><jsp:doBody/><hr/>

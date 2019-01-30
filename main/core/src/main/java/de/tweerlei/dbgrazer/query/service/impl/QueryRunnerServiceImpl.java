@@ -28,7 +28,6 @@ import de.tweerlei.dbgrazer.common.util.impl.NamedSet;
 import de.tweerlei.dbgrazer.query.backend.QueryRunner;
 import de.tweerlei.dbgrazer.query.exception.PerformQueryException;
 import de.tweerlei.dbgrazer.query.model.CancelableProgressMonitor;
-import de.tweerlei.dbgrazer.query.model.ColumnDef;
 import de.tweerlei.dbgrazer.query.model.DMLProgressMonitor;
 import de.tweerlei.dbgrazer.query.model.Query;
 import de.tweerlei.dbgrazer.query.model.QueryType;
@@ -169,7 +168,7 @@ public class QueryRunnerServiceImpl implements QueryRunnerService
 	private void prepareResult(Result res)
 		{
 		if (res.getRowSets().isEmpty())
-			res.getRowSets().put(res.getQuery().getName(), new RowSetImpl(res.getQuery(), 0, Collections.<ColumnDef>emptyList()));
+			res.getRowSets().put(res.getQuery().getName(), new RowSetImpl(res.getQuery(), 0, null));
 		else
 			{
 			final ResultVisitor v = res.getQuery().getType().getPostProcessor();

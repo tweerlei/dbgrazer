@@ -18,7 +18,6 @@ package de.tweerlei.dbgrazer.query.service.impl;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -49,7 +48,7 @@ public class ResultBuilderServiceImpl implements ResultBuilderService
 	@Override
 	public RowSetImpl createEmptyRowSet(Query query, int subQueryIndex, long time)
 		{
-		final RowSetImpl rs = new RowSetImpl(query, subQueryIndex, Collections.<ColumnDef>emptyList());
+		final RowSetImpl rs = new RowSetImpl(query, subQueryIndex, null);
 		rs.setQueryTime(time);
 		
 		return (rs);

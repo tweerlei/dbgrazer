@@ -55,7 +55,10 @@ public class RowSetImpl implements RowSet
 		{
 		this.query = query;
 		this.subQueryIndex = subQueryIndex;
-		this.columns = columns;
+		if (columns == null)
+			this.columns = new ArrayList<ColumnDef>(0);
+		else
+			this.columns = columns;
 		this.rows = new LinkedList<ResultRow>();
 		this.attributes = new HashMap<String, Object>();
 		this.parameters = new ArrayList<String>();

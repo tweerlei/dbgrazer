@@ -31,7 +31,7 @@
 %><c:if test="${zoomable}"><div class="h2-buttons"><span class="action" title="<fmt:message key="maximize"/>" onclick="return zoomRight();"><fmt:message key="maximizeIcon"/></span></div>
 </c:if
 >		<h2><c:choose
-			><c:when test="${not empty key}"><fmt:message key="${key}"/></c:when
 			><c:when test="${not empty label}">${fn:escapeXml(label)}</c:when
+			><c:when test="${not empty key}"><fmt:message key="${key}"/></c:when
 			><c:otherwise>${content}</c:otherwise
 ></c:choose></h2><jsp:doBody/><hr/>

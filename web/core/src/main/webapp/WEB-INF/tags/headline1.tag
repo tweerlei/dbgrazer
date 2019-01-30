@@ -31,7 +31,7 @@
 %><div class="h1-buttons"><span class="action" title="<fmt:message key="maximize"/>" onclick="return zoomView();"><fmt:message key="maximizeIcon"/></span></div>
 	<h1><c:if test="${not empty group}"
 		><a href="db/${currentConnection.linkName}/index.html?group=${group}">${group}</a>: </c:if><c:choose
-		><c:when test="${not empty key}"><fmt:message key="${key}"/></c:when
 		><c:when test="${not empty label}">${fn:escapeXml(label)}</c:when
+		><c:when test="${not empty key}"><fmt:message key="${key}"/></c:when
 		><c:otherwise>${content}</c:otherwise
 ></c:choose></h1><jsp:doBody/><hr/>
