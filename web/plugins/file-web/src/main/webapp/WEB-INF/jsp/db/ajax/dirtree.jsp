@@ -14,4 +14,10 @@
  * limitations under the License.
 --%><%@
 	include file="../../include/include.jspf"
-%><ui:result-dirtree rs="${rs}" label="${fn:escapeXml(label)}" left="${fn:escapeXml(left)}" targetElement="${fn:escapeXml(targetElement)}"/>
+%><c:choose><c:when test="${exception != null}"
+	><div class="treerow"><div class="treebutton">&#x25b7;</div><div class="treelabel">${fn:escapeXml(exception.message)}</div></div>
+</c:when><c:when test="${fn:length(rs.rows) == 0}"
+	><div class="treerow"><div class="treebutton">&#x25b7;</div><div class="treelabel"><fmt:message key="empty"/></div></div>
+</c:when><c:otherwise
+	><ui:result-dirtree rs="${rs}" label="${fn:escapeXml(label)}" left="${fn:escapeXml(left)}" targetElement="${fn:escapeXml(targetElement)}"
+/></c:otherwise></c:choose>

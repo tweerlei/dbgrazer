@@ -85,14 +85,14 @@ public class LdapBrowseController
 		final DataFormatter fmt = factory.getWebFormatter();
 		
 		try	{
-			final Result dirResult = runner.performCustomQuery(connectionSettings.getLinkName(), LdapConstants.QUERYTYPE_LIST, "SELECT rdn, rdn.name", null, null, "dirs", true, null);
+			final Result dirResult = runner.performCustomQuery(connectionSettings.getLinkName(), LdapConstants.QUERYTYPE_LIST, "SELECT rdn, rdn.name", null, null, "dirs", false, null);
 			final RowSet dirs = dirResult.getFirstRowSet();
 			resultTransformer.translateRowSet(dirs, fmt);
 			
 			final Map<String, TabItem<RowSet>> tabs = new HashMap<String, TabItem<RowSet>>(1);
 			tabs.put(LdapMessageKeys.ENTRIES_TAB, new TabItem<RowSet>(dirs, dirs.getRows().size()));
 			
-			final Result fileResult = runner.performCustomQuery(connectionSettings.getLinkName(), LdapConstants.QUERYTYPE_LOOKUP, "", null, null, "files", true, null);
+			final Result fileResult = runner.performCustomQuery(connectionSettings.getLinkName(), LdapConstants.QUERYTYPE_LOOKUP, "", null, null, "files", false, null);
 			final RowSet files = fileResult.getFirstRowSet();
 			resultTransformer.translateRowSet(files, fmt);
 			
@@ -149,7 +149,7 @@ public class LdapBrowseController
 		final DataFormatter fmt = factory.getWebFormatter();
 		
 		try	{
-			final Result fileResult = runner.performCustomQuery(connectionSettings.getLinkName(), LdapConstants.QUERYTYPE_LOOKUP, "FROM " + path, null, null, "files", true, null);
+			final Result fileResult = runner.performCustomQuery(connectionSettings.getLinkName(), LdapConstants.QUERYTYPE_LOOKUP, "FROM " + path, null, null, "files", false, null);
 			final RowSet files = fileResult.getFirstRowSet();
 			resultTransformer.translateRowSet(files, fmt);
 			
@@ -200,7 +200,7 @@ public class LdapBrowseController
 		final DataFormatter fmt = factory.getWebFormatter();
 		
 		try	{
-			final Result dirResult = runner.performCustomQuery(connectionSettings.getLinkName(), LdapConstants.QUERYTYPE_LIST, "SELECT rdn, rdn.name\nFROM " + path, null, null, "dirs", true, null);
+			final Result dirResult = runner.performCustomQuery(connectionSettings.getLinkName(), LdapConstants.QUERYTYPE_LIST, "SELECT rdn, rdn.name\nFROM " + path, null, null, "dirs", false, null);
 			final RowSet dirs = dirResult.getFirstRowSet();
 			resultTransformer.translateRowSet(dirs, fmt);
 			
@@ -208,7 +208,11 @@ public class LdapBrowseController
 			}
 		catch (PerformQueryException e)
 			{
-			throw e.getCause();
+			model.put("exception", e.getCause());
+			}
+		catch (RuntimeException e)
+			{
+			model.put("exception", e);
 			}
 		
 		return (model);

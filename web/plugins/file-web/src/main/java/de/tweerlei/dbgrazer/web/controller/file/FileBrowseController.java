@@ -208,7 +208,11 @@ public class FileBrowseController
 			}
 		catch (PerformQueryException e)
 			{
-			throw e.getCause();
+			model.put("exception", e.getCause());
+			}
+		catch (RuntimeException e)
+			{
+			model.put("exception", e);
 			}
 		
 		return (model);
