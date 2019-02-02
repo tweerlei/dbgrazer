@@ -60,6 +60,7 @@ Table.highlightRow = function(c) {
 		coff += r.cells[ix].colSpan;
 	}
 	
+	var toggle = !this.hasClassName(c, 'selected');
 	var t = Table.resolve(r);
 	
 	var bodies = t.tBodies;
@@ -71,19 +72,26 @@ Table.highlightRow = function(c) {
 		var tbrows = bodies[i].rows;
 		for (var cRowIndex=0,RL=tbrows.length; cRowIndex<RL; cRowIndex++) {
 			var cRow=tbrows[cRowIndex];
+			if (toggle && (cRow == r)) {
+				this.addClassName(cRow, 'highlight');
+			} else {
+				this.removeClassName(cRow, 'highlight');
+			}
 			var rcells = cRow.cells;
 			coff = 0;
 			for (var cColIndex=0,CL=rcells.length; cColIndex<CL; cColIndex++) {
 				var rcell = rcells[cColIndex];
-				if (cRow == r) {
-					this.removeClassName(rcell, 'crosshair');
-					this.addClassName(rcell, 'highlight');
-				} else if (coff == ix) {
-					this.removeClassName(rcell, 'highlight');
-					this.addClassName(rcell, 'crosshair');
+				if (toggle && (coff == ix)) {
+					if (cRow == r) {
+						this.removeClassName(rcell, 'crosshair');
+						this.addClassName(rcell, 'selected');
+					} else {
+						this.addClassName(rcell, 'crosshair');
+						this.removeClassName(rcell, 'selected');
+					}
 				} else {
-					this.removeClassName(rcell, 'highlight');
 					this.removeClassName(rcell, 'crosshair');
+					this.removeClassName(rcell, 'selected');
 				}
 				coff += rcell.colSpan;
 			}
@@ -104,6 +112,7 @@ Table.highlightColumn = function(c) {
 		return;
 	}
 	
+	var toggle = !this.hasClassName(c, 'selected');
 	var t = Table.resolve(r);
 	
 	var bodies = t.tBodies;
@@ -115,18 +124,25 @@ Table.highlightColumn = function(c) {
 		var tbrows = bodies[i].rows;
 		for (var cRowIndex=0,RL=tbrows.length; cRowIndex<RL; cRowIndex++) {
 			var cRow=tbrows[cRowIndex];
+			if (toggle && (cRow == r)) {
+				this.addClassName(cRow, 'crosshair');
+			} else {
+				this.removeClassName(cRow, 'crosshair');
+			}
 			var rcells = cRow.cells;
 			for (var cColIndex=1,CL=rcells.length; cColIndex<CL; cColIndex++) {
 				var rcell = rcells[cColIndex];
-				if (cColIndex == ix) {
-					this.removeClassName(rcell, 'crosshair');
-					this.addClassName(rcell, 'highlight');
-				} else if (cRow == r) {
-					this.removeClassName(rcell, 'highlight');
-					this.addClassName(rcell, 'crosshair');
+				if (toggle && (cColIndex == ix)) {
+					if (cRow == r) {
+						this.removeClassName(rcell, 'highlight');
+						this.addClassName(rcell, 'selected');
+					} else {
+						this.addClassName(rcell, 'highlight');
+						this.removeClassName(rcell, 'selected');
+					}
 				} else {
 					this.removeClassName(rcell, 'highlight');
-					this.removeClassName(rcell, 'crosshair');
+					this.removeClassName(rcell, 'selected');
 				}
 			}
 		}
@@ -817,6 +833,44 @@ function generateResultLink(ev, title, frm) {
 	}
 	showDbDialog(ev, 'resultlinks', params, title);
 	return false;
+}
+
+/*
+ * DML results
+ */
+
+function submitDML(frm) {
+	Forms.submitAsync(frm);
+	return false;
+}
+
+function submitDMLError(txt) {
+	var fld = $('dmlerror');
+	if (fld) {
+		if (txt) {
+			fld.innerHTML = '<div class="error">' + txt + '</div>';
+		} else {
+			fld.innerHTML = '';
+		}
+	}
+}
+
+function submitDMLSuccess(txt) {
+	var fld = $('submitresult');
+	if (fld) {
+		if (txt) {
+			fld.innerHTML = '<div id="error-1000" class="notice"><span class="action" onclick="return hideError(\'1000\');">✖</span> ' + txt + '</div>';
+		} else {
+			fld.innerHTML = '';
+		}
+	}
+	closeDialog();
+	var frm = $('submitform');
+	if (frm) {
+		submitForm(frm, 'table');
+	} else {
+		reloadPage();
+	}
 }
 
 /*

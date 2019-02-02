@@ -263,12 +263,14 @@ span.menu {
 	margin: 0.1em 0em 0.1em 0em;
 	padding: 0em 0.5em 0em 0.5em;
 	cursor: pointer;
+	white-space: nowrap;
 }
 
 span.button {
 	margin: 0.1em 0em 0.1em 0em;
 	padding: 0em 0.5em 0em 0.5em;
 	cursor: pointer;
+	white-space: nowrap;
 }
 
 /********************************************************************

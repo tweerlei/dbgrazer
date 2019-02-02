@@ -43,40 +43,6 @@ function showMessage(ev, topic, partition, offset, format, formatting) {
 	return false;
 }
 
-function submitDML(frm) {
-	Forms.submitAsync(frm);
-	return false;
-}
-
-function submitDMLError(txt) {
-	var fld = $('dmlerror');
-	if (fld) {
-		if (txt) {
-			fld.innerHTML = '<div class="error">' + txt + '</div>';
-		} else {
-			fld.innerHTML = '';
-		}
-	}
-}
-
-function submitDMLSuccess(txt) {
-	var fld = $('submitresult');
-	if (fld) {
-		if (txt) {
-			fld.innerHTML = '<div id="error-1000" class="notice"><span class="action" onclick="return hideError(\'1000\');">✖</span> ' + txt + '</div>';
-		} else {
-			fld.innerHTML = '';
-		}
-	}
-	closeDialog();
-	var frm = $('submitform');
-	if (frm) {
-		submitForm(frm, 'table');
-	} else {
-		reloadPage();
-	}
-}
-
 function refreshTopic() {
 	var topic = HashMonitor.get('topic');
 	var partition = HashMonitor.get('partition');

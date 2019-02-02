@@ -24,6 +24,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
 import de.tweerlei.dbgrazer.extension.jdbc.JdbcConstants;
+import de.tweerlei.dbgrazer.query.model.Query;
 import de.tweerlei.dbgrazer.web.constant.MessageKeys;
 import de.tweerlei.dbgrazer.web.extension.ExtensionLink;
 import de.tweerlei.dbgrazer.web.extension.FrontendExtensionAdapter;
@@ -40,6 +41,8 @@ import de.tweerlei.dbgrazer.web.session.ConnectionSettings;
 @Order(1)
 public class JdbcExtension extends FrontendExtensionAdapter
 	{
+	private static final List<String> EDIT_JS = Collections.singletonList("jdbc-edit.js");
+	
 	private final FrontendHelperService frontendHelper;
 	private final BrowserSettingsManagerService browserSettingsManager;
 	private final ConnectionSettings connectionSettings;
@@ -105,5 +108,14 @@ public class JdbcExtension extends FrontendExtensionAdapter
 		ret.add(new ExtensionLink("ddlCompare", frontendHelper.buildPath(MessageKeys.PATH_WS, connectionSettings.getLinkName(), "form-srccompare.html", null), null, null));
 		
 		return (ret);
+		}
+	
+	@Override
+	public List<String> getQueryViewJS(Query query)
+		{
+		if (!connectionSettings.getType().getName().equals(JdbcConstants.LINKTYPE_JDBC) || !connectionSettings.isWritable())
+			return (super.getQueryViewJS(query));
+		
+		return (EDIT_JS);
 		}
 	}

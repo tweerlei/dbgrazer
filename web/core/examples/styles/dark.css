@@ -364,12 +364,17 @@ th.table-sorted-desc:after {
 	content: "\00a0\002193";
 }
 
-tbody tr.highlight, tbody td.highlight {
+td.selected {
+	background-color: #f27800 !important;
+	color: #ffffff !important;
+}
+
+tr.highlight td, td.highlight {
 	background-color: #f27800;
 	color: #ffffff;
 }
 
-tbody tr.crosshair, tbody td.crosshair {
+tr.crosshair td:nth-child(n+2), td.crosshair {
 	background-color: #ad6500;
 	color: #ffffff;
 }

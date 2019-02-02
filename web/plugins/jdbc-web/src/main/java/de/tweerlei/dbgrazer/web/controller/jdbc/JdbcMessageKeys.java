@@ -15,6 +15,9 @@
  */
 package de.tweerlei.dbgrazer.web.controller.jdbc;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Keys for localized messages in messages.properties
  * 
@@ -23,7 +26,7 @@ package de.tweerlei.dbgrazer.web.controller.jdbc;
 public final class JdbcMessageKeys
 	{
 	/** JS extension file */
-	public static final String EXTENSION_JS = "jdbc.js";
+	public static final List<String> EXTENSION_JS = Arrays.asList("jdbc.js", "jdbc-edit.js");
 	
 	/** Header text for generated DDL compare files */
 	public static final String DDL_COMPARE_HEADER = "ddlCompareHeader";

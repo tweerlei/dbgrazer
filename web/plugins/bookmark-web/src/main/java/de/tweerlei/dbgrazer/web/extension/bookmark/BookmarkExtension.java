@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 import de.tweerlei.dbgrazer.query.model.Query;
 import de.tweerlei.dbgrazer.query.model.QueryGroup;
 import de.tweerlei.dbgrazer.query.service.QueryService;
+import de.tweerlei.dbgrazer.web.controller.bookmark.BookmarkMessageKeys;
 import de.tweerlei.dbgrazer.web.extension.ExtensionGroup;
 import de.tweerlei.dbgrazer.web.extension.ExtensionLink;
 import de.tweerlei.dbgrazer.web.extension.FrontendExtensionAdapter;
@@ -43,14 +44,6 @@ import de.tweerlei.dbgrazer.web.session.UserSettings;
 public class BookmarkExtension extends FrontendExtensionAdapter
 	{
 	private static final List<ExtensionLink> TOP_MENU = Collections.singletonList(new ExtensionLink("bookmarks", null, "return showDbMenu(event, 'favorites');", null));
-	private static final List<String> BOOKMARK_JS = Collections.singletonList("bookmark.js");
-	
-	/** Message keys */
-	private static final String BOOKMARK_TAB = "$bookmarkTab";
-	private static final String ICON_ADD = "addBookmarkIcon";
-	private static final String ICON_REMOVE = "removeBookmarkIcon";
-	private static final String LABEL_ADD = "addBookmark";
-	private static final String LABEL_REMOVE = "removeBookmark";
 	
 	private final BookmarkManager bookmarkManager;
 	private final QueryService queryService;
@@ -95,7 +88,7 @@ public class BookmarkExtension extends FrontendExtensionAdapter
 		if (!bookmarkManager.getFavorites().isEmpty())
 			{
 			final QueryGroup fav = queryService.groupQueries(connectionSettings.getLinkName(), bookmarkManager.getFavorites(), false, true);
-			ret.add(new ExtensionGroup(BOOKMARK_TAB, fav));
+			ret.add(new ExtensionGroup(BookmarkMessageKeys.BOOKMARK_TAB, fav));
 			}
 		
 		return (ret);
@@ -110,9 +103,9 @@ public class BookmarkExtension extends FrontendExtensionAdapter
 		final List<ExtensionLink> ret = new ArrayList<ExtensionLink>();
 		
 		if (bookmarkManager.getFavorites().contains(query.getName()))
-			ret.add(new ExtensionLink(ICON_REMOVE, null, "return removeFromFavorites(event, '" + query.getName() + "');", LABEL_REMOVE));
+			ret.add(new ExtensionLink(BookmarkMessageKeys.ICON_REMOVE, null, "return removeFromFavorites(event, '" + query.getName() + "');", BookmarkMessageKeys.LABEL_REMOVE));
 		else
-			ret.add(new ExtensionLink(ICON_ADD, null, "return addToFavorites(event, '" + query.getName() + "');", LABEL_ADD));
+			ret.add(new ExtensionLink(BookmarkMessageKeys.ICON_ADD, null, "return addToFavorites(event, '" + query.getName() + "');", BookmarkMessageKeys.LABEL_ADD));
 		
 		return (ret);
 		}
@@ -123,6 +116,6 @@ public class BookmarkExtension extends FrontendExtensionAdapter
 		if (userSettings.getPrincipal() == null)
 			return (super.getQueryViewJS(query));
 		
-		return (BOOKMARK_JS);
+		return (BookmarkMessageKeys.EXTENSION_JS);
 		}
 	}
