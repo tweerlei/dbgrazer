@@ -330,7 +330,19 @@ public class KafkaBrowseController
 			{
 			nodes = Collections.emptyList();
 			}
-		model.put("results", Collections.singletonMap(KafkaMessageKeys.NODES, new TabItem<RowSet>(buildNodeRowSet(nodes), nodes.size())));
+		Collection<AclBinding> acls;
+		try	{
+			final AclBindingFilter filter = new AclBindingFilter(new ResourceFilter(ResourceType.CLUSTER, null), AccessControlEntryFilter.ANY);
+			acls = adminClient.describeAcls(filter).values().get();
+			}
+		catch (Exception e)
+			{
+			acls = Collections.emptyList();
+			}
+		final Map<String, TabItem<RowSet>> results = new LinkedHashMap<String, TabItem<RowSet>>();
+		results.put(KafkaMessageKeys.NODES, new TabItem<RowSet>(buildNodeRowSet(nodes), nodes.size()));
+		results.put(KafkaMessageKeys.ACLS, new TabItem<RowSet>(buildAclRowSet(acls), acls.size()));
+		model.put("results", results);
 		
 		final Consumer<String, String> consumer = kafkaClientService.getConsumer(connectionSettings.getLinkName());
 		final Map<String, List<PartitionInfo>> topics = consumer.listTopics();

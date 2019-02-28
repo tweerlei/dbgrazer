@@ -96,7 +96,7 @@ public class JspFunctions
 	 * @param error Throwable
 	 * @return Error message to display
 	 */
-	public String handleError(Throwable error)
+	public static String handleError(Throwable error)
 		{
 		return (frontendHelper.handleError(error));
 		}

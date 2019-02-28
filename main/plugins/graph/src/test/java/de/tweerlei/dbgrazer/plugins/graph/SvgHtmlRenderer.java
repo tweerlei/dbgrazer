@@ -32,6 +32,11 @@ import de.tweerlei.spring.config.ConfigAccessor;
  */
 public class SvgHtmlRenderer
 	{
+	/**
+	 * Entry point
+	 * @param args Arguments
+	 * @throws Exception on error
+	 */
 	public static void main(String[] args) throws Exception
 		{
 		final ConfigAccessor cfg = EasyMock.createMock(ConfigAccessor.class);
