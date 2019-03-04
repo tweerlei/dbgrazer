@@ -78,6 +78,14 @@ public final class KafkaMessageKeys
 	public static final String OPERATION = "aclOperation";
 	/** ID column */
 	public static final String PERMISSION_TYPE = "aclPermissionType";
+	/** ID column */
+	public static final String CONFIGS = "$configs";
+	/** ID column */
+	public static final String RESOURCE = "configResource";
+	/** ID column */
+	public static final String KEY = "configKey";
+	/** ID column */
+	public static final String VALUE = "configValue";
 	
 	
 	private KafkaMessageKeys()

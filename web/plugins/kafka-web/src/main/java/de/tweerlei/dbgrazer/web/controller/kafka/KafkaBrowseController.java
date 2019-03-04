@@ -31,6 +31,8 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.apache.kafka.clients.admin.AdminClient;
+import org.apache.kafka.clients.admin.Config;
+import org.apache.kafka.clients.admin.ConfigEntry;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.Node;
@@ -38,6 +40,7 @@ import org.apache.kafka.common.PartitionInfo;
 import org.apache.kafka.common.acl.AccessControlEntryFilter;
 import org.apache.kafka.common.acl.AclBinding;
 import org.apache.kafka.common.acl.AclBindingFilter;
+import org.apache.kafka.common.config.ConfigResource;
 import org.apache.kafka.common.header.Header;
 import org.apache.kafka.common.resource.ResourceFilter;
 import org.apache.kafka.common.resource.ResourceType;
@@ -339,9 +342,21 @@ public class KafkaBrowseController
 			{
 			acls = Collections.emptyList();
 			}
+		Map<ConfigResource, Config> configs;
+		try	{
+			final List<ConfigResource> rsrc = new ArrayList<ConfigResource>(nodes.size());
+			for (Node node : nodes)
+				rsrc.add(new ConfigResource(ConfigResource.Type.BROKER, node.idString()));
+			configs = adminClient.describeConfigs(rsrc).all().get();
+			}
+		catch (Exception e)
+			{
+			configs = Collections.emptyMap();
+			}
 		final Map<String, TabItem<RowSet>> results = new LinkedHashMap<String, TabItem<RowSet>>();
 		results.put(KafkaMessageKeys.NODES, new TabItem<RowSet>(buildNodeRowSet(nodes), nodes.size()));
 		results.put(KafkaMessageKeys.ACLS, new TabItem<RowSet>(buildAclRowSet(acls), acls.size()));
+		results.put(KafkaMessageKeys.CONFIGS, new TabItem<RowSet>(buildConfigRowSet(configs), configs.size()));
 		model.put("results", results);
 		
 		final Consumer<String, String> consumer = kafkaClientService.getConsumer(connectionSettings.getLinkName());
@@ -427,7 +442,19 @@ public class KafkaBrowseController
 			{
 			acls = Collections.emptyList();
 			}
-		model.put("results", Collections.singletonMap(KafkaMessageKeys.ACLS, new TabItem<RowSet>(buildAclRowSet(acls), acls.size())));
+		Map<ConfigResource, Config> configs;
+		try	{
+			final ConfigResource rsrc = new ConfigResource(ConfigResource.Type.TOPIC, topic);
+			configs = adminClient.describeConfigs(Collections.singleton(rsrc)).all().get();
+			}
+		catch (Exception e)
+			{
+			configs = Collections.emptyMap();
+			}
+		final Map<String, TabItem<RowSet>> results = new LinkedHashMap<String, TabItem<RowSet>>();
+		results.put(KafkaMessageKeys.ACLS, new TabItem<RowSet>(buildAclRowSet(acls), acls.size()));
+		results.put(KafkaMessageKeys.CONFIGS, new TabItem<RowSet>(buildConfigRowSet(configs), configs.size()));
+		model.put("results", results);
 		
 		final Consumer<String, String> consumer = kafkaClientService.getConsumer(connectionSettings.getLinkName());
 		
@@ -490,6 +517,37 @@ public class KafkaBrowseController
 		
 		for (AclBinding acl : acls)
 			rs.getRows().add(new DefaultResultRow(acl.entry().principal(), acl.entry().host(), acl.entry().operation().toString(), acl.entry().permissionType().toString()));
+		
+		return (rs);
+		}
+	
+	private RowSet buildConfigRowSet(Map<ConfigResource, Config> configs)
+		{
+		final Query query = new ViewImpl(KafkaMessageKeys.CONFIGS, null, null, null, null, null, null);
+		
+		if (configs.isEmpty())
+			return (resultBuilder.createEmptyRowSet(query, 0, 0));
+		
+		final List<ColumnDef> columns = new ArrayList<ColumnDef>(3);
+		columns.add(new ColumnDefImpl(KafkaMessageKeys.RESOURCE, ColumnType.STRING, null, null, null, null));
+		columns.add(new ColumnDefImpl(KafkaMessageKeys.KEY, ColumnType.STRING, null, null, null, null));
+		columns.add(new ColumnDefImpl(KafkaMessageKeys.VALUE, ColumnType.STRING, null, null, null, null));
+		final RowSetImpl rs = new RowSetImpl(query, 0, columns);
+		
+		final Map<String, Map<String, String>> sortedConfigs = new TreeMap<String, Map<String, String>>();
+		for (Map.Entry<ConfigResource, Config> ent : configs.entrySet())
+			{
+			final Map<String, String> sortedEntries = new TreeMap<String, String>();
+			for (ConfigEntry config : ent.getValue().entries())
+				sortedEntries.put(config.name(), config.value());
+			sortedConfigs.put(ent.getKey().name(), sortedEntries);
+			}
+		
+		for (Map.Entry<String, Map<String, String>> ent : sortedConfigs.entrySet())
+			{
+			for (Map.Entry<String, String> config : ent.getValue().entrySet())
+				rs.getRows().add(new DefaultResultRow(ent.getKey(), config.getKey(), config.getValue()));
+			}
 		
 		return (rs);
 		}
