@@ -34,6 +34,8 @@ import de.tweerlei.dbgrazer.query.model.SubQueryDef;
  */
 public class QueryGroupBuilder
 	{
+	private static final String HIDDEN_PREFIX = "$";
+	
 	private final boolean listviews;
 	private final boolean valuequeries;
 	private final QueryGroup group;
@@ -58,7 +60,9 @@ public class QueryGroupBuilder
 	 */
 	public void add(Query q)
 		{
-		if (q.getType().isManipulation())
+		if (q.getName().startsWith(HIDDEN_PREFIX))
+			;	// skip
+		else if (q.getType().isManipulation())
 			group.getActions().add(q);
 		else if (q.getParameters().isEmpty())
 			{

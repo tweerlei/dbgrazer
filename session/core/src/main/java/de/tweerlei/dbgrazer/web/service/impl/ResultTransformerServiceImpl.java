@@ -93,17 +93,17 @@ public class ResultTransformerServiceImpl implements ResultTransformerService
 		
 		final Set<TextTransformerService.Option> opts = EnumSet.copyOf(options);
 		
-		final Object attrFormatting = rs.getAttributes().get(RowSetConstants.ATTR_FORMATTING);
-		if (attrFormatting != null && Boolean.parseBoolean(attrFormatting.toString()))
+		final String attrFormatting = getRowSetOrQueryAttribute(rs, RowSetConstants.ATTR_FORMATTING);
+		if (attrFormatting != null && Boolean.parseBoolean(attrFormatting))
 			opts.add(TextTransformerService.Option.FORMATTING);
-		final Object attrSyntaxColoring = rs.getAttributes().get(RowSetConstants.ATTR_SYNTAX_COLORING);
-		if (attrSyntaxColoring != null && Boolean.parseBoolean(attrSyntaxColoring.toString()))
+		final String attrSyntaxColoring = getRowSetOrQueryAttribute(rs, RowSetConstants.ATTR_SYNTAX_COLORING);
+		if (attrSyntaxColoring != null && Boolean.parseBoolean(attrSyntaxColoring))
 			opts.add(TextTransformerService.Option.SYNTAX_COLORING);
-		final Object attrLineNumbers = rs.getAttributes().get(RowSetConstants.ATTR_LINE_NUMBERS);
-		if (attrLineNumbers != null && Boolean.parseBoolean(attrLineNumbers.toString()))
+		final String attrLineNumbers = getRowSetOrQueryAttribute(rs, RowSetConstants.ATTR_LINE_NUMBERS);
+		if (attrLineNumbers != null && Boolean.parseBoolean(attrLineNumbers))
 			opts.add(TextTransformerService.Option.LINE_NUMBERS);
 		
-		final Object attrFormatter = rs.getAttributes().get(RowSetConstants.ATTR_FORMATTER);
+		final String attrFormatter = getRowSetOrQueryAttribute(rs, RowSetConstants.ATTR_FORMATTER);
 		final String formatter;
 		if (attrFormatter != null)
 			formatter = attrFormatter.toString();
@@ -114,6 +114,19 @@ public class ResultTransformerServiceImpl implements ResultTransformerService
 		
 		rs.getRows().clear();
 		rs.getRows().add(new DefaultResultRow(result));
+		}
+	
+	private String getRowSetOrQueryAttribute(RowSet rs, String key)
+		{
+		final String queryValue = rs.getQuery().getAttributes().get(key);
+		if (queryValue != null)
+			return (queryValue);
+		
+		final Object value = rs.getAttributes().get(key);
+		if (value != null)
+			return (value.toString());
+		
+		return (null);
 		}
 	
 	@Override

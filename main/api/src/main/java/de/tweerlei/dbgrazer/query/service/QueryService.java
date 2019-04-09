@@ -46,14 +46,6 @@ public interface QueryService
 	public Query findQueryByName(String link, String name);
 	
 	/**
-	 * Find queries by substring
-	 * @param link Link name
-	 * @param name Substring
-	 * @return Queries
-	 */
-	public List<Query> findQueriesBySubstring(String link, String name);
-	
-	/**
 	 * Find queries that accept a given set of parameters
 	 * @param link Link name
 	 * @param params Parameter names
@@ -61,13 +53,6 @@ public interface QueryService
 	 * @return Queries
 	 */
 	public List<Query> findQueriesByParameters(String link, List<String> params, boolean views);
-	
-	/**
-	 * Find all queries
-	 * @param link Link name
-	 * @return Queries
-	 */
-	public List<Query> findAllQueries(String link);
 	
 	/**
 	 * Get a QueryGroup for all queries

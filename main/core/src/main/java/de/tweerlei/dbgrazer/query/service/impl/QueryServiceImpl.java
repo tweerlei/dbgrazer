@@ -182,21 +182,6 @@ public class QueryServiceImpl implements QueryService, ConfigListener, LinkListe
 		}
 	
 	@Override
-	public List<Query> findQueriesBySubstring(String link, String name)
-		{
-		final List<Query> ret = new ArrayList<Query>();
-		
-		final String qn = keywordService.normalizeName(name);
-		for (Map.Entry<String, Query> ent : getQueries(link).entrySet())
-			{
-			if (ent.getKey().contains(qn))
-				ret.add(ent.getValue());
-			}
-		
-		return (ret);
-		}
-	
-	@Override
 	public List<Query> findQueriesByParameters(String link, List<String> params, boolean views)
 		{
 		final List<Query> ret = new ArrayList<Query>();
@@ -223,16 +208,6 @@ public class QueryServiceImpl implements QueryService, ConfigListener, LinkListe
 			if (matched)
 				ret.add(q);
 			}
-		
-		return (ret);
-		}
-	
-	@Override
-	public List<Query> findAllQueries(String link)
-		{
-		final List<Query> ret = new ArrayList<Query>();
-		
-		ret.addAll(getQueries(link).values());
 		
 		return (ret);
 		}

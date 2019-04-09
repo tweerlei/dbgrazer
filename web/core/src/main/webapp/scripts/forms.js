@@ -111,7 +111,7 @@ var Forms = {
 			el.onkeydown = Forms.selectOnKeypress;
 		});
 		$$('textarea').each(function(el) {
-			el.onkeypress = Forms.textareaOnKeypress;
+			el.onkeydown = Forms.textareaOnKeypress;
 			if (el.id && $(el.id + '-row') && $(el.id + '-column')) {
 				el.onkeyup = Forms.textareaOnKeyup;
 				el.onmouseup = Forms.textareaOnKeyup;
