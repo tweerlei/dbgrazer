@@ -733,8 +733,7 @@ public class LinkEditController
 			if (!StringUtils.empty(ent.getValue()))
 				{
 				final String v = fbo.getPropValues().get(ent.getKey());
-				if (!StringUtils.empty(v))
-					props.setProperty(ent.getValue(), v);
+				props.setProperty(ent.getValue(), StringUtils.notNull(v));
 				}
 			}
 		

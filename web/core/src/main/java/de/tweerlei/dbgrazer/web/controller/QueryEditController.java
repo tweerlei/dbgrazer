@@ -794,8 +794,8 @@ public class QueryEditController
 		final Map<String, String> attributes = new TreeMap<String, String>();
 		for (Map.Entry<String, String> ent : fbo.getAttributes().entrySet())
 			{
-			if (!StringUtils.empty(ent.getValue()))
-				attributes.put(ent.getKey(), ent.getValue());
+			if (!StringUtils.empty(ent.getKey()))
+				attributes.put(ent.getKey(), StringUtils.notNull(ent.getValue()));
 			}
 		
 		final QueryType type = queryService.findQueryType(fbo.getType());
