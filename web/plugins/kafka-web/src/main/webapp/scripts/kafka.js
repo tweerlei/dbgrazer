@@ -1,4 +1,4 @@
-function showPartition(ev, topic, partition, offset) {
+function showPartition(ev, topic, partition, offset, key) {
 	if (ev) {
 		Event.stop(ev);
 	}
@@ -8,6 +8,9 @@ function showPartition(ev, topic, partition, offset) {
 		var params = { topic: topic, partition: partition };
 		if (!Object.isUndefined(offset)) {
 			params.offset = offset;
+		}
+		if (!Object.isUndefined(key)) {
+			params.key = key;
 		}
 		WSApi.getDBAsync('messages', params, function(txt) {
 			el.innerHTML = extractLocalStyles(txt);

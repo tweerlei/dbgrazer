@@ -134,9 +134,10 @@ public interface KafkaClientService
 	 * @param partition Partition number (null to fetch from all partitions)
 	 * @param startOffset Record offset (null to fetch from current offset)
 	 * @param endOffset Max. Record offset (null to fetch from current offset)
+	 * @param key Optional key to match
 	 * @return ConsumerRecord or null
 	 */
-	public List<ConsumerRecord<String, String>> fetchRecords(String c, String topic, Integer partition, Long startOffset, Long endOffset);
+	public List<ConsumerRecord<String, String>> fetchRecords(String c, String topic, Integer partition, Long startOffset, Long endOffset, String key);
 	
 	/**
 	 * Send a record

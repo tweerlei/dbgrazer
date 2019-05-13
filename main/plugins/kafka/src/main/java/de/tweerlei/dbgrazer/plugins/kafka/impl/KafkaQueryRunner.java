@@ -188,7 +188,7 @@ public class KafkaQueryRunner extends BaseQueryRunner
 			final int maxRows = Math.min(limit, kafkaClient.getMaxRows(link));
 			
 			final long start = timeService.getCurrentTime();
-			final List<ConsumerRecord<String, String>> recs = kafkaClient.fetchRecords(link, topic, partition, startOffset, endOffset);
+			final List<ConsumerRecord<String, String>> recs = kafkaClient.fetchRecords(link, topic, partition, startOffset, endOffset, null);
 			final long end = timeService.getCurrentTime();
 			
 			final RowSet rs = createListRowSet(query, subQueryIndex, recs, maxRows, end - start);

@@ -17,7 +17,7 @@
 	Tab panel for directory contents
 	
 --%><div class="tab-header">
-			<form action="db/${currentConnection.linkName}/messages.html" method="get"<c:if test="${not empty targetElement}"> onsubmit="return showPartition(event, $F('f2-topic'), $F('f2-partition'), $F('f2-offset'));"</c:if>>
+			<form action="db/${currentConnection.linkName}/messages.html" method="get"<c:if test="${not empty targetElement}"> onsubmit="return showPartition(event, $F('f2-topic'), $F('f2-partition'), $F('f2-offset'), $F('f2-key'));"</c:if>>
 				<input type="hidden" id="f2-topic" name="topic" value="${topic}"/>
 				<input type="hidden" id="f2-partition" name="partition" value="${partition}"/>
 				<div class="filter"><fmt:message key="topicIDRange"><fmt:param value="${startOffset}"/><fmt:param value="${endOffset}"/></fmt:message> &nbsp;
@@ -36,7 +36,8 @@
 </c:otherwise></c:choose
 >				</div>
 				<div class="filter"><label for="f2-offset"><fmt:message key="seek"/>:</label> <input type="text" id="f2-offset" name="offset" value="${offset}" size="10"/>
-				<input type="submit"/></div>
+				<label for="f2-key"><fmt:message key="key"/>:</label> <input type="text" id="f2-key" name="key" value="${key}" size="10"/>
+				<input type="submit" value="<fmt:message key="apply"/></div>
 				<div class="filter"><ui:filter id="filter-table-${label}" target="table-${label}"/></div>
 			</form>
 			<hr/>

@@ -51,6 +51,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import de.tweerlei.common.util.StringJoiner;
+import de.tweerlei.common.util.StringUtils;
 import de.tweerlei.dbgrazer.extension.kafka.KafkaClientService;
 import de.tweerlei.dbgrazer.extension.kafka.KafkaClientService.OffsetInfo;
 import de.tweerlei.dbgrazer.query.model.ColumnDef;
@@ -557,16 +558,18 @@ public class KafkaBrowseController
 	 * @param topic Topic name
 	 * @param partition Partition number
 	 * @param offset Message offset
+	 * @param key Key to match
 	 * @return Model
 	 */
 	@RequestMapping(value = "/db/*/messages.html", method = RequestMethod.GET)
 	public Map<String, Object> showMessages(
 			@RequestParam("topic") String topic,
 			@RequestParam(value = "partition", required = false) Integer partition,
-			@RequestParam(value = "offset", required = false) Long offset
+			@RequestParam(value = "offset", required = false) Long offset,
+			@RequestParam(value = "key", required = false) String key
 			)
 		{
-		return (showMessagesInternal(topic, partition, offset));
+		return (showMessagesInternal(topic, partition, offset, key));
 		}
 	
 	/**
@@ -574,22 +577,25 @@ public class KafkaBrowseController
 	 * @param topic Topic name
 	 * @param partition Partition number
 	 * @param offset Message offset
+	 * @param key Key to match
 	 * @return Model
 	 */
 	@RequestMapping(value = "/db/*/ajax/messages.html", method = RequestMethod.GET)
 	public Map<String, Object> showAjaxMessages(
 			@RequestParam("topic") String topic,
 			@RequestParam(value = "partition", required = false) Integer partition,
-			@RequestParam(value = "offset", required = false) Long offset
+			@RequestParam(value = "offset", required = false) Long offset,
+			@RequestParam(value = "key", required = false) String key
 			)
 		{
-		return (showMessagesInternal(topic, partition, offset));
+		return (showMessagesInternal(topic, partition, offset, key));
 		}
 	
 	private Map<String, Object> showMessagesInternal(
 			String topic,
 			Integer partition,
-			Long offset
+			Long offset,
+			String key
 			)
 		{
 		if (!connectionSettings.isBrowserEnabled())
@@ -599,6 +605,7 @@ public class KafkaBrowseController
 		
 		model.put("topic", topic);
 		model.put("partition", partition);
+		model.put("key", key);
 		
 		final OffsetInfo offsets = kafkaClientService.getOffsetInfo(connectionSettings.getLinkName(), topic, partition);
 		model.put("startOffset", offsets.getMinOffset());
@@ -612,7 +619,7 @@ public class KafkaBrowseController
 			effectiveOffset = offset;
 		model.put("offset", effectiveOffset);
 		
-		final List<ConsumerRecord<String, String>> records = kafkaClientService.fetchRecords(connectionSettings.getLinkName(), topic, partition, effectiveOffset, null);
+		final List<ConsumerRecord<String, String>> records = kafkaClientService.fetchRecords(connectionSettings.getLinkName(), topic, partition, effectiveOffset, null, StringUtils.nullIfEmpty(key));
 		
 		final List<ConsumerRecordBean> l = new ArrayList<ConsumerRecordBean>(records.size());
 		Long minOffset = null;

@@ -295,21 +295,26 @@ public class KafkaClientServiceImpl implements KafkaClientService, LinkListener,
 		final TopicPartition tp = new TopicPartition(topic, partition);
 		
 		consumer.assign(Collections.singleton(tp));
-		consumer.seek(tp, offset);
-		final ConsumerRecords<String, String> records = consumer.poll(configService.get(ConfigKeys.KAFKA_FETCH_TIMEOUT));
-		consumer.unsubscribe();
-		
-		for (ConsumerRecord<String, String> record : records)
+		try	{
+			consumer.seek(tp, offset);
+			final ConsumerRecords<String, String> records = consumer.poll(configService.get(ConfigKeys.KAFKA_FETCH_TIMEOUT));
+			
+			for (ConsumerRecord<String, String> record : records)
+				{
+				if (record.offset() == offset)
+					return (record);
+				}
+			}
+		finally
 			{
-			if (record.offset() == offset)
-				return (record);
+			consumer.unsubscribe();
 			}
 		
 		return (null);
 		}
 	
 	@Override
-	public List<ConsumerRecord<String, String>> fetchRecords(String c, String topic, Integer partition, Long startOffset, Long endOffset)
+	public List<ConsumerRecord<String, String>> fetchRecords(String c, String topic, Integer partition, Long startOffset, Long endOffset, String key)
 		{
 		final Consumer<String, String> consumer = getConsumer(c);
 		
@@ -324,24 +329,30 @@ public class KafkaClientServiceImpl implements KafkaClientService, LinkListener,
 			consumer.subscribe(Collections.singleton(topic));
 		
 		final List<ConsumerRecord<String, String>> ret = new LinkedList<ConsumerRecord<String, String>>();
-		final int limit = getMaxRows(c);
-		int n = 0;
-		while (n < limit)
-			{
-			final ConsumerRecords<String, String> records = consumer.poll(configService.get(ConfigKeys.KAFKA_FETCH_TIMEOUT));
-			if (records.isEmpty())
-				break;
-			for (ConsumerRecord<String, String> rec : records)
+		try	{
+			final int limit = getMaxRows(c);
+			int n = 0;
+			while (n < limit)
 				{
-				if (((startOffset == null) || (rec.offset() >= startOffset)) && ((endOffset == null) || (rec.offset() <= endOffset)))
+				final ConsumerRecords<String, String> records = consumer.poll(configService.get(ConfigKeys.KAFKA_FETCH_TIMEOUT));
+				if (records.isEmpty())
+					break;
+				for (ConsumerRecord<String, String> rec : records)
 					{
-					ret.add(rec);
-					n++;
+					if (((startOffset == null) || (rec.offset() >= startOffset))
+							&& ((endOffset == null) || (rec.offset() <= endOffset))
+							&& ((key == null) || key.equals(rec.key())))
+						{
+						ret.add(rec);
+						n++;
+						}
 					}
 				}
 			}
-		
-		consumer.unsubscribe();
+		finally
+			{
+			consumer.unsubscribe();
+			}
 		
 		return (ret);
 		}
