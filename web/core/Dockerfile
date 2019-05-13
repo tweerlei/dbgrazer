@@ -16,7 +16,7 @@
 # To set JVM options to e.g. use a custom SSL trust store, set the CATALINA_OPTS environment variable:
 #
 #   docker run --name dbgrazer -e CATALINA_OPTS=-Djavax.net.ssl.trustStore=/usr/local/tomcat/conf/trust.jks -p <hostport>:8443 -v <hostpath>:/root/.dbgrazer dbgrazer
-# 
+#
 
 # Use Tomcat 9.0
 FROM tomcat:9.0-jre8-alpine
@@ -43,4 +43,4 @@ COPY examples/*.properties /root/.dbgrazer/
 COPY examples/themes/*.properties /root/.dbgrazer/themes/
 
 # Set Tomcat options
-ENV CATALINA_OPTS -Xmx512m 
+ENV CATALINA_OPTS -Xmx512m -XX:-OmitStackTraceInFastThrow
