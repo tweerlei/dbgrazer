@@ -24,6 +24,10 @@ public final class QueryTypeAttributes
 	{
 	/** RowSet attribute for the TextFormatter name */
 	public static final String ATTR_FORMATTER = "formatter";
+	/** RowSet attribute for the topic name */
+	public static final String ATTR_TOPIC = "kafkaTopic";
+	/** RowSet attribute for the partition number */
+	public static final String ATTR_PARTITION = "kafkaPartition";
 	
 	private QueryTypeAttributes()
 		{

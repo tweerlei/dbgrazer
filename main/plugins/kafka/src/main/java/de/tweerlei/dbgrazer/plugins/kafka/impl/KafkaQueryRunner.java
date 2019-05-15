@@ -25,6 +25,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.header.Header;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,6 +33,8 @@ import org.springframework.stereotype.Service;
 import de.tweerlei.dbgrazer.extension.kafka.KafkaClientService;
 import de.tweerlei.dbgrazer.plugins.kafka.types.MessageHeadersQueryType;
 import de.tweerlei.dbgrazer.plugins.kafka.types.MessageQueryType;
+import de.tweerlei.dbgrazer.plugins.kafka.types.QueryTypeAttributes;
+import de.tweerlei.dbgrazer.plugins.kafka.types.SendQueryType;
 import de.tweerlei.dbgrazer.query.backend.BaseQueryRunner;
 import de.tweerlei.dbgrazer.query.backend.ParamReplacer;
 import de.tweerlei.dbgrazer.query.exception.PerformQueryException;
@@ -67,6 +70,8 @@ public class KafkaQueryRunner extends BaseQueryRunner
 	private static final String KEY_HEADER = "Key";
 	private static final String TIMESTAMP_HEADER = "Timestamp";
 	private static final String SIZE_HEADER = "Size";
+	private static final String TOPIC_HEADER = "Topic";
+	private static final String PARTITION_HEADER = "Partition";
 	
 	private final TimeService timeService;
 	private final KafkaClientService kafkaClient;
@@ -101,7 +106,9 @@ public class KafkaQueryRunner extends BaseQueryRunner
 		{
 		final Result res = new ResultImpl(query);
 		
-		if (query.getType() instanceof MessageQueryType)
+		if (query.getType() instanceof SendQueryType)
+			sendMessage(res, link, query, subQueryIndex, params);
+		else if (query.getType() instanceof MessageQueryType)
 			fetchSingleMessage(res, link, query, subQueryIndex, params);
 		else
 			fetchMessages(res, link, query, subQueryIndex, params, limit);
@@ -109,12 +116,54 @@ public class KafkaQueryRunner extends BaseQueryRunner
 		return (res);
 		}
 	
+	private void sendMessage(Result res, String link, Query query, int subQueryIndex, List<Object> params) throws PerformQueryException
+		{
+		try	{
+			final String topic = query.getAttributes().get(QueryTypeAttributes.ATTR_TOPIC);
+			final String partNo = query.getAttributes().get(QueryTypeAttributes.ATTR_PARTITION);
+			Integer partition = null;
+			try	{
+				partition = Integer.valueOf(partNo);
+				}
+			catch (NumberFormatException e)
+				{
+				// ignore
+				}
+			
+			final String q = buildQuery(query, params);
+			final String[] fields = q.split("\n", 2);
+			final String key;
+			final String value;
+			if (fields.length > 1)
+				{
+				key = fields[0].trim();
+				value = fields[1].trim();
+				}
+			else
+				{
+				key = null;
+				value = fields[0].trim();
+				}
+			
+			final long start = timeService.getCurrentTime();
+			final RecordMetadata rm = kafkaClient.sendRecord(link, topic, partition, key, value);
+			final long end = timeService.getCurrentTime();
+			
+			res.getRowSets().put(BODY_TAB, createResultRowSet(query, subQueryIndex, rm, end - start));
+			}
+		catch (RuntimeException e)
+			{
+			logger.log(Level.SEVERE, "sendMessage", e);
+			throw new PerformQueryException(query.getName(), new RuntimeException("sendMessage: " + e.getMessage(), e));
+			}
+		}
+	
 	private void fetchSingleMessage(Result res, String link, Query query, int subQueryIndex, List<Object> params) throws PerformQueryException
 		{
 		try	{
 			final String q = buildQuery(query, params);
 			
-			final String[] fields = q.split(":");
+			final String[] fields = q.split("\n");
 			final String topic = fields[0];
 			final int partition;
 			final long offset;
@@ -153,11 +202,12 @@ public class KafkaQueryRunner extends BaseQueryRunner
 		try	{
 			final String q = buildQuery(query, params);
 			
-			final String[] fields = q.split(":");
+			final String[] fields = q.split("\n");
 			final String topic = fields[0];
 			final int partition;
 			final long startOffset;
 			final Long endOffset;
+			final String key;
 			if (fields.length > 2)
 				{
 				partition = Integer.parseInt(fields[1]);
@@ -167,6 +217,10 @@ public class KafkaQueryRunner extends BaseQueryRunner
 					endOffset = Long.parseLong(offsets[1]);
 				else
 					endOffset = null;
+				if (fields.length > 3)
+					key = fields[3].trim();
+				else
+					key = null;
 				}
 			else if (fields.length > 1)
 				{
@@ -177,18 +231,20 @@ public class KafkaQueryRunner extends BaseQueryRunner
 					endOffset = Long.parseLong(offsets[1]);
 				else
 					endOffset = null;
+				key = null;
 				}
 			else
 				{
 				partition = 0;
 				startOffset = 0;
 				endOffset = null;
+				key = null;
 				}
 			
 			final int maxRows = Math.min(limit, kafkaClient.getMaxRows(link));
 			
 			final long start = timeService.getCurrentTime();
-			final List<ConsumerRecord<String, String>> recs = kafkaClient.fetchRecords(link, topic, partition, startOffset, endOffset, null);
+			final List<ConsumerRecord<String, String>> recs = kafkaClient.fetchRecords(link, topic, partition, startOffset, endOffset, key);
 			final long end = timeService.getCurrentTime();
 			
 			final RowSet rs = createListRowSet(query, subQueryIndex, recs, maxRows, end - start);
@@ -283,6 +339,25 @@ public class KafkaQueryRunner extends BaseQueryRunner
 				count++;
 				}
 			}
+		
+		rs.setQueryTime(time);
+		return (rs);
+		}
+	
+	private RowSet createResultRowSet(Query query, int subQueryIndex, RecordMetadata rm, long time)
+		{
+		final List<ColumnDef> columns = new ArrayList<ColumnDef>();
+		columns.add(new ColumnDefImpl(TOPIC_HEADER, ColumnType.STRING, null, query.getTargetQueries().get(0), null, null));
+		columns.add(new ColumnDefImpl(PARTITION_HEADER, ColumnType.INTEGER, null, query.getTargetQueries().get(1), null, null));
+		columns.add(new ColumnDefImpl(ID_HEADER, ColumnType.INTEGER, null, query.getTargetQueries().get(2), null, null));
+		
+		final RowSetImpl rs = new RowSetImpl(query, subQueryIndex, columns);
+		
+		final ResultRow row = new DefaultResultRow(columns.size());
+		row.getValues().add(rm.topic());
+		row.getValues().add(rm.partition());
+		row.getValues().add(rm.offset());
+		rs.getRows().add(row);
 		
 		rs.setQueryTime(time);
 		return (rs);

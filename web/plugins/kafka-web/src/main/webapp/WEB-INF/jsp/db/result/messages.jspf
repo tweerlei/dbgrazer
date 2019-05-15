@@ -37,7 +37,7 @@
 >				</div>
 				<div class="filter"><label for="f2-offset"><fmt:message key="seek"/>:</label> <input type="text" id="f2-offset" name="offset" value="${offset}" size="10"/>
 				<label for="f2-key"><fmt:message key="key"/>:</label> <input type="text" id="f2-key" name="key" value="${key}" size="10"/>
-				<input type="submit" value="<fmt:message key="apply"/></div>
+				<input type="submit" value="<fmt:message key="apply"/>"/></div>
 				<div class="filter"><ui:filter id="filter-table-${label}" target="table-${label}"/></div>
 			</form>
 			<hr/>
