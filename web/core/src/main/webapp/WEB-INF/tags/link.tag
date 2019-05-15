@@ -31,6 +31,7 @@
 %><c:choose
 ><c:when test="${value == null}"><fmt:message key="null"/></c:when
 ><c:when test="${target == null && (fn:startsWith(value, 'http://') || fn:startsWith(value, 'https://'))}"><a class="external" href="${fn:escapeXml(value)}" target="_blank">${fn:escapeXml(fn:substringAfter(value, '//'))}</a></c:when
+><c:when test="${target == null && fn:length(value) > 100}"><span class="zoomable" onclick="">${fn:escapeXml(value)}</span></c:when
 ><c:when test="${target == null}">${fn:escapeXml(value)}</c:when
 ><c:when test="${target.parameter}"><span class="menu" onclick="return chooseTarget(event, '${target.parameterName}', '${util:paramEncode(value)}', '${targetElement}');">${fn:escapeXml(util:getLinkTitle(value))}</span></c:when
 ><c:when test="${not empty targetElement}"><a href="db/${currentConnection.linkName}/result.html?q=${target.queryName}${util:paramEncode(value)}" onclick="return runQuery(event, '${target.queryName}', '${util:paramEncode(value)}', '${targetElement}');">${fn:escapeXml(util:getLinkTitle(value))}</a></c:when

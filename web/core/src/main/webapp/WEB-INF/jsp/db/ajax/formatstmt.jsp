@@ -23,7 +23,7 @@
 >			<option value="${f}"<c:if test="${f == format}"> selected="selected"</c:if>><fmt:message key="${f}"/></option>
 </c:forEach
 >		</select>
-		&nbsp; <span class="action" title="<fmt:message key="maximize"/>" onclick="return unzoomContent();"><fmt:message key="maximizeIcon"/></span>
+		&nbsp; <span class="action" title="<fmt:message key="maximize"/>" onclick="return unzoomForm();"><fmt:message key="maximizeIcon"/></span>
 	</div>
 	<textarea id="zoomresult" name="result" style="width: 100%; height: 95%">${result}</textarea>
 </form>

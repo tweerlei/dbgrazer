@@ -24,7 +24,7 @@
 </c:forEach
 >		</select>
 		&nbsp; <input id="f1-formatting" type="checkbox" name="formatting" value="true"<c:if test="${formatting}"> checked="checked"</c:if> onchange="Forms.submit(form);"/> <label for="f1-formatting"><fmt:message key="formatter"/></label>
-		&nbsp; <span class="action" title="<fmt:message key="maximize"/>" onclick="return unzoomContent();"><fmt:message key="maximizeIcon"/></span>
+		&nbsp; <span class="action" title="<fmt:message key="maximize"/>" onclick="return unzoomForm();"><fmt:message key="maximizeIcon"/></span>
 	</div>
 </form><hr/></div><div class="tab-body">
 	<pre class="code">${result}</pre>

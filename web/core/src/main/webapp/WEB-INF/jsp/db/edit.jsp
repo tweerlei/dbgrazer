@@ -50,7 +50,6 @@
 >	</ui:headline1>
 	
 	<div class="tab-page">
-		<div id="fullscreen" style="display: none;"></div>
 		<form id="zoomform" class="hidden" method="post" action="db/${currentConnection.linkName}/ajax/formatstmt.html">
 			<input id="zoomstmt" type="hidden" name="statement" value=""/>
 			<input type="hidden" name="format" value=""/>
@@ -214,7 +213,7 @@
 				<dt class="query-only"<c:if test="${model.viewType}"> style="display: none;"</c:if>><spring:label path="statement"><fmt:message key="sqlStatement"/></spring:label></dt>
 				<dd class="query-only"<c:if test="${model.viewType}"> style="display: none;"</c:if>><div>
 					<span class="action" title="<fmt:message key="clear"/>" onclick="return clearElement('statement');"><fmt:message key="clearIcon"/></span>
-					<span class="action" title="<fmt:message key="maximize"/>" onclick="return zoomContent('statement');"><fmt:message key="maximizeIcon"/></span>
+					<span class="action" title="<fmt:message key="maximize"/>" onclick="return zoomForm('statement');"><fmt:message key="maximizeIcon"/></span>
 					<ui:info name="sqlStatement"><fmt:message key="help_sqlStatement"/></ui:info></div>
 					<spring:textarea path="statement" cssClass="large" cols="80" rows="25"/></dd>
 				<dt>&nbsp;</dt>

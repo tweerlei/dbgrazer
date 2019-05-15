@@ -551,10 +551,6 @@ th.table-sortable {
 	cursor: pointer;
 }
 
-td.zoomable {
-	cursor: zoom-in;
-}
-
 #drilldown0 {
 	margin-top: 1em;
 }
@@ -583,10 +579,6 @@ dl.result dd {
 	white-space: pre-line;
 	overflow: auto;
 	max-height: 6em;
-}
-
-span.zoomable {
-	cursor: zoom-in;
 }
 
 iframe.result {
@@ -785,6 +777,10 @@ img.unscaled {
 	z-index: 500;
 }
 
+#fullscreen pre {
+	cursor: zoom-out;
+}
+
 #search-result {
 	width: 80em;
 	height: 40em;
@@ -825,4 +821,8 @@ img.unscaled {
 
 .message {
 	white-space: pre-line;
+}
+
+.zoomable {
+	cursor: zoom-in;
 }

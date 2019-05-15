@@ -387,7 +387,7 @@ function tw_windowOnResize() {
 		var tab = f.parentNode;
 		var w = Elements.getWidth(tab);
 		var h = Elements.getHeight(tab);
-		Elements.resizeTo(f, w, h);
+		Elements.resizeTo(f, w - 2 * ym, h - 2 * ym);
 		f.show();
 	}
 }
@@ -442,7 +442,7 @@ function tw_contentChanged() {
 			e.src = 'db/' + WSApi.currentDB + '/graph-image.html?q=' + x;
 		}
 	});
-	$$('td.zoomable').each(function(e) {
+	$$('.zoomable').each(function(e) {
 		e.onclick = function() { zoomContent(e); };
 	});
 	// Establish keyboard handlers
@@ -1197,7 +1197,7 @@ function zoomTab(ev) {
 				p2.childElements().each(function(n) { n.hide(); });
 				
 				p1.insertBefore(marker, tab);
-				p2.insertBefore(tab, p2.childNodes[0]);
+				p2.insertBefore(tab, p2.firstChild);
 				tab.addClassName('zoomed');
 			}
 		}
@@ -1250,20 +1250,31 @@ function clearElement(e) {
 	return false;
 }
 
-var zoomContentSource = null;
-
 function zoomContent(e) {
+	AutoRefresh.stop();
+	Menu.hide();
+	Popup.hide();
+	var el = $(e);
+	if (el) {
+		var txt = '<pre>'+el.innerHTML+'</pre>';
+		if (txt) {
+			Dialog.show('', txt);
+		}
+	}
+	return false;
+}
+
+var zoomFormSource = null;
+
+function zoomForm(e) {
 	var el = $(e);
 	var frm = $('zoomform');
 	var full = $('fullscreen');
 	if (el && frm && full && !full.visible()) {
-		var txt;
-		zoomContentSource = el;
-		if (zoomContentSource.tagName == 'TEXTAREA') {
-			txt = zoomContentSource.value;
-		} else {
-			txt = zoomContentSource.innerText;
-		}
+		var p = el.up('.tab-body');
+		p.insertBefore(full, p.firstChild);
+		zoomFormSource = el;
+		var txt = zoomFormSource.value;
 		getFormInto(frm, full, { zoomstmt: txt }, function() {
 			full.show();
 			tw_windowOnResize();
@@ -1272,16 +1283,15 @@ function zoomContent(e) {
 	return false;
 }
 
-function unzoomContent() {
+function unzoomForm() {
 	var full = $('fullscreen');
 	if (full && full.visible()) {
-		if (zoomContentSource.tagName == 'TEXTAREA') {
-			var el = $('zoomresult');
-			if (el) {
-				zoomContentSource.value = el.value;
-			}
+		var el = $('zoomresult');
+		if (el) {
+			zoomFormSource.value = el.value;
 		}
 		full.hide();
+		full.innerHTML = '';
 		tw_windowOnResize();
 	}
 	return false;
@@ -1608,6 +1618,8 @@ document.observe('dom:loaded', function(ev) {
 	runInitialQuery();
 	
 	Event.observe(window, 'resize', tw_windowOnResize);
+	var fs = Elements.create(document.body, 'div', 'fullscreen');
+	fs.style.display = 'none';
 	
 	tw_contentChanged();
 	
