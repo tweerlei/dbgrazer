@@ -70,8 +70,6 @@ public class KafkaQueryRunner extends BaseQueryRunner
 	private static final String KEY_HEADER = "Key";
 	private static final String TIMESTAMP_HEADER = "Timestamp";
 	private static final String SIZE_HEADER = "Size";
-	private static final String TOPIC_HEADER = "Topic";
-	private static final String PARTITION_HEADER = "Partition";
 	
 	private final TimeService timeService;
 	private final KafkaClientService kafkaClient;
@@ -163,7 +161,7 @@ public class KafkaQueryRunner extends BaseQueryRunner
 		try	{
 			final String q = buildQuery(query, params);
 			
-			final String[] fields = q.split("\n");
+			final String[] fields = q.split(":", 4);
 			final String topic = fields[0];
 			final int partition;
 			final long offset;
@@ -202,7 +200,7 @@ public class KafkaQueryRunner extends BaseQueryRunner
 		try	{
 			final String q = buildQuery(query, params);
 			
-			final String[] fields = q.split("\n");
+			final String[] fields = q.split(":", 4);
 			final String topic = fields[0];
 			final int partition;
 			final long startOffset;
@@ -347,16 +345,12 @@ public class KafkaQueryRunner extends BaseQueryRunner
 	private RowSet createResultRowSet(Query query, int subQueryIndex, RecordMetadata rm, long time)
 		{
 		final List<ColumnDef> columns = new ArrayList<ColumnDef>();
-		columns.add(new ColumnDefImpl(TOPIC_HEADER, ColumnType.STRING, null, query.getTargetQueries().get(0), null, null));
-		columns.add(new ColumnDefImpl(PARTITION_HEADER, ColumnType.INTEGER, null, query.getTargetQueries().get(1), null, null));
-		columns.add(new ColumnDefImpl(ID_HEADER, ColumnType.INTEGER, null, query.getTargetQueries().get(2), null, null));
+		columns.add(new ColumnDefImpl(ID_HEADER, ColumnType.STRING, null, query.getTargetQueries().get(0), null, null));
 		
 		final RowSetImpl rs = new RowSetImpl(query, subQueryIndex, columns);
 		
 		final ResultRow row = new DefaultResultRow(columns.size());
-		row.getValues().add(rm.topic());
-		row.getValues().add(rm.partition());
-		row.getValues().add(rm.offset());
+		row.getValues().add(rm.topic() + "  " + rm.partition() + "  " + rm.offset());
 		rs.getRows().add(row);
 		
 		rs.setQueryTime(time);

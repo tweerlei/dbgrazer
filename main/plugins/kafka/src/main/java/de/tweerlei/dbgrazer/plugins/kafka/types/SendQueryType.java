@@ -24,7 +24,8 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
 import de.tweerlei.dbgrazer.plugins.kafka.impl.KafkaLinkType;
-import de.tweerlei.dbgrazer.query.model.impl.AbstractSingleQueryType;
+import de.tweerlei.dbgrazer.query.model.ResultMapMode;
+import de.tweerlei.dbgrazer.query.model.impl.AbstractTableQueryType;
 
 /**
  * GET webservice request
@@ -33,7 +34,7 @@ import de.tweerlei.dbgrazer.query.model.impl.AbstractSingleQueryType;
  */
 @Service
 @Order(502)
-public class SendQueryType extends AbstractSingleQueryType
+public class SendQueryType extends AbstractTableQueryType
 	{
 	/** The NAME */
 	public static final String NAME = "KAFKA_SEND";
@@ -47,7 +48,7 @@ public class SendQueryType extends AbstractSingleQueryType
 	@Autowired
 	public SendQueryType(KafkaLinkType linkType)
 		{
-		super(NAME, linkType);
+		super(NAME, linkType, ResultMapMode.SINGLE);
 		
 		final Map<String, Class<?>> m = new LinkedHashMap<String, Class<?>>();
 		m.put(QueryTypeAttributes.ATTR_TOPIC, String.class);
