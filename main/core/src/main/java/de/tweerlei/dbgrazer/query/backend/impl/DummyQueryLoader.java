@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -231,6 +232,18 @@ public class DummyQueryLoader implements QueryLoader
 	
 	@Override
 	public void renameSchema(String user, SchemaDef oldName, SchemaDef newName) throws IOException
+		{
+		throw new IOException("Not implemented");
+		}
+	
+	@Override
+	public Map<String, String> loadAttributes(SchemaDef schema)
+		{
+		return (Collections.emptyMap());
+		}
+	
+	@Override
+	public void updateAttributes(SchemaDef schema, String user, Map<String, String> attributes) throws IOException
 		{
 		throw new IOException("Not implemented");
 		}

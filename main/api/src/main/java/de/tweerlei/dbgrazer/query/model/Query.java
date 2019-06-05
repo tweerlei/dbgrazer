@@ -19,6 +19,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
+import de.tweerlei.dbgrazer.common.util.Named;
 import de.tweerlei.dbgrazer.link.model.SchemaDef;
 
 /**
@@ -26,14 +27,8 @@ import de.tweerlei.dbgrazer.link.model.SchemaDef;
  * 
  * @author Robert Wruck
  */
-public interface Query extends Serializable
+public interface Query extends Named, Serializable
 	{
-	/**
-	 * Get the query name
-	 * @return Name
-	 */
-	public String getName();
-	
 	/**
 	 * Get the query scope
 	 * @return Query scope

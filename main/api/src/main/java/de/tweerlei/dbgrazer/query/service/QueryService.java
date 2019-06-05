@@ -16,6 +16,7 @@
 package de.tweerlei.dbgrazer.query.service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
@@ -185,6 +186,23 @@ public interface QueryService
 	 * @return Schema names
 	 */
 	public Set<SchemaDef> getPossibleSchemaNames(String link);
+	
+	/**
+	 * Get the cumulative schema attributes for a link
+	 * @param link Link name
+	 * @return Attributes
+	 */
+	public Map<String, String> getSchemaAttributes(String link);
+	
+	/**
+	 * Set a schema attribute
+	 * @param link Link name
+	 * @param user User name
+	 * @param schema Schema name
+	 * @param key Key
+	 * @param value Value
+	 */
+	public void setSchemaAttribute(String link, String user, SchemaDef schema, String key, String value);
 	
 	/**
 	 * Create a query

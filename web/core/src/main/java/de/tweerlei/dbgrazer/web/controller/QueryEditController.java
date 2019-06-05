@@ -48,11 +48,13 @@ import de.tweerlei.dbgrazer.query.model.impl.QueryImpl;
 import de.tweerlei.dbgrazer.query.model.impl.QueryTargetImpl;
 import de.tweerlei.dbgrazer.query.model.impl.SubQueryDefImpl;
 import de.tweerlei.dbgrazer.query.model.impl.ViewImpl;
+import de.tweerlei.dbgrazer.query.service.DataExtractorService;
 import de.tweerlei.dbgrazer.query.service.QueryService;
 import de.tweerlei.dbgrazer.visualization.service.ChartScaling;
 import de.tweerlei.dbgrazer.visualization.service.ChartType;
 import de.tweerlei.dbgrazer.visualization.service.GraphType;
 import de.tweerlei.dbgrazer.web.constant.ErrorKeys;
+import de.tweerlei.dbgrazer.web.constant.MessageKeys;
 import de.tweerlei.dbgrazer.web.constant.VisualizationSettings;
 import de.tweerlei.dbgrazer.web.exception.AccessDeniedException;
 import de.tweerlei.dbgrazer.web.exception.QueryNotFoundException;
@@ -219,6 +221,7 @@ public class QueryEditController
 		private String backTo;
 		private String name;
 		private String scope;
+		private boolean welcome;
 		private String groupName;
 		private String type;
 		private boolean viewType;
@@ -275,7 +278,23 @@ public class QueryEditController
 			{
 			this.scope = scope;
 			}
-
+		
+		/**
+		 * @return the welcome
+		 */
+		public boolean isWelcome()
+			{
+			return welcome;
+			}
+		
+		/**
+		 * @param welcome the welcome to set
+		 */
+		public void setWelcome(boolean welcome)
+			{
+			this.welcome = welcome;
+			}
+		
 		/**
 		 * Get the attributes
 		 * @return the attributes
@@ -439,6 +458,7 @@ public class QueryEditController
 	
 	private final QueryService queryService;
 	private final TextTransformerService textFormatterService;
+	private final DataExtractorService dataExtractorService;
 	private final VisualizationService visualizationService;
 	private final StringTransformerService stringTransformerService;
 	private final UserSettings userSettings;
@@ -448,6 +468,7 @@ public class QueryEditController
 	 * Constructor
 	 * @param queryService QueryService
 	 * @param textFormatterService TextFormatterService
+	 * @param dataExtractorService DataExtractorService
 	 * @param visualizationService VisualizationService
 	 * @param stringTransformerService StringTransformerService
 	 * @param userSettings UserSettings
@@ -455,11 +476,13 @@ public class QueryEditController
 	 */
 	@Autowired
 	public QueryEditController(QueryService queryService, TextTransformerService textFormatterService,
+			DataExtractorService dataExtractorService,
 			VisualizationService visualizationService, StringTransformerService stringTransformerService,
 			UserSettings userSettings, ConnectionSettings connectionSettings)
 		{
 		this.queryService = queryService;
 		this.textFormatterService = textFormatterService;
+		this.dataExtractorService = dataExtractorService;
 		this.visualizationService = visualizationService;
 		this.stringTransformerService = stringTransformerService;
 		this.userSettings = userSettings;
@@ -501,6 +524,8 @@ public class QueryEditController
 			ret.setName(creating ? "" : q.getName());
 			ret.setOriginalName(creating ? "" : q.getName());
 			ret.setScope(q.getSourceSchema().toString());
+			if (!creating)
+				ret.setWelcome(q.getName().equals(queryService.getSchemaAttributes(connectionSettings.getLinkName()).get(MessageKeys.WELCOME_QUERY)));
 			ret.setGroupName(q.getGroupName());
 			ret.setType(q.getType().getName());
 			ret.setViewType(q.getType().getResultType().isView());
@@ -703,6 +728,16 @@ public class QueryEditController
 		}
 	
 	/**
+	 * Get all extractors
+	 * @return extractors
+	 */
+	@ModelAttribute("extractors")
+	public List<String> getExtractors()
+		{
+		return (CollectionUtils.list(dataExtractorService.getSupportedFormats()));
+		}
+	
+	/**
 	 * Get all extensionJS
 	 * @return extensionJS
 	 */
@@ -831,6 +866,17 @@ public class QueryEditController
 					result.reject(ErrorKeys.WRITE_FAILED);
 					return ("db/edit");
 					}
+				}
+			
+			if (name.equals(queryService.getSchemaAttributes(connectionSettings.getLinkName()).get(MessageKeys.WELCOME_QUERY)))
+				{
+				if (!fbo.isWelcome())
+					queryService.setSchemaAttribute(connectionSettings.getLinkName(), userSettings.getPrincipal().getLogin(), q.getSourceSchema(), MessageKeys.WELCOME_QUERY, null);
+				}
+			else
+				{
+				if (fbo.isWelcome())
+					queryService.setSchemaAttribute(connectionSettings.getLinkName(), userSettings.getPrincipal().getLogin(), q.getSourceSchema(), MessageKeys.WELCOME_QUERY, name);
 				}
 			
 			if (!StringUtils.empty(fbo.getBackTo()))

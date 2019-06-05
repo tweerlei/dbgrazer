@@ -71,7 +71,8 @@
 					><c:when test="${s.mainSchema}"><fmt:message key="applyToSchema" var="connectionSpecific"><fmt:param value="${s.name}"/></fmt:message><spring:radiobutton path="scope" value="${s}" label=" ${connectionSpecific}"/> &nbsp; </c:when
 					><c:when test="${s.querySet}"><fmt:message key="applyToDialect" var="connectionSpecific"><fmt:param value="${s.version}"/></fmt:message><spring:radiobutton path="scope" value="${s}" label=" ${connectionSpecific}"/> &nbsp; </c:when
 					><c:when test="${s.subschema}"><fmt:message key="applyToVersion" var="connectionSpecific"><fmt:param value="${s.version}"/></fmt:message><spring:radiobutton path="scope" value="${s}" label=" ${connectionSpecific}"/> &nbsp; </c:when
-					></c:choose></c:forEach></dd>
+					></c:choose></c:forEach><br/>
+					<fmt:message key="welcomeQuery" var="connectionSpecific"/><spring:checkbox path="welcome" label=" ${connectionSpecific}"/></dd>
 				<dt><label for="groupName"><fmt:message key="queryGroup"/></label></dt>
 				<dd><ui:input name="groupName" id="groupName" value="${model.groupName}" page="db:select-group"/></dd>
 <c:if test="${not empty referencing}"
@@ -145,6 +146,12 @@
 						><c:when test="${a.value.simpleName == 'TextFormatter'}"><spring:select path="attributes[${a.key}]">
 							<spring:option value=""><fmt:message key="default"/></spring:option>
 <c:forEach items="${formatters}" var="v"
+>							<spring:option value="${v}"><fmt:message key="${v}"/></spring:option>
+</c:forEach
+>						</spring:select></c:when
+						><c:when test="${a.value.simpleName == 'DataExtractor'}"><spring:select path="attributes[${a.key}]">
+							<spring:option value=""><fmt:message key="default"/></spring:option>
+<c:forEach items="${extractors}" var="v"
 >							<spring:option value="${v}"><fmt:message key="${v}"/></spring:option>
 </c:forEach
 >						</spring:select></c:when

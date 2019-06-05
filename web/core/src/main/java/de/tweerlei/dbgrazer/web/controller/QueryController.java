@@ -146,9 +146,9 @@ public class QueryController
 			@RequestParam(value = "group", required = false) String group
 			) throws RedirectException
 		{
-		final Query welcome = queryService.findQueryByName(connectionSettings.getLinkName(), MessageKeys.WELCOME_TAB);
-		if (welcome != null)
-			throw new RedirectException("result.html?q=" + MessageKeys.WELCOME_TAB);
+		final String welcomeQueryName = queryService.getSchemaAttributes(connectionSettings.getLinkName()).get(MessageKeys.WELCOME_QUERY);
+		if (welcomeQueryName != null)
+			throw new RedirectException("result.html?q=" + welcomeQueryName);
 		
 		final Map<String, Object> model = new HashMap<String, Object>();
 		

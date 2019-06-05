@@ -18,24 +18,20 @@ package de.tweerlei.dbgrazer.security.model;
 import java.util.Map;
 import java.util.Set;
 
+import de.tweerlei.dbgrazer.common.util.Named;
+
 /**
  * User details
  * 
  * @author Robert Wruck
  */
-public interface User
+public interface User extends Named
 	{
 	/**
 	 * Get the login name
 	 * @return Login name
 	 */
 	public String getLogin();
-	
-	/**
-	 * Get the display name
-	 * @return Display name
-	 */
-	public String getName();
 	
 	/**
 	 * Get the password

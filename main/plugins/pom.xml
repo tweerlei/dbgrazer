@@ -26,6 +26,7 @@
 		<module>kafka</module>
 		<module>ldap</module>
 		<module>sql</module>
+		<module>text</module>
 		<module>wiki</module>
 		<module>xml</module>
 	</modules>

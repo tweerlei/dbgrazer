@@ -160,29 +160,10 @@ public class KafkaQueryRunner extends BaseQueryRunner
 		{
 		try	{
 			final String q = buildQuery(query, params);
-			
-			final String[] fields = q.split(":", 4);
-			final String topic = fields[0];
-			final int partition;
-			final long offset;
-			if (fields.length > 2)
-				{
-				partition = Integer.parseInt(fields[1]);
-				offset = Long.parseLong(fields[2]);
-				}
-			else if (fields.length > 1)
-				{
-				partition = 0;
-				offset = Long.parseLong(fields[1]);
-				}
-			else
-				{
-				partition = 0;
-				offset = 0;
-				}
+			final KafkaQueryParser p = new KafkaQueryParser(q);
 			
 			final long start = timeService.getCurrentTime();
-			final ConsumerRecord<String, String> rec = kafkaClient.fetchRecord(link, topic, partition, offset);
+			final ConsumerRecord<String, String> rec = kafkaClient.fetchRecord(link, p.getTopic(), p.getPartition(), p.getStartOffset());
 			final long end = timeService.getCurrentTime();
 			
 			res.getRowSets().put(BODY_TAB, createBodyRowSet(query, subQueryIndex, rec, end - start, link));
@@ -199,50 +180,12 @@ public class KafkaQueryRunner extends BaseQueryRunner
 		{
 		try	{
 			final String q = buildQuery(query, params);
-			
-			final String[] fields = q.split(":", 4);
-			final String topic = fields[0];
-			final int partition;
-			final long startOffset;
-			final Long endOffset;
-			final String key;
-			if (fields.length > 2)
-				{
-				partition = Integer.parseInt(fields[1]);
-				final String[] offsets = fields[2].split("-");
-				startOffset = Long.parseLong(offsets[0]);
-				if (offsets.length > 1)
-					endOffset = Long.parseLong(offsets[1]);
-				else
-					endOffset = null;
-				if (fields.length > 3)
-					key = fields[3].trim();
-				else
-					key = null;
-				}
-			else if (fields.length > 1)
-				{
-				partition = 0;
-				final String[] offsets = fields[1].split("-");
-				startOffset = Long.parseLong(offsets[0]);
-				if (offsets.length > 1)
-					endOffset = Long.parseLong(offsets[1]);
-				else
-					endOffset = null;
-				key = null;
-				}
-			else
-				{
-				partition = 0;
-				startOffset = 0;
-				endOffset = null;
-				key = null;
-				}
+			final KafkaQueryParser p = new KafkaQueryParser(q);
 			
 			final int maxRows = Math.min(limit, kafkaClient.getMaxRows(link));
 			
 			final long start = timeService.getCurrentTime();
-			final List<ConsumerRecord<String, String>> recs = kafkaClient.fetchRecords(link, topic, partition, startOffset, endOffset, key);
+			final List<ConsumerRecord<String, String>> recs = kafkaClient.fetchRecords(link, p.getTopic(), p.getPartition(), p.getStartOffset(), p.getEndOffset(), p.getKey());
 			final long end = timeService.getCurrentTime();
 			
 			final RowSet rs = createListRowSet(query, subQueryIndex, recs, maxRows, end - start);

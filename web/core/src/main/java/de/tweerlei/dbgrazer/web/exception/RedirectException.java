@@ -21,7 +21,7 @@ import org.springframework.web.servlet.ModelAndViewDefiningException;
 /**
  * Thrown from a controller to redirect the user to a different page.
  * 
- * @author Robert Wruck <wruck@tweerlei.de>
+ * @author Robert Wruck
  */
 public class RedirectException extends ModelAndViewDefiningException
 	{

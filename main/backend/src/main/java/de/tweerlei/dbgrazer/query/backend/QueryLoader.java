@@ -17,6 +17,7 @@ package de.tweerlei.dbgrazer.query.backend;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.SortedMap;
 
 import de.tweerlei.dbgrazer.common.file.HistoryEntry;
@@ -102,4 +103,20 @@ public interface QueryLoader
 	 * @throws IOException on error
 	 */
 	public void renameSchema(String user, SchemaDef oldName, SchemaDef newName) throws IOException;
+	
+	/**
+	 * Load schema attributes
+	 * @param schema Schema name
+	 * @return Attributes
+	 */
+	public Map<String, String> loadAttributes(SchemaDef schema);
+	
+	/**
+	 * Update schema attributes
+	 * @param schema Schema name
+	 * @param user User name
+	 * @param attributes New attributes
+	 * @throws IOException on error
+	 */
+	public void updateAttributes(SchemaDef schema, String user, Map<String, String> attributes) throws IOException;
 	}

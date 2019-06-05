@@ -87,6 +87,8 @@ public class QueryServiceImpl implements QueryService, ConfigListener, LinkListe
 	private final Set<QueryType> queryTypes;
 	private final Map<SchemaDef, Map<String, Query>> queriesBySchema;
 	private final Map<String, Map<String, Query>> queries;
+	private final Map<SchemaDef, Map<String, String>> attributesBySchema;
+	private final Map<String, Map<String, String>> attributes;
 	
 	private QueryLoader loader;
 	
@@ -109,6 +111,8 @@ public class QueryServiceImpl implements QueryService, ConfigListener, LinkListe
 		this.logger = Logger.getLogger(getClass().getCanonicalName());
 		this.queriesBySchema = new ConcurrentHashMap<SchemaDef, Map<String, Query>>();
 		this.queries = new ConcurrentHashMap<String, Map<String, Query>>();
+		this.attributesBySchema = new ConcurrentHashMap<SchemaDef, Map<String, String>>();
+		this.attributes = new ConcurrentHashMap<String, Map<String, String>>();
 		this.queryTypes = Collections.unmodifiableSet(new NamedSet<QueryType>(queryTypes));
 		
 		this.logger.log(Level.INFO, "Query types: " + this.queryTypes);
@@ -147,12 +151,14 @@ public class QueryServiceImpl implements QueryService, ConfigListener, LinkListe
 	public void linksChanged()
 		{
 		queries.clear();
+		attributes.clear();
 		}
 	
 	@Override
 	public void linkChanged(String link)
 		{
 		queries.remove(link);
+		attributes.remove(link);
 		}
 	
 	@Override
@@ -160,6 +166,8 @@ public class QueryServiceImpl implements QueryService, ConfigListener, LinkListe
 		{
 		queriesBySchema.clear();
 		queries.clear();
+		attributesBySchema.clear();
+		attributes.clear();
 		}
 	
 	@Override
@@ -651,6 +659,90 @@ public class QueryServiceImpl implements QueryService, ConfigListener, LinkListe
 			ret.add(setSchema);
 			}
 		
+		return (ret);
+		}
+	
+	@Override
+	public Map<String, String> getSchemaAttributes(String link)
+		{
+		Map<String, String> ret = attributes.get(link);
+		if (ret != null)
+			return (ret);
+		
+		final LinkDef c = linkService.getLink(link, null);
+		if (c == null)
+			return (Collections.emptyMap());
+		
+		return (loadAttributes(c));
+		}
+	
+	@Override
+	public synchronized void setSchemaAttribute(String link, String user, SchemaDef schema, String key, String value)
+		{
+		final SchemaDef targetSchema;
+		final Set<SchemaDef> possibleSchemas = getPossibleSchemaNames(link);
+		if (possibleSchemas.contains(schema))
+			targetSchema = schema;
+		else
+			{
+			targetSchema = possibleSchemas.iterator().next();
+			logger.log(Level.INFO, "createQuery: Invalid schema " + schema + " for " + link + ", using " + targetSchema);
+			}
+		
+		final Map<String, String> map = loadAttributes(targetSchema);
+		final Map<String, String> newMap = new HashMap<String, String>(map);
+		if (value == null)
+			newMap.remove(key);
+		else
+			newMap.put(key, value);
+		
+		try	{
+			loader.updateAttributes(targetSchema, user, newMap);
+			
+			attributesBySchema.remove(targetSchema);
+			attributes.clear();
+			}
+		catch (IOException e)
+			{
+			logger.log(Level.WARNING, "setSchemaAttribute: updateAttributes failed in " + targetSchema, e);
+			}
+		}
+	
+	private synchronized Map<String, String> loadAttributes(LinkDef c)
+		{
+		Map<String, String> ret = attributes.get(c.getName());
+		if (ret != null)
+			return (ret);
+		
+		final SortedMap<String, String> allQueries = new TreeMap<String, String>();
+		
+		// Load queries for all query sets
+		for (String qs : c.getQuerySetNames())
+			allQueries.putAll(loadAttributes(new SchemaDef(null, qs)));
+		
+		// Load queries for main schema
+		if (c.getSchema().isSubschema())
+			allQueries.putAll(loadAttributes(c.getSchema().getUnversionedSchema()));
+		
+		// Load queries for subschema (or main schema if unversioned)
+		allQueries.putAll(loadAttributes(c.getSchema()));
+		
+		ret = Collections.unmodifiableMap(allQueries);
+		attributes.put(c.getName(), ret);
+		
+		return (ret);
+		}
+	
+	private synchronized Map<String, String> loadAttributes(SchemaDef schema)
+		{
+		Map<String, String> ret = attributesBySchema.get(schema);
+		if (ret != null)
+			return (ret);
+		
+		ret = loader.loadAttributes(schema);
+		logger.log(Level.INFO, "Loaded attributes for " + schema);
+		
+		attributesBySchema.put(schema, ret);
 		return (ret);
 		}
 	

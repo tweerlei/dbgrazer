@@ -77,7 +77,7 @@ public final class MessageKeys
 	/** Sum tab title */
 	public static final String SUM_TAB = "$sumTab";
 	/** Welcome tab title */
-	public static final String WELCOME_TAB = "$welcome";
+	public static final String WELCOME_QUERY = "welcomeQuery";
 	
 	/*
 	 * Other stuff

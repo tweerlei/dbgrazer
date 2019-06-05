@@ -317,6 +317,17 @@
 			</dependencies>
 		</profile>
 		<profile>
+			<id>text</id>
+			<dependencies>
+				<dependency>
+					<groupId>de.tweerlei</groupId>
+					<artifactId>dbgrazer-plugin-text</artifactId>
+					<version>${project.version}</version>
+					<scope>runtime</scope>
+				</dependency>
+			</dependencies>
+		</profile>
+		<profile>
 			<id>tnsnames</id>
 			<dependencies>
 				<dependency>

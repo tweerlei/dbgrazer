@@ -21,6 +21,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import de.tweerlei.common.util.StringUtils;
+import de.tweerlei.dbgrazer.common.util.impl.NamedBase;
 import de.tweerlei.dbgrazer.link.model.LinkDef;
 import de.tweerlei.dbgrazer.link.model.LinkType;
 import de.tweerlei.dbgrazer.link.model.SchemaDef;
@@ -30,10 +31,9 @@ import de.tweerlei.dbgrazer.link.model.SchemaDef;
  * 
  * @author Robert Wruck
  */
-public class LinkDefImpl implements LinkDef
+public class LinkDefImpl extends NamedBase implements LinkDef
 	{
 	private final transient LinkType type;
-	private final String name;
 	private final String description;
 	private final String driver;
 	private final String url;
@@ -73,8 +73,8 @@ public class LinkDefImpl implements LinkDef
 			boolean writable, String preDMLStatement, String postDMLStatement, String groupName, String setName, String dialectName,
 			Properties properties, String schemaName, String subSchemaName, Set<String> querySetNames)
 		{
+		super(name);
 		this.type = type;
-		this.name = name;
 		this.description = description;
 		this.driver = driver;
 		this.url = url;
@@ -95,12 +95,6 @@ public class LinkDefImpl implements LinkDef
 	public LinkType getType()
 		{
 		return type;
-		}
-
-	@Override
-	public String getName()
-		{
-		return name;
 		}
 
 	@Override

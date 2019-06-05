@@ -21,6 +21,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.tweerlei.dbgrazer.common.util.impl.NamedBase;
 import de.tweerlei.dbgrazer.link.model.SchemaDef;
 import de.tweerlei.dbgrazer.query.model.ParameterDef;
 import de.tweerlei.dbgrazer.query.model.Query;
@@ -31,9 +32,8 @@ import de.tweerlei.dbgrazer.query.model.QueryType;
  * 
  * @author Robert Wruck
  */
-public abstract class AbstractQueryImpl implements Query
+public abstract class AbstractQueryImpl extends NamedBase implements Query
 	{
-	private final String name;
 	private final SchemaDef scope;
 	private final String groupName;
 	private final transient QueryType type;
@@ -51,18 +51,12 @@ public abstract class AbstractQueryImpl implements Query
 	 */
 	public AbstractQueryImpl(String name, SchemaDef scope, String groupName, QueryType type, List<ParameterDef> params, Map<String, String> attributes)
 		{
-		this.name = name;
+		super(name);
 		this.scope = scope;
 		this.groupName = groupName;
 		this.type = type;
 		this.params = (params == null) ? Collections.<ParameterDef>emptyList() : Collections.unmodifiableList(new ArrayList<ParameterDef>(params));
 		this.attributes = (attributes == null) ? Collections.<String, String>emptyMap() : Collections.unmodifiableMap(new LinkedHashMap<String, String>(attributes));
-		}
-	
-	@Override
-	public final String getName()
-		{
-		return (name);
 		}
 	
 	@Override
@@ -93,11 +87,5 @@ public abstract class AbstractQueryImpl implements Query
 	public final Map<String, String> getAttributes()
 		{
 		return (attributes);
-		}
-	
-	@Override
-	public String toString()
-		{
-		return (name);
 		}
 	}

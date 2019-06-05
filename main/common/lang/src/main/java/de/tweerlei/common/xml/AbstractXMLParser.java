@@ -17,6 +17,7 @@ package de.tweerlei.common.xml;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
@@ -27,6 +28,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -198,12 +200,7 @@ public abstract class AbstractXMLParser extends DefaultHandler
 		validating = validate;
 		}
 	
-	/**
-	 * Parst einen Datenstrom
-	 * @param s Datenstrom
-	 * @throws SAXException bei Fehlern
-	 */
-	public void parse(InputStream s) throws SAXException
+	private void parse(InputSource s) throws SAXException
 		{
 		try	{
 			final SAXParserFactory f = SAXParserFactory.newInstance();
@@ -220,5 +217,25 @@ public abstract class AbstractXMLParser extends DefaultHandler
 			{
 			throw new SAXException(e);
 			}
+		}
+	
+	/**
+	 * Parst einen Datenstrom
+	 * @param s Datenstrom
+	 * @throws SAXException bei Fehlern
+	 */
+	public void parse(InputStream s) throws SAXException
+		{
+		parse(new InputSource(s));
+		}
+	
+	/**
+	 * Parst einen Datenstrom
+	 * @param s Datenstrom
+	 * @throws SAXException bei Fehlern
+	 */
+	public void parse(Reader s) throws SAXException
+		{
+		parse(new InputSource(s));
 		}
 	}

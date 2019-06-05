@@ -30,7 +30,6 @@ import de.tweerlei.dbgrazer.link.model.LinkDef;
 import de.tweerlei.dbgrazer.link.service.LinkService;
 import de.tweerlei.dbgrazer.plugins.file.ConfigKeys;
 import de.tweerlei.dbgrazer.plugins.file.types.DirsQueryType;
-import de.tweerlei.dbgrazer.plugins.file.types.FileQueryType;
 import de.tweerlei.dbgrazer.plugins.file.types.FilesQueryType;
 import de.tweerlei.dbgrazer.query.backend.BaseQueryRunner;
 import de.tweerlei.dbgrazer.query.backend.ParamReplacer;
@@ -111,7 +110,7 @@ public class FilesystemQueryRunner extends BaseQueryRunner
 			readDir(res, base, query, subQueryIndex, statement, false);
 		else if (query.getType() instanceof FilesQueryType)
 			readDir(res, base, query, subQueryIndex, statement, true);
-		else if (query.getType() instanceof FileQueryType)
+		else //if (query.getType() instanceof FileQueryType)
 			readFile(res, base, query, subQueryIndex, statement);
 		
 		return (res);

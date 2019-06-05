@@ -22,7 +22,11 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.logging.Level;
@@ -49,6 +53,7 @@ import de.tweerlei.spring.config.ConfigAccessor;
 public abstract class AbstractFileQueryLoader implements QueryLoader
 	{
 	private static final String FILE_EXTENSION = "txt";
+	private static final String PROPERTIES_FILE = "schema.properties"; 
 	
 	private static final class QueryReader implements StreamReader
 		{
@@ -97,6 +102,57 @@ public abstract class AbstractFileQueryLoader implements QueryLoader
 			{
 			final OutputStreamWriter w = new OutputStreamWriter(stream, charset);
 			persister.writeQuery(w, query);
+			w.flush();
+			}
+		}
+	
+	private static final class AttributesReader implements StreamReader
+		{
+		private final String charset;
+		private Map<String, String> attributes;
+		
+		public AttributesReader(String charset)
+			{
+			this.charset = charset;
+			}
+		
+		@Override
+		public void read(InputStream stream) throws IOException
+			{
+			final InputStreamReader r = new InputStreamReader(stream, charset);
+			final Properties props = new Properties();
+			props.load(r);
+			
+			attributes = new HashMap<String, String>();
+			for (Map.Entry<?, ?> ent : props.entrySet())
+				attributes.put(String.valueOf(ent.getKey()), String.valueOf(ent.getValue()));
+			}
+		
+		public Map<String, String> getAttributes()
+			{
+			return (attributes);
+			}
+		}
+	
+	private static final class AttributesWriter implements StreamWriter
+		{
+		private final String charset;
+		private Map<String, String> attributes;
+		
+		public AttributesWriter(Map<String, String> attributes, String charset)
+			{
+			this.charset = charset;
+			this.attributes = attributes;
+			}
+		
+		@Override
+		public void write(OutputStream stream) throws IOException
+			{
+			final OutputStreamWriter w = new OutputStreamWriter(stream, charset);
+			final Properties props = new Properties();
+			for (Map.Entry<String, String> ent : attributes.entrySet())
+				props.setProperty(ent.getKey(), ent.getValue());
+			props.store(w, null);
 			w.flush();
 			}
 		}
@@ -280,6 +336,39 @@ public abstract class AbstractFileQueryLoader implements QueryLoader
 			}
 		else
 			throw new IOException("Can not convert between schema, subschema and dialect");
+		}
+	
+	@Override
+	public Map<String, String> loadAttributes(SchemaDef schema)
+		{
+		final File f = new File(getPath(schema), PROPERTIES_FILE);
+		if (f.isFile())
+			{
+			try	{
+				final AttributesReader r = new AttributesReader(store.getFileEncoding());
+				fileAccess.readFile(f, r);
+				return (r.getAttributes());
+				}
+			catch (IOException e)
+				{
+				logger.log(Level.WARNING, "loadAttributes", e);
+				}
+			}
+		return (Collections.emptyMap());
+		}
+	
+	@Override
+	public void updateAttributes(SchemaDef schema, String user, Map<String, String> attributes) throws IOException
+		{
+		final File dir = getPath(schema);
+		if (!dir.exists())
+			fileAccess.createDirectory(user, dir);
+		
+		final File f = new File(dir, PROPERTIES_FILE);
+		if (f.isFile())
+			fileAccess.createFile(user, new AttributesWriter(attributes, store.getFileEncoding()), f);
+		else
+			fileAccess.writeFile(user, new AttributesWriter(attributes, store.getFileEncoding()), f, f);
 		}
 	
 	private File getPath(SchemaDef schema)

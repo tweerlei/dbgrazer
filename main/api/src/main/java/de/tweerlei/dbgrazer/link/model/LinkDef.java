@@ -19,12 +19,14 @@ import java.io.Serializable;
 import java.util.Properties;
 import java.util.Set;
 
+import de.tweerlei.dbgrazer.common.util.Named;
+
 /**
  * Link definition
  * 
  * @author Robert Wruck
  */
-public interface LinkDef extends Serializable
+public interface LinkDef extends Named, Serializable
 	{
 	/** Special login group name */
 	public static final String LOGIN_GROUP = "*";
@@ -35,12 +37,6 @@ public interface LinkDef extends Serializable
 	 */
 	public LinkType getType();
 	
-	/**
-	 * Get the name
-	 * @return the name
-	 */
-	public String getName();
-
 	/**
 	 * Get the description
 	 * @return the description
