@@ -19,6 +19,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLWarning;
 import java.sql.Statement;
 import java.util.List;
 
@@ -165,6 +166,12 @@ public class ScriptQueryRunner extends BaseQueryRunner
 					
 					if (monitor != null)
 						monitor.progress(1);
+					
+					for (SQLWarning w = stmt.getWarnings(); w != null; w = w.getNextWarning())
+						{
+						errors.append(w.getMessage());
+						errors.append("\n");
+						}
 					
 					String output = null;
 					try	{

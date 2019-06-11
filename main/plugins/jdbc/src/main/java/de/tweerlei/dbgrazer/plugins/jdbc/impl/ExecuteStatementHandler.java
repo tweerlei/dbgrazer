@@ -16,6 +16,7 @@
 package de.tweerlei.dbgrazer.plugins.jdbc.impl;
 
 import java.sql.SQLException;
+import java.sql.SQLWarning;
 import java.sql.Statement;
 
 import org.springframework.jdbc.BadSqlGrammarException;
@@ -83,6 +84,12 @@ public class ExecuteStatementHandler implements StatementHandler
 			if (monitor != null)
 				monitor.getTotalRows().progress(rows);
 			rowCount += rows;
+			
+			for (SQLWarning w = ps.getWarnings(); w != null; w = w.getNextWarning())
+				{
+				errors.append(w.getMessage());
+				errors.append("\n");
+				}
 			
 			if ((nextCommit > 0) && (rowCount >= nextCommit))
 				{
