@@ -23,11 +23,21 @@ import de.tweerlei.ermtools.schema.SchemaNamingStrategy;
  * 
  * @author Robert Wruck
  */
-public class CrossNamingStrategy implements SchemaNamingStrategy
+public class PrefixNamingStrategy implements SchemaNamingStrategy
 	{
+	private final String prefix;
+	
+	public PrefixNamingStrategy(String prefix)
+		{
+		this.prefix = prefix;
+		}
+	
 	public String getTableName(QualifiedName qn)
 		{
-		return (qn.getObjectName());
+		if (qn.getObjectName().startsWith(prefix))
+			return (qn.getObjectName().substring(prefix.length()));
+		else
+			return (qn.getObjectName());
 		}
 	
 	public String getColumnName(String c)

@@ -53,9 +53,11 @@ public class OracleDialect extends CommonSQLDialect
 		TYPE_MAP.put(Types.SMALLINT, new SQLDataType("NUMBER", true, true));
 		TYPE_MAP.put(Types.INTEGER, new SQLDataType("NUMBER", true, true));
 		TYPE_MAP.put(Types.BIGINT, new SQLDataType("NUMBER", true, true));
+		
 		TYPE_MAP.put(Types.REAL, new SQLDataType("NUMBER", true, true));
 		TYPE_MAP.put(Types.DOUBLE, new SQLDataType("NUMBER", true, true));
 		TYPE_MAP.put(Types.FLOAT, new SQLDataType("NUMBER", true, true));
+		
 		TYPE_MAP.put(Types.DECIMAL, new SQLDataType("NUMBER", true, true));
 		TYPE_MAP.put(Types.NUMERIC, new SQLDataType("NUMBER", true, true));
 		

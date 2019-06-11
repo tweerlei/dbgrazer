@@ -65,9 +65,11 @@ public class MySQLDialect extends CommonSQLDialect
 		TYPE_MAP.put(Types.CHAR, new SQLDataType("CHAR", true, false));
 		TYPE_MAP.put(Types.VARCHAR, new SQLDataType("VARCHAR", true, false));
 		TYPE_MAP.put(Types.LONGVARCHAR, new SQLDataType("TEXT", true, false));
+		TYPE_MAP.put(Types.CLOB, new SQLDataType("TEXT", true, false));
 		
 		TYPE_MAP.put(Types.BINARY, new SQLDataType("BINARY", true, false));
 		TYPE_MAP.put(Types.VARBINARY, new SQLDataType("VARBINARY", true, false));
+		TYPE_MAP.put(Types.LONGVARBINARY, new SQLDataType("VARBINARY", true, false));
 		TYPE_MAP.put(Types.BLOB, new SQLDataType("VARBINARY", true, false));
 		}
 	

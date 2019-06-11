@@ -23,6 +23,7 @@ import de.tweerlei.ermtools.dialect.SQLDialect;
 import de.tweerlei.ermtools.dialect.mssql.MSSQLDialect;
 import de.tweerlei.ermtools.dialect.mysql.MySQLDialect;
 import de.tweerlei.ermtools.dialect.oracle.OracleDialect;
+import de.tweerlei.ermtools.dialect.postgresql.PostgreSQLDialect;
 
 /**
  * Factory that knows about all available SQLDialect implementations
@@ -39,6 +40,7 @@ public class SQLDialectFactory
 		tmp.put("mssql", new MSSQLDialect());
 		tmp.put("mysql", new MySQLDialect());
 		tmp.put("oracle", new OracleDialect());
+		tmp.put("postgresql", new PostgreSQLDialect());
 		
 		dialects = Collections.unmodifiableMap(tmp);
 		}

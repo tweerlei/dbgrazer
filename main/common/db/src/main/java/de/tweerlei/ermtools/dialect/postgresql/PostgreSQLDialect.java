@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.tweerlei.ermtools.dialect.mssql;
+package de.tweerlei.ermtools.dialect.postgresql;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -32,124 +32,53 @@ import de.tweerlei.ermtools.dialect.SQLStatementAnalyzer;
 import de.tweerlei.ermtools.dialect.impl.CommonSQLDialect;
 
 /**
- * Microsoft SQL Server
+ * MySQL
  * 
  * @author Robert Wruck
  */
-public class MSSQLDialect extends CommonSQLDialect
+public class PostgreSQLDialect extends CommonSQLDialect
 	{
-	private static final String DATE_FORMAT = "''yyyy-MM-dd''";
-	private static final String TIME_FORMAT = "''HH:mm:ss''";
-	private static final String DATETIME_FORMAT = "''yyyy-MM-dd HH:mm:ss''";
-	private static final String TIMESTAMP_FORMAT = "''yyyy-MM-dd HH:mm:ss.SSS''";
-	
 	private static final Map<Integer, SQLDataType> TYPE_MAP;
 	
 	static
 		{
 		TYPE_MAP = new HashMap<Integer, SQLDataType>();
 		
-		TYPE_MAP.put(Types.BIT, new SQLDataType("BIT", false, false));
-		TYPE_MAP.put(Types.BOOLEAN, new SQLDataType("BIT", false, false));
-		TYPE_MAP.put(Types.TINYINT, new SQLDataType("TINYINT", false, false));
-		TYPE_MAP.put(Types.SMALLINT, new SQLDataType("SMALLINT", false, false));
-		TYPE_MAP.put(Types.INTEGER, new SQLDataType("INT", false, false));
-		TYPE_MAP.put(Types.BIGINT, new SQLDataType("BIGINT", false, false));
+		TYPE_MAP.put(Types.BIT, new SQLDataType("BIT", true, false));
+		TYPE_MAP.put(Types.BOOLEAN, new SQLDataType("BOOL", true, false));
+		TYPE_MAP.put(Types.TINYINT, new SQLDataType("INT2", true, false));
+		TYPE_MAP.put(Types.SMALLINT, new SQLDataType("INT2", true, false));
+		TYPE_MAP.put(Types.INTEGER, new SQLDataType("INT4", true, false));
+		TYPE_MAP.put(Types.BIGINT, new SQLDataType("INT8", true, false));
 		
-		TYPE_MAP.put(Types.REAL, new SQLDataType("REAL", false, false));
-		TYPE_MAP.put(Types.DOUBLE, new SQLDataType("FLOAT", true, false));
-		TYPE_MAP.put(Types.FLOAT, new SQLDataType("FLOAT", true, false));
+		TYPE_MAP.put(Types.REAL, new SQLDataType("FLOAT4", true, true));
+		TYPE_MAP.put(Types.DOUBLE, new SQLDataType("FLOAT8", true, true));
+		TYPE_MAP.put(Types.FLOAT, new SQLDataType("FLOAT4", true, true));
 		
 		TYPE_MAP.put(Types.DECIMAL, new SQLDataType("DECIMAL", true, true));
 		TYPE_MAP.put(Types.NUMERIC, new SQLDataType("NUMERIC", true, true));
 		
 		TYPE_MAP.put(Types.DATE, new SQLDataType("DATE", false, false));
 		TYPE_MAP.put(Types.TIME, new SQLDataType("TIME", false, false));
-		TYPE_MAP.put(Types.TIMESTAMP, new SQLDataType("DATETIME", false, false));
+		TYPE_MAP.put(Types.TIMESTAMP, new SQLDataType("TIMESTAMP", false, false));
 		
 		TYPE_MAP.put(Types.CHAR, new SQLDataType("CHAR", true, false));
 		TYPE_MAP.put(Types.VARCHAR, new SQLDataType("VARCHAR", true, false));
-		TYPE_MAP.put(Types.LONGVARCHAR, new SQLDataType("VARCHAR", true, false));
-		TYPE_MAP.put(Types.CLOB, new SQLDataType("VARCHAR", true, false));
+		TYPE_MAP.put(Types.LONGVARCHAR, new SQLDataType("TEXT", true, false));
+		TYPE_MAP.put(Types.CLOB, new SQLDataType("TEXT", true, false));
 		
-		TYPE_MAP.put(Types.BINARY, new SQLDataType("BINARY", true, false));
-		TYPE_MAP.put(Types.VARBINARY, new SQLDataType("VARBINARY", true, false));
-		TYPE_MAP.put(Types.LONGVARBINARY, new SQLDataType("VARBINARY", true, false));
-		TYPE_MAP.put(Types.BLOB, new SQLDataType("VARBINARY", true, false));
+		TYPE_MAP.put(Types.BINARY, new SQLDataType("BYTEA", true, false));
+		TYPE_MAP.put(Types.VARBINARY, new SQLDataType("BYTEA", true, false));
+		TYPE_MAP.put(Types.LONGVARBINARY, new SQLDataType("BYTEA", true, false));
+		TYPE_MAP.put(Types.BLOB, new SQLDataType("BYTEA", true, false));
 		}
 	
 	/**
 	 * Constructor
 	 */
-	public MSSQLDialect()
+	public PostgreSQLDialect()
 		{
 		super(TYPE_MAP);
-		}
-	
-	@Override
-	public String getDateFormat()
-		{
-		return (DATE_FORMAT);
-		}
-	
-	@Override
-	public String getTimeFormat()
-		{
-		return (TIME_FORMAT);
-		}
-	
-	@Override
-	public String getDatetimeFormat()
-		{
-		return (DATETIME_FORMAT);
-		}
-	
-	@Override
-	public String getTimestampFormat()
-		{
-		return (TIMESTAMP_FORMAT);
-		}
-	
-	@Override
-	public boolean supportsMerge()
-		{
-		return (true);
-		}
-	
-	@Override
-	public boolean dmlRequiresTerminator()
-		{
-		return (true);
-		}
-	
-	@Override
-	public String prepareInsert(TableDescription t)
-		{
-		// SQL Server won't permit INSERTs into identity columns
-		if (isIdentityInsert(t))
-			return ("SET IDENTITY_INSERT " + getQualifiedTableName(t.getName()) + " ON");
-		return (null);
-		}
-	
-	@Override
-	public String finishInsert(TableDescription t)
-		{
-		// SQL Server won't permit INSERTs into identity columns
-		if (isIdentityInsert(t))
-			return ("SET IDENTITY_INSERT " + getQualifiedTableName(t.getName()) + " OFF");
-		return (null);
-		}
-	
-	private boolean isIdentityInsert(TableDescription t)
-		{
-		final PrimaryKeyDescription pk = t.getPrimaryKey();
-		if ((pk != null) && (pk.getColumns().size() == 1))
-			{
-			final ColumnDescription col = t.getColumn(pk.getColumns().get(0));
-			if ((col != null) && col.getType().getName().equalsIgnoreCase("int identity"))
-				return (true);
-			}
-		return (false);
 		}
 	
 	public String createTable(TableDescription t)
@@ -182,9 +111,7 @@ public class MSSQLDialect extends CommonSQLDialect
 		final PrimaryKeyDescription pk = t.getPrimaryKey();
 		if (pk != null)
 			{
-			sb.append(",\n\tCONSTRAINT ");
-			sb.append(pk.getName());
-			sb.append(" PRIMARY KEY (");
+			sb.append(",\n\tPRIMARY KEY (");
 			
 			first = true;
 			for (Iterator<String> i = pk.getColumns().iterator(); i.hasNext(); )
@@ -216,8 +143,9 @@ public class MSSQLDialect extends CommonSQLDialect
 		sb.append(c.isNullable() ? " NULL" : " NOT NULL");
 		if (c.getDefaultValue() != null)
 			{
-			sb.append(" DEFAULT ");
+			sb.append(" DEFAULT '");
 			sb.append(c.getDefaultValue());
+			sb.append("'");
 			}
 		return (sb.toString());
 		}
@@ -227,17 +155,16 @@ public class MSSQLDialect extends CommonSQLDialect
 		final StringBuffer sb = new StringBuffer();
 		sb.append("ALTER TABLE ");
 		sb.append(t.getName().getObjectName());
-		sb.append("\n\tALTER COLUMN ");
+		sb.append("\n\tMODIFY COLUMN ");
 		sb.append(c.getName());
 		sb.append(" ");
 		sb.append(dataTypeToString(c.getType()));
 		sb.append(c.isNullable() ? " NULL" : " NOT NULL");
 		if (c.getDefaultValue() != null)
 			{
-			sb.append(" DEFAULT ");
+			sb.append(" DEFAULT '");
 			sb.append(c.getDefaultValue());
-			// FIXME: It's not possible to remove a DEFAULT from a column without knowing the constraint name -
-			//        but that is not returned from DatabaseMetadata
+			sb.append("'");
 			}
 		return (sb.toString());
 		}
@@ -255,13 +182,13 @@ public class MSSQLDialect extends CommonSQLDialect
 	public String createIndex(TableDescription t, IndexDescription ix)
 		{
 		final StringBuffer sb = new StringBuffer();
-		if (ix.isUnique())
-			sb.append("CREATE UNIQUE INDEX ");
-		else
-			sb.append("CREATE INDEX ");
-		sb.append(ix.getName());
-		sb.append("\n\tON ");
+		sb.append("ALTER TABLE ");
 		sb.append(t.getName().getObjectName());
+		if (ix.isUnique())
+			sb.append("\n\tADD UNIQUE KEY ");
+		else
+			sb.append("\n\tADD KEY ");
+		sb.append(ix.getName());
 		sb.append(" (");
 		
 		boolean first = true;
@@ -281,10 +208,10 @@ public class MSSQLDialect extends CommonSQLDialect
 	public String dropIndex(TableDescription t, IndexDescription ix)
 		{
 		final StringBuffer sb = new StringBuffer();
-		sb.append("DROP INDEX ");
-		sb.append(ix.getName());
-		sb.append(" ON ");
+		sb.append("ALTER TABLE ");
 		sb.append(t.getName().getObjectName());
+		sb.append("\n\tDROP INDEX ");
+		sb.append(ix.getName());
 		return (sb.toString());
 		}
 
@@ -293,9 +220,7 @@ public class MSSQLDialect extends CommonSQLDialect
 		final StringBuffer sb = new StringBuffer();
 		sb.append("ALTER TABLE ");
 		sb.append(t.getName().getObjectName());
-		sb.append("\n\tADD CONSTRAINT ");
-		sb.append(k.getName());
-		sb.append(" PRIMARY KEY (");
+		sb.append("\n\tADD PRIMARY KEY (");
 		
 		boolean first = true;
 		for (Iterator<String> i = k.getColumns().iterator(); i.hasNext(); )
@@ -316,8 +241,7 @@ public class MSSQLDialect extends CommonSQLDialect
 		final StringBuffer sb = new StringBuffer();
 		sb.append("ALTER TABLE ");
 		sb.append(t.getName().getObjectName());
-		sb.append("\n\tDROP CONSTRAINT ");
-		sb.append(k.getName());
+		sb.append("\n\tDROP PRIMARY KEY");
 		return (sb.toString());
 		}
 
@@ -363,7 +287,7 @@ public class MSSQLDialect extends CommonSQLDialect
 		final StringBuffer sb = new StringBuffer();
 		sb.append("ALTER TABLE ");
 		sb.append(t.getName().getObjectName());
-		sb.append("\n\tDROP CONSTRAINT ");
+		sb.append("\n\tDROP FOREIGN KEY ");
 		sb.append(fk.getName());
 		return (sb.toString());
 		}
@@ -371,6 +295,6 @@ public class MSSQLDialect extends CommonSQLDialect
 	@Override
 	public SQLStatementAnalyzer getStatementAnalyzer(Connection c) throws SQLException
 		{
-		return (new MSSQLStatementAnalyzer(c));
+		return (new PostgreSQLStatementAnalyzer(c));
 		}
 	}
