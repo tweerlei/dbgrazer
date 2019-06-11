@@ -223,12 +223,17 @@ public class URLConnectionHttpClient implements HttpClient
 			}
 		
 		final long size;
-		try	{
-			size = StreamUtils.copy(r, baos);
-			}
-		finally
+		if (r == null)
+			size = 0;
+		else
 			{
-			StreamUtils.closeQuietly(r);
+			try	{
+				size = StreamUtils.copy(r, baos);
+				}
+			finally
+				{
+				StreamUtils.closeQuietly(r);
+				}
 			}
 		
 		final long length = c.getContentLength();

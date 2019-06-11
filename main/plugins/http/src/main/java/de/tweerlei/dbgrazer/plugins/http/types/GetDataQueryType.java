@@ -25,8 +25,9 @@ import org.springframework.stereotype.Service;
 
 import de.tweerlei.dbgrazer.plugins.http.impl.WebserviceLinkType;
 import de.tweerlei.dbgrazer.query.model.DataExtractor;
+import de.tweerlei.dbgrazer.query.model.ResultMapMode;
 import de.tweerlei.dbgrazer.query.model.ResultVisitor;
-import de.tweerlei.dbgrazer.query.model.impl.AbstractSingleQueryType;
+import de.tweerlei.dbgrazer.query.model.impl.AbstractTableQueryType;
 import de.tweerlei.dbgrazer.query.model.impl.DataExtractorVisitor;
 import de.tweerlei.dbgrazer.query.service.DataExtractorService;
 
@@ -37,7 +38,7 @@ import de.tweerlei.dbgrazer.query.service.DataExtractorService;
  */
 @Service
 @Order(204)
-public class GetDataQueryType extends AbstractSingleQueryType
+public class GetDataQueryType extends AbstractTableQueryType
 	{
 	/** The NAME */
 	public static final String NAME = "GET_DATA";
@@ -53,7 +54,7 @@ public class GetDataQueryType extends AbstractSingleQueryType
 	@Autowired
 	public GetDataQueryType(WebserviceLinkType linkType, DataExtractorService extractorService)
 		{
-		super(NAME, linkType);
+		super(NAME, linkType, ResultMapMode.SINGLE);
 		
 		this.extractorService = extractorService;
 		final Map<String, Class<?>> m = new LinkedHashMap<String, Class<?>>();

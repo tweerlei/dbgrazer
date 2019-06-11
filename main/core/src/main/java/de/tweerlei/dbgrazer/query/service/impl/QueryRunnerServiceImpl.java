@@ -34,6 +34,7 @@ import de.tweerlei.dbgrazer.query.model.QueryType;
 import de.tweerlei.dbgrazer.query.model.Result;
 import de.tweerlei.dbgrazer.query.model.ResultVisitor;
 import de.tweerlei.dbgrazer.query.model.RowHandler;
+import de.tweerlei.dbgrazer.query.model.RowSet;
 import de.tweerlei.dbgrazer.query.model.RowTransferer;
 import de.tweerlei.dbgrazer.query.model.StatementProducer;
 import de.tweerlei.dbgrazer.query.model.impl.QueryImpl;
@@ -171,9 +172,12 @@ public class QueryRunnerServiceImpl implements QueryRunnerService
 			res.getRowSets().put(res.getQuery().getName(), new RowSetImpl(res.getQuery(), 0, null));
 		else
 			{
-			final ResultVisitor v = res.getQuery().getType().getPostProcessor();
-			if (v != null)
-				res.accept(v);
+			for (RowSet rs : res.getRowSets().values())
+				{
+				final ResultVisitor v = rs.getQuery().getType().getPostProcessor();
+				if (v != null)
+					rs.accept(v, 0);
+				}
 			}
 		}
 	}
