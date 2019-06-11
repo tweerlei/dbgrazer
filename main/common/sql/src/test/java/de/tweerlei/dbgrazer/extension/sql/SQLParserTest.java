@@ -71,11 +71,17 @@ public class SQLParserTest extends TestCase
 		assertEquals(Arrays.asList("select", "column", "from", "table", "where", "\"column 2\"", "=", ":var"), parse("select column from table where \"column 2\" = :var"));
 		assertEquals(Arrays.asList("select", "column", "from", "table", "where", "column2", "=", ":\"var 1\""), parse("select column from table where column2 = : \"var 1\""));
 		
+		assertEquals(Arrays.asList("DO", "' this is verbatim ''text''; with a $1 placeholder '"), parse("DO $$ this is verbatim 'text'; with a $1 placeholder $$"));
+		assertEquals(Arrays.asList("DO", "' this is verbatim ''text''; with a $1 placeholder '"), parse("DO $body$ this is verbatim 'text'; with a $1 placeholder $body$"));
+		assertEquals(Arrays.asList("DO", "' this is verbatim ''text''; with a $head$ placeholder '"), parse("DO $body$ this is verbatim 'text'; with a $head$ placeholder $body$"));
+		
 		expectError("='test", "Error at line 1, column 7: Unterminated string literal");
 		expectError("= 0; drop table users; --", "Error at line 1, column 4: Unexpected character ';'");
 		expectError(") and 1=1", "Error at line 1, column 1: Unmatched closing brace");
 		expectError("= 0 --", "Error at line 1, column 6: Unexpected character '-'");
 		expectError("= ?", "Error at line 1, column 3: Unexpected character '?'");
+		expectError("DO $$ test", "Error at line 1, column 11: Unterminated string literal");
+		expectError("DO $body$ test $body $", "Error at line 1, column 23: Unterminated string literal");
 		}
 	
 	/**

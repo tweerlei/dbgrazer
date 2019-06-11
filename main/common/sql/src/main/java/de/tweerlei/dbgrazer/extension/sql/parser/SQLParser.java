@@ -25,6 +25,37 @@ import java.util.Set;
  */
 public class SQLParser
 	{
+	private static final class TokenBuffer
+		{
+		private final StringBuilder sb;
+		
+		public TokenBuffer()
+			{
+			this.sb = new StringBuilder();
+			}
+		
+		public void append(char c)
+			{
+			sb.append(c);
+			}
+		
+		public void append(String s)
+			{
+			sb.append(s);
+			}
+		
+		public void clear()
+			{
+			sb.setLength(0);
+			}
+		
+		@Override
+		public String toString()
+			{
+			return (sb.toString());
+			}
+		}
+	
 	private static enum State
 		{
 		INITIAL,
@@ -37,7 +68,10 @@ public class SQLParser
 		OPERATOR,
 		COMMENT,
 		COMMENT_END,
-		EOL_COMMENT
+		EOL_COMMENT,
+		QUOTED_STRING_START,
+		QUOTED_STRING,
+		QUOTED_STRING_END
 		}
 	
 	private static final Set<String> operators;
@@ -73,8 +107,10 @@ public class SQLParser
 	
 	private final SQLConsumer consumer;
 	private final boolean extended;
-	private final StringBuilder token;
-	private final StringBuilder space;
+	private final TokenBuffer token;
+	private final TokenBuffer space;
+	private final TokenBuffer startLabel;
+	private final TokenBuffer endLabel;
 	private State state;
 	private int row;
 	private int column;
@@ -97,8 +133,10 @@ public class SQLParser
 		{
 		this.consumer = new SQLConsumer(handler);
 		this.extended = extended;
-		this.token = new StringBuilder();
-		this.space = new StringBuilder();
+		this.token = new TokenBuffer();
+		this.space = new TokenBuffer();
+		this.startLabel = new TokenBuffer();
+		this.endLabel = new TokenBuffer();
 		this.state = State.INITIAL;
 		}
 	
@@ -120,43 +158,16 @@ public class SQLParser
 		return (column);
 		}
 	
-	private void append(char c)
-		{
-		token.append(c);
-		}
-	
-	private String currentToken()
-		{
-		return (token.toString());
-		}
-	
-	private void clearToken()
-		{
-		token.setLength(0);
-		}
-	
-	private void clearSpace()
-		{
-		space.setLength(0);
-		}
-	
-	private void whitespace(char c)
-		{
-		space.append(c);
-		}
-	
 	private void flushToken()
 		{
-		if (space.length() > 0)
-			{
-			final String s = space.toString();
-			consumer.appendSpace(s);
-			clearSpace();
-			}
+		final String sp = space.toString();
+		if (sp.length() > 0)
+			consumer.appendSpace(sp);
+		space.clear();
 		
-		if ((token.length() > 0) || (state == State.STRING) || (state == State.COMMENT_END) || (state == State.EOL_COMMENT))
+		final String s = token.toString();
+		if ((s.length() > 0) || (state == State.STRING) || (state == State.COMMENT_END) || (state == State.EOL_COMMENT))
 			{
-			final String s = token.toString();
 			switch (state)
 				{
 				case NAME:
@@ -164,6 +175,7 @@ public class SQLParser
 					consumer.appendName(s);
 					break;
 				case STRING:
+				case QUOTED_STRING_END:
 					consumer.appendString(s);
 					break;
 				case NUMBER:
@@ -181,8 +193,8 @@ public class SQLParser
 				default:
 					throw new RuntimeException("Unexpected flush");
 				}
-			clearToken();
 			}
+		token.clear();
 		}
 	
 	private boolean isNumber(char c)
@@ -192,7 +204,7 @@ public class SQLParser
 
 	private boolean isNameStart(char c)
 		{
-		return (Character.isLetter(c) || (c == '_') || (c == '$') || (c == '#')
+		return (Character.isLetter(c) || (c == '_') //|| (c == '$') || (c == '#')
 				|| (extended && (c == '?')));
 		}
 	
@@ -247,43 +259,48 @@ public class SQLParser
 						// distinguish number literals from "." and ".." operators
 						if ((c == '.') && (i + 1 < n) && !isNumber(sql.charAt(i + 1)))
 							{
-							append(c);
+							token.append(c);
 							state = State.OPERATOR;
 							}
 						else if ((c == '.') && (i + 1 < n) && (sql.charAt(i + 1) == '.'))
 							{
-							append(c);
+							token.append(c);
 							state = State.OPERATOR;
 							}
 						else
 							{
-							append(c);
+							token.append(c);
 							state = State.NUMBER;
 							}
 						}
 					else if (isNameStart(c))
 						{
-						append(c);
+						token.append(c);
 						state = State.NAME;
 						}
 					else if (c == ':')
 						{
-						append(c);
+						token.append(c);
 						state = State.PARAMETER;
+						}
+					else if (c == '$')
+						{
+						startLabel.append(c);
+						state = State.QUOTED_STRING_START;
 						}
 					else if (isOperator(c))
 						{
-						append(c);
+						token.append(c);
 						state = State.OPERATOR;
 						}
 					else if (c == '\'')
 						{
-//						append(c);
+//						token.append(c);
 						state = State.STRING;
 						}
 					else if (c == '"')
 						{
-						append(c);
+						token.append(c);
 						state = State.QUOTED_NAME;
 						}
 					else if (c == '(')
@@ -299,24 +316,24 @@ public class SQLParser
 						state = State.INITIAL;
 						}
 					else if (Character.isWhitespace(c))
-						whitespace(c);
+						space.append(c);
 					else
 						throw new IllegalStateException("Unexpected character '" + c + "'");
 					break;
 				
 				case NAME:
 					if (isName(c))
-						append(c);
+						token.append(c);
 					else if (isOperator(c))
 						{
 						flushToken();
-						append(c);
+						token.append(c);
 						state = State.OPERATOR;
 						}
 					else if (c == '\'')
 						{
 						flushToken();
-//						append(c);
+//						token.append(c);
 						state = State.STRING;
 						}
 					else if (c == '(')
@@ -334,7 +351,7 @@ public class SQLParser
 					else if (Character.isWhitespace(c))
 						{
 						flushToken();
-						whitespace(c);
+						space.append(c);
 						state = State.INITIAL;
 						}
 					else
@@ -348,21 +365,21 @@ public class SQLParser
 						if ((c == '.') && (i + 1 < n) && (sql.charAt(i + 1) == '.'))
 							{
 							flushToken();
-							append(c);
+							token.append(c);
 							state = State.OPERATOR;
 							}
 						else
-							append(c);
+							token.append(c);
 						}
 					else if ((c == 'e') || (c == 'E'))
 						{
-						append(c);
+						token.append(c);
 						state = State.NUMBER_EXP;
 						}
 					else if (isOperator(c))
 						{
 						flushToken();
-						append(c);
+						token.append(c);
 						state = State.OPERATOR;
 						}
 					else if (c == '(')
@@ -380,7 +397,7 @@ public class SQLParser
 					else if (Character.isWhitespace(c))
 						{
 						flushToken();
-						whitespace(c);
+						space.append(c);
 						state = State.INITIAL;
 						}
 					else
@@ -390,12 +407,12 @@ public class SQLParser
 				case NUMBER_EXP:
 					if (isNumber(c))
 						{
-						append(c);
+						token.append(c);
 						state = State.NUMBER;
 						}
 					else if ((c == '-') || (c == '+'))
 						{
-						append(c);
+						token.append(c);
 						state = State.NUMBER;
 						}
 					else
@@ -408,22 +425,22 @@ public class SQLParser
 						// detect embedded single quotes
 						if ((i + 1 >= n) || (sql.charAt(i + 1) != '\''))
 							{
-//							append(c);
+//							token.append(c);
 							flushToken();
 							state = State.INITIAL;
 							}
 						else
 							{
-							append(c);
+							token.append(c);
 							i++;
 							}
 						}
 					else
-						append(c);
+						token.append(c);
 					break;
 				
 				case QUOTED_NAME:
-					append(c);
+					token.append(c);
 					if (c == '"')
 						{
 						flushToken();
@@ -434,28 +451,28 @@ public class SQLParser
 				case PARAMETER:
 					if (isNameStart(c))
 						{
-						append(c);
+						token.append(c);
 						state = State.NAME;
 						}
 					else if (Character.isDigit(c))
 						{
-						append(c);
+						token.append(c);
 						state = State.NAME;
 						}
 					else if (c == '"')
 						{
-						append(c);
+						token.append(c);
 						state = State.QUOTED_NAME;
 						}
 					else if ((c == '='))
 						{
 						// special case to distinguish the assignment operator from a host variable declaration
 						state = State.OPERATOR;
-						append(c);
+						token.append(c);
 						flushToken();
 						}
 					else if (Character.isWhitespace(c))
-						whitespace(c);
+						space.append(c);
 					else
 						throw new IllegalStateException("Unexpected character '" + c + "'");
 					break;
@@ -463,19 +480,19 @@ public class SQLParser
 				case OPERATOR:
 					if (isOperator(c))
 						{
-						final String tmp = currentToken() + c;
+						final String tmp = token.toString() + c;
 						// check for known compound operators
 						if (tmp.equals(".*"))
 							{
 							flushToken();
-							append(c);
+							token.append(c);
 							flushToken();
 							state = State.INITIAL;
 							break;
 							}
 						else if (operators.contains(tmp))
 							{
-							append(c);
+							token.append(c);
 							flushToken();
 							state = State.INITIAL;
 							break;
@@ -486,7 +503,7 @@ public class SQLParser
 								throw new IllegalStateException("Unexpected character '" + c + "'");
 							
 							state = State.EOL_COMMENT;
-							clearToken();
+							token.clear();
 //							flushToken();
 							break;
 							}
@@ -496,14 +513,14 @@ public class SQLParser
 								throw new IllegalStateException("Unexpected character '" + c + "'");
 							
 							state = State.COMMENT;
-							clearToken();
+							token.clear();
 //							flushToken();
 							break;
 							}
 						else if ((c == '-') || (c == '/'))
 							{
 							flushToken();
-							append(c);
+							token.append(c);
 							break;
 							}
 						}
@@ -511,30 +528,30 @@ public class SQLParser
 					if (isNumber(c))
 						{
 						flushToken();
-						append(c);
+						token.append(c);
 						state = State.NUMBER;
 						}
 					else if (isNameStart(c))
 						{
 						flushToken();
-						append(c);
+						token.append(c);
 						state = State.NAME;
 						}
 					else if (c == ':')
 						{
-						append(c);
+						token.append(c);
 						state = State.PARAMETER;
 						}
 					else if (c == '\'')
 						{
 						flushToken();
-//						append(c);
+//						token.append(c);
 						state = State.STRING;
 						}
 					else if (c == '"')
 						{
 						flushToken();
-						append(c);
+						token.append(c);
 						state = State.QUOTED_NAME;
 						}
 					else if (c == '(')
@@ -552,7 +569,7 @@ public class SQLParser
 					else if (Character.isWhitespace(c))
 						{
 						flushToken();
-						whitespace(c);
+						space.append(c);
 						state = State.INITIAL;
 						}
 					else
@@ -563,7 +580,7 @@ public class SQLParser
 					if (c == '*')
 						state = State.COMMENT_END;
 					else
-						append(c);
+						token.append(c);
 					break;
 				
 				case COMMENT_END:
@@ -573,11 +590,11 @@ public class SQLParser
 						state = State.INITIAL;
 						}
 					else if (c == '*')
-						append('*');
+						token.append('*');
 					else
 						{
-						append('*');
-						append(c);
+						token.append('*');
+						token.append(c);
 						state = State.COMMENT;
 						}
 					break;
@@ -586,11 +603,58 @@ public class SQLParser
 					if ((c == '\r') || (c == '\n'))
 						{
 						flushToken();
-						whitespace(c);
+						space.append(c);
 						state = State.INITIAL;
 						}
 					else
-						append(c);
+						token.append(c);
+					break;
+				
+				case QUOTED_STRING_START:
+					if (c == '$')
+						state = State.QUOTED_STRING;
+					else if (isNameStart(c))
+						startLabel.append(c);
+					else
+						throw new IllegalStateException("Malformed quote delimiter '" + startLabel.toString() + "'");
+					break;
+				
+				case QUOTED_STRING:
+					if (c == '$')
+						{
+						endLabel.append(c);
+						state = State.QUOTED_STRING_END;
+						}
+					else
+						token.append(c);
+					break;
+				
+				case QUOTED_STRING_END:
+					if (c == '$')
+						{
+						if (endLabel.toString().equals(startLabel.toString()))
+							{
+							flushToken();
+							startLabel.clear();
+							endLabel.clear();
+							state = State.INITIAL;
+							}
+						else
+							{
+							token.append(endLabel.toString());
+							endLabel.clear();
+							endLabel.append(c);
+							}
+						}
+					else if (isNameStart(c))
+						endLabel.append(c);
+					else
+						{
+						endLabel.append(c);
+						token.append(endLabel.toString());
+						endLabel.clear();
+						state = State.QUOTED_STRING;
+						}
 					break;
 				}
 			
@@ -603,7 +667,7 @@ public class SQLParser
 				column++;
 			}
 		
-		if (state == State.STRING)
+		if ((state == State.STRING) || (state == State.QUOTED_STRING_START) || (state == State.QUOTED_STRING) || (state == State.QUOTED_STRING_END))
 			throw new IllegalStateException("Unterminated string literal");
 		if (state == State.QUOTED_NAME)
 			throw new IllegalStateException("Unterminated name");
