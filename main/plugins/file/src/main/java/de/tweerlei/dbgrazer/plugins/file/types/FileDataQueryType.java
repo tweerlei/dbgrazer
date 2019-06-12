@@ -30,6 +30,7 @@ import de.tweerlei.dbgrazer.query.model.ResultVisitor;
 import de.tweerlei.dbgrazer.query.model.impl.AbstractTableQueryType;
 import de.tweerlei.dbgrazer.query.model.impl.DataExtractorVisitor;
 import de.tweerlei.dbgrazer.query.service.DataExtractorService;
+import de.tweerlei.dbgrazer.query.service.RowTransformerService;
 
 /**
  * Read file contents
@@ -43,19 +44,23 @@ public class FileDataQueryType extends AbstractTableQueryType
 	private static final String NAME = "FILE_DATA";
 	
 	private final DataExtractorService extractorService;
+	private final RowTransformerService transformerService;
 	private final Map<String, Class<?>> attributes;
 	
 	/**
 	 * Constructor
 	 * @param linkType LinkType
 	 * @param extractorService DataExtractorService
+	 * @param transformerService RowTransformerService
 	 */
 	@Autowired
-	public FileDataQueryType(FilesystemLinkType linkType, DataExtractorService extractorService)
+	public FileDataQueryType(FilesystemLinkType linkType,
+			DataExtractorService extractorService, RowTransformerService transformerService)
 		{
 		super(NAME, linkType, ResultMapMode.SINGLE);
 		
 		this.extractorService = extractorService;
+		this.transformerService = transformerService;
 		final Map<String, Class<?>> m = new LinkedHashMap<String, Class<?>>();
 		m.put(DataExtractorVisitor.EXTRACTOR_NAME_ATTRIBUTE, DataExtractor.class);
 		attributes = Collections.unmodifiableMap(m);
@@ -70,6 +75,6 @@ public class FileDataQueryType extends AbstractTableQueryType
 	@Override
 	public ResultVisitor getPostProcessor()
 		{
-		return (new DataExtractorVisitor(extractorService));
+		return (new DataExtractorVisitor(extractorService, transformerService));
 		}
 	}

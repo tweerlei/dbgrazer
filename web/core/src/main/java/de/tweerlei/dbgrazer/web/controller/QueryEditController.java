@@ -50,6 +50,7 @@ import de.tweerlei.dbgrazer.query.model.impl.SubQueryDefImpl;
 import de.tweerlei.dbgrazer.query.model.impl.ViewImpl;
 import de.tweerlei.dbgrazer.query.service.DataExtractorService;
 import de.tweerlei.dbgrazer.query.service.QueryService;
+import de.tweerlei.dbgrazer.query.service.RowTransformerService;
 import de.tweerlei.dbgrazer.visualization.service.ChartScaling;
 import de.tweerlei.dbgrazer.visualization.service.ChartType;
 import de.tweerlei.dbgrazer.visualization.service.GraphType;
@@ -459,6 +460,7 @@ public class QueryEditController
 	private final QueryService queryService;
 	private final TextTransformerService textFormatterService;
 	private final DataExtractorService dataExtractorService;
+	private final RowTransformerService transformerService;
 	private final VisualizationService visualizationService;
 	private final StringTransformerService stringTransformerService;
 	private final UserSettings userSettings;
@@ -469,6 +471,7 @@ public class QueryEditController
 	 * @param queryService QueryService
 	 * @param textFormatterService TextFormatterService
 	 * @param dataExtractorService DataExtractorService
+	 * @param transformerService RowTransformerService
 	 * @param visualizationService VisualizationService
 	 * @param stringTransformerService StringTransformerService
 	 * @param userSettings UserSettings
@@ -476,13 +479,14 @@ public class QueryEditController
 	 */
 	@Autowired
 	public QueryEditController(QueryService queryService, TextTransformerService textFormatterService,
-			DataExtractorService dataExtractorService,
+			DataExtractorService dataExtractorService, RowTransformerService transformerService,
 			VisualizationService visualizationService, StringTransformerService stringTransformerService,
 			UserSettings userSettings, ConnectionSettings connectionSettings)
 		{
 		this.queryService = queryService;
 		this.textFormatterService = textFormatterService;
 		this.dataExtractorService = dataExtractorService;
+		this.transformerService = transformerService;
 		this.visualizationService = visualizationService;
 		this.stringTransformerService = stringTransformerService;
 		this.userSettings = userSettings;
@@ -735,6 +739,16 @@ public class QueryEditController
 	public List<String> getExtractors()
 		{
 		return (CollectionUtils.list(dataExtractorService.getSupportedFormats()));
+		}
+	
+	/**
+	 * Get all transformers
+	 * @return transformers
+	 */
+	@ModelAttribute("transformers")
+	public List<String> getTransformers()
+		{
+		return (CollectionUtils.list(transformerService.getSupportedFormats()));
 		}
 	
 	/**

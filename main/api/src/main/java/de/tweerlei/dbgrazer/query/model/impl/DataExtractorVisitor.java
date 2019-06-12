@@ -17,8 +17,11 @@ package de.tweerlei.dbgrazer.query.model.impl;
 
 import java.io.StringReader;
 
+import de.tweerlei.dbgrazer.query.model.ResultRow;
+import de.tweerlei.dbgrazer.query.model.RowHandler;
 import de.tweerlei.dbgrazer.query.model.RowSet;
 import de.tweerlei.dbgrazer.query.service.DataExtractorService;
+import de.tweerlei.dbgrazer.query.service.RowTransformerService;
 
 /**
  * ResultVisitor that uses a DataExtractor to extract data from the first row's first field
@@ -32,15 +35,29 @@ public class DataExtractorVisitor extends ResultVisitorAdapter
 	 */
 	public static final String EXTRACTOR_NAME_ATTRIBUTE = "dataExtractor";
 	
+	/**
+	 * The Query attribute for the RowTransformer name
+	 */
+	public static final String TRANSFORMER_NAME_ATTRIBUTE = "rowTransformer";
+	
+	/**
+	 * The Query attribute for the RowTransformer recipe
+	 */
+	public static final String TRANSFORMER_RECIPE_ATTRIBUTE = "rowTransformation";
+	
 	private final DataExtractorService extractorService;
+	private final RowTransformerService transformerService;
+	private RowHandler handler;
 	
 	/**
 	 * Constructor
 	 * @param extractorService DataExtractorService
+	 * @param transformerService RowTransformerService
 	 */
-	public DataExtractorVisitor(DataExtractorService extractorService)
+	public DataExtractorVisitor(DataExtractorService extractorService, RowTransformerService transformerService)
 		{
 		this.extractorService = extractorService;
+		this.transformerService = transformerService;
 		}
 	
 	@Override
@@ -61,9 +78,35 @@ public class DataExtractorVisitor extends ResultVisitorAdapter
 					
 					rs.getRows().clear();
 					rs.getRows().addAll(extracted.getRows());
+					
+					final String transformerName = rs.getQuery().getAttributes().get(TRANSFORMER_NAME_ATTRIBUTE);
+					final String transformerRecipe = rs.getQuery().getAttributes().get(TRANSFORMER_RECIPE_ATTRIBUTE);
+					if ((transformerName != null) && (transformerRecipe != null))
+						{
+						handler = transformerService.createHandler(transformerRecipe, transformerName);
+						if (handler != null)
+							{
+							handler.startRows(extracted.getColumns());
+							return (true);
+							}
+						}
 					}
 				}
 			}
+		
+		return (false);
+		}
+	
+	@Override
+	public void endRowSet(RowSet rs)
+		{
+		handler.endRows();
+		}
+	
+	@Override
+	public boolean startRow(ResultRow row, int level)
+		{
+		handler.handleRow(row);
 		
 		return (false);
 		}
