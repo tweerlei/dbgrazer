@@ -44,19 +44,19 @@ public class PostgreSQLDialect extends CommonSQLDialect
 		{
 		TYPE_MAP = new HashMap<Integer, SQLDataType>();
 		
-		TYPE_MAP.put(Types.BIT, new SQLDataType("BIT", true, false));
-		TYPE_MAP.put(Types.BOOLEAN, new SQLDataType("BOOL", true, false));
-		TYPE_MAP.put(Types.TINYINT, new SQLDataType("INT2", true, false));
-		TYPE_MAP.put(Types.SMALLINT, new SQLDataType("INT2", true, false));
-		TYPE_MAP.put(Types.INTEGER, new SQLDataType("INT4", true, false));
-		TYPE_MAP.put(Types.BIGINT, new SQLDataType("INT8", true, false));
+		TYPE_MAP.put(Types.BIT, new SQLDataType("BIT", false, false));
+		TYPE_MAP.put(Types.BOOLEAN, new SQLDataType("BOOL", false, false));
+		TYPE_MAP.put(Types.TINYINT, new SQLDataType("INT2", false, false));
+		TYPE_MAP.put(Types.SMALLINT, new SQLDataType("INT2", false, false));
+		TYPE_MAP.put(Types.INTEGER, new SQLDataType("INT4", false, false));
+		TYPE_MAP.put(Types.BIGINT, new SQLDataType("INT8", false, false));
 		
-		TYPE_MAP.put(Types.REAL, new SQLDataType("FLOAT4", true, true));
-		TYPE_MAP.put(Types.DOUBLE, new SQLDataType("FLOAT8", true, true));
-		TYPE_MAP.put(Types.FLOAT, new SQLDataType("FLOAT4", true, true));
+		TYPE_MAP.put(Types.REAL, new SQLDataType("FLOAT4", false, false));
+		TYPE_MAP.put(Types.DOUBLE, new SQLDataType("FLOAT8", false, false));
+		TYPE_MAP.put(Types.FLOAT, new SQLDataType("FLOAT4", false, false));
 		
-		TYPE_MAP.put(Types.DECIMAL, new SQLDataType("DECIMAL", true, true));
-		TYPE_MAP.put(Types.NUMERIC, new SQLDataType("NUMERIC", true, true));
+		TYPE_MAP.put(Types.DECIMAL, new SQLDataType("DECIMAL", false, false));
+		TYPE_MAP.put(Types.NUMERIC, new SQLDataType("NUMERIC", false, false));
 		
 		TYPE_MAP.put(Types.DATE, new SQLDataType("DATE", false, false));
 		TYPE_MAP.put(Types.TIME, new SQLDataType("TIME", false, false));
@@ -64,13 +64,13 @@ public class PostgreSQLDialect extends CommonSQLDialect
 		
 		TYPE_MAP.put(Types.CHAR, new SQLDataType("CHAR", true, false));
 		TYPE_MAP.put(Types.VARCHAR, new SQLDataType("VARCHAR", true, false));
-		TYPE_MAP.put(Types.LONGVARCHAR, new SQLDataType("TEXT", true, false));
-		TYPE_MAP.put(Types.CLOB, new SQLDataType("TEXT", true, false));
+		TYPE_MAP.put(Types.LONGVARCHAR, new SQLDataType("TEXT", false, false));
+		TYPE_MAP.put(Types.CLOB, new SQLDataType("TEXT", false, false));
 		
-		TYPE_MAP.put(Types.BINARY, new SQLDataType("BYTEA", true, false));
-		TYPE_MAP.put(Types.VARBINARY, new SQLDataType("BYTEA", true, false));
-		TYPE_MAP.put(Types.LONGVARBINARY, new SQLDataType("BYTEA", true, false));
-		TYPE_MAP.put(Types.BLOB, new SQLDataType("BYTEA", true, false));
+		TYPE_MAP.put(Types.BINARY, new SQLDataType("BYTEA", false, false));
+		TYPE_MAP.put(Types.VARBINARY, new SQLDataType("BYTEA", false, false));
+		TYPE_MAP.put(Types.LONGVARBINARY, new SQLDataType("BYTEA", false, false));
+		TYPE_MAP.put(Types.BLOB, new SQLDataType("BYTEA", false, false));
 		}
 	
 	/**

@@ -44,19 +44,19 @@ public class MySQLDialect extends CommonSQLDialect
 		{
 		TYPE_MAP = new HashMap<Integer, SQLDataType>();
 		
-		TYPE_MAP.put(Types.BIT, new SQLDataType("BIT", true, false));
-		TYPE_MAP.put(Types.BOOLEAN, new SQLDataType("TINYINT", true, false));
-		TYPE_MAP.put(Types.TINYINT, new SQLDataType("TINYINT", true, false));
-		TYPE_MAP.put(Types.SMALLINT, new SQLDataType("SMALLINT", true, false));
-		TYPE_MAP.put(Types.INTEGER, new SQLDataType("INT", true, false));
-		TYPE_MAP.put(Types.BIGINT, new SQLDataType("BIGINT", true, false));
+		TYPE_MAP.put(Types.BIT, new SQLDataType("BIT", false, false));
+		TYPE_MAP.put(Types.BOOLEAN, new SQLDataType("TINYINT", false, false));
+		TYPE_MAP.put(Types.TINYINT, new SQLDataType("TINYINT", false, false));
+		TYPE_MAP.put(Types.SMALLINT, new SQLDataType("SMALLINT", false, false));
+		TYPE_MAP.put(Types.INTEGER, new SQLDataType("INT", false, false));
+		TYPE_MAP.put(Types.BIGINT, new SQLDataType("BIGINT", false, false));
 		
-		TYPE_MAP.put(Types.REAL, new SQLDataType("REAL", true, true));
-		TYPE_MAP.put(Types.DOUBLE, new SQLDataType("DOUBLE", true, true));
-		TYPE_MAP.put(Types.FLOAT, new SQLDataType("FLOAT", true, true));
+		TYPE_MAP.put(Types.REAL, new SQLDataType("REAL", false, false));
+		TYPE_MAP.put(Types.DOUBLE, new SQLDataType("DOUBLE", false, false));
+		TYPE_MAP.put(Types.FLOAT, new SQLDataType("FLOAT", false, false));
 		
-		TYPE_MAP.put(Types.DECIMAL, new SQLDataType("DECIMAL", true, true));
-		TYPE_MAP.put(Types.NUMERIC, new SQLDataType("NUMERIC", true, true));
+		TYPE_MAP.put(Types.DECIMAL, new SQLDataType("DECIMAL", false, false));
+		TYPE_MAP.put(Types.NUMERIC, new SQLDataType("NUMERIC", false, false));
 		
 		TYPE_MAP.put(Types.DATE, new SQLDataType("DATE", false, false));
 		TYPE_MAP.put(Types.TIME, new SQLDataType("TIME", false, false));
