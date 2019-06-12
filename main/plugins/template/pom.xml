@@ -7,11 +7,11 @@
 	<modelVersion>4.0.0</modelVersion>
 	
 	<groupId>de.tweerlei</groupId>
-	<artifactId>dbgrazer-plugin-text</artifactId>
+	<artifactId>dbgrazer-plugin-template</artifactId>
 	<version>3.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	
-	<name>dbgrazer-plugin-text</name>
+	<name>dbgrazer-plugin-template</name>
 	<description>Web application for browsing DB schemas</description>
 	<url>http://www.tweerlei.de/</url>
 	
@@ -30,6 +30,23 @@
 			<groupId>de.tweerlei</groupId>
 			<artifactId>dbgrazer-backend</artifactId>
 			<version>${project.version}</version>
+		</dependency>
+		<!--
+			JavaEE APIs
+		-->
+		<dependency>
+			<groupId>de.odysseus.juel</groupId>
+			<artifactId>juel-api</artifactId>
+			<version>2.2.7</version>
+			<scope>provided</scope>
+		</dependency>
+		<!--
+			compile time dependencies
+		-->
+		<dependency>
+			<groupId>de.odysseus.juel</groupId>
+			<artifactId>juel-impl</artifactId>
+			<version>2.2.7</version>
 		</dependency>
 	</dependencies>
 	
