@@ -86,7 +86,7 @@ public class DataExtractorVisitor extends ResultVisitorAdapter
 						handler = transformerService.createHandler(transformerRecipe, transformerName);
 						if (handler != null)
 							{
-							handler.startRows(extracted.getColumns());
+							handler.startRows(rs.getColumns());
 							return (true);
 							}
 						}
