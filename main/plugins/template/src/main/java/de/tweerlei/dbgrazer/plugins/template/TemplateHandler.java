@@ -16,7 +16,9 @@
 package de.tweerlei.dbgrazer.plugins.template;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.el.ELContext;
 import javax.el.ExpressionFactory;
@@ -57,6 +59,7 @@ public class TemplateHandler implements RowHandler
 	private ExpressionFactory el;
 	private ELContext ctx;
 	private ValueExpression valuesExpr;
+	private ColumnDef[] sourceColumns;
 	private ColumnMapping[] columnMapping;
 	
 	/**
@@ -77,7 +80,7 @@ public class TemplateHandler implements RowHandler
 		
 		columnMapping = parseRecipe(recipe, columns, el, ctx);
 		
-		final ColumnDef[] defs = columns.toArray(new ColumnDef[columns.size()]);
+		sourceColumns = columns.toArray(new ColumnDef[columns.size()]);
 		columns.clear();
 		for (ColumnMapping m : columnMapping)
 			{
@@ -85,7 +88,7 @@ public class TemplateHandler implements RowHandler
 				columns.add(new ColumnDefImpl(m.name, m.type, null, null, null, null));
 			else
 				{
-				final ColumnDef def = defs[m.sourceColumn];
+				final ColumnDef def = sourceColumns[m.sourceColumn];
 				columns.add(new ColumnDefImpl(m.name, def.getType(), def.getTypeName(), def.getTargetQuery(), def.getSourceObject(), def.getSourceColumn()));
 				}
 			}
@@ -190,7 +193,13 @@ public class TemplateHandler implements RowHandler
 	public boolean handleRow(ResultRow row)
 		{
 		final List<Object> l = row.getValues();
-		final Object[] values = l.toArray();
+		final Map<Object, Object> values = new HashMap<Object, Object>(2 * l.size());
+		for (int i = 0; i < sourceColumns.length; i++)
+			{
+			final Object value = l.get(i);
+			values.put(Long.valueOf(i), value);
+			values.put(sourceColumns[i].getName(), value);
+			}
 		l.clear();
 		
 		valuesExpr.setValue(ctx, values);
@@ -199,7 +208,7 @@ public class TemplateHandler implements RowHandler
 			if (m.type != null)
 				l.add(m.expression.getValue(ctx));
 			else
-				l.add(values[m.sourceColumn]);
+				l.add(values.get(Long.valueOf(m.sourceColumn)));
 			}
 		
 		return (true);

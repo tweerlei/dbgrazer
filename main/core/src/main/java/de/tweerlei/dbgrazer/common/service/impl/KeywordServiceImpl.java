@@ -31,37 +31,45 @@ import de.tweerlei.dbgrazer.common.service.KeywordService;
 @Service
 public class KeywordServiceImpl implements KeywordService
 	{
+	/*
+	 * ASCII special characters:
+	 * !"#$%&'()*+,-./
+	 * :;<=>?@
+	 * [\]^_`
+	 * {|}~
+	 */
+	
 	// Names for objects:
 	// Allow (unicode) letters, digits and certain special characters.
-	// Disallow characters that may not occur in filenames: "*/:<>?\|
-	// Disallow XML special characters: <>&"'
+	// Disallow characters that may not occur in file names: "*/:<>?\|
+	// Disallow XML special characters: <>&"
 	// Disallow URL special characters: :/?&%#=
 	// Disallow SVN special characters: @
-	// Disallow SPLIT_DELIM
-	private static final Pattern ILLEGAL_NAME_CHARS = Pattern.compile("[^-+._()$ \\p{javaLetterOrDigit}]+");
+	// Disallow SPLIT_DELIM ,
+	private static final Pattern ILLEGAL_NAME_CHARS = Pattern.compile("[^-()+._ \\p{javaLetterOrDigit}]+");
 	
 	// Names for parameters:
 	// Allow (unicode) letters, digits and certain special characters.
-	// Disallow XML special characters: <>&"'
-	// Disallow SPLIT_DELIM
+	// Disallow XML special characters: <>&"
+	// Disallow SPLIT_DELIM ,
 	// Disallow internal separator :
 	// Disallow special marker *
-	private static final Pattern ILLEGAL_PARAM_CHARS = Pattern.compile("[^-+._()@/ \\p{javaLetterOrDigit}]+");
+	private static final Pattern ILLEGAL_PARAM_CHARS = Pattern.compile("[^-()+./@_ \\p{javaLetterOrDigit}]+");
 	
 	// Parameter values:
 	// Allow (unicode) letters, digits and certain special characters.
 	// Allow special characters !#()*+-./;?@[]{|}
-	// Disallow XML special characters: <>&"'
-	// Disallow SPLIT_DELIM
+	// Disallow XML special characters: <>&"
+	// Disallow SPLIT_DELIM ,
 	// Disallow internal separator :
-	private static final Pattern ILLEGAL_VALUE_CHARS = Pattern.compile("[^-!#*+._()@/;?\\[\\]\\{\\} \\p{javaLetterOrDigit}]+");
+	private static final Pattern ILLEGAL_VALUE_CHARS = Pattern.compile("[^-!#$%'()*+./;=?@\\[\\]_{|}~ \\p{javaLetterOrDigit}]+");
 	
 	// Names for groups:
 	// Allow (unicode) letters, digits and certain special characters.
-	// Disallow XML special characters: <>&"'
-	// Disallow SPLIT_DELIM
+	// Disallow XML special characters: <>&"
+	// Disallow SPLIT_DELIM ,
 	// Disallow internal separator :
-	private static final Pattern ILLEGAL_GROUP_CHARS = Pattern.compile("[^-*+._()@/ \\p{javaLetterOrDigit}]+");
+	private static final Pattern ILLEGAL_GROUP_CHARS = Pattern.compile("[^-()*+./@_ \\p{javaLetterOrDigit}]+");
 	
 	// Words to be replaced in raw SQL queries should be restricted to SQL names
 	// (including the . and @ component operators)

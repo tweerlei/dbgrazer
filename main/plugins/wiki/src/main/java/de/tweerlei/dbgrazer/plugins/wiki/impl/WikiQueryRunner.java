@@ -21,6 +21,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import de.tweerlei.dbgrazer.plugins.wiki.types.PlaintextQueryType;
 import de.tweerlei.dbgrazer.plugins.wiki.types.WikiQueryType;
 import de.tweerlei.dbgrazer.query.backend.BaseQueryRunner;
 import de.tweerlei.dbgrazer.query.backend.ParamReplacer;
@@ -61,7 +62,7 @@ public class WikiQueryRunner extends BaseQueryRunner
 	@Override
 	public boolean supports(QueryType t)
 		{
-		return (t instanceof WikiQueryType);
+		return ((t instanceof WikiQueryType) || (t instanceof PlaintextQueryType));
 		}
 	
 	@Override

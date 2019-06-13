@@ -48,7 +48,7 @@ public class TemplateHandlerTest extends TestCase
 		
 		final ResultRow row = new DefaultResultRow("hello", "world", 42, 23, new Date(1560370000000L));
 		
-		final RowHandler handler = new TemplateHandler("c1!STRING!${values[0]}_${values[1]} c2!INTEGER!${values[2]+values[3]} c3!!constant c4!!${fn.format('%1$tY-%1$tm-%1$td',values[4])}");
+		final RowHandler handler = new TemplateHandler("c1!STRING!${values[0]}_${values[1]} c2!INTEGER!${values['int1']+values[3]} c3!!constant c4!!${fn.format('%1$tY-%1$tm-%1$td',values[4])}");
 		
 		handler.startRows(columns);
 		assertEquals(4, columns.size());

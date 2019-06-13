@@ -37,7 +37,7 @@ public class KeywordServiceImplTest extends TestCase
 		assertEquals("", svc.normalizeName(null));
 		assertEquals("", svc.normalizeName(""));
 		assertEquals("abcäD12-a (g)", svc.normalizeName(" abcäD12-a (g) "));
-		assertEquals("a_bc$äD12-a (g)", svc.normalizeName(" a_b/c$äD?\n1*2-a! (g) "));
+		assertEquals("a_bcäD12-a (g)", svc.normalizeName(" a_b/c$äD?\n1*2-a! (g) "));
 		}
 	
 	/**
@@ -63,7 +63,7 @@ public class KeywordServiceImplTest extends TestCase
 		assertEquals("", svc.normalizeValue(null));
 		assertEquals("", svc.normalizeValue(""));
 		assertEquals("abcäD12-a (g)", svc.normalizeValue(" abcäD12-a (g) "));
-		assertEquals("a_b/cäD?1*2-a! (g)", svc.normalizeValue(" a_b/c$äD?\n1*2-a! (g) "));
+		assertEquals("a_b/c$äD?1*2-a! (g)", svc.normalizeValue(" a_b/c$äD?\n1*2-a! (g) "));
 		}
 	
 	/**
