@@ -269,10 +269,10 @@ public class DataEditController
 		
 		final Map<String, Object> model = new HashMap<String, Object>();
 		
-		for (Map.Entry<Integer, String> ent : fbo.getParams().entrySet())
+		for (Map.Entry<Integer, Boolean> ent : fbo.getNulls().entrySet())
 			{
-			if (fbo.getNulls().get(ent.getKey()) != Boolean.TRUE)
-				ent.setValue(null);
+			if (ent.getValue() != Boolean.TRUE)
+				fbo.getParams().put(ent.getKey(), null);
 			}
 		
 		final QualifiedName qname = new QualifiedName(fbo.getCatalog(), fbo.getSchema(), fbo.getObject());
@@ -375,10 +375,10 @@ public class DataEditController
 		
 		final Map<String, Object> model = new HashMap<String, Object>();
 		
-		for (Map.Entry<Integer, String> ent : fbo.getParams().entrySet())
+		for (Map.Entry<Integer, Boolean> ent : fbo.getNulls().entrySet())
 			{
-			if (fbo.getNulls().get(ent.getKey()) != Boolean.TRUE)
-				ent.setValue(null);
+			if (ent.getValue() != Boolean.TRUE)
+				fbo.getParams().put(ent.getKey(), null);
 			}
 		
 		final QualifiedName qname = new QualifiedName(fbo.getCatalog(), fbo.getSchema(), fbo.getObject());

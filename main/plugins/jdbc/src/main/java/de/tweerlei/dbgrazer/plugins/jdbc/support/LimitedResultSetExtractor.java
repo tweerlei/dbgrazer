@@ -72,14 +72,13 @@ public class LimitedResultSetExtractor implements ResultSetExtractor
 		while (rs.next())
 			{
 			if (rows >= limit)
-				{
-				moreAvailable = true;
 				break;
-				}
 			
 			handler.processRow(rs);
 			rows++;
 			}
+		
+		moreAvailable = (rows >= limit);
 		
 		return (null);
 		}

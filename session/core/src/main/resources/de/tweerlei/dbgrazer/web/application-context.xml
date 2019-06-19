@@ -13,24 +13,6 @@
 		"
 	>
 	
-	<!-- Apply logging levels -->
-	<bean id="loggingConfigurator" class="de.tweerlei.spring.util.LoggingConfigurator" lazy-init="false">
-		<constructor-arg>
-			<props>
-<!--
-				<prop key="org.springframework">WARNING</prop>
--->
-				<prop key="org.hibernate.cfg">WARNING</prop>
-				<prop key="org.hibernate.cache">WARNING</prop>
-				<prop key="org.hibernate.SQL">INFO</prop>
-				<!-- OpenMQ bug 6874125: _destroy():called on a connection that was not closed -->
-				<prop key="javax.jms.Connection.mqjmsra">SEVERE</prop>
-				
-				<prop key="de.tweerlei">INFO</prop>
-			</props>
-		</constructor-arg>
-	</bean>
-	
 	<!-- Message resource bundle that uses external messages and falls back to the built-in messages -->
 	<bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
 		<!--property name="basename" value="classpath:de/tweerlei/dbgrazer/web/messages"/-->
