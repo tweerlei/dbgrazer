@@ -1,4 +1,4 @@
-<%--
+/*
  * Copyright 2018 tweerlei Wruck + Buchmeier GbR - http://www.tweerlei.de/
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,9 +12,20 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
---%><%@
-	include file="../include/js.jspf"
-%><c:choose
-><c:when test="${exceptionText == null}">forceReload();</c:when
-><c:otherwise>submitDMLError(${exceptionText});</c:otherwise
-></c:choose>
+ */
+package de.tweerlei.dbgrazer.extension.kubernetes;
+
+/**
+ * Constants used by the Kubernetes plugin
+ * 
+ * @author Robert Wruck
+ */
+public final class KubernetesConstants
+	{
+	/** HttpLinkType.NAME */
+	public static final String LINKTYPE_KUBERNETES = "KUBERNETES";
+	
+	private KubernetesConstants()
+		{
+		}
+	}

@@ -13,8 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 --%><%@
-	include file="../include/js.jspf"
-%><c:choose
-><c:when test="${exceptionText == null}">forceReload();</c:when
-><c:otherwise>submitDMLError(${exceptionText});</c:otherwise
-></c:choose>
+	include file="../../include/include.jspf"
+%><c:set var="targetElement" value="explorer-right"
+/><ui:headline2 label="${name}" zoomable="true">
+	<div class="h2-actions">
+		<a class="action" title="<fmt:message key="showQuery"/>" href="db/${currentConnection.linkName}/apiobject.html?namespace=${namespace}&amp;kind=${kind}&amp;name=${name}"><fmt:message key="showQueryIcon"/></a>
+	</div>
+	
+	</ui:headline2>
+	
+	<ui:tabs items="${tabs}" var="rs" varKey="label" varLink="detailLink" varParams="detailParams" varParamString="detailParamString" name="result"><%@
+		include file="../result/apiobject.jspf"
+	%></ui:tabs>

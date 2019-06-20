@@ -1,4 +1,4 @@
-<%--
+/*
  * Copyright 2018 tweerlei Wruck + Buchmeier GbR - http://www.tweerlei.de/
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,9 +12,22 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
---%><%@
-	include file="../include/js.jspf"
-%><c:choose
-><c:when test="${exceptionText == null}">forceReload();</c:when
-><c:otherwise>submitDMLError(${exceptionText});</c:otherwise
-></c:choose>
+ */
+package de.tweerlei.dbgrazer.extension.kubernetes;
+
+import io.kubernetes.client.apis.CoreV1Api;
+
+/**
+ * Perform HTTP requests
+ * 
+ * @author Robert Wruck
+ */
+public interface KubernetesClientService
+	{
+	/**
+	 * Get a CoreV1Api for a link
+	 * @param c Link name
+	 * @return CoreV1Api
+	 */
+	public CoreV1Api getCoreV1Api(String c);
+	}

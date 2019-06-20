@@ -146,7 +146,10 @@ public class RecursiveQueryRunnerImpl implements RecursiveQueryRunnerService
 				if (showEmpty || !ent.getValue().getRows().isEmpty())
 					{
 					if (q.getQuery().getType().getMapMode() == ResultMapMode.SINGLE)
+						{
 						r.getRowSets().put(getTitle(q.getLabel(), q.getSuffix()), ent.getValue());
+						break;
+						}
 					else
 						r.getRowSets().put(ent.getKey(), ent.getValue());
 					base++;

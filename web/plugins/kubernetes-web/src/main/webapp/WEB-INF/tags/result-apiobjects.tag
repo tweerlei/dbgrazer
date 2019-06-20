@@ -51,7 +51,17 @@
 >				</tr>
 			</thead>
 			<tbody>
-<c:forEach items="${rs.rows}" var="row"
+<c:choose><c:when test="${empty rs.rows}"
+>               <tr>
+<c:if test="${rs.attributes['moreLevels']}"
+>					<th>&nbsp;</th>
+</c:if
+>                    <td><form method="get" action="#" onsubmit="return showNamespace('${label}-namespace', '${link}');">
+                         <input id="${label}-namespace" type="text" name="namespace" value=""/> <input type="submit" value="submit"/>
+                     </form></td>
+                 </tr>
+</c:when><c:otherwise
+><c:forEach items="${rs.rows}" var="row"
 >				<tr>
 <c:if test="${rs.attributes['moreLevels']}"><c:set var="rowid" value="${fn:contains(row.values[0], ' ') ? fn:substringBefore(row.values[0], ' ') : row.values[0]}"
 />					<td><a class="action" title="<fmt:message key="expand"/>" href="${fn:replace(link, '%%', rowid)}">&#x25ba;</a></td>
@@ -63,6 +73,7 @@
 </c:forEach
 >				</tr>
 </c:forEach
+></c:otherwise></c:choose
 >			</tbody>
 		</table>
 		</div>

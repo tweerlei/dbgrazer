@@ -1,4 +1,4 @@
-<%--
+/*
  * Copyright 2018 tweerlei Wruck + Buchmeier GbR - http://www.tweerlei.de/
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,9 +12,29 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
---%><%@
-	include file="../include/js.jspf"
-%><c:choose
-><c:when test="${exceptionText == null}">forceReload();</c:when
-><c:otherwise>submitDMLError(${exceptionText});</c:otherwise
-></c:choose>
+ */
+package de.tweerlei.dbgrazer.extension.kubernetes;
+
+import de.tweerlei.spring.config.ConfigKey;
+
+/**
+ * Well known configuration keys
+ * 
+ * @author Robert Wruck
+ */
+public final class ConfigKeys
+	{
+	/*
+	 * Kafka settings (config.properties only)
+	 */
+	
+	private static final String PACKAGE_NAME = "dbgrazer.backend.kubernetes";
+	
+	/** Timeout for connecting */
+	public static final ConfigKey<Long> CONNECT_TIMEOUT = ConfigKey.create(PACKAGE_NAME, "connectTimeout", Long.class, 5000L);
+	
+	
+	private ConfigKeys()
+		{
+		}
+	}
