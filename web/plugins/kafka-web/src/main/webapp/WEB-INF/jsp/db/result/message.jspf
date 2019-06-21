@@ -16,11 +16,26 @@
 	
 	Tab panel for directory contents
 	
---%><div class="tab-header"><form class="filter" action="db/${currentConnection.linkName}/message.html" method="get"<c:if test="${not empty targetElement}"> onsubmit="return showMessage(event, $F('f1-topic'), $F('f1-partition'), $F('f1-offset'), $F('f1-format'), $F('f1-formatting'));"</c:if>>
-			<input type="hidden" id="f1-topic" name="topic" value="${topic}"/>
-			<input type="hidden" id="f1-partition" name="partition" value="${partition}"/>
-			<input type="hidden" id="f1-offset" name="offset" value="${offset}"/>
-			<div class="column3"><dl class="result">
+--%><div class="tab-header">
+			<div id="tools-${label}" class="hidden"><div class="menucolumn">
+				<div class="menuitem"><span onclick="return downloadElement('text-${label}', 'text/plain;charset=utf-8');"><fmt:message key="PLAIN"/></a></div>
+			</div></div>
+<c:if test="${rs != null}"
+>			<form class="filter" action="db/${currentConnection.linkName}/message.html" method="get"<c:if test="${not empty targetElement}"> onsubmit="return showMessage(event, $F('f1-topic'), $F('f1-partition'), $F('f1-offset'), $F('f1-format'), $F('f1-formatting'));"</c:if>>
+				<input type="hidden" id="f1-topic" name="topic" value="${topic}"/>
+				<input type="hidden" id="f1-partition" name="partition" value="${partition}"/>
+				<input type="hidden" id="f1-offset" name="offset" value="${offset}"/>
+				<span class="menu" onclick="return showElementMenu(event, 'tools-${label}');"><fmt:message key="download"/></span>
+				&nbsp; <fmt:message key="formatter"/>: <select id="f1-format" name="format" onchange="Forms.submit(form);">
+					<option value=""><fmt:message key="default"/></option>
+<c:forEach items="${formats}" var="f"
+>					<option value="${f}"<c:if test="${f == format}"> selected="selected"</c:if>><fmt:message key="${f}"/></option>
+</c:forEach
+>				</select>
+				&nbsp; <input id="f1-formatting" type="checkbox" name="formatting" value="true"<c:if test="${formatting}"> checked="checked"</c:if> onchange="Forms.submit(form);"/> <label for="f1-formatting"><fmt:message key="formatter"/></label>
+			</form><hr/>
+</c:if
+>			<div class="column3"><dl class="result">
 				<dt><fmt:message key="kafkaTopic"/></dt>
 				<dd>${topic}</dd>
 				<dt><fmt:message key="kafkaPartition"/></dt>
@@ -34,13 +49,6 @@
 				<dd><fmt:formatDate pattern="yyyy-MM-dd HH:mm:ss" value="${rs.timestamp}"/></dd>
 				<dt><fmt:message key="key"/></dt>
 				<dd>${fn:escapeXml(rs.key)}</dd>
-				<dt><fmt:message key="formatter"/></dt>
-				<dd><select id="f1-format" name="format" onchange="Forms.submit(form);">
-					<option value=""><fmt:message key="default"/></option>
-<c:forEach items="${formats}" var="f"
->					<option value="${f}"<c:if test="${f == format}"> selected="selected"</c:if>><fmt:message key="${f}"/></option>
-</c:forEach
->				</select> <input id="f1-formatting" type="checkbox" name="formatting" value="true"<c:if test="${formatting}"> checked="checked"</c:if> onchange="Forms.submit(form);"/> <label for="f1-formatting"><fmt:message key="formatter"/></label></dd>
 			</dl><hr/></div>
 <c:if test="${not empty rs.headers}"
 >			<div class="column3"><dl class="result">
@@ -51,12 +59,12 @@
 >			</dl><hr/></div>
 </c:if
 ></c:if
->		<hr/></form><hr/></div>
+>		<hr/></div>
 		<div class="tab-body">
 <c:choose><c:when test="${rs != null && format == 'HTML'}"
 >			<div id="text-${label}" class="hidden">${rs.value}</div><iframe id="html-${label}" class="result"></iframe>
 </c:when><c:when test="${rs != null}"
->			<pre class="code">${rs.value}</pre>
+>			<pre id="text-${label}" class="code">${rs.value}</pre>
 </c:when><c:otherwise
 >			<strong><fmt:message key="noData"/></strong>
 </c:otherwise></c:choose

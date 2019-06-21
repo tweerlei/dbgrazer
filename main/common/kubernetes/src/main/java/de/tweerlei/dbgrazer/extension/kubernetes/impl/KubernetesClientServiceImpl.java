@@ -212,7 +212,7 @@ public class KubernetesClientServiceImpl implements KubernetesClientService, Lin
 		if (StringUtils.empty(def.getUsername()))
 			{
 			ret.setApiKeyPrefix("Bearer");
-			ret.setAccessToken(def.getPassword());
+			ret.setApiKey(def.getPassword());
 			}
 		else
 			{
