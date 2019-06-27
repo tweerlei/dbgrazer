@@ -290,7 +290,9 @@
 						<span class="action" title="<fmt:message key="clear"/>" onclick="return clearElement('where');"><fmt:message key="clearIcon"/></span></div>
 						<textarea id="where" name="where" cols="80" rows="3">${where}</textarea></dd>
 					<dt><label for="order"><fmt:message key="ORDER_BY"/></label></dt>
-					<dd><textarea id="order" name="order" size="80" rows="1">${orderBy}</textarea></dd>
+					<dd><div>
+						<span class="action" title="<fmt:message key="clear"/>" onclick="return clearElement('order');"><fmt:message key="clearIcon"/></span></div>
+						<textarea id="order" name="order" size="80" rows="1">${orderBy}</textarea></dd>
 					<dt>&nbsp;</dt>
 					<dd><input type="submit" value="<fmt:message key="execute"/>"/>
 						<input type="button" value="<fmt:message key="showCount"/>" onclick="submitForm(form, 'count');"/>

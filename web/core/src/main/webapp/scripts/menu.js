@@ -10,6 +10,7 @@ var PopupWindow = Class.create({
 		this.targetId = id;
 		this.target = null;
 		this.active = false;
+		this.parent = null;
 		this.autohide = ah;
 	},
 	
@@ -50,6 +51,7 @@ var PopupWindow = Class.create({
 		Forms.focusFirstField(m);
 		
 		this.active = true;
+		this.parent = parent;
 		return true;
 	},
 	
@@ -65,6 +67,7 @@ var PopupWindow = Class.create({
 		if (this.active) {
 			this.target.hide();
 			this.active = false;
+			this.parent = null;
 		}
 	}
 });

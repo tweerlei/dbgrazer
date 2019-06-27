@@ -187,4 +187,60 @@ function restoreDBObject() {
 	}
 }
 
+function addOrderAsc(ev) {
+	var cell = Popup.parent;
+	var order = $('order');
+	if (order) {
+		if (order.value) {
+			order.value = order.value + ', ' + cell.innerText;
+		} else {
+			order.value = cell.innerText;
+		}
+		submitForm($('submitform'), 'table');
+	}
+}
+
+function addOrderDesc(ev) {
+	var cell = Popup.parent;
+	var order = $('order');
+	if (order) {
+		if (order.value) {
+			order.value = order.value + ', ' + cell.innerText + ' DESC';
+		} else {
+			order.value = cell.innerText + ' DESC';
+		}
+		submitForm($('submitform'), 'table');
+	}
+}
+
+function addWhere(ev) {
+	var cell = Popup.parent;
+	var n = cell.previousSiblings().length;
+	var hdr = cell.up('table').down('tr').childElements()[n];
+	var where = $('where');
+	if (where) {
+		if (where.value) {
+			where.value = where.value + ' AND ' + hdr.innerText + ' = \'' + cell.innerText.replace(/'/g, "''") + '\'';
+		} else {
+			where.value = hdr.innerText + ' = \'' + cell.innerText.replace(/'/g, "''") + '\'';
+		}
+		submitForm($('submitform'), 'table');
+	}
+}
+
+function addWhereNotIcon(ev) {
+	var cell = Popup.parent;
+	var n = cell.previousSiblings().length;
+	var hdr = cell.up('table').down('tr').childElements()[n];
+	var where = $('where');
+	if (where) {
+		if (where.value) {
+			where.value = where.value + ' AND ' + hdr.innerText + ' <> \'' + cell.innerText.replace(/'/g, "''") + '\'';
+		} else {
+			where.value = hdr.innerText + ' <> \'' + cell.innerText.replace(/'/g, "''") + '\'';
+		}
+		submitForm($('submitform'), 'table');
+	}
+}
+
 HashMonitor.addListener(restoreDBObject);

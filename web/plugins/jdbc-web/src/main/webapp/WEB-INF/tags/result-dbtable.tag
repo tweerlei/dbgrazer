@@ -38,7 +38,7 @@
 	taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"
 %><%@
 	taglib prefix="ui" tagdir="/WEB-INF/tags"
-%>		<table id="table-${label}" class="multiple table-autosort">
+%>		<table id="table-${label}" class="multiple dbtable table-autosort">
 			<thead>
 				<tr>
 <c:forEach items="${rs.columns}" var="c"
@@ -70,3 +70,5 @@
 </c:forEach
 >			</tbody>
 		</table>
+		<div id="order-table-${label}" class="hidden"><span class="action" title="<fmt:message key="addOrderAsc"/>" onclick="addOrderAsc(event);"><fmt:message key="orderAscIcon"/></span>&nbsp;<span class="action" title="<fmt:message key="addOrderDesc"/>" onclick="addOrderDesc(event);"><fmt:message key="orderDescIcon"/></span></div>
+		<div id="where-table-${label}" class="hidden"><span class="action" title="<fmt:message key="addWhere"/>" onclick="addWhere(event);"><fmt:message key="addWhereIcon"/></span>&nbsp;<span class="action" title="<fmt:message key="addWhereNot"/>" onclick="addWhereNot(event);"><fmt:message key="addWhereNotIcon"/></span></div>
