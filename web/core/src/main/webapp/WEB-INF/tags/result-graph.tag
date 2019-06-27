@@ -57,7 +57,7 @@
 </c:if
 >			</form><hr/>
 		</div>
-		<div<c:if test="${tab}"> class="tab-body"</c:if>>
+		<div<c:if test="${tab}"> class="tab-body center"</c:if>>
 <c:choose><c:when test="${not empty rs.attributes['svg']}"
 >			${rs.attributes['svg']}
 </c:when><c:when test="${not empty rs.attributes['imagemap']}"

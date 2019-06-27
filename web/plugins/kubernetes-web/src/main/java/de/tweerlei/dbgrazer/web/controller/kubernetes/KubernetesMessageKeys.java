@@ -58,6 +58,10 @@ public final class KubernetesMessageKeys
 	public static final String KIND = "kubernetesKind";
 	/** Name column */
 	public static final String OBJECT = "kubernetesObject";
+	/** API group column */
+	public static final String API_GROUP = "kubernetesApiGroup";
+	/** API version column */
+	public static final String API_VERSION = "kubernetesApiVersion";
 	
 	
 	private KubernetesMessageKeys()

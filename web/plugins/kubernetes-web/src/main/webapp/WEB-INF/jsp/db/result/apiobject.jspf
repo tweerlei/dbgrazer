@@ -26,6 +26,7 @@
 				<input type="hidden" id="f1-kind" name="kind" value="${kind}"/>
 				<input type="hidden" id="f1-name" name="name" value="${name}"/>
 				<span class="menu" onclick="return showElementMenu(event, 'tools-${label}');"><fmt:message key="download"/></span>
+				&nbsp; <input type="button" value="Base64" onclick="decodeBase64();"/>
 				&nbsp; <fmt:message key="formatter"/>: <select id="f1-format" name="format" onchange="Forms.submit(form);">
 					<option value=""><fmt:message key="default"/></option>
 <c:forEach items="${formats}" var="f"
@@ -48,7 +49,7 @@
 <c:choose><c:when test="${rs != null && format == 'HTML'}"
 >			<div id="text-${label}" class="hidden">${rs.value}</div><iframe id="html-${label}" class="result"></iframe>
 </c:when><c:when test="${rs != null}"
->			<pre id="text-${label}" class="code">${rs}</pre>
+>			<pre id="text-${label}" class="code" onmouseup="saveSelection();">${rs}</pre>
 </c:when><c:otherwise
 >			<strong><fmt:message key="noData"/></strong>
 </c:otherwise></c:choose

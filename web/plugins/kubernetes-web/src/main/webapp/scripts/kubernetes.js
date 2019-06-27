@@ -67,8 +67,27 @@ function restoreApiObject() {
 	var formatting = HashMonitor.get('formatting');
 	
 	if (namespace && kind && name) {
-		showMessage(null, namespace, kind, name, format, formatting);
+		showApiObject(null, namespace, kind, name, format, formatting);
 	}
+}
+
+var lastSelection = '';
+
+function saveSelection() {
+	var txt = window.getSelection().toString();
+	if (txt) {
+		lastSelection = txt;
+	}
+}
+
+function decodeBase64() {
+	if (lastSelection) {
+		AutoRefresh.stop();
+		Menu.hide();
+		Popup.hide();
+		Dialog.show('Base64', '<pre>'+atob(lastSelection).escapeHTML()+'</pre>');
+	}
+	return false;
 }
 
 HashMonitor.addListener(restoreApiObject);

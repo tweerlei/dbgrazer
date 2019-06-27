@@ -43,7 +43,6 @@ import de.tweerlei.dbgrazer.link.service.LinkManager;
 import de.tweerlei.dbgrazer.link.service.LinkService;
 import de.tweerlei.spring.config.ConfigAccessor;
 import io.kubernetes.client.ApiClient;
-import io.kubernetes.client.apis.CoreV1Api;
 
 /**
  * Default impl.
@@ -139,12 +138,7 @@ public class KubernetesClientServiceImpl implements KubernetesClientService, Lin
 		}
 	
 	@Override
-	public CoreV1Api getCoreV1Api(String c)
-		{
-		return (new CoreV1Api(getApiClient(c)));
-		}
-	
-	private ApiClient getApiClient(String c)
+	public ApiClient getApiClient(String c)
 		{
 		final KubernetesConnectionHolder holder = activeConnections.get(c);
 		if (holder != null)

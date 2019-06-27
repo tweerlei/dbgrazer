@@ -15,19 +15,19 @@
  */
 package de.tweerlei.dbgrazer.extension.kubernetes;
 
-import io.kubernetes.client.apis.CoreV1Api;
+import io.kubernetes.client.ApiClient;
 
 /**
- * Perform HTTP requests
+ * Manage Kubernetes connections
  * 
  * @author Robert Wruck
  */
 public interface KubernetesClientService
 	{
 	/**
-	 * Get a CoreV1Api for a link
+	 * Get an ApiClient for a link
 	 * @param c Link name
-	 * @return CoreV1Api
+	 * @return ApiClient
 	 */
-	public CoreV1Api getCoreV1Api(String c);
+	public ApiClient getApiClient(String c);
 	}
