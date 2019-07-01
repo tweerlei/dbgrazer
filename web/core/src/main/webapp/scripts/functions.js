@@ -165,7 +165,7 @@ var searchTimer = new Timer(function() {
 	var s = arguments[0];
 	var p = $('search-result');
 	if ((s.length >= 3) && p) {
-		WSApi.getSearchResult(s, function(txt) {
+		WSApi.getDBAsync('search-result', { q: s }, function(txt) {
 			p.innerHTML = txt;
 		});
 	}
@@ -185,9 +185,9 @@ var waitTimer = new Timer(function(n) {
 		if (n % 5 == 1) {
 			var p = $('waitProgress');
 			if (p) {
-				WSApi.getProgress(function(txt) {
+				WSApi.getAsync('progress', null, function(txt) {
 					p.innerHTML = txt;
-				});
+				}, true);
 			}
 		}
 		this.start(1000, n + 1);
@@ -555,7 +555,7 @@ function chooseTarget(ev, param, args, target) {
 	Event.stop(ev);
 	AutoRefresh.stop();
 	var div = getMenuParentNode(ev);
-	WSApi.getTargets(param, args, target, function(txt) {
+	WSApi.getDBAsync('targets', 'p='+param+args+'&target='+target, function(txt) {
 		Menu.showLeft(div, txt);
 	});
 	return false;
@@ -1006,62 +1006,57 @@ function moveLineUp(ev, prefix, index) {
 }
 
 function setTheme(f) {
-	WSApi.setTheme($F(f), forceReload);
+	WSApi.getAsync('theme', { q: $F(f) }, forceReload);
 	return false;
 }
 
 function setLocale(f) {
-	WSApi.setLocale($F(f), forceReload);
+	WSApi.getAsync('locale', { q: $F(f) }, forceReload);
 	return false;
 }
 
 function setTimezone(f) {
-	WSApi.setTimezone($F(f), forceReload);
+	WSApi.getAsync('timezone', { q: $F(f) }, forceReload);
 	return false;
 }
 
 function setGraphType(q, t, s, v) {
-	WSApi.setGraphType(q, t, s, v, reloadPage);
+	WSApi.getDBAsync('graphtype', { q: q, t: t, s: s, v: v }, reloadPage);
 	return false;
 }
 
 function toggleEditMode() {
-	WSApi.toggleEditMode(forceReload);
+	WSApi.getAsync('editmode', null, forceReload);
 	return false;
 }
 
 function toggleFormatter(q, v) {
-	WSApi.toggleFormatter(q, $F(v), reloadPage);
+	WSApi.getDBAsync('formatter', { q: q, v: $F(v) }, reloadPage);
 	return false;
 }
 
 function toggleFormatMode(q, v) {
-	WSApi.toggleFormatMode(q, v, reloadPage);
+	WSApi.getDBAsync('formatmode', { q: q, v: (v ? 'true' : 'false') }, reloadPage);
 	return false;
 }
 
 function toggleColoringMode(q, v) {
-	WSApi.toggleColoringMode(q, v, reloadPage);
+	WSApi.getDBAsync('coloringmode', { q: q, v: (v ? 'true' : 'false') }, reloadPage);
 	return false;
 }
 
 function toggleLineNumberMode(q, v) {
-	WSApi.toggleLineNumberMode(q, v, reloadPage);
+	WSApi.getDBAsync('linemode', { q: q, v: (v ? 'true' : 'false') }, reloadPage);
 	return false;
 }
 
 function toggleTrimColumnsMode(q, v) {
-	WSApi.toggleTrimColumnsMode(q, v, reloadPage);
-	return false;
-}
-
-function clearDbCache() {
-	WSApi.clearCache(reloadPage);
+	WSApi.getDBAsync('trimcols', { q: q, v: (v ? 'true' : 'false') }, reloadPage);
 	return false;
 }
 
 function cancelTasks() {
-	WSApi.cancelTasks(function(txt) {});
+	WSApi.getAsync('cancel', null, function(txt) {}, true);
 	return false;
 }
 
@@ -1092,7 +1087,7 @@ function toggleAutoRefresh(ev) {
 
 function relogin(frm) {
 	showCancelDialog(Messages.submitFormTitle, Messages.submitFormText);
-	WSApi.login($F('f1-username'), $F('f1-password'), function(txt) {
+	WSApi.postAsync('login', { username: $F('f1-username'), password: $F('f1-password') }, function(txt) {
 		Dialog.hide();
 	});
 	return false;
@@ -1108,12 +1103,12 @@ function runQuery(ev, query, param, target) {
 	var el = $(target);
 	if (el) {
 		if (target.indexOf('drilldown') == 0) {
-			WSApi.getDrilldownResult(target.substr(9), query, param, function(txt) {
+			WSApi.getDBAsync('drilldown', 'level='+target.substr(9)+'&q='+query+param, function(txt) {
 				el.innerHTML = txt;
 				tw_contentChanged();
 			});
 		} else {
-			WSApi.getQueryResult(query, param, function(txt) {
+			WSApi.getDBAsync('result', 'q='+query+param, function(txt) {
 				el.innerHTML = extractLocalStyles(txt);
 				tw_contentChanged();
 				HashMonitor.set({ detail: query, params: param });
@@ -1140,7 +1135,7 @@ function rerunQuery() {
 		AutoRefresh.stop();
 		var el = $('explorer-right');
 		if (el) {
-			WSApi.getQueryResult(d, p, function(txt) {
+			WSApi.getDBAsync('result', 'q='+d+p, function(txt) {
 				el.innerHTML = extractLocalStyles(txt);
 				tw_contentChanged();
 				Tabs.hashChanged(HashMonitor.values);
@@ -1154,12 +1149,12 @@ function rerunQuery() {
 
 function resetTimechart() {
 	AutoRefresh.stop();
-	WSApi.resetTimechart(reloadPage);
+	WSApi.getDBAsync('timechart-reset', null, reloadPage);
 	return false;
 }
 
 function formatText(txt, fmt, cb) {
-	WSApi.formatText(txt, fmt, cb);
+	WSApi.postDBAsync('formattext', { statement: txt, format: fmt }, cb);
 }
 
 function showDatePicker(ev, id) {
@@ -1355,7 +1350,18 @@ function toggleTreeItem(ev, label, left, query, target) {
 	if (e && !Tree.collapseItem(e)) {
 		var params = Tree.getPath(e);
 		if (params) {
-			WSApi.getTreeItem(query, params.length, label, left, target, params, function(txt) {
+			var p = {
+				q: query,
+				level: params.length,
+				label: label,
+				left: left,
+				target: target
+			};
+			
+			for (var i = 0; i < params.length; i++)
+				p['params['+i+']'] = params[i];
+			
+			WSApi.getDBAsync('tree', p, function(txt) {
 				Tree.expandItem(e, txt);
 				HashMonitor.set({ node: label+'-'+left }, true);
 			});
@@ -1382,7 +1388,16 @@ function selectTreeItem() {
 }
 
 function getQueryLevel(query, level, params) {
-	WSApi.getQueryLevel(query, level, params, 'explorer-right', function(txt) {
+	var p = {
+		q: query,
+		level: level,
+		target: 'explorer-right'
+	};
+	
+	for (var i = 0; i < params.length; i++)
+		p['params['+i+']'] = params[i];
+	
+	WSApi.getDBAsync('multilevel', p, function(txt) {
 		var el = $('explorer-left');
 		el.innerHTML = txt;
 		tw_contentChanged();
@@ -1425,7 +1440,7 @@ function expandQueryLevel(ev, query, level, param) {
 }
 
 function loadCustomQueryHistory(index) {
-	WSApi.loadCustomQueryHistory(index, function() {
+	WSApi.postDBAsync('submit-history', { q: index }, function() {
 		// don't use reloadPage, it might be customized by the current page
 		showCancelDialog(Messages.waitTitle, Messages.waitText);
 		forceReload();
@@ -1435,13 +1450,13 @@ function loadCustomQueryHistory(index) {
 
 function loadCustomQuery(name, del) {
 	if (del) {
-		WSApi.deleteCustomQuery(name, function() {
+		WSApi.postDBAsync('query-delete', { q: name }, function() {
 			// don't use reloadPage, it might be customized by the current page
 			showCancelDialog(Messages.waitTitle, Messages.waitText);
 			forceReload();
 		});
 	} else {
-		WSApi.loadCustomQuery(name, function() {
+		WSApi.postDBAsync('query-load', { q: name }, function() {
 			// don't use reloadPage, it might be customized by the current page
 			showCancelDialog(Messages.waitTitle, Messages.waitText);
 			forceReload();
@@ -1451,7 +1466,7 @@ function loadCustomQuery(name, del) {
 }
 
 function saveCustomQuery(name, statement) {
-	WSApi.saveCustomQuery(name, statement, function() {
+	WSApi.postDBAsync('query-save', { q: name, statement: statement }, function() {
 		// don't use reloadPage, it might be customized by the current page
 		showCancelDialog(Messages.waitTitle, Messages.waitText);
 		forceReload();
@@ -1555,7 +1570,7 @@ function showOutline(ev, id) {
 		});
 		
 		if (nextId > 0) {
-			WSApi.getMenuRows(nextId, function(n) {
+			WSApi.getAsync('menurows', { q: nextId }, function(n) {
 				var txt = '<div class="menucolumn">';
 				for (var i = 0; i < nextId; i++) {
 					if ((i > 0) && (i % n == 0)) {

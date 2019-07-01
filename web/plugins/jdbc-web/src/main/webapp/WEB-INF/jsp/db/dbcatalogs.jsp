@@ -17,7 +17,14 @@
 %><fmt:message key="schemaBrowser" var="pageTitle"/><%@
 	include file="../include/header.jspf"
 %>
-	<ui:headline1 label="${pageTitle}"/>
+	<ui:headline1 label="${pageTitle}">
+	<div class="h1-actions">
+		<span class="menu" onclick="return showElementMenu(event, 'tools-1');"><fmt:message key="actions"/></span>
+	</div>
+	<div id="tools-1" class="hidden"><div class="menucolumn">
+		<div class="menuitem"><a href="#" onclick="return clearDbCache();"><fmt:message key="clearCache"/></a></div>
+	</div></div>
+	</ui:headline1>
 	
 	<c:set var="links" value="db/${currentConnection.linkName}/dbcatalogs.html"
 	/><c:set var="links" value="${fn:split(links, ',')}"

@@ -112,7 +112,7 @@
     </bean>
 	
 	<!-- Locale resolver: Allow the preferred locale to be stored in a session attribute -->
-	<bean id="localeResolver" class="org.springframework.web.servlet.i18n.SessionLocaleResolver">
+	<bean id="localeResolver" class="org.springframework.web.servlet.i18n.CookieLocaleResolver">
 		<!--property name="defaultLocale" value="US"/-->
 	</bean>
 	
@@ -121,7 +121,7 @@
 	</bean>
 	
 	<!-- Resolve current theme from a session attribute -->
-	<bean id="themeResolver" class="de.tweerlei.spring.web.handler.ValidatingSessionThemeResolver">
+	<bean id="themeResolver" class="de.tweerlei.spring.web.handler.ValidatingCookieThemeResolver">
 		<constructor-arg ref="themeEnumerator"/>
 	</bean>
 	
@@ -140,7 +140,7 @@
 	</bean>
 	
 	<!-- Time zone resolver: Allow the preferred time zone to be stored in a session attribute -->
-	<bean id="timeZoneResolver" class="de.tweerlei.spring.web.handler.SessionTimeZoneResolver">
+	<bean id="timeZoneResolver" class="de.tweerlei.spring.web.handler.CookieTimeZoneResolver">
 		<!--property name="defaultTimeZone" value="Europe/Berlin"/-->
 	</bean>
 	

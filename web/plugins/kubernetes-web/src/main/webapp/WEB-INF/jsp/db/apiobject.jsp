@@ -39,10 +39,15 @@
 	
 	<ui:headline1 label="${pageTitle}">
 	<div class="h1-actions">
+		<span class="menu" onclick="return showElementMenu(event, 'tools-1');"><fmt:message key="actions"/></span>
+	</div>
+	<div class="h1-actions">
 		<span class="action" title="<fmt:message key="refresh"/>" onclick="return reloadPage();"><fmt:message key="refreshIcon"/></span>
 		<a class="action" title="<fmt:message key="newWindow"/>" href="db/${currentConnection.linkName}/apiobject.html?namespace=${namespace}&amp;kind=${kind}&amp;name=${name}" target="_blank"><fmt:message key="newWindowIcon"/></a>
 	</div>
-	
+	<div id="tools-1" class="hidden"><div class="menucolumn">
+		<div class="menuitem"><a href="#" onclick="return clearClusterCache();"><fmt:message key="clearCache"/></a></div>
+	</div></div>
 	</ui:headline1>
 	
 	<ui:tabs items="${tabs}" var="rs" varKey="label" varLink="detailLink" varParams="detailParams" varParamString="detailParamString" name="result"><%@

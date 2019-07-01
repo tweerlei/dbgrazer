@@ -39,6 +39,8 @@
 		<div class="menuitem"><span onclick="return showDbDialog(event, 'design-data', { q: '${currentDesign.name}' }, '<fmt:message key="downloadData"/>');"><fmt:message key="downloadData"/></span></div>
 		<div class="menuitem"><a href="db/${currentConnection.linkName}/dbdesigner-compare.html" target="_blank"><fmt:message key="structureCompare"/></a></div>
 		<div class="menuitem"><a href="db/${currentConnection.linkName}/dbdesigner-count.html" target="_blank"><fmt:message key="countCompare"/></a></div>
+		<hr class="menuseparator"/>
+		<div class="menuitem"><a href="#" onclick="return clearDbCache();"><fmt:message key="clearCache"/></a></div>
 	</div></div>
 	</ui:headline1>
 	

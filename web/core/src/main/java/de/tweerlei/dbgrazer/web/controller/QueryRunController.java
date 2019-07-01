@@ -485,8 +485,8 @@ public class QueryRunController
 		
 		resultCache.clearCachedObjects(CacheClass.RESULT_VISUALIZATION);
 		
-		// Show related queries on top for PANELS
-		if (showRelated && (fbo.getQuery().getType().getOrientation() == ResultOrientation.DOWN))
+		// Show related queries on top for PANELS and DASHBOARD
+		if (showRelated && (fbo.getQuery().getType().getOrientation() != ResultOrientation.ACROSS))
 			addRelatedQueries(rowSets, fbo.getQuery(), fbo.getParams());
 		
 		for (Map.Entry<String, Result> ent : results.entrySet())

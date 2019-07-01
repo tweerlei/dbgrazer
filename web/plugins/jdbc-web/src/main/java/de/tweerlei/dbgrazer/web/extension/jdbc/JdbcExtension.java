@@ -82,10 +82,6 @@ public class JdbcExtension extends FrontendExtensionAdapter
 			{
 			ret.add(new ExtensionLink("designer", frontendHelper.buildPath(MessageKeys.PATH_DB, connectionSettings.getLinkName(), "dbdesigner.html", null), null, null));
 			}
-		if (connectionSettings.isBrowserEnabled() || connectionSettings.isDesignerEnabled())
-			{
-			ret.add(new ExtensionLink("clearCache", null, "return clearDbCache();", null));
-			}
 		if (connectionSettings.isSubmitEnabled() && connectionSettings.isWritable())
 			{
 			ret.add(new ExtensionLink("scriptQuery", frontendHelper.buildPath(MessageKeys.PATH_DB, connectionSettings.getLinkName(), "submitexec.html", null), null, null));

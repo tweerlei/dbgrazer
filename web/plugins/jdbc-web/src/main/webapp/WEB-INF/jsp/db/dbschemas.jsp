@@ -19,7 +19,14 @@
 %>
 	<ui:headline1><jsp:attribute name="content"><a href="db/${currentConnection.linkName}/dbcatalogs.html"><fmt:message key="schemaBrowser"/></a>
 		&raquo; ${pageTitle}
-	</jsp:attribute></ui:headline1>
+	</jsp:attribute><jsp:body>
+	<div class="h1-actions">
+		<span class="menu" onclick="return showElementMenu(event, 'tools-1');"><fmt:message key="actions"/></span>
+	</div>
+	<div id="tools-1" class="hidden"><div class="menucolumn">
+		<div class="menuitem"><a href="#" onclick="return clearDbCache();"><fmt:message key="clearCache"/></a></div>
+	</div></div>
+	</jsp:body></ui:headline1>
 	
 	<c:set var="links" value="db/${currentConnection.linkName}/dbcatalogs.html,db/${currentConnection.linkName}/dbschemas.html?catalog=${catalog}"
 	/><c:set var="links" value="${fn:split(links, ',')}"

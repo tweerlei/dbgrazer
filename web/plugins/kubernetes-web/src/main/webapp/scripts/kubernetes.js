@@ -71,6 +71,11 @@ function restoreApiObject() {
 	}
 }
 
+function clearClusterCache() {
+	WSApi.getDBAsync('cluster-reload', null, reloadPage);
+	return false;
+}
+
 var lastSelection = '';
 
 function saveSelection() {

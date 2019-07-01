@@ -84,6 +84,7 @@ public class ThemeSourceConfigurator implements ConfigListener, ThemeEnumerator
 		logger.log(Level.INFO, "Using custom themes from base name: " + themePath);
 		final File themeFile = store.getFileLocation(themePath);
 		themeSource.setBasenamePrefix("file:" + themeFile.getAbsolutePath() + File.separator);
+		themeSource.reload();
 		
 		// Set the available theme names
 		final String v = configService.get(ConfigKeys.THEME_NAMES);

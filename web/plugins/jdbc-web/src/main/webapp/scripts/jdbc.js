@@ -187,27 +187,53 @@ function restoreDBObject() {
 	}
 }
 
-function addOrderAsc(ev) {
-	var cell = Popup.parent;
+function clearDbCache() {
+	WSApi.getDBAsync('metadata-reset', null, reloadPage);
+	return false;
+}
+
+function setOrder(f, v) {
 	var order = $('order');
 	if (order) {
-		if (order.value) {
-			order.value = order.value + ', ' + cell.innerText;
+		var re = new RegExp('(^|,) *' + f + '( [^,]*)?(?=,|$)');
+		var cl = v ? (f + ' ' + v) : '';
+		if (order.value.match(re)) {
+			order.value = order.value.replace(re, cl).replace(/^ *, */, '').replace(/ *, *$/, '');
+		} else if (order.value) {
+			order.value = order.value + ', ' + cl;
 		} else {
-			order.value = cell.innerText;
+			order.value = cl;
 		}
 		submitForm($('submitform'), 'table');
 	}
 }
 
+function addOrderAsc(ev) {
+	var cell = Popup.parent;
+	setOrder(cell.innerText, 'ASC');
+}
+
 function addOrderDesc(ev) {
 	var cell = Popup.parent;
-	var order = $('order');
-	if (order) {
-		if (order.value) {
-			order.value = order.value + ', ' + cell.innerText + ' DESC';
+	setOrder(cell.innerText, 'DESC');
+}
+
+function removeOrder(ev) {
+	var cell = Popup.parent;
+	setOrder(cell.innerText);
+}
+
+function setWhere(f, v) {
+	var where = $('where');
+	if (where) {
+		var re = new RegExp('(^| and | or ) *' + f + ' .+?(?= and| or|$)', 'i');
+		var cl = v ? (f + ' ' + v) : '';
+		if (where.value.match(re)) {
+			where.value = where.value.replace(re, cl).replace(/^ *(and|or) +/i, '').replace(/ +(and|or) *$/i, '');
+		} else if (where.value) {
+			where.value = where.value + ' AND ' + cl;
 		} else {
-			order.value = cell.innerText + ' DESC';
+			where.value = cl;
 		}
 		submitForm($('submitform'), 'table');
 	}
@@ -217,30 +243,27 @@ function addWhere(ev) {
 	var cell = Popup.parent;
 	var n = cell.previousSiblings().length;
 	var hdr = cell.up('table').down('tr').childElements()[n];
-	var where = $('where');
-	if (where) {
-		if (where.value) {
-			where.value = where.value + ' AND ' + hdr.innerText + ' = \'' + cell.innerText.replace(/'/g, "''") + '\'';
-		} else {
-			where.value = hdr.innerText + ' = \'' + cell.innerText.replace(/'/g, "''") + '\'';
-		}
-		submitForm($('submitform'), 'table');
-	}
+	if (cell.innerText === '\u2205')
+		setWhere(hdr.innerText, 'IS NULL');
+	else
+		setWhere(hdr.innerText, '= \'' + cell.innerText.replace(/'/g, "''") + '\'');
 }
 
-function addWhereNotIcon(ev) {
+function addWhereNot(ev) {
 	var cell = Popup.parent;
 	var n = cell.previousSiblings().length;
 	var hdr = cell.up('table').down('tr').childElements()[n];
-	var where = $('where');
-	if (where) {
-		if (where.value) {
-			where.value = where.value + ' AND ' + hdr.innerText + ' <> \'' + cell.innerText.replace(/'/g, "''") + '\'';
-		} else {
-			where.value = hdr.innerText + ' <> \'' + cell.innerText.replace(/'/g, "''") + '\'';
-		}
-		submitForm($('submitform'), 'table');
-	}
+	if (cell.innerText === '\u2205')
+		setWhere(hdr.innerText, 'IS NOT NULL');
+	else
+		setWhere(hdr.innerText, '<> \'' + cell.innerText.replace(/'/g, "''") + '\'');
+}
+
+function removeWhere(ev) {
+	var cell = Popup.parent;
+	var n = cell.previousSiblings().length;
+	var hdr = cell.up('table').down('tr').childElements()[n];
+	setWhere(hdr.innerText);
 }
 
 HashMonitor.addListener(restoreDBObject);
