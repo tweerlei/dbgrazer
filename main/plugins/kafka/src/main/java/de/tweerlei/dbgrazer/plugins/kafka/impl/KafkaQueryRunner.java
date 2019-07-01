@@ -30,7 +30,7 @@ import org.apache.kafka.common.header.Header;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import de.tweerlei.dbgrazer.extension.kafka.KafkaClientService;
+import de.tweerlei.dbgrazer.extension.kafka.KafkaApiService;
 import de.tweerlei.dbgrazer.plugins.kafka.types.MessageHeadersQueryType;
 import de.tweerlei.dbgrazer.plugins.kafka.types.MessageQueryType;
 import de.tweerlei.dbgrazer.plugins.kafka.types.QueryTypeAttributes;
@@ -72,18 +72,18 @@ public class KafkaQueryRunner extends BaseQueryRunner
 	private static final String SIZE_HEADER = "Size";
 	
 	private final TimeService timeService;
-	private final KafkaClientService kafkaClient;
+	private final KafkaApiService kafkaClient;
 	private final ResultBuilderService resultBuilder;
 	private final Logger logger;
 	
 	/**
 	 * Constructor
 	 * @param timeService TimeService
-	 * @param kafkaClient KafkaClientService
+	 * @param kafkaClient KafkaApiService
 	 * @param resultBuilder ResultBuilderService
 	 */
 	@Autowired
-	public KafkaQueryRunner(TimeService timeService, KafkaClientService kafkaClient,
+	public KafkaQueryRunner(TimeService timeService, KafkaApiService kafkaClient,
 			ResultBuilderService resultBuilder)
 		{
 		super("Kafka");

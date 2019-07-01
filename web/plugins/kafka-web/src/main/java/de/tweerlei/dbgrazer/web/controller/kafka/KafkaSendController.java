@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import de.tweerlei.common.util.StringUtils;
-import de.tweerlei.dbgrazer.extension.kafka.KafkaClientService;
+import de.tweerlei.dbgrazer.extension.kafka.KafkaApiService;
 import de.tweerlei.dbgrazer.web.exception.AccessDeniedException;
 import de.tweerlei.dbgrazer.web.service.FrontendHelperService;
 import de.tweerlei.dbgrazer.web.service.QuerySettingsManager;
@@ -43,20 +43,20 @@ public class KafkaSendController
 	{
 	private static final String ATTR_KEY = "key";
 	
-	private final KafkaClientService kafkaClientService;
+	private final KafkaApiService kafkaClientService;
 	private final QuerySettingsManager querySettingsManager;
 	private final FrontendHelperService frontendHelperService;
 	private final ConnectionSettings connectionSettings;
 	
 	/**
 	 * Constructor
-	 * @param kafkaClientService KafkaClientService
+	 * @param kafkaClientService KafkaApiService
 	 * @param querySettingsManager QuerySettingsManager
 	 * @param frontendHelperService FrontendHelperService
 	 * @param connectionSettings ConnectionSettings
 	 */
 	@Autowired
-	public KafkaSendController(KafkaClientService kafkaClientService, FrontendHelperService frontendHelperService,
+	public KafkaSendController(KafkaApiService kafkaClientService, FrontendHelperService frontendHelperService,
 			QuerySettingsManager querySettingsManager, ConnectionSettings connectionSettings)
 		{
 		this.kafkaClientService = kafkaClientService;

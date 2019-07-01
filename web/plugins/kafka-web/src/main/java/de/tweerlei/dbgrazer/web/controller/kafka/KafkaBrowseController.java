@@ -30,20 +30,14 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.Config;
 import org.apache.kafka.clients.admin.ConfigEntry;
-import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.Node;
 import org.apache.kafka.common.PartitionInfo;
-import org.apache.kafka.common.acl.AccessControlEntryFilter;
 import org.apache.kafka.common.acl.AclBinding;
-import org.apache.kafka.common.acl.AclBindingFilter;
 import org.apache.kafka.common.config.ConfigResource;
 import org.apache.kafka.common.header.Header;
-import org.apache.kafka.common.resource.ResourceFilter;
-import org.apache.kafka.common.resource.ResourceType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -52,8 +46,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import de.tweerlei.common.util.StringJoiner;
 import de.tweerlei.common.util.StringUtils;
-import de.tweerlei.dbgrazer.extension.kafka.KafkaClientService;
-import de.tweerlei.dbgrazer.extension.kafka.KafkaClientService.OffsetInfo;
+import de.tweerlei.dbgrazer.extension.kafka.KafkaApiService;
+import de.tweerlei.dbgrazer.extension.kafka.KafkaApiService.OffsetInfo;
 import de.tweerlei.dbgrazer.query.model.ColumnDef;
 import de.tweerlei.dbgrazer.query.model.ColumnType;
 import de.tweerlei.dbgrazer.query.model.Query;
@@ -64,14 +58,15 @@ import de.tweerlei.dbgrazer.query.model.impl.DefaultResultRow;
 import de.tweerlei.dbgrazer.query.model.impl.RowSetImpl;
 import de.tweerlei.dbgrazer.query.model.impl.SubQueryDefImpl;
 import de.tweerlei.dbgrazer.query.model.impl.ViewImpl;
-import de.tweerlei.dbgrazer.query.service.ResultBuilderService;
 import de.tweerlei.dbgrazer.web.constant.RowSetConstants;
+import de.tweerlei.dbgrazer.web.constant.ViewConstants;
 import de.tweerlei.dbgrazer.web.exception.AccessDeniedException;
 import de.tweerlei.dbgrazer.web.model.TabItem;
 import de.tweerlei.dbgrazer.web.service.QuerySettingsManager;
 import de.tweerlei.dbgrazer.web.service.TextTransformerService;
 import de.tweerlei.dbgrazer.web.service.kafka.TopicSettingsManager;
 import de.tweerlei.dbgrazer.web.session.ConnectionSettings;
+import de.tweerlei.spring.service.TimeService;
 
 /**
  * Controller for simple pages
@@ -284,32 +279,32 @@ public class KafkaBrowseController
 			}
 		}
 	
-	private final KafkaClientService kafkaClientService;
-	private final ResultBuilderService resultBuilder;
+	private final KafkaApiService kafkaClientService;
 	private final TextTransformerService textFormatterService;
 	private final QuerySettingsManager querySettingsManager;
 	private final TopicSettingsManager topicStateManager;
+	private final TimeService timeService;
 	private final ConnectionSettings connectionSettings;
 	
 	/**
 	 * Constructor
-	 * @param kafkaClientService KafkaClientService
-	 * @param resultBuilder ResultBuilderService
+	 * @param kafkaClientService KafkaApiService
 	 * @param textFormatterService TextFormatterService
 	 * @param querySettingsManager QuerySettingsManager
 	 * @param topicStateManager TopicStateManager
 	 * @param connectionSettings ConnectionSettings
 	 */
 	@Autowired
-	public KafkaBrowseController(KafkaClientService kafkaClientService, TextTransformerService textFormatterService,
-			ResultBuilderService resultBuilder, QuerySettingsManager querySettingsManager,
-			TopicSettingsManager topicStateManager, ConnectionSettings connectionSettings)
+	public KafkaBrowseController(KafkaApiService kafkaClientService, TextTransformerService textFormatterService,
+			QuerySettingsManager querySettingsManager,
+			TopicSettingsManager topicStateManager, TimeService timeService,
+			ConnectionSettings connectionSettings)
 		{
 		this.kafkaClientService = kafkaClientService;
-		this.resultBuilder = resultBuilder;
 		this.textFormatterService = textFormatterService;
 		this.querySettingsManager = querySettingsManager;
 		this.topicStateManager = topicStateManager;
+		this.timeService = timeService;
 		this.connectionSettings = connectionSettings;
 		}
 	
@@ -325,48 +320,34 @@ public class KafkaBrowseController
 		
 		final Map<String, Object> model = new HashMap<String, Object>();
 		
-		final AdminClient adminClient = kafkaClientService.getAdminClient(connectionSettings.getLinkName());
-		Collection<Node> nodes;
-		try	{
-			nodes = adminClient.describeCluster().nodes().get();
-			}
-		catch (Exception e)
-			{
-			nodes = Collections.emptyList();
-			}
-		Collection<AclBinding> acls;
-		try	{
-			final AclBindingFilter filter = new AclBindingFilter(new ResourceFilter(ResourceType.CLUSTER, null), AccessControlEntryFilter.ANY);
-			acls = adminClient.describeAcls(filter).values().get();
-			}
-		catch (Exception e)
-			{
-			acls = Collections.emptyList();
-			}
-		Map<ConfigResource, Config> configs;
-		try	{
-			final List<ConfigResource> rsrc = new ArrayList<ConfigResource>(nodes.size());
-			for (Node node : nodes)
-				rsrc.add(new ConfigResource(ConfigResource.Type.BROKER, node.idString()));
-			configs = adminClient.describeConfigs(rsrc).all().get();
-			}
-		catch (Exception e)
-			{
-			configs = Collections.emptyMap();
-			}
+		long start, end;
+		
 		final Map<String, TabItem<RowSet>> results = new LinkedHashMap<String, TabItem<RowSet>>();
-		results.put(KafkaMessageKeys.NODES, new TabItem<RowSet>(buildNodeRowSet(nodes), nodes.size()));
-		results.put(KafkaMessageKeys.ACLS, new TabItem<RowSet>(buildAclRowSet(acls), acls.size()));
-		results.put(KafkaMessageKeys.CONFIGS, new TabItem<RowSet>(buildConfigRowSet(configs), configs.size()));
+		start = timeService.getCurrentTime();
+		final Collection<Node> nodes = kafkaClientService.getNodes(connectionSettings.getLinkName());
+		end = timeService.getCurrentTime();
+		results.put(KafkaMessageKeys.NODES, new TabItem<RowSet>(buildNodeRowSet(nodes, end - start), nodes.size()));
+		
+		start = timeService.getCurrentTime();
+		final Collection<AclBinding> acls = kafkaClientService.getClusterAcls(connectionSettings.getLinkName());
+		end = timeService.getCurrentTime();
+		results.put(KafkaMessageKeys.ACLS, new TabItem<RowSet>(buildAclRowSet(acls, end - start), acls.size()));
+		
+		start = timeService.getCurrentTime();
+		final Map<ConfigResource, Config> configs = kafkaClientService.getClusterConfigs(connectionSettings.getLinkName());
+		end = timeService.getCurrentTime();
+		final RowSet rs = buildConfigRowSet(configs, end - start);
+		results.put(KafkaMessageKeys.CONFIGS, new TabItem<RowSet>(rs, rs.getRows().size()));
 		model.put("results", results);
 		
-		final Consumer<String, String> consumer = kafkaClientService.getConsumer(connectionSettings.getLinkName());
-		final Map<String, List<PartitionInfo>> topics = consumer.listTopics();
+		start = timeService.getCurrentTime();
+		final Map<String, List<PartitionInfo>> topics = kafkaClientService.getTopics(connectionSettings.getLinkName());
+		end = timeService.getCurrentTime();
 		
 		final List<SubQueryDef> levels = new ArrayList<SubQueryDef>();
 		final Query query = new ViewImpl(KafkaMessageKeys.TOPIC_LEVEL, null, null, null, null, levels, null);
 		
-		final RowSet cats = buildRowSet(query, topics.keySet());
+		final RowSet cats = buildRowSet(query, topics.keySet(), end - start);
 		
 		final Map<String, TabItem<RowSet>> tabs = new LinkedHashMap<String, TabItem<RowSet>>();
 		tabs.put(KafkaMessageKeys.TOPICS_TAB, new TabItem<RowSet>(cats, cats.getRows().size()));
@@ -378,15 +359,13 @@ public class KafkaBrowseController
 		return (model);
 		}
 	
-	private RowSet buildRowSet(Query query, Set<String> values)
+	private RowSet buildRowSet(Query query, Set<String> values, long time)
 		{
-		if (values.isEmpty())
-			return (resultBuilder.createEmptyRowSet(query, RowSetConstants.INDEX_MULTILEVEL, 0));
-		
 		final List<ColumnDef> columns = new ArrayList<ColumnDef>(2);
 		columns.add(new ColumnDefImpl(KafkaMessageKeys.ID, ColumnType.STRING, null, null, null, null));
 		columns.add(new ColumnDefImpl(KafkaMessageKeys.TOPIC, ColumnType.STRING, null, null, null, null));
 		final RowSetImpl rs = new RowSetImpl(query, RowSetConstants.INDEX_MULTILEVEL, columns);
+		rs.setQueryTime(time);
 		
 		final Set<String> sortedTopics = new TreeSet<String>(values);
 		for (String value : sortedTopics)
@@ -396,12 +375,9 @@ public class KafkaBrowseController
 		return (rs);
 		}
 	
-	private RowSet buildNodeRowSet(Collection<Node> nodes)
+	private RowSet buildNodeRowSet(Collection<Node> nodes, long time)
 		{
 		final Query query = new ViewImpl(KafkaMessageKeys.NODES, null, null, null, null, null, null);
-		
-		if (nodes.isEmpty())
-			return (resultBuilder.createEmptyRowSet(query, 0, 0));
 		
 		final List<ColumnDef> columns = new ArrayList<ColumnDef>(5);
 		columns.add(new ColumnDefImpl(KafkaMessageKeys.ID, ColumnType.INTEGER, null, null, null, null));
@@ -409,6 +385,7 @@ public class KafkaBrowseController
 		columns.add(new ColumnDefImpl(KafkaMessageKeys.PORT, ColumnType.INTEGER, null, null, null, null));
 		columns.add(new ColumnDefImpl(KafkaMessageKeys.RACK, ColumnType.STRING, null, null, null, null));
 		final RowSetImpl rs = new RowSetImpl(query, 0, columns);
+		rs.setQueryTime(time);
 		
 		for (Node node : nodes)
 			rs.getRows().add(new DefaultResultRow(String.valueOf(node.id()), node.host(), String.valueOf(node.port()), node.rack()));
@@ -433,39 +410,30 @@ public class KafkaBrowseController
 		
 		model.put("topic", topic);
 		
-		final AdminClient adminClient = kafkaClientService.getAdminClient(connectionSettings.getLinkName());
-		Collection<AclBinding> acls;
-		try	{
-			final AclBindingFilter filter = new AclBindingFilter(new ResourceFilter(ResourceType.TOPIC, topic), AccessControlEntryFilter.ANY);
-			acls = adminClient.describeAcls(filter).values().get();
-			}
-		catch (Exception e)
-			{
-			acls = Collections.emptyList();
-			}
-		Map<ConfigResource, Config> configs;
-		try	{
-			final ConfigResource rsrc = new ConfigResource(ConfigResource.Type.TOPIC, topic);
-			configs = adminClient.describeConfigs(Collections.singleton(rsrc)).all().get();
-			}
-		catch (Exception e)
-			{
-			configs = Collections.emptyMap();
-			}
+		long start, end;
+		
 		final Map<String, TabItem<RowSet>> results = new LinkedHashMap<String, TabItem<RowSet>>();
-		results.put(KafkaMessageKeys.ACLS, new TabItem<RowSet>(buildAclRowSet(acls), acls.size()));
-		results.put(KafkaMessageKeys.CONFIGS, new TabItem<RowSet>(buildConfigRowSet(configs), configs.size()));
+		start = timeService.getCurrentTime();
+		final Collection<AclBinding> acls = kafkaClientService.getTopicAcls(connectionSettings.getLinkName(), topic);
+		end = timeService.getCurrentTime();
+		results.put(KafkaMessageKeys.ACLS, new TabItem<RowSet>(buildAclRowSet(acls, end - start), acls.size()));
+		
+		start = timeService.getCurrentTime();
+		final Map<ConfigResource, Config> configs = kafkaClientService.getTopicConfigs(connectionSettings.getLinkName(), topic);
+		end = timeService.getCurrentTime();
+		final RowSet rs = buildConfigRowSet(configs, end - start);
+		results.put(KafkaMessageKeys.CONFIGS, new TabItem<RowSet>(rs, rs.getRows().size()));
 		model.put("results", results);
 		
-		final Consumer<String, String> consumer = kafkaClientService.getConsumer(connectionSettings.getLinkName());
-		
-		final List<PartitionInfo> partitions = consumer.partitionsFor(topic);
+		start = timeService.getCurrentTime();
+		final List<PartitionInfo> partitions = kafkaClientService.getPartitions(connectionSettings.getLinkName(), topic);
+		end = timeService.getCurrentTime();
 		
 		final List<SubQueryDef> levels = new ArrayList<SubQueryDef>();
 		levels.add(new SubQueryDefImpl(KafkaMessageKeys.TOPIC_LEVEL, null));
 		final Query query = new ViewImpl(KafkaMessageKeys.PARTITION_LEVEL, null, null, null, null, levels, null);
 		
-		final RowSet cats = buildRowSet(query, partitions);
+		final RowSet cats = buildRowSet(query, partitions, end - start);
 		
 		final Map<String, TabItem<RowSet>> tabs = new LinkedHashMap<String, TabItem<RowSet>>();
 		tabs.put(KafkaMessageKeys.PARTITIONS_TAB, new TabItem<RowSet>(cats, cats.getRows().size() - 1));
@@ -477,11 +445,8 @@ public class KafkaBrowseController
 		return (model);
 		}
 	
-	private RowSet buildRowSet(Query query, List<PartitionInfo> partitions)
+	private RowSet buildRowSet(Query query, List<PartitionInfo> partitions, long time)
 		{
-		if (partitions.isEmpty())
-			return (resultBuilder.createEmptyRowSet(query, RowSetConstants.INDEX_MULTILEVEL, 0));
-		
 		final List<ColumnDef> columns = new ArrayList<ColumnDef>(5);
 		columns.add(new ColumnDefImpl(KafkaMessageKeys.ID, ColumnType.INTEGER, null, null, null, null));
 		columns.add(new ColumnDefImpl(KafkaMessageKeys.PARTITION, ColumnType.INTEGER, null, null, null, null));
@@ -489,6 +454,7 @@ public class KafkaBrowseController
 		columns.add(new ColumnDefImpl(KafkaMessageKeys.IN_SYNC_REPLICAS, ColumnType.STRING, null, null, null, null));
 		columns.add(new ColumnDefImpl(KafkaMessageKeys.LEADER, ColumnType.STRING, null, null, null, null));
 		final RowSetImpl rs = new RowSetImpl(query, RowSetConstants.INDEX_MULTILEVEL, columns);
+		rs.setQueryTime(time);
 		
 		final Set<PartitionInfoBean> sortedPartitions = new TreeSet<PartitionInfoBean>();
 		for (PartitionInfo pi : partitions)
@@ -502,12 +468,9 @@ public class KafkaBrowseController
 		return (rs);
 		}
 
-	private RowSet buildAclRowSet(Collection<AclBinding> acls)
+	private RowSet buildAclRowSet(Collection<AclBinding> acls, long time)
 		{
 		final Query query = new ViewImpl(KafkaMessageKeys.ACLS, null, null, null, null, null, null);
-		
-		if (acls.isEmpty())
-			return (resultBuilder.createEmptyRowSet(query, 0, 0));
 		
 		final List<ColumnDef> columns = new ArrayList<ColumnDef>(5);
 		columns.add(new ColumnDefImpl(KafkaMessageKeys.PRINCIPAL, ColumnType.STRING, null, null, null, null));
@@ -515,6 +478,7 @@ public class KafkaBrowseController
 		columns.add(new ColumnDefImpl(KafkaMessageKeys.OPERATION, ColumnType.STRING, null, null, null, null));
 		columns.add(new ColumnDefImpl(KafkaMessageKeys.PERMISSION_TYPE, ColumnType.STRING, null, null, null, null));
 		final RowSetImpl rs = new RowSetImpl(query, 0, columns);
+		rs.setQueryTime(time);
 		
 		for (AclBinding acl : acls)
 			rs.getRows().add(new DefaultResultRow(acl.entry().principal(), acl.entry().host(), acl.entry().operation().toString(), acl.entry().permissionType().toString()));
@@ -522,18 +486,16 @@ public class KafkaBrowseController
 		return (rs);
 		}
 	
-	private RowSet buildConfigRowSet(Map<ConfigResource, Config> configs)
+	private RowSet buildConfigRowSet(Map<ConfigResource, Config> configs, long time)
 		{
 		final Query query = new ViewImpl(KafkaMessageKeys.CONFIGS, null, null, null, null, null, null);
-		
-		if (configs.isEmpty())
-			return (resultBuilder.createEmptyRowSet(query, 0, 0));
 		
 		final List<ColumnDef> columns = new ArrayList<ColumnDef>(3);
 		columns.add(new ColumnDefImpl(KafkaMessageKeys.RESOURCE, ColumnType.STRING, null, null, null, null));
 		columns.add(new ColumnDefImpl(KafkaMessageKeys.KEY, ColumnType.STRING, null, null, null, null));
 		columns.add(new ColumnDefImpl(KafkaMessageKeys.VALUE, ColumnType.STRING, null, null, null, null));
 		final RowSetImpl rs = new RowSetImpl(query, 0, columns);
+		rs.setQueryTime(time);
 		
 		final Map<String, Map<String, String>> sortedConfigs = new TreeMap<String, Map<String, String>>();
 		for (Map.Entry<ConfigResource, Config> ent : configs.entrySet())
@@ -753,5 +715,20 @@ public class KafkaBrowseController
 		model.put("extensionJS", KafkaMessageKeys.EXTENSION_JS);
 		
 		return (model);
+		}
+	
+	/**
+	 * Show catalogs
+	 * @return Model
+	 */
+	@RequestMapping(value = "/db/*/ajax/kafka-reload.html", method = RequestMethod.GET)
+	public String clearCache()
+		{
+		if (!connectionSettings.isBrowserEnabled())
+			throw new AccessDeniedException();
+
+		kafkaClientService.flushCache(connectionSettings.getLinkName());
+
+		return (ViewConstants.EMPTY_VIEW);
 		}
 	}

@@ -98,4 +98,9 @@ function restoreTopic() {
 	}
 }
 
+function clearKafkaCache() {
+	WSApi.getDBAsync('kafka-reload', null, reloadPage);
+	return false;
+}
+
 HashMonitor.addListener(restoreTopic);

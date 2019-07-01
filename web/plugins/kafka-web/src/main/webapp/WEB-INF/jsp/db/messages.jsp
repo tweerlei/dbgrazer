@@ -27,23 +27,22 @@
 	/*]]>*/</script>
 	
 	<ui:headline1 label="${pageTitle}">
-<c:if test="${currentConnection.writable}"
->	<div class="h1-actions">
+	<div class="h1-actions">
 		<span class="menu" onclick="return showElementMenu(event, 'tools-1');"><fmt:message key="actions"/></span>
 	</div>
-</c:if
->	<div class="h1-actions">
+	<div class="h1-actions">
 		<span class="action" title="<fmt:message key="refresh"/>" onclick="return reloadPage();"><fmt:message key="refreshIcon"/></span>
 		<a class="action" title="<fmt:message key="newWindow"/>" href="db/${currentConnection.linkName}/messages.html?topic=${topic}&amp;partition=${partition}" target="_blank"><fmt:message key="newWindowIcon"/></a>
 	</div>
 	
+	<div id="tools-1" class="hidden"><div class="menucolumn">
 <c:if test="${currentConnection.writable}"
->	<div id="tools-1" class="hidden"><div class="menucolumn">
-		<div class="menuitem"><span onclick="return showDbDialog(event, 'send-message', { topic: '${topic}', partition: '${partition}' }, '<fmt:message key="send"/>');"><fmt:message key="send"/></span></div>
+>		<div class="menuitem"><span onclick="return showDbDialog(event, 'send-message', { topic: '${topic}', partition: '${partition}' }, '<fmt:message key="send"/>');"><fmt:message key="send"/></span></div>
 		<div class="menuitem"><span onclick="return showConfirmDialog('<fmt:message key="deleteTopic"/>', '<fmt:message key="confirmDeleteTopic"/>', 'db/${currentConnection.linkName}/delete-topic.html', '${topic}');"><fmt:message key="deleteTopic"/></span></div>
-	</div></div>
 </c:if
->	</ui:headline1>
+>		<div class="menuitem"><a href="#" onclick="return clearKafkaCache();"><fmt:message key="clearCache"/></a></div>
+	</div></div>
+	</ui:headline1>
 	
 	<div id="submitresult"></div>
 	

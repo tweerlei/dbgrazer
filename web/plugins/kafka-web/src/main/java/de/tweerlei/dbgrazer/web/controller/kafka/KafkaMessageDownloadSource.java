@@ -21,7 +21,7 @@ import java.io.OutputStreamWriter;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 
-import de.tweerlei.dbgrazer.extension.kafka.KafkaClientService;
+import de.tweerlei.dbgrazer.extension.kafka.KafkaApiService;
 import de.tweerlei.spring.web.view.AbstractDownloadSource;
 import de.tweerlei.spring.web.view.DownloadSource;
 
@@ -34,7 +34,7 @@ public class KafkaMessageDownloadSource extends AbstractDownloadSource
 	{
 	private static final String OUTPUT_CHARSET = "UTF-8";
 	
-	private final KafkaClientService kafkaClientService;
+	private final KafkaApiService kafkaClientService;
 	private final String link;
 	private final String topic;
 	private final int partition;
@@ -42,13 +42,13 @@ public class KafkaMessageDownloadSource extends AbstractDownloadSource
 	
 	/**
 	 * Constructor
-	 * @param kafkaClientService KafkaClientService
+	 * @param kafkaClientService KafkaApiService
 	 * @param link Link name
 	 * @param topic Topic name
 	 * @param partition Partition number
 	 * @param offset Message offset
 	 */
-	public KafkaMessageDownloadSource(KafkaClientService kafkaClientService,
+	public KafkaMessageDownloadSource(KafkaApiService kafkaClientService,
 			String link, String topic, int partition, long offset)
 		{
 		this.kafkaClientService = kafkaClientService;

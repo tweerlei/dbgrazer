@@ -193,7 +193,6 @@ public class KubernetesApiServiceImpl implements KubernetesApiService, ConfigLis
 			
 			try	{
 				final V1APIGroupList l = new ApisApi(client).getAPIVersions();
-				logger.log(Level.INFO, l.toString());
 				for (V1APIGroup r : l.getGroups())
 					{
 					final String groupName = StringUtils.notNull(r.getName());
@@ -219,7 +218,6 @@ public class KubernetesApiServiceImpl implements KubernetesApiService, ConfigLis
 					{
 					try	{
 						final V1APIResourceList l = api.getAPIResources(ent.getKey(), ent2.getKey());
-						logger.log(Level.INFO, l.toString());
 						for (V1APIResource r : l.getResources())
 							{
 							if (r.isNamespaced() && r.getVerbs().contains("list"))
@@ -237,7 +235,6 @@ public class KubernetesApiServiceImpl implements KubernetesApiService, ConfigLis
 			try	{
 				final Map<String, KubernetesApiResource> rsrc = new TreeMap<String, KubernetesApiResource>();
 				final V1APIResourceList l = new CoreV1Api(client).getAPIResources();
-				logger.log(Level.INFO, l.toString());
 				for (V1APIResource r : l.getResources())
 					{
 					if (r.getVerbs().contains("list"))
@@ -295,7 +292,6 @@ public class KubernetesApiServiceImpl implements KubernetesApiService, ConfigLis
 		final Set<String> names = new TreeSet<String>();
 		try	{
 			final Object list = api.listNamespacedCustomObject(group, version, namespace, kind, null, null, null, null);
-			logger.log(Level.INFO, "listNamespacedCustomObject: " + list.getClass().getName() + ": " + list);
 			for (Object item : extractListItems(list))
 				{
 				final Object name = extractName(item);
@@ -429,7 +425,6 @@ public class KubernetesApiServiceImpl implements KubernetesApiService, ConfigLis
 		Object content = null;
 		try	{
 			content = api.getNamespacedCustomObject(group, version, namespace, kind, name);
-			logger.log(Level.INFO, "getNamespacedCustomObject: " + content);
 			}
 		catch (ApiException e)
 			{

@@ -29,6 +29,7 @@ public class ReloadableResourceBundleThemeSource extends ResourceBundleThemeSour
 	{
 	private String defaultEncoding;
 	private MessageSource parentMessageSource;
+	private ReloadableResourceBundleMessageSource messageSource;
 	
 	/**
 	 * Set the defaultEncoding
@@ -48,10 +49,19 @@ public class ReloadableResourceBundleThemeSource extends ResourceBundleThemeSour
 		this.parentMessageSource = parentMessageSource;
 		}
 	
+	/**
+	 * Reload the message source
+	 */
+	public void reload()
+		{
+		if (messageSource != null)
+			messageSource.clearCache();
+		}
+	
 	@Override
 	protected MessageSource createMessageSource(String basename)
 		{
-		final ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
+		messageSource = new ReloadableResourceBundleMessageSource();
 		messageSource.setFallbackToSystemLocale(false);
 		if (defaultEncoding != null)
 			messageSource.setDefaultEncoding(defaultEncoding);
