@@ -68,7 +68,8 @@
 </c:if><c:forEach items="${row.values}" begin="1" var="v" varStatus="st"
 >					<td><c:choose
 						><c:when test="${rs.attributes['moreLevels']}"><ui:message text="${v}" key=""/></c:when
-						><c:otherwise><a href="${fn:replace(link, '%%', v)}" onclick="${fn:replace(jsLink, '%%', v)}">${v}</a></c:otherwise
+						><c:when test="${st.first}"><a href="${fn:replace(link, '%%', v)}" onclick="${fn:replace(jsLink, '%%', v)}">${v}</a></c:when
+						><c:otherwise>${v}</c:otherwise
 					></c:choose></td>
 </c:forEach
 >				</tr>

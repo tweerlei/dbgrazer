@@ -16,6 +16,7 @@
 package de.tweerlei.dbgrazer.extension.kubernetes;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 
@@ -114,6 +115,81 @@ public interface KubernetesApiService
 		}
 	
 	/**
+	 * Kubernetes API object
+	 */
+	public static class KubernetesApiObject implements Comparable<KubernetesApiObject>
+		{
+		private final String name;
+		private final Date creationTimestamp;
+		private Map<String, String> labels;
+		
+		/**
+		 * Constructor
+		 * @param name Name
+		 * @param creationTimestamp Creation timestamp
+		 * @param labels Labels
+		 */
+		public KubernetesApiObject(String name, Date creationTimestamp, Map<String, String> labels)
+			{
+			this.name = name;
+			this.creationTimestamp = creationTimestamp;
+			this.labels = Collections.unmodifiableMap(labels);
+			}
+		
+		/**
+		 * Get the name
+		 * @return the name
+		 */
+		public String getName()
+			{
+			return name;
+			}
+		
+		/**
+		 * Get the creationTimestamp
+		 * @return the creationTimestamp
+		 */
+		public Date getCreationTimestamp()
+			{
+			return creationTimestamp;
+			}
+		
+		/**
+		 * Get the labels
+		 * @return the labels
+		 */
+		public Map<String, String> getLabels()
+			{
+			return labels;
+			}
+		
+		@Override
+		public int hashCode()
+			{
+			return name.hashCode();
+			}
+		
+		@Override
+		public boolean equals(Object o)
+			{
+			if (o == this)
+				return (true);
+			if (o == null)
+				return (false);
+			if (!(o instanceof KubernetesApiObject))
+				return (false);
+			final KubernetesApiObject other = (KubernetesApiObject) o;
+			return (name.equals(other.name));
+			}
+		
+		@Override
+		public int compareTo(KubernetesApiObject o)
+			{
+			return (name.compareTo(o.name));
+			}
+		}
+	
+	/**
 	 * Get the supported namespaced API resources for a link
 	 * @param c Link name
 	 * @return Map: API group name -> API version -> Resource Kind -> Resource
@@ -134,9 +210,9 @@ public interface KubernetesApiService
 	 * @param group API group name
 	 * @param version API version
 	 * @param kind Resource kind
-	 * @return Object names
+	 * @return KubernetesApiObjects
 	 */
-	public Set<String> listApiObjects(String c, String namespace, String group, String version, String kind);
+	public Set<KubernetesApiObject> listApiObjects(String c, String namespace, String group, String version, String kind);
 	
 	/**
 	 * Get an object as JSON

@@ -33,6 +33,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import de.tweerlei.dbgrazer.extension.kubernetes.KubernetesApiService;
+import de.tweerlei.dbgrazer.extension.kubernetes.KubernetesApiService.KubernetesApiObject;
 import de.tweerlei.dbgrazer.extension.kubernetes.KubernetesApiService.KubernetesApiResource;
 import de.tweerlei.dbgrazer.query.model.ColumnDef;
 import de.tweerlei.dbgrazer.query.model.ColumnType;
@@ -50,7 +51,9 @@ import de.tweerlei.dbgrazer.web.constant.RowSetConstants;
 import de.tweerlei.dbgrazer.web.constant.ViewConstants;
 import de.tweerlei.dbgrazer.web.exception.AccessDeniedException;
 import de.tweerlei.dbgrazer.web.model.TabItem;
+import de.tweerlei.dbgrazer.web.service.DataFormatterFactory;
 import de.tweerlei.dbgrazer.web.service.QuerySettingsManager;
+import de.tweerlei.dbgrazer.web.service.ResultTransformerService;
 import de.tweerlei.dbgrazer.web.service.TextTransformerService;
 import de.tweerlei.dbgrazer.web.session.ConnectionSettings;
 import de.tweerlei.spring.service.TimeService;
@@ -65,6 +68,8 @@ public class KubernetesBrowseController
 	{
 	private final KubernetesApiService clientService;
 	private final ResultBuilderService resultBuilder;
+	private final DataFormatterFactory factory;
+	private final ResultTransformerService resultTransformer;
 	private final TextTransformerService textFormatterService;
 	private final QuerySettingsManager querySettingsManager;
 	private final TimeService timeService;
@@ -74,6 +79,8 @@ public class KubernetesBrowseController
 	 * Constructor
 	 * @param clientService KubernetesApiService
 	 * @param resultBuilder ResultBuilderService
+	 * @param factory DataFormatterFactory
+	 * @param resultTransformer ResultTransformerService
 	 * @param textFormatterService TextFormatterService
 	 * @param querySettingsManager QuerySettingsManager
 	 * @param timeService TimeService
@@ -81,12 +88,15 @@ public class KubernetesBrowseController
 	 */
 	@Autowired
 	public KubernetesBrowseController(KubernetesApiService clientService, TextTransformerService textFormatterService,
+			DataFormatterFactory factory, ResultTransformerService resultTransformer,
 			ResultBuilderService resultBuilder, QuerySettingsManager querySettingsManager,
 			TimeService timeService,
 			ConnectionSettings connectionSettings)
 		{
 		this.clientService = clientService;
 		this.resultBuilder = resultBuilder;
+		this.factory = factory;
+		this.resultTransformer = resultTransformer;
 		this.textFormatterService = textFormatterService;
 		this.querySettingsManager = querySettingsManager;
 		this.timeService = timeService;
@@ -244,7 +254,7 @@ public class KubernetesBrowseController
 		final String[] parts = kind.split("/", 3);
 		
 		final long start = timeService.getCurrentTime();
-		final Set<String> apiObjects = clientService.listApiObjects(connectionSettings.getLinkName(), namespace, parts[0], parts[1], parts[2]);
+		final Set<KubernetesApiObject> apiObjects = clientService.listApiObjects(connectionSettings.getLinkName(), namespace, parts[0], parts[1], parts[2]);
 		final long end = timeService.getCurrentTime();
 		
 		final List<SubQueryDef> levels = new ArrayList<SubQueryDef>();
@@ -265,16 +275,20 @@ public class KubernetesBrowseController
 		return (model);
 		}
 	
-	private RowSet buildRowSet(Query query, Set<String> values, long time)
+	private RowSet buildRowSet(Query query, Set<KubernetesApiObject> values, long time)
 		{
 		final List<ColumnDef> columns = new ArrayList<ColumnDef>(2);
 		columns.add(new ColumnDefImpl(KubernetesMessageKeys.ID, ColumnType.STRING, null, null, null, null));
 		columns.add(new ColumnDefImpl(KubernetesMessageKeys.OBJECT, ColumnType.STRING, null, null, null, null));
+		columns.add(new ColumnDefImpl(KubernetesMessageKeys.TIMESTAMP, ColumnType.DATE, null, null, null, null));
 		final RowSetImpl rs = new RowSetImpl(query, RowSetConstants.INDEX_MULTILEVEL, columns);
 		rs.setQueryTime(time);
 		
-		for (String n : values)
-			rs.getRows().add(new DefaultResultRow(n, n));
+		for (KubernetesApiObject n : values)
+			rs.getRows().add(new DefaultResultRow(n.getName(), n.getName(), n.getCreationTimestamp()));
+		
+		// Format dates
+		resultTransformer.translateRowSet(rs, factory.getWebFormatter());
 		
 		rs.getAttributes().put(RowSetConstants.ATTR_MORE_LEVELS, false);
 		return (rs);
