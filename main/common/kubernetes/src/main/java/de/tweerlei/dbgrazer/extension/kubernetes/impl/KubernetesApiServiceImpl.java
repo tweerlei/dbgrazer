@@ -222,7 +222,7 @@ public class KubernetesApiServiceImpl implements KubernetesApiService, ConfigLis
 						final V1APIResourceList l = api.getAPIResources(ent.getKey(), ent2.getKey());
 						for (V1APIResource r : l.getResources())
 							{
-							if (r.isNamespaced() && r.getVerbs().contains("list"))
+							if (r.getVerbs().contains("list"))
 								ent2.getValue().put(r.getKind(), new KubernetesApiResource(r.getName(), r.getKind(), r.isNamespaced(), new TreeSet<String>(r.getVerbs())));
 							}
 						}

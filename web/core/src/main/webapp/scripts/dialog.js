@@ -140,6 +140,9 @@ var Dialog = {
 	
 	hide: function() {
 		if (this.active) {
+			if (document.activeElement) {
+				document.activeElement.blur();
+			}
 			this.target.hide();
 			this.overlay.hide();
 			this.dialogForm.innerHTML = '';

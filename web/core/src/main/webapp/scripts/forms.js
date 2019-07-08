@@ -339,13 +339,31 @@ var Forms = {
 		}
 	},
 	
+	disable: function(f) {
+		var frm = $(f);
+		var s = [];
+		frm.getElements().each(function (e) {
+			if (!e.disabled) {
+				s.push(e);
+				e.disable();
+			}
+		});
+		return s;
+	},
+	
+	enable: function(f, s) {
+		s.each(function (e) {
+			e.enable();
+		});
+	},
+	
 	processRequest: function(f, url, h1, h2) {
 		var a = f.action;
 		if (url) {
 			f.action = url;
 		}
 		var params = f.serialize(true); // serialize doesn't work for disabled forms, so do it here
-		f.disable();
+		var formState = Forms.disable(f);
 		
 		var taskID = this.scheduler.currentTaskID;
 		this.currentRequest = f.request({
@@ -368,7 +386,7 @@ var Forms = {
 			},
 			onComplete: function() {
 				Forms.currentRequest = false;
-				f.enable();
+				Forms.enable(f, formState);
 				if (h2) {
 					h2();
 				}

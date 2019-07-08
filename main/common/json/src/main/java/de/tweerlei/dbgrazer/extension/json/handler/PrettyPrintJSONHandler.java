@@ -16,6 +16,9 @@
 package de.tweerlei.dbgrazer.extension.json.handler;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
 
 import de.tweerlei.dbgrazer.extension.json.parser.JSONHandler;
 import de.tweerlei.dbgrazer.extension.json.printer.DefaultJSONPrinter;
@@ -118,11 +121,42 @@ public class PrettyPrintJSONHandler implements JSONHandler
 		{
 		try	{
 			sb.append(printer.printNumber(tag));
+			// Hack: Try to interpret the value as a UNIX timestamp
+			// If successful, print the result as comment
+			final String comment = convertNumberToDate(tag);
+			if (comment != null)
+				sb.append(printer.printComment(comment));
 			}
 		catch (IOException e)
 			{
 			throw new RuntimeException(e);
 			}
+		}
+	
+	private static String convertNumberToDate(String tag)
+		{
+		try	{
+			final double value = Double.parseDouble(tag);
+			// 2001-01-01 .. 2100-01-01 as seconds
+			if (value >= 978307200.0 && value <= 4102444800.0)
+				return (formatDate(new Date((long) (value * 1000.0))));
+			// 2001-01-01 .. 2100-01-01 as milliseconds
+			else if (value >= 978307200000.0 && value <= 4102444800000.0)
+				return (formatDate(new Date((long) value)));
+			else
+				return (null);
+			}
+		catch (NumberFormatException e)
+			{
+			return (null);
+			}
+		}
+	
+	private static String formatDate(Date d)
+		{
+		final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+		sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+		return (sdf.format(d));
 		}
 	
 	@Override

@@ -18,14 +18,6 @@
 	include file="../include/header.jspf"
 %><c:set var="targetElement" value="explorer-right"
 />
-	<script type="text/javascript">/*<![CDATA[*/
-	
-	function reloadPage() {
-		return refreshApiObject();
-	}
-	
-	/*]]>*/</script>
-	
 	<ui:headline1 label="${pageTitle}">
 	<div class="h1-actions">
 		<span class="menu" onclick="return showElementMenu(event, 'tools-1');"><fmt:message key="actions"/></span>

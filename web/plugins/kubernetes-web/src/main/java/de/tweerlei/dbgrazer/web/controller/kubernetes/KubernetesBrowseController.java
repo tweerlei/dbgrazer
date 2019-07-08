@@ -180,7 +180,7 @@ public class KubernetesBrowseController
 		levels.add(new SubQueryDefImpl(KubernetesMessageKeys.NAMESPACE_LEVEL, null));
 		final Query query = new ViewImpl(KubernetesMessageKeys.KIND_LEVEL, null, null, null, null, levels, null);
 		
-		final RowSet cats = buildResourcesRowSet(query, apiResources, end - start);
+		final RowSet cats = buildResourcesRowSet(query, apiResources, true, end - start);
 		
 		final Map<String, TabItem<RowSet>> tabs = new LinkedHashMap<String, TabItem<RowSet>>();
 		tabs.put(KubernetesMessageKeys.KIND_TAB, new TabItem<RowSet>(cats, cats.getRows().size()));
@@ -192,7 +192,7 @@ public class KubernetesBrowseController
 		return (model);
 		}
 	
-	private RowSet buildResourcesRowSet(Query query, Map<String, Map<String, Map<String, KubernetesApiResource>>> apiResources, long time)
+	private RowSet buildResourcesRowSet(Query query, Map<String, Map<String, Map<String, KubernetesApiResource>>> apiResources, boolean namespaced, long time)
 		{
 		final List<ColumnDef> columns = new ArrayList<ColumnDef>(2);
 		columns.add(new ColumnDefImpl(KubernetesMessageKeys.ID, ColumnType.STRING, null, null, null, null));
@@ -207,7 +207,10 @@ public class KubernetesBrowseController
 			for (Map.Entry<String, Map<String, KubernetesApiResource>> ent2 : ent.getValue().entrySet())
 				{
 				for (Map.Entry<String, KubernetesApiResource> ent3 : ent2.getValue().entrySet())
-					rs.getRows().add(new DefaultResultRow(ent.getKey() + "/" + ent2.getKey() + "/" + ent3.getValue().getName(), ent3.getKey(), ent.getKey(), ent2.getKey()));
+					{
+					if (ent3.getValue().isNamespaced() == namespaced)
+						rs.getRows().add(new DefaultResultRow(ent.getKey() + "/" + ent2.getKey() + "/" + ent3.getValue().getName(), ent3.getKey(), ent.getKey(), ent2.getKey()));
+					}
 				}
 			}
 		
