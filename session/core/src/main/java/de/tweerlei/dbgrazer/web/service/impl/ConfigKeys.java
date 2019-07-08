@@ -93,9 +93,6 @@ public final class ConfigKeys
 	/** Columns for hexadecimal presentation of binary data */
 	public static final ConfigKey<Integer> HEX_COLUMN_LIMIT = ConfigKey.create(PACKAGE_NAME, "result.hexColumnLimit", Integer.class, 16);
 	
-	/** Line number pattern for formatted text results */
-	public static final ConfigKey<String> LINE_NUMBER_FORMAT = ConfigKey.create(PACKAGE_NAME, "result.lineNumberFormat", String.class, "[%5d] ");
-	
 	/** Fetch limit for dashboard queries */
 	public static final ConfigKey<Integer> DASHBOARD_ROWS = ConfigKey.create(PACKAGE_NAME, "result.dashboardRows", Integer.class, 10);
 	

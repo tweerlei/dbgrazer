@@ -77,7 +77,6 @@ public class TextTransformerServiceImpl implements TextTransformerService, Confi
 	@Override
 	public void configChanged()
 		{
-//		this.lineFormatter = new LineNumberFormatter(configService.get(ConfigKeys.LINE_NUMBER_FORMAT));
 		this.xmlFormatter = new EscapeXMLFormatter();
 		}
 	

@@ -18,6 +18,7 @@ package de.tweerlei.dbgrazer.plugins.json;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -58,29 +59,41 @@ public class JSONDataExtractor implements DataExtractor
 			if (o instanceof List)
 				{
 				final List<?> l = (List<?>) o;
+				final Map<String, ColumnType> columns = new LinkedHashMap<String, ColumnType>();
 				for (Object o2 : l)
 					{
 					if (o2 instanceof Map)
 						{
 						final Map<?, ?> m = (Map<?, ?>) o2;
 						
-						if (rs == null)
+						for (Map.Entry<?, ?> ent : m.entrySet())
 							{
-							final List<ColumnDef> cd = new ArrayList<ColumnDef>(m.size());
-							for (Map.Entry<?, ?> ent : m.entrySet())
-								{
-								if (ent.getValue() instanceof Number)
-									cd.add(new ColumnDefImpl(String.valueOf(ent.getKey()), ColumnType.INTEGER, null, null, null, null));
-								else
-									cd.add(new ColumnDefImpl(String.valueOf(ent.getKey()), ColumnType.STRING, null, null, null, null));
-								}
-							rs = new RowSetImpl(null, 0, cd);
+							final String name = String.valueOf(ent.getKey());
+							if (!columns.containsKey(name))
+								columns.put(name, ColumnType.forObject(ent.getValue()));
 							}
 						
-						final ResultRow row = new DefaultResultRow(rs.getColumns().size());
-						for (ColumnDef cd : rs.getColumns())
-							row.getValues().add(m.get(cd.getName()));
-						rs.getRows().add(row);
+						}
+					}
+				
+				if (!columns.isEmpty())
+					{
+					final List<ColumnDef> cols = new ArrayList<ColumnDef>(columns.size());
+					for (Map.Entry<String, ColumnType> ent : columns.entrySet())
+						cols.add(new ColumnDefImpl(ent.getKey(), ent.getValue(), null, null, null, null));
+					rs = new RowSetImpl(null, 0, cols);
+					
+					for (Object o2 : l)
+						{
+						if (o2 instanceof Map)
+							{
+							final Map<?, ?> m = (Map<?, ?>) o2;
+							
+							final ResultRow row = new DefaultResultRow(rs.getColumns().size());
+							for (ColumnDef cd : rs.getColumns())
+								row.getValues().add(m.get(cd.getName()));
+							rs.getRows().add(row);
+							}
 						}
 					}
 				}

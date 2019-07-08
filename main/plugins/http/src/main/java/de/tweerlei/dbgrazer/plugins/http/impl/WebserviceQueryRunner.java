@@ -125,8 +125,20 @@ public class WebserviceQueryRunner extends BaseQueryRunner
 		try	{
 			final HttpEntity request = parseEntity(buildFormQuery(query, params), null);
 			
+			final String getParams = new String(request.getRawContent(), request.getContentType().getParams().get(CHARSET_PARAM)).trim();
+			final String getURL;
+			if (getParams.startsWith("?"))
+				{
+				if (getParams.length() == 1)
+					getURL = url;
+				else
+					getURL = url + getParams;
+				}
+			else
+				getURL = url + "?" + getParams;
+			
 			final long start = timeService.getCurrentTime();
-			final HttpEntity response = httpClient.get(link, url + "?" + new String(request.getRawContent(), request.getContentType().getParams().get(CHARSET_PARAM)), request.getHeaders());
+			final HttpEntity response = httpClient.get(link, getURL, request.getHeaders());
 			final long end = timeService.getCurrentTime();
 			
 			res.getRowSets().put(BODY_TAB, createBodyRowSet(query, subQueryIndex, response.toString(), end - start, link));
@@ -213,7 +225,7 @@ public class WebserviceQueryRunner extends BaseQueryRunner
 			final StringBuilder sb = new StringBuilder();
 			boolean inBody = false;
 			// Split part into lines
-			for (String line : part.split("\n"))
+			for (String line : lines)
 				{
 				if (inBody)
 					sb.append(line).append("\n");

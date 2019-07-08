@@ -599,7 +599,7 @@ public class KafkaBrowseController
 		model.put("minOffset", minOffset);
 		model.put("maxOffset", maxOffset);
 		
-		if (minOffset != null)
+		if ((effectiveOffset != null) && (minOffset != null))
 			topicStateManager.setLastOffset(topic, partition, minOffset);
 		
 		if ((minOffset != null) && (offsets.getMinOffset() != null) && (minOffset > offsets.getMinOffset()))

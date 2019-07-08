@@ -61,22 +61,18 @@ public class KafkaApiServiceImpl implements KafkaApiService
 	{
 	private static class TopicMetadataHolder
 		{
-		private List<PartitionInfo> partitions;
+		private final List<PartitionInfo> partitions;
 		private Collection<AclBinding> acls;
 		private Map<ConfigResource, Config> configs;
 		
-		public TopicMetadataHolder()
+		public TopicMetadataHolder(List<PartitionInfo> partitions)
 			{
+			this.partitions = partitions;
 			}
 		
 		public List<PartitionInfo> getPartitions()
 			{
 			return partitions;
-			}
-		
-		public void setPartitions(List<PartitionInfo> partitions)
-			{
-			this.partitions = partitions;
 			}
 		
 		public Collection<AclBinding> getAcls()
@@ -105,11 +101,10 @@ public class KafkaApiServiceImpl implements KafkaApiService
 		private Collection<Node> nodes;
 		private Collection<AclBinding> acls;
 		private Map<ConfigResource, Config> configs;
-		private final Map<String, TopicMetadataHolder> topics;
+		private Map<String, TopicMetadataHolder> topics;
 
 		public KafkaMetadataHolder()
 			{
-			this.topics = new ConcurrentHashMap<String, TopicMetadataHolder>();
 			}
 
 		public Collection<Node> getNodes()
@@ -145,6 +140,11 @@ public class KafkaApiServiceImpl implements KafkaApiService
 		public Map<String, TopicMetadataHolder> getTopics()
 			{
 			return topics;
+			}
+		
+		public void setTopics(Map<String, TopicMetadataHolder> topics)
+			{
+			this.topics = topics;
 			}
 		}
 	
@@ -241,6 +241,23 @@ public class KafkaApiServiceImpl implements KafkaApiService
 		return (null);
 		}
 	
+	private void seek(Consumer<String, String> consumer, List<TopicPartition> partitions, long offset)
+		{
+		if (offset < 0)
+			{
+			for (Map.Entry<TopicPartition, Long> ent : consumer.endOffsets(partitions).entrySet())
+				{
+				if (ent.getValue() != null)
+					consumer.seek(ent.getKey(), Math.max(ent.getValue() + offset, 0));
+				}
+			}
+		else
+			{
+			for (TopicPartition tp : partitions)
+				consumer.seek(tp, offset);
+			}
+		}
+	
 	@Override
 	public List<ConsumerRecord<String, String>> fetchRecords(String c, String topic, Integer partition, Long startOffset, Long endOffset, String key)
 		{
@@ -249,9 +266,22 @@ public class KafkaApiServiceImpl implements KafkaApiService
 		if (partition != null)
 			{
 			final TopicPartition tp = new TopicPartition(topic, partition);
-			consumer.assign(Collections.singleton(tp));
+			final List<TopicPartition> partitions = new ArrayList<TopicPartition>(1);
+			partitions.add(tp);
+			consumer.assign(partitions);
+			
 			if (startOffset != null)
-				consumer.seek(tp, startOffset);
+				seek(consumer, partitions, startOffset);
+			}
+		else if (startOffset != null)
+			{
+			final List<PartitionInfo> pinfos = consumer.partitionsFor(topic);
+			final List<TopicPartition> partitions = new ArrayList<TopicPartition>(pinfos.size());
+			for (PartitionInfo pi : pinfos)
+				partitions.add(new TopicPartition(topic, pi.partition()));
+			consumer.assign(partitions);
+			
+			seek(consumer, partitions, startOffset);
 			}
 		else
 			consumer.subscribe(Collections.singleton(topic));
@@ -320,14 +350,47 @@ public class KafkaApiServiceImpl implements KafkaApiService
 		return (ret);
 		}
 	
-	private TopicMetadataHolder getTopicMetadataHolder(String c, String topic)
+	private Map<String, TopicMetadataHolder> getTopicMetadata(String c)
 		{
 		final KafkaMetadataHolder md = getKafkaMetadataHolder(c);
-		TopicMetadataHolder ret = md.getTopics().get(topic);
+		if (md.getTopics() == null)
+			{
+			try	{
+				final Map<String, TopicMetadataHolder> map = new ConcurrentHashMap<String, TopicMetadataHolder>();
+				final Map<String, List<PartitionInfo>> topics = clientService.getConsumer(c).listTopics();
+				for (Map.Entry<String, List<PartitionInfo>> ent : topics.entrySet())
+					{
+					final TopicMetadataHolder tmd = new TopicMetadataHolder(ent.getValue());
+					map.put(ent.getKey(), tmd);
+					}
+				md.setTopics(map);
+				}
+			catch (Exception e)
+				{
+				logger.log(Level.WARNING, "listTopics", e);
+				return (Collections.emptyMap());
+				}
+			}
+		return (md.getTopics());
+		}
+	
+	private TopicMetadataHolder getTopicMetadataHolder(String c, String topic)
+		{
+		final Map<String, TopicMetadataHolder> md = getTopicMetadata(c);
+		
+		TopicMetadataHolder ret = md.get(topic);
 		if (ret == null)
 			{
-			ret = new TopicMetadataHolder();
-			md.getTopics().put(topic, ret);
+			try	{
+				final List<PartitionInfo> partitions = clientService.getConsumer(c).partitionsFor(topic);
+				ret = new TopicMetadataHolder(partitions);
+				md.put(topic, ret);
+				}
+			catch (Exception e)
+				{
+				logger.log(Level.WARNING, "partitionsFor", e);
+				return (new TopicMetadataHolder(Collections.<PartitionInfo>emptyList()));
+				}
 			}
 		return (ret);
 		}
@@ -399,25 +462,10 @@ public class KafkaApiServiceImpl implements KafkaApiService
 		{
 		final Map<String, List<PartitionInfo>> ret = new TreeMap<String, List<PartitionInfo>>();
 		
-		final KafkaMetadataHolder md = getKafkaMetadataHolder(c);
-		if (!md.getTopics().isEmpty())
-			{
-			for (Map.Entry<String, TopicMetadataHolder> ent : md.getTopics().entrySet())
-				ret.put(ent.getKey(), ent.getValue().getPartitions());
-			return (ret);
-			}
-		
-		try	{
-			final Map<String, List<PartitionInfo>> topics = clientService.getConsumer(c).listTopics();
-			for (Map.Entry<String, List<PartitionInfo>> ent : topics.entrySet())
-				getTopicMetadataHolder(c, ent.getKey()).setPartitions(ent.getValue());
-			return (topics);
-			}
-		catch (Exception e)
-			{
-			logger.log(Level.WARNING, "getTopics", e);
-			return (Collections.emptyMap());
-			}
+		final Map<String, TopicMetadataHolder> topics = getTopicMetadata(c);
+		for (Map.Entry<String, TopicMetadataHolder> ent : topics.entrySet())
+			ret.put(ent.getKey(), ent.getValue().getPartitions());
+		return (ret);
 		}
 	
 	@Override
@@ -464,19 +512,7 @@ public class KafkaApiServiceImpl implements KafkaApiService
 	public List<PartitionInfo> getPartitions(String c, String topic)
 		{
 		final TopicMetadataHolder md = getTopicMetadataHolder(c, topic);
-		if (md.getPartitions() != null)
-			return (md.getPartitions());
-		
-		try	{
-			final List<PartitionInfo> partitions = clientService.getConsumer(c).partitionsFor(topic);
-			md.setPartitions(partitions);
-			return (partitions);
-			}
-		catch (Exception e)
-			{
-			logger.log(Level.WARNING, "getPartitions", e);
-			return (Collections.emptyList());
-			}
+		return (md.getPartitions());
 		}
 	
 	@Override

@@ -24,6 +24,7 @@ var Dialog = {
 	active: false,
 	closeEnabled: true,
 	onClose: null,
+	restoreFocus: null,
 	
 	create: function() {
 		if (!this.overlay) {
@@ -68,6 +69,12 @@ var Dialog = {
 		this.create();
 		this.dialogName.innerHTML = title || '&nbsp;';
 		this.dialogForm.innerHTML = content || '';
+		if (document.activeElement) {
+			this.restoreFocus = document.activeElement.id;
+			document.activeElement.blur();
+		} else {
+			this.restoreFocus = null;
+		}
 		this.overlay.show();
 		this.target.show();
 		this.onClose = cc;
@@ -142,6 +149,12 @@ var Dialog = {
 		if (this.active) {
 			if (document.activeElement) {
 				document.activeElement.blur();
+			}
+			if (this.restoreFocus) {
+				var f = $(this.restoreFocus);
+				if (f) {
+					f.focus();
+				}
 			}
 			this.target.hide();
 			this.overlay.hide();

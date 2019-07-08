@@ -16,6 +16,7 @@
 package de.tweerlei.dbgrazer.extension.kubernetes.impl;
 
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -296,7 +297,7 @@ public class KubernetesApiServiceImpl implements KubernetesApiService, ConfigLis
 			final Object list = api.listNamespacedCustomObject(group, version, namespace, kind, null, null, null, null);
 			for (V1Item item : extractList(list, api.getApiClient()).getItems())
 				{
-				final KubernetesApiObject name = getKubernetesApiObject(item.getMetadata());
+				final KubernetesApiObject name = getKubernetesApiObject(item.getMetadata(), null);
 				names.add(name);
 				}
 			}
@@ -319,9 +320,9 @@ public class KubernetesApiServiceImpl implements KubernetesApiService, ConfigLis
 		return (null);
 		}
 	
-	private KubernetesApiObject getKubernetesApiObject(V1ObjectMeta metadata)
+	private KubernetesApiObject getKubernetesApiObject(V1ObjectMeta metadata, Map<String, String> properties)
 		{
-		return (new KubernetesApiObject(metadata.getName(), metadata.getCreationTimestamp().toDate(), metadata.getLabels()));
+		return (new KubernetesApiObject(metadata.getName(), metadata.getCreationTimestamp().toDate(), metadata.getLabels(), properties));
 		}
 	
 	private Set<KubernetesApiObject> listCoreObjects(String c, String namespace, String kind)
@@ -334,62 +335,62 @@ public class KubernetesApiServiceImpl implements KubernetesApiService, ConfigLis
 				{
 				case ConfigMap:
 					for (V1ConfigMap n : api.listNamespacedConfigMap(namespace, null, null, null, null, null, null, null, null, null).getItems())
-						names.add(getKubernetesApiObject(n.getMetadata()));
+						names.add(getKubernetesApiObject(n.getMetadata(), null));
 					break;
 				
 				case Endpoints:
 					for (V1Endpoints n : api.listNamespacedEndpoints(namespace, null, null, null, null, null, null, null, null, null).getItems())
-						names.add(getKubernetesApiObject(n.getMetadata()));
+						names.add(getKubernetesApiObject(n.getMetadata(), null));
 					break;
 				
 				case Event:
 					for (V1Event n : api.listNamespacedEvent(namespace, null, null, null, null, null, null, null, null, null).getItems())
-						names.add(getKubernetesApiObject(n.getMetadata()));
+						names.add(getKubernetesApiObject(n.getMetadata(), getEventProperties(n)));
 					break;
 				
 				case Pod:
 					for (V1Pod n : api.listNamespacedPod(namespace, null, null, null, null, null, null, null, null, null).getItems())
-						names.add(getKubernetesApiObject(n.getMetadata()));
+						names.add(getKubernetesApiObject(n.getMetadata(), getPodProperties(n)));
 					break;
 				
 				case Secret:
 					for (V1Secret n : api.listNamespacedSecret(namespace, null, null, null, null, null, null, null, null, null).getItems())
-						names.add(getKubernetesApiObject(n.getMetadata()));
+						names.add(getKubernetesApiObject(n.getMetadata(), null));
 					break;
 				
 				case Service:
 					for (V1Service n : api.listNamespacedService(namespace, null, null, null, null, null, null, null, null, null).getItems())
-						names.add(getKubernetesApiObject(n.getMetadata()));
+						names.add(getKubernetesApiObject(n.getMetadata(), null));
 					break;
 				
 				case LimitRange:
 					for (V1LimitRange n : api.listNamespacedLimitRange(namespace, null, null, null, null, null, null, null, null, null).getItems())
-						names.add(getKubernetesApiObject(n.getMetadata()));
+						names.add(getKubernetesApiObject(n.getMetadata(), null));
 					break;
 				
 				case PodTemplate:
 					for (V1PodTemplate n : api.listNamespacedPodTemplate(namespace, null, null, null, null, null, null, null, null, null).getItems())
-						names.add(getKubernetesApiObject(n.getMetadata()));
+						names.add(getKubernetesApiObject(n.getMetadata(), null));
 					break;
 				
 				case ReplicationController:
 					for (V1ReplicationController n : api.listNamespacedReplicationController(namespace, null, null, null, null, null, null, null, null, null).getItems())
-						names.add(getKubernetesApiObject(n.getMetadata()));
+						names.add(getKubernetesApiObject(n.getMetadata(), null));
 					break;
 				
 				case ResourceQuota:
 					for (V1ResourceQuota n : api.listNamespacedResourceQuota(namespace, null, null, null, null, null, null, null, null, null).getItems())
-						names.add(getKubernetesApiObject(n.getMetadata()));
+						names.add(getKubernetesApiObject(n.getMetadata(), null));
 					break;
 				
 				case ServiceAccount:
 					for (V1ServiceAccount n : api.listNamespacedServiceAccount(namespace, null, null, null, null, null, null, null, null, null).getItems())
-						names.add(getKubernetesApiObject(n.getMetadata()));
+						names.add(getKubernetesApiObject(n.getMetadata(), null));
 					break;
 				
 				case PersistentVolumeClaim:
 					for (V1PersistentVolumeClaim n : api.listNamespacedPersistentVolumeClaim(namespace, null, null, null, null, null, null, null, null, null).getItems())
-						names.add(getKubernetesApiObject(n.getMetadata()));
+						names.add(getKubernetesApiObject(n.getMetadata(), null));
 					break;
 				
 				case Other:
@@ -402,6 +403,27 @@ public class KubernetesApiServiceImpl implements KubernetesApiService, ConfigLis
 			}
 		
 		return (names);
+		}
+	
+	private Map<String, String> getPodProperties(V1Pod pod)
+		{
+		final Map<String, String> ret = new LinkedHashMap<String, String>();
+		
+		ret.put("Phase", pod.getStatus().getPhase());
+		ret.put("StartTime", pod.getStatus().getStartTime().toString());
+		ret.put("PodIP", pod.getStatus().getPodIP());
+		ret.put("HostIP", pod.getStatus().getHostIP());
+		
+		return (ret);
+		}
+	
+	private Map<String, String> getEventProperties(V1Event event)
+		{
+		final Map<String, String> ret = new LinkedHashMap<String, String>();
+		
+		ret.put("Message", event.getMessage());
+		
+		return (ret);
 		}
 	
 	@Override

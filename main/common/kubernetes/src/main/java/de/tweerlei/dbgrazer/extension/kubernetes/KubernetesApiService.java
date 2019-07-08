@@ -122,18 +122,21 @@ public interface KubernetesApiService
 		private final String name;
 		private final Date creationTimestamp;
 		private Map<String, String> labels;
+		private Map<String, String> properties;
 		
 		/**
 		 * Constructor
 		 * @param name Name
 		 * @param creationTimestamp Creation timestamp
 		 * @param labels Labels
+		 * @param properties Additional properties
 		 */
-		public KubernetesApiObject(String name, Date creationTimestamp, Map<String, String> labels)
+		public KubernetesApiObject(String name, Date creationTimestamp, Map<String, String> labels, Map<String, String> properties)
 			{
 			this.name = name;
 			this.creationTimestamp = creationTimestamp;
-			this.labels = Collections.unmodifiableMap(labels);
+			this.labels = (labels == null) ? Collections.<String, String>emptyMap() : Collections.unmodifiableMap(labels);
+			this.properties = (properties == null) ? Collections.<String, String>emptyMap() : Collections.unmodifiableMap(properties);
 			}
 		
 		/**
@@ -161,6 +164,15 @@ public interface KubernetesApiService
 		public Map<String, String> getLabels()
 			{
 			return labels;
+			}
+		
+		/**
+		 * Get the labels
+		 * @return the labels
+		 */
+		public Map<String, String> getProperties()
+			{
+			return properties;
 			}
 		
 		@Override

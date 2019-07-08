@@ -120,6 +120,12 @@ public class KubernetesBrowseController
 		final long end = timeService.getCurrentTime();
 		
 		final Map<String, TabItem<RowSet>> results = new LinkedHashMap<String, TabItem<RowSet>>();
+		final long start2 = timeService.getCurrentTime();
+		final Map<String, Map<String, Map<String, KubernetesApiResource>>> apiResources = clientService.getApiResources(connectionSettings.getLinkName());
+		final long end2 = timeService.getCurrentTime();
+		final Query query2 = new ViewImpl(KubernetesMessageKeys.KIND_LEVEL, null, null, null, null, null, null);
+		final RowSet rs = buildResourcesRowSet(query2, apiResources, false, end2 - start2);
+		results.put(KubernetesMessageKeys.KIND_TAB, new TabItem<RowSet>(rs, rs.getRows().size()));
 		model.put("results", results);
 		
 		final List<SubQueryDef> levels = new ArrayList<SubQueryDef>();
@@ -199,7 +205,7 @@ public class KubernetesBrowseController
 		columns.add(new ColumnDefImpl(KubernetesMessageKeys.KIND, ColumnType.STRING, null, null, null, null));
 		columns.add(new ColumnDefImpl(KubernetesMessageKeys.API_GROUP, ColumnType.STRING, null, null, null, null));
 		columns.add(new ColumnDefImpl(KubernetesMessageKeys.API_VERSION, ColumnType.STRING, null, null, null, null));
-		final RowSetImpl rs = new RowSetImpl(query, RowSetConstants.INDEX_MULTILEVEL, columns);
+		final RowSetImpl rs = new RowSetImpl(query, namespaced ? RowSetConstants.INDEX_MULTILEVEL : 0, columns);
 		rs.setQueryTime(time);
 		
 		for (Map.Entry<String, Map<String, Map<String, KubernetesApiResource>>> ent : apiResources.entrySet())
@@ -260,6 +266,12 @@ public class KubernetesBrowseController
 		final Set<KubernetesApiObject> apiObjects = clientService.listApiObjects(connectionSettings.getLinkName(), namespace, parts[0], parts[1], parts[2]);
 		final long end = timeService.getCurrentTime();
 		
+		final Map<String, TabItem<RowSet>> results = new LinkedHashMap<String, TabItem<RowSet>>();
+		final Query query2 = new ViewImpl(KubernetesMessageKeys.OBJECT_LEVEL, null, null, null, null, null, null);
+		final RowSet rs = buildDetailsRowSet(query2, apiObjects, end - start);
+		results.put(KubernetesMessageKeys.KIND_TAB, new TabItem<RowSet>(rs, rs.getRows().size()));
+		model.put("results", results);
+		
 		final List<SubQueryDef> levels = new ArrayList<SubQueryDef>();
 		levels.add(new SubQueryDefImpl(KubernetesMessageKeys.NAMESPACE_LEVEL, null));
 		levels.add(new SubQueryDefImpl(KubernetesMessageKeys.KIND_LEVEL, null));
@@ -283,17 +295,47 @@ public class KubernetesBrowseController
 		final List<ColumnDef> columns = new ArrayList<ColumnDef>(2);
 		columns.add(new ColumnDefImpl(KubernetesMessageKeys.ID, ColumnType.STRING, null, null, null, null));
 		columns.add(new ColumnDefImpl(KubernetesMessageKeys.OBJECT, ColumnType.STRING, null, null, null, null));
-		columns.add(new ColumnDefImpl(KubernetesMessageKeys.TIMESTAMP, ColumnType.DATE, null, null, null, null));
 		final RowSetImpl rs = new RowSetImpl(query, RowSetConstants.INDEX_MULTILEVEL, columns);
 		rs.setQueryTime(time);
 		
 		for (KubernetesApiObject n : values)
-			rs.getRows().add(new DefaultResultRow(n.getName(), n.getName(), n.getCreationTimestamp()));
+			rs.getRows().add(new DefaultResultRow(n.getName(), n.getName()));
 		
 		// Format dates
 		resultTransformer.translateRowSet(rs, factory.getWebFormatter());
 		
 		rs.getAttributes().put(RowSetConstants.ATTR_MORE_LEVELS, false);
+		return (rs);
+		}
+	
+	private RowSet buildDetailsRowSet(Query query, Set<KubernetesApiObject> values, long time)
+		{
+		final List<ColumnDef> columns = new ArrayList<ColumnDef>(2);
+		columns.add(new ColumnDefImpl(KubernetesMessageKeys.OBJECT, ColumnType.STRING, null, null, null, null));
+		columns.add(new ColumnDefImpl(KubernetesMessageKeys.TIMESTAMP, ColumnType.DATE, null, null, null, null));
+		columns.add(new ColumnDefImpl(KubernetesMessageKeys.LABELS, ColumnType.STRING, null, null, null, null));
+		if (!values.isEmpty())
+			{
+			for (String key : values.iterator().next().getProperties().keySet())
+				columns.add(new ColumnDefImpl(key, ColumnType.STRING, null, null, null, null));
+			}
+		final RowSetImpl rs = new RowSetImpl(query, 0, columns);
+		rs.setQueryTime(time);
+		
+		for (KubernetesApiObject n : values)
+			{
+			final DefaultResultRow row = new DefaultResultRow(3 + n.getProperties().size());
+			row.getValues().add(n.getName());
+			row.getValues().add(n.getCreationTimestamp());
+			row.getValues().add(n.getLabels().toString());
+			for (String v : n.getProperties().values())
+				row.getValues().add(v);
+			rs.getRows().add(row);
+			}
+		
+		// Format dates
+		resultTransformer.translateRowSet(rs, factory.getWebFormatter());
+		
 		return (rs);
 		}
 	
