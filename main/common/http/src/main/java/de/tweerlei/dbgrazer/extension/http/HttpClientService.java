@@ -17,6 +17,7 @@ package de.tweerlei.dbgrazer.extension.http;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import de.tweerlei.spring.http.HttpEntity;
 
@@ -31,10 +32,11 @@ public interface HttpClientService
 	 * Perform a GET request
 	 * @param c Link name
 	 * @param endpoint Endpoint path
+	 * @param headers Additional headers (may be null)
 	 * @return Response entity
 	 * @throws IOException on error
 	 */
-	public HttpEntity get(String c, String endpoint) throws IOException;
+	public HttpEntity get(String c, String endpoint, Map<String, String> headers) throws IOException;
 	
 	/**
 	 * Perform a GET request for an external URL that might not be relative to any link's URL.

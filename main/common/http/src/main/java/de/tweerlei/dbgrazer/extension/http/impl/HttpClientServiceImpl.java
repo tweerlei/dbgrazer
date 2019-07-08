@@ -143,13 +143,13 @@ public class HttpClientServiceImpl implements HttpClientService, ConfigListener,
 		}
 	
 	@Override
-	public HttpEntity get(String c, String endpoint) throws IOException
+	public HttpEntity get(String c, String endpoint, Map<String, String> headers) throws IOException
 		{
 		final LinkDef def = linkService.getLink(c, null);
 		if (def == null)
 			throw new IOException("Unknown link " + c);
 		
-		return (getClient(c).get(def.getUrl() + endpoint, def.getUsername(), def.getPassword()));
+		return (getClient(c).get(def.getUrl() + endpoint, headers, def.getUsername(), def.getPassword()));
 		}
 	
 	@Override
@@ -158,10 +158,10 @@ public class HttpClientServiceImpl implements HttpClientService, ConfigListener,
 		for (LinkDef def : linkService.findLinksByType(HttpConstants.LINKTYPE_WEBSERVICE))
 			{
 			if (url.startsWith(def.getUrl()))
-				return (getClient(def.getName()).get(url, def.getUsername(), def.getPassword()));
+				return (getClient(def.getName()).get(url, null, def.getUsername(), def.getPassword()));
 			}
 		
-		return (getClient(configService.get(ConfigKeys.HTTP_ANON_LINK)).get(url, null, null));
+		return (getClient(configService.get(ConfigKeys.HTTP_ANON_LINK)).get(url, null, null, null));
 		}
 	
 	@Override

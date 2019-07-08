@@ -100,10 +100,11 @@ public class URLConnectionHttpClient implements HttpClient
 		{
 		}
 	
-	public HttpEntity get(String url, String username, String password) throws IOException
+	public HttpEntity get(String url, Map<String, String> headers, String username, String password) throws IOException
 		{
 		final URLConnection c = getConnection(url);
 		
+		applyHeaders(c, headers);
 		authenticate(c, username, password);
 		
 		c.connect();
@@ -123,12 +124,7 @@ public class URLConnectionHttpClient implements HttpClient
 			ht.setFixedLengthStreamingMode((int) request.getContentLength());
 			}
 		
-		for (Map.Entry<String, String> ent : request.getHeaders().entrySet())
-			{
-			// Content-Length is calculated by URLConnection
-			if (!HttpHeaders.CONTENT_LENGTH.equals(ent.getKey()))
-				c.setRequestProperty(ent.getKey(), ent.getValue());
-			}
+		applyHeaders(c, request.getHeaders());
 		authenticate(c, username, password);
 		
 		c.connect();
@@ -163,6 +159,19 @@ public class URLConnectionHttpClient implements HttpClient
 			ret.setReadTimeout(readTimeout);
 		
 		return (ret);
+		}
+	
+	private void applyHeaders(URLConnection c, Map<String, String> headers)
+		{
+		if (headers != null)
+			{
+			for (Map.Entry<String, String> ent : headers.entrySet())
+				{
+				// Content-Length is calculated by URLConnection
+				if (!HttpHeaders.CONTENT_LENGTH.equals(ent.getKey()))
+					c.setRequestProperty(ent.getKey(), ent.getValue());
+				}
+			}
 		}
 	
 	private void authenticate(URLConnection c, String username, String password) throws IOException

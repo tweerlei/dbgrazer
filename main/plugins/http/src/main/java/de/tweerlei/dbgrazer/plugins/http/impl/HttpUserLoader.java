@@ -117,7 +117,7 @@ public class HttpUserLoader implements UserAuthenticator, ConfigListener
 				pattern = Pattern.compile(pat);
 			final String request = url.replace("%username%", username).replace("%password%", password);
 			
-			final HttpEntity response = httpClient.get(link, request);
+			final HttpEntity response = httpClient.get(link, request, null);
 			
 			if (!response.isSuccessful())
 				{

@@ -17,6 +17,7 @@ package de.tweerlei.spring.http;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Perform HTTP requests
@@ -59,12 +60,13 @@ public interface HttpClient
 	/**
 	 * Perform a GET request
 	 * @param url URL
+	 * @param headers Additional headers (may be null)
 	 * @param username Username
 	 * @param password Password
 	 * @return Response entity
 	 * @throws IOException on error
 	 */
-	public HttpEntity get(String url, String username, String password) throws IOException;
+	public HttpEntity get(String url, Map<String, String> headers, String username, String password) throws IOException;
 	
 	/**
 	 * Perform a POST request

@@ -123,10 +123,10 @@ public class WebserviceQueryRunner extends BaseQueryRunner
 	private void performGET(Result res, String link, String url, Query query, int subQueryIndex, List<Object> params) throws PerformQueryException
 		{
 		try	{
-			final String q = buildFormQuery(query, params);
+			final HttpEntity request = parseEntity(buildFormQuery(query, params), null);
 			
 			final long start = timeService.getCurrentTime();
-			final HttpEntity response = httpClient.get(link, url + "?" + q);
+			final HttpEntity response = httpClient.get(link, url + "?" + new String(request.getRawContent(), request.getContentType().getParams().get(CHARSET_PARAM)), request.getHeaders());
 			final long end = timeService.getCurrentTime();
 			
 			res.getRowSets().put(BODY_TAB, createBodyRowSet(query, subQueryIndex, response.toString(), end - start, link));
@@ -142,12 +142,12 @@ public class WebserviceQueryRunner extends BaseQueryRunner
 	private void performPOST(Result res, String link, String url, Query query, int subQueryIndex, List<Object> params) throws PerformQueryException
 		{
 		try	{
-			final MimeType mimeType = getContentType(query.getAttributes().get(QueryTypeAttributes.ATTR_CONTENT_TYPE), DEFAULT_CONTENT_TYPE);
-			final StringHttpEntity request;
-			if (mimeType.getMediaType().equals(FORM_CONTENT_TYPE))
-				request = new StringHttpEntity(mimeType, buildFormQuery(query, params));
+			final String mimeType = query.getAttributes().get(QueryTypeAttributes.ATTR_CONTENT_TYPE);
+			final HttpEntity request;
+			if (FORM_CONTENT_TYPE.equals(mimeType))
+				request = parseEntity(buildFormQuery(query, params), mimeType);
 			else
-				request = new StringHttpEntity(mimeType, buildXMLQuery(query, params));
+				request = parseEntity(buildXMLQuery(query, params), mimeType);
 			
 			final long start = timeService.getCurrentTime();
 			final HttpEntity response = httpClient.post(link, url, request);
@@ -193,16 +193,32 @@ public class WebserviceQueryRunner extends BaseQueryRunner
 			if (part.length() == 0)
 				continue;
 			
-			final Map<String, String> headers = new HashMap<String, String>();
+			final HttpEntity mimePart = parseEntity(part, null);
+			
+			ret.add(mimePart);
+			}
+		
+		return (ret);
+		}
+	
+	private HttpEntity parseEntity(String part, String fallbackContentType) throws IOException
+		{
+		final Map<String, String> headers = new HashMap<String, String>();
+		final String[] lines = part.split("\n");
+		final String body;
+		if (lines.length == 1)
+			body = part;
+		else
+			{
 			final StringBuilder sb = new StringBuilder();
-			boolean body = false;
+			boolean inBody = false;
 			// Split part into lines
 			for (String line : part.split("\n"))
 				{
-				if (body)
+				if (inBody)
 					sb.append(line).append("\n");
 				else if (line.length() == 0)
-					body = true;
+					inBody = true;
 				else
 					{
 					// Split header
@@ -211,16 +227,15 @@ public class WebserviceQueryRunner extends BaseQueryRunner
 						headers.put(header[0].trim(), header[1].trim());
 					}
 				}
-			
-			final String ct = headers.get(HttpHeaders.CONTENT_TYPE);
-			final StringHttpEntity mimePart = new StringHttpEntity(getContentType(ct, DEFAULT_CONTENT_TYPE), sb.toString());
-			for (Map.Entry<String, String> ent : headers.entrySet())
-				mimePart.setHeader(ent.getKey(), ent.getValue());
-			
-			ret.add(mimePart);
+			body = sb.toString();
 			}
 		
-		return (ret);
+		final String ct = headers.get(HttpHeaders.CONTENT_TYPE);
+		final StringHttpEntity mimePart = new StringHttpEntity(getContentType(ct, fallbackContentType, DEFAULT_CONTENT_TYPE), body);
+		for (Map.Entry<String, String> ent : headers.entrySet())
+			mimePart.setHeader(ent.getKey(), ent.getValue());
+		
+		return (mimePart);
 		}
 	
 	private void performSOAP(Result res, String link, String url, Query query, int subQueryIndex, List<Object> params) throws PerformQueryException
@@ -314,21 +329,22 @@ public class WebserviceQueryRunner extends BaseQueryRunner
 		return (rs);
 		}
 	
-	private MimeType getContentType(String contentType, String defaultType)
+	private MimeType getContentType(String... contentTypes)
 		{
-		MimeTypeBuilder mimeType;
-		
-		try	{
-			mimeType = MimeTypeBuilder.parse(contentType);
-			}
-		catch (RuntimeException e)
+		for (String contentType : contentTypes)
 			{
-			mimeType = MimeTypeBuilder.parse(defaultType);
+			try	{
+				final MimeTypeBuilder mimeType = MimeTypeBuilder.parse(contentType);
+				if (mimeType.getParam(CHARSET_PARAM) == null)
+					mimeType.setParam(CHARSET_PARAM, DEFAULT_CHARSET);
+				return (mimeType);
+				}
+			catch (RuntimeException e)
+				{
+				// continue
+				}
 			}
 		
-		if (mimeType.getParam(CHARSET_PARAM) == null)
-			mimeType.setParam(CHARSET_PARAM, DEFAULT_CHARSET);
-		
-		return (mimeType);
+		throw new RuntimeException("No content type could be parsed");
 		}
 	}
