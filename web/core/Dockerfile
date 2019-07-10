@@ -43,4 +43,4 @@ COPY examples/*.properties /root/.dbgrazer/
 COPY examples/themes/*.properties /root/.dbgrazer/themes/
 
 # Set Tomcat options
-ENV CATALINA_OPTS -Xmx512m -XX:-OmitStackTraceInFastThrow
+ENV CATALINA_OPTS -Xmx512m -XX:-OmitStackTraceInFastThrow -Duser.language=de -Duser.country=DE -Duser.timezone=Europe/Berlin

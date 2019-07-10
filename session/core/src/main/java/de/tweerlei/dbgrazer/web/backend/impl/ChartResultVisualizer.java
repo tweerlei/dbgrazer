@@ -92,6 +92,14 @@ public class ChartResultVisualizer extends NamedBase implements Visualizer
 	/** Index of the column containing the range */
 	private static final int CHART_INTERVAL_RANGE_INDEX = 2;
 	
+	// Intervals in milliseconds
+	//                                   days   hrs  mins  secs  millis
+	private static final long ONE_YEAR = 365L * 24L * 60L * 60L * 1000L;
+	private static final long ONE_MONTH = 28L * 24L * 60L * 60L * 1000L;
+	private static final long ONE_DAY =         24L * 60L * 60L * 1000L;
+	private static final long ONE_HOUR =              60L * 60L * 1000L;
+	private static final long ONE_MINUTE =                  60L * 1000L;
+	
 	private final ChartBuilder chartBuilder;
 	private final ChartService chartService;
 	private final ChartStyle chartStyle;
@@ -178,11 +186,11 @@ public class ChartResultVisualizer extends NamedBase implements Visualizer
 				{
 				case OPTION_CODE_CONTINUOUS:
 				case OPTION_CODE_XYZ:
+				case OPTION_CODE_TIME:
 					for (ChartScaling t : chartBuilder.getChartScalings())
 						ret.add(t.getName());
 					break;
 				case OPTION_CODE_CATEGORY:
-				case OPTION_CODE_TIME:
 					for (ChartScaling t : chartBuilder.getChartScalings())
 						{
 						if (!t.isDomainAxisScaled())
@@ -220,10 +228,23 @@ public class ChartResultVisualizer extends NamedBase implements Visualizer
 			}
 		
 		final ColumnType domain = rs.getColumns().get(CHART_DOMAIN_INDEX).getType();
-		final ColumnType range = rs.getColumns().get(CHART_RANGE_INDEX).getType();
-		
 		final String xLabel = rs.getColumns().get(CHART_DOMAIN_INDEX).getName();
+		
+		final ColumnType range = rs.getColumns().get(CHART_RANGE_INDEX).getType();
 		final String yLabel = rs.getColumns().get(CHART_RANGE_INDEX).getName();
+		
+		final ColumnType intervalRange;
+		final String zLabel;
+		if (rs.getColumns().size() >= CHART_INTERVAL_COLUMNS)
+			{
+			intervalRange = rs.getColumns().get(CHART_INTERVAL_RANGE_INDEX).getType();
+			zLabel = rs.getColumns().get(CHART_INTERVAL_RANGE_INDEX).getName();
+			}
+		else
+			{
+			intervalRange = null;
+			zLabel = null;
+			}
 		
 		final ChartType type = getChartType(options);
 		final ChartScaling scaling = getChartScaling(options);
@@ -239,15 +260,35 @@ public class ChartResultVisualizer extends NamedBase implements Visualizer
 				break;
 			case INTEGER:
 				if (range == ColumnType.INTEGER)
-					return buildNumberChart(r, true, true, name, subtitle, xLabel, yLabel, type, scaling, rowLink);
+					{
+					if ((intervalRange == ColumnType.INTEGER) || (intervalRange == ColumnType.FLOAT))
+						return buildNumberZChart(r, true, true, name, subtitle, xLabel, yLabel, type, scaling, rowLink);
+					else
+						return buildNumberChart(r, true, true, name, subtitle, xLabel, yLabel, type, scaling, rowLink);
+					}
 				else if (range == ColumnType.FLOAT)
-					return buildNumberChart(r, true, false, name, subtitle, xLabel, yLabel, type, scaling, rowLink);
+					{
+					if ((intervalRange == ColumnType.INTEGER) || (intervalRange == ColumnType.FLOAT))
+						return buildNumberZChart(r, true, false, name, subtitle, xLabel, yLabel, type, scaling, rowLink);
+					else
+						return buildNumberChart(r, true, false, name, subtitle, xLabel, yLabel, type, scaling, rowLink);
+					}
 				break;
 			case FLOAT:
 				if (range == ColumnType.INTEGER)
-					return buildNumberChart(r, false, true, name, subtitle, xLabel, yLabel, type, scaling, rowLink);
+					{
+					if ((intervalRange == ColumnType.INTEGER) || (intervalRange == ColumnType.FLOAT))
+						return buildNumberZChart(r, false, true, name, subtitle, xLabel, yLabel, type, scaling, rowLink);
+					else
+						return buildNumberChart(r, false, true, name, subtitle, xLabel, yLabel, type, scaling, rowLink);
+					}
 				else if (range == ColumnType.FLOAT)
-					return buildNumberChart(r, false, false, name, subtitle, xLabel, yLabel, type, scaling, rowLink);
+					{
+					if ((intervalRange == ColumnType.INTEGER) || (intervalRange == ColumnType.FLOAT))
+						return buildNumberZChart(r, false, false, name, subtitle, xLabel, yLabel, type, scaling, rowLink);
+					else
+						return buildNumberChart(r, false, false, name, subtitle, xLabel, yLabel, type, scaling, rowLink);
+					}
 				break;
 			case DATE:
 				if (range == ColumnType.INTEGER)
@@ -255,7 +296,14 @@ public class ChartResultVisualizer extends NamedBase implements Visualizer
 				else if (range == ColumnType.FLOAT)
 					return buildTimeChart(r, fmt, false, name, subtitle, xLabel, yLabel, type, scaling, rowLink);
 				else if (range == ColumnType.DATE)
-					return buildIntervalChart(r, name, subtitle, xLabel, yLabel, type, scaling, rowLink);
+					{
+					if (intervalRange == ColumnType.INTEGER)
+						return buildTimerangeChart(r, true, name, subtitle, xLabel, zLabel, type, scaling, rowLink);
+					else if (intervalRange == ColumnType.FLOAT)
+						return buildTimerangeChart(r, false, name, subtitle, xLabel, zLabel, type, scaling, rowLink);
+					else
+						return buildTimeSeriesChart(r, false, name, subtitle, xLabel, yLabel, type, scaling, rowLink);
+					}
 				break;
 			default:
 				break;
@@ -289,59 +337,41 @@ public class ChartResultVisualizer extends NamedBase implements Visualizer
 	
 	private Visualization buildNumberChart(Result r, boolean xDiscrete, boolean yDiscrete, String name, String subtitle, String xLabel, String yLabel, ChartType type, ChartScaling scaling, String rowLink)
 		{
-		final RowSet rs = getFirstFilledRowSet(r);
+		final List<ChartDataRow<Number, Number>> rows = extractRows(Number.class, r);
 		
-		if (rs.getColumns().size() >= CHART_INTERVAL_COLUMNS)
-			{
-			final List<ChartDataRow<Pair<Number, Number>, Number>> rows = extractZRows(Number.class, r, Integer.valueOf(0));
-			
-			return (new Visualization(r.getQuery().getType().getName(), name, OPTION_CODE_XYZ,
-					chartBuilder.buildZChart(name, rows, type, scaling, chartStyle, r.getQuery().getName(), subtitle,
-					yLabel, yDiscrete, xLabel, xDiscrete, rowLink)));
-			}
-		else
-			{
-			final List<ChartDataRow<Number, Number>> rows = extractRows(Number.class, r);
-			
-			return (new Visualization(r.getQuery().getType().getName(), name, OPTION_CODE_CONTINUOUS,
-					chartBuilder.buildNumberChart(name, rows, type, scaling, chartStyle, r.getQuery().getName(), subtitle,
-					yLabel, yDiscrete, xLabel, xDiscrete, rowLink)));
-			}
+		return (new Visualization(r.getQuery().getType().getName(), name, OPTION_CODE_CONTINUOUS,
+				chartBuilder.buildNumberChart(name, rows, type, scaling, chartStyle, r.getQuery().getName(), subtitle,
+						yLabel, yDiscrete, xLabel, xDiscrete, rowLink)));
+		}
+	
+	private Visualization buildNumberZChart(Result r, boolean xDiscrete, boolean yDiscrete, String name, String subtitle, String xLabel, String yLabel, ChartType type, ChartScaling scaling, String rowLink)
+		{
+		final List<ChartDataRow<Pair<Number, Number>, Number>> rows = extractZRows(Number.class, r, Integer.valueOf(0));
+		
+		return (new Visualization(r.getQuery().getType().getName(), name, OPTION_CODE_XYZ,
+				chartBuilder.buildZChart(name, rows, type, scaling, chartStyle, r.getQuery().getName(), subtitle,
+						yLabel, yDiscrete, xLabel, xDiscrete, rowLink)));
 		}
 	
 	private Visualization buildTimeChart(Result r, DataFormatter fmt, boolean discrete, String name, String subtitle, String xLabel, String yLabel, ChartType type, ChartScaling scaling, String rowLink)
 		{
 		final List<ChartDataRow<Date, Number>> rows = extractRows(Date.class, r);
 		
-		// If no date value has a time component, create a timerange chart
-		final List<ChartDataRow<Pair<Date, Date>, Number>> irows = convertToIntervalRows(rows, fmt);
-		if (irows != null)
+		if (scaling.isDomainAxisScaled())
 			{
-			return (new Visualization(r.getQuery().getType().getName(), name, OPTION_CODE_TIME,
-					chartBuilder.buildTimerangeChart(name, irows, type, scaling, chartStyle, r.getQuery().getName(), subtitle,
-					yLabel, discrete, xLabel, rowLink)));
+			// If no date value has a time component, create a timerange chart
+			final List<ChartDataRow<Pair<Date, Date>, Number>> irows = convertToIntervalRows(rows, fmt);
+			if (irows != null)
+				{
+				return (new Visualization(r.getQuery().getType().getName(), name, OPTION_CODE_TIME,
+						chartBuilder.buildTimerangeChart(name, irows, type, scaling, chartStyle, r.getQuery().getName(), subtitle,
+								yLabel, discrete, xLabel, rowLink)));
+				}
 			}
 		
 		return (new Visualization(r.getQuery().getType().getName(), name, OPTION_CODE_TIME,
 				chartBuilder.buildTimeChart(name, rows, type, scaling, chartStyle, r.getQuery().getName(), subtitle,
-				yLabel, discrete, xLabel, rowLink)));
-		}
-	
-	private Visualization buildIntervalChart(Result r, String name, String subtitle, String xLabel, String yLabel, ChartType type, ChartScaling scaling, String rowLink)
-		{
-		final RowSet rs = getFirstFilledRowSet(r);
-		
-		if (rs.getColumns().size() >= CHART_INTERVAL_COLUMNS)
-			{
-			final ColumnType range2 = rs.getColumns().get(CHART_INTERVAL_RANGE_INDEX).getType();
-			final String yLabel2 = rs.getColumns().get(CHART_INTERVAL_RANGE_INDEX).getName();
-			if (range2 == ColumnType.INTEGER)
-				return buildTimerangeChart(r, true, name, subtitle, xLabel, yLabel2, type, scaling, rowLink);
-			else if (range2 == ColumnType.FLOAT)
-				return buildTimerangeChart(r, false, name, subtitle, xLabel, yLabel2, type, scaling, rowLink);
-			}
-		
-		return buildTimeSeriesChart(r, false, name, subtitle, xLabel, yLabel, type, scaling, rowLink);
+						yLabel, discrete, xLabel, rowLink)));
 		}
 	
 	private Visualization buildCategoryChart(Result r, boolean discrete, String name, String subtitle, String xLabel, String yLabel, ChartType type, ChartScaling scaling, String rowLink)
@@ -350,7 +380,7 @@ public class ChartResultVisualizer extends NamedBase implements Visualizer
 		
 		return (new Visualization(r.getQuery().getType().getName(), name, OPTION_CODE_CATEGORY,
 				chartBuilder.buildCategoryChart(name, rows, type, scaling, chartStyle, r.getQuery().getName(), subtitle,
-				yLabel, discrete, xLabel, rowLink)));
+						yLabel, discrete, xLabel, rowLink)));
 		}
 	
 	private Visualization buildTimeSeriesChart(Result r, boolean discrete, String name, String subtitle, String xLabel, String yLabel, ChartType type, ChartScaling scaling, String rowLink)
@@ -359,7 +389,7 @@ public class ChartResultVisualizer extends NamedBase implements Visualizer
 		
 		return (new Visualization(r.getQuery().getType().getName(), name, OPTION_CODE_GANTT,
 				chartBuilder.buildTimeSeriesChart(name, rows, type, scaling, chartStyle, r.getQuery().getName(), subtitle,
-				yLabel, discrete, xLabel, rowLink)));
+						yLabel, discrete, xLabel, rowLink)));
 		}
 	
 	private Visualization buildTimerangeChart(Result r, boolean discrete, String name, String subtitle, String xLabel, String yLabel, ChartType type, ChartScaling scaling, String rowLink)
@@ -368,7 +398,7 @@ public class ChartResultVisualizer extends NamedBase implements Visualizer
 		
 		return (new Visualization(r.getQuery().getType().getName(), name, OPTION_CODE_TIME,
 				chartBuilder.buildTimerangeChart(name, rows, type, scaling, chartStyle, r.getQuery().getName(), subtitle,
-				yLabel, discrete, xLabel, rowLink)));
+						yLabel, discrete, xLabel, rowLink)));
 		}
 	
 	private <T> List<ChartDataRow<T, Number>> extractRows(Class<T> keyType, Result r)
@@ -499,71 +529,64 @@ public class ChartResultVisualizer extends NamedBase implements Visualizer
 	
 	private <T> List<ChartDataRow<Pair<Date, Date>, T>> convertToIntervalRows(List<ChartDataRow<Date, T>> rows, DataFormatter fmt)
 		{
-		final Calendar c = fmt.getCalendar();
+		// Inspect all values to find minimum distance between data points (assuming that rows are ordered by date!)
+		long minDistance = Long.MAX_VALUE;
 		
-		int field = Calendar.YEAR;
-		int range = 0;
-		
-		// Inspect all values to find minimum date granularity (minutes, seconds, days, months, years)
 		for (ChartDataRow<Date, T> row : rows)
 			{
+			long lastTime = 0L;
+			
 			for (Map.Entry<Date, T> ent : row.getValues().entrySet())
 				{
-				c.setTime(ent.getKey());
-				
-				if ((c.get(Calendar.MILLISECOND) != 0) || (c.get(Calendar.SECOND) != 0))
-					return (null);
-				
-				if (c.get(Calendar.MINUTE) != 0)
-					{
-					if (field < Calendar.SECOND)
-						{
-						// create 30 second intervals
-						field = Calendar.SECOND;
-						range = 15;
-						}
-					}
-				else if (c.get(Calendar.HOUR_OF_DAY) != 0)
-					{
-					if (field < Calendar.MINUTE)
-						{
-						// create 30 minute intervals
-						field = Calendar.MINUTE;
-						range = 15;
-						}
-					}
-				else if (c.get(Calendar.DAY_OF_MONTH) != 1)
-					{
-					if (field < Calendar.HOUR_OF_DAY)
-						{
-						// create 12 hour intervals
-						field = Calendar.HOUR_OF_DAY;
-						range = 6;
-						}
-					}
-				else if (c.get(Calendar.MONTH) != Calendar.JANUARY)
-					{
-					if (field < Calendar.DAY_OF_MONTH)
-						{
-						// create 14 day intervals
-						field = Calendar.DAY_OF_MONTH;
-						range = 7;
-						}
-					}
-				else
-					{
-					if (field < Calendar.MONTH)
-						{
-						// create 6 month intervals
-						field = Calendar.MONTH;
-						range = 6;
-						}
-					}
+				final long time = ent.getKey().getTime();
+				final long distance = time - lastTime;
+				if (distance < minDistance)
+					minDistance = distance;
+				lastTime = time;
 				}
 			}
 		
+		// Determine granularity
+		final int field;
+		final int range;
+		
+		if (minDistance >= ONE_YEAR)
+			{
+			// create 6 month intervals
+			field = Calendar.MONTH;
+			range = 6;
+			}
+		else if (minDistance >= ONE_MONTH)
+			{
+			// create 14 day intervals
+			field = Calendar.DAY_OF_MONTH;
+			range = 7;
+			}
+		else if (minDistance >= ONE_DAY)
+			{
+			// create 12 hour intervals
+			field = Calendar.HOUR_OF_DAY;
+			range = 6;
+			}
+		else if (minDistance >= ONE_HOUR)
+			{
+			// create 30 minute intervals
+			field = Calendar.MINUTE;
+			range = 15;
+			}
+		else if (minDistance >= ONE_MINUTE)
+			{
+			// create 30 second intervals
+			field = Calendar.SECOND;
+			range = 15;
+			}
+		else
+			return (null);
+		
 		// Convert to intervals of found granularity
 		final List<ChartDataRow<Pair<Date, Date>, T>> ret = new ArrayList<ChartDataRow<Pair<Date, Date>, T>>(rows.size());
+		
+		final Calendar c = fmt.getCalendar();
 		for (ChartDataRow<Date, T> row : rows)
 			{
 			final Map<Pair<Date, Date>, T> map = new LinkedHashMap<Pair<Date, Date>, T>();
