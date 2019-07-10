@@ -16,6 +16,7 @@
 package de.tweerlei.dbgrazer.query.model.impl;
 
 import de.tweerlei.common.util.StringUtils;
+import de.tweerlei.dbgrazer.common.util.impl.NamedBase;
 import de.tweerlei.dbgrazer.query.model.ColumnType;
 import de.tweerlei.dbgrazer.query.model.ParameterDef;
 
@@ -24,9 +25,8 @@ import de.tweerlei.dbgrazer.query.model.ParameterDef;
  * 
  * @author Robert Wruck
  */
-public class ParameterDefImpl implements ParameterDef
+public class ParameterDefImpl extends NamedBase implements ParameterDef
 	{
-	private final String name;
 	private final ColumnType type;
 	private final String valueQuery;
 	
@@ -38,17 +38,11 @@ public class ParameterDefImpl implements ParameterDef
 	 */
 	public ParameterDefImpl(String name, ColumnType type, String valueQuery)
 		{
-		this.name = name;
+		super(name);
 		this.type = type;
 		this.valueQuery = StringUtils.empty(valueQuery) ? null : valueQuery;
 		}
 
-	@Override
-	public String getName()
-		{
-		return name;
-		}
-	
 	@Override
 	public ColumnType getType()
 		{
@@ -59,11 +53,5 @@ public class ParameterDefImpl implements ParameterDef
 	public String getValueQuery()
 		{
 		return valueQuery;
-		}
-	
-	@Override
-	public String toString()
-		{
-		return (name);
 		}
 	}

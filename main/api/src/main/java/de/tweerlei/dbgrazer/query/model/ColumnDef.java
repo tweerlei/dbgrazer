@@ -18,20 +18,15 @@ package de.tweerlei.dbgrazer.query.model;
 import java.io.Serializable;
 
 import de.tweerlei.common5.jdbc.model.QualifiedName;
+import de.tweerlei.dbgrazer.common.util.Named;
 
 /**
  * Column definition
  * 
  * @author Robert Wruck
  */
-public interface ColumnDef extends Serializable
+public interface ColumnDef extends Named, Serializable
 	{
-	/**
-	 * Get the name
-	 * @return the name
-	 */
-	public String getName();
-	
 	/**
 	 * Get the type
 	 * @return the type

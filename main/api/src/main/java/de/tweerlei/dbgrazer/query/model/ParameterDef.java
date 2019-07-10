@@ -17,20 +17,15 @@ package de.tweerlei.dbgrazer.query.model;
 
 import java.io.Serializable;
 
+import de.tweerlei.dbgrazer.common.util.Named;
 
 /**
  * Definition of a query parameter
  * 
  * @author Robert Wruck
  */
-public interface ParameterDef extends Serializable
+public interface ParameterDef extends Named, Serializable
 	{
-	/**
-	 * Get the name
-	 * @return the name
-	 */
-	public String getName();
-
 	/**
 	 * Get the type
 	 * @return the type

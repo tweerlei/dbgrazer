@@ -18,8 +18,6 @@ package de.tweerlei.dbgrazer.common.util.impl;
 import java.util.Collection;
 import java.util.TreeSet;
 
-import org.springframework.core.annotation.AnnotationAwareOrderComparator;
-
 import de.tweerlei.dbgrazer.common.util.Named;
 
 /**
@@ -31,32 +29,12 @@ import de.tweerlei.dbgrazer.common.util.Named;
  */
 public class NamedSet<T extends Named> extends TreeSet<T>
 	{
-	private static final class NamedComparator extends AnnotationAwareOrderComparator
-		{
-		public NamedComparator()
-			{
-			}
-		
-		@Override
-		public int compare(Object o1, Object o2)
-			{
-			final int ret = super.compare(o1, o2);
-			if (ret != 0)
-				return (ret);
-			
-			return (((Named) o1).getName().compareTo(((Named) o2).getName()));
-			}
-		}
-	
-	private static final NamedComparator COMPARATOR = new NamedComparator();
-	
 	/**
 	 * Constructor
 	 */
-	@SuppressWarnings("unchecked")
 	public NamedSet()
 		{
-		super(COMPARATOR);
+		this(null);
 		}
 	
 	/**
@@ -65,7 +43,7 @@ public class NamedSet<T extends Named> extends TreeSet<T>
 	 */
 	public NamedSet(Collection<? extends T> c)
 		{
-		this();
+		super(NamedComparators.BY_ORDER);
 		if (c != null)
 			addAll(c);
 		}

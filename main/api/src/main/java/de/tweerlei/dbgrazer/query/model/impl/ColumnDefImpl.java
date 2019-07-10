@@ -16,6 +16,7 @@
 package de.tweerlei.dbgrazer.query.model.impl;
 
 import de.tweerlei.common5.jdbc.model.QualifiedName;
+import de.tweerlei.dbgrazer.common.util.impl.NamedBase;
 import de.tweerlei.dbgrazer.query.model.ColumnDef;
 import de.tweerlei.dbgrazer.query.model.ColumnType;
 import de.tweerlei.dbgrazer.query.model.TargetDef;
@@ -25,9 +26,8 @@ import de.tweerlei.dbgrazer.query.model.TargetDef;
  * 
  * @author Robert Wruck
  */
-public class ColumnDefImpl implements ColumnDef
+public class ColumnDefImpl extends NamedBase implements ColumnDef
 	{
-	private final String name;
 	private final ColumnType type;
 	private final String typeName;
 	private final QualifiedName sourceObject;
@@ -45,18 +45,12 @@ public class ColumnDefImpl implements ColumnDef
 	 */
 	public ColumnDefImpl(String name, ColumnType type, String typeName, TargetDef target, QualifiedName sourceObject, String sourceColumn)
 		{
-		this.name = name;
+		super(name);
 		this.type = type;
 		this.typeName = typeName;
 		this.target = target;
 		this.sourceObject = sourceObject;
 		this.sourceColumn = sourceColumn;
-		}
-
-	@Override
-	public String getName()
-		{
-		return name;
 		}
 
 	@Override

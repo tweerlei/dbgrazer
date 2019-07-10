@@ -16,6 +16,7 @@
 package de.tweerlei.dbgrazer.plugins.ldap.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -35,6 +36,7 @@ import org.springframework.stereotype.Service;
 
 import de.tweerlei.common.util.StringJoiner;
 import de.tweerlei.common.util.StringUtils;
+import de.tweerlei.dbgrazer.common.util.impl.NamedComparators;
 import de.tweerlei.dbgrazer.extension.ldap.LdapAccessService;
 import de.tweerlei.dbgrazer.plugins.ldap.types.LdapAttributesQueryType;
 import de.tweerlei.dbgrazer.plugins.ldap.types.LdapListQueryType;
@@ -169,11 +171,12 @@ public class LdapQueryRunner extends BaseQueryRunner
 				{
 				if (attrIds == null)
 					{
-					columns = new ArrayList<ColumnDef>(attributes.size() + 4);
+//					columns = new ArrayList<ColumnDef>(attributes.size() + 4);
 //					columns.add(new ColumnDefImpl(DN_ATTRIBUTE, ColumnType.STRING, null, getQuery().getTargetQueries().get(0), null, null));
 //					columns.add(new ColumnDefImpl(RDN_ATTRIBUTE, ColumnType.STRING, null, getQuery().getTargetQueries().get(1), null, null));
 //					columns.add(new ColumnDefImpl(RDN_NAME_ATTRIBUTE, ColumnType.STRING, null, getQuery().getTargetQueries().get(2), null, null));
 //					columns.add(new ColumnDefImpl(RDN_PARENT_ATTRIBUTE, ColumnType.STRING, null, getQuery().getTargetQueries().get(3), null, null));
+					columns = new ArrayList<ColumnDef>(attributes.size());
 					final NamingEnumeration<? extends Attribute> all = attributes.getAll();
 					try	{
 						while (all.hasMore())
@@ -186,6 +189,7 @@ public class LdapQueryRunner extends BaseQueryRunner
 						{
 						all.close();
 						}
+					Collections.sort(columns, NamedComparators.BY_NAME);
 					}
 				else
 					{

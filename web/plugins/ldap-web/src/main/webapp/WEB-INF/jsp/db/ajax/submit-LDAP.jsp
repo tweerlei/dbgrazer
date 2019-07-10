@@ -34,18 +34,19 @@
 </c:forEach
 >	/*]]>*/</style>
 		<div class="tab-header">
-			<div id="sql" class="hidden"><pre>${fn:escapeXml(sql)}</pre></div>
+			<ui:filter id="filter-table-result0" target="table-result0" form="true"/>
+<%--			<div id="sql" class="hidden"><pre>${fn:escapeXml(sql)}</pre></div>
 			<div class="filter">
 				<span class="button" onclick="return showElementDialog(event, '<fmt:message key="columnTypes"/>', 'sql');"><fmt:message key="columnTypes"/></span>
 			</div>
-			<div class="filter">
+--%>			<div class="filter">
 				<span class="nowrap"><fmt:message key="rowCount"><fmt:param value="${fn:length(rs.rows)}"/></fmt:message></span>
 			</div>
 			<div class="filter">
-				<span class="action" title="<fmt:message key="maximize"/>" onclick="return toggleElement('zoomable1');"><fmt:message key="maximizeIcon"/></span>
+				<span class="nowrap"><fmt:message key="duration"><fmt:param value="${rs.queryTime}"/></fmt:message></span>
 			</div>
 			<div class="filter">
-				<span class="nowrap"><fmt:message key="duration"><fmt:param value="${rs.queryTime}"/></fmt:message></span>
+				<span class="action" title="<fmt:message key="maximize"/>" onclick="return toggleElement('zoomable1');"><fmt:message key="maximizeIcon"/></span>
 			</div>
 <c:if test="${rs.moreAvailable}"
 >			<div class="filter">
