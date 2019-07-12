@@ -408,6 +408,10 @@ tr.crosshair td:nth-child(n+2), td.crosshair {
 	color: #fdf6e3;
 }
 
+th.actions, td.actions {
+	background-color: #eee8d5;
+}
+
 /********************************************************************
  *
  * Result lists

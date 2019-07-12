@@ -46,12 +46,12 @@
 		<div class="tab-body">
 			<ui:result-transposed rs="${rs}" label="result0"/>
 		</div>
-</c:when><c:otherwise><style>/*<![CDATA[*/
+</c:when><c:otherwise><c:set var="offset" value="${((not empty objectName) && (not empty pkColumns)) ? 2 : 1}"/><style>/*<![CDATA[*/
 <c:forEach items="${tableColumns}" var="tc" varStatus="st1"><c:forEach items="${tc}" var="col" varStatus="st2"><c:choose
 ><c:when test="${col.type.name == 'INTEGER'}"
->		#table-result${st1.index} td:nth-child(${st2.index + 1}) { text-align: right; }
+>		#table-result${st1.index} td:nth-child(${st2.index + offset}) { text-align: right; }
 </c:when><c:when test="${col.type.name == 'FLOAT'}"
->		#table-result${st1.index} td:nth-child(${st2.index + 1}) { text-align: right; }
+>		#table-result${st1.index} td:nth-child(${st2.index + offset}) { text-align: right; }
 </c:when
 ></c:choose></c:forEach
 >	

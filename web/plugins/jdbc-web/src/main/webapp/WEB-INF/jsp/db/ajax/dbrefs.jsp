@@ -14,7 +14,10 @@
  * limitations under the License.
 --%><%@
 	include file="../../include/include.jspf"
-%><c:forEach items="${infos}" var="i"
+%><c:choose><c:when test="${empty infos}"
+><div class="menutext"><fmt:message key="noEntry"/></div>
+</c:when><c:otherwise><c:forEach items="${infos}" var="i"
 ><div class="menuitem"><ui:dblink fk="${i.value.fk}" dir="true" targetElement="${targetElement}" label="${i.key}" value="${pk}"/></div>
 </c:forEach
+></c:otherwise></c:choose
 >

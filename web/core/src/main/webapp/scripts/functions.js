@@ -429,10 +429,14 @@ function tw_contentChanged() {
 	});
 	$$('table.dbtable').each(function(e) {
 		e.select('th').each(function(el) {
-			el.onmouseenter = showHeaderOptions;
+			if (!el.hasClassName('actions')) {
+				el.onmouseenter = showHeaderOptions;
+			}
 		});
 		e.select('td').each(function(el) {
-			el.onmouseenter = showCellOptions;
+			if (!el.hasClassName('actions')) {
+				el.onmouseenter = showCellOptions;
+			}
 		});
 	});
 	$$('iframe.result').each(function(e) {

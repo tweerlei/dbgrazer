@@ -379,6 +379,10 @@ tr.crosshair td:nth-child(n+2), td.crosshair {
 	color: #ffffff;
 }
 
+th.actions, td.actions {
+	background-color: #333333;
+}
+
 /********************************************************************
  *
  * Result lists

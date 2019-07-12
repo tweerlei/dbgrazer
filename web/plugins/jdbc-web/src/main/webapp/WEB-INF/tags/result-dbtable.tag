@@ -41,7 +41,10 @@
 %>		<table id="table-${label}" class="multiple dbtable table-autosort">
 			<thead>
 				<tr>
-<c:forEach items="${rs.columns}" var="c"
+<c:if test="${(not empty objectName) && (not empty pkColumns)}"
+>					<th class="actions">&nbsp;</th>
+</c:if
+><c:forEach items="${rs.columns}" var="c"
 >					<th class="table-sortable <c:choose
 						><c:when test="${c.type == 'INTEGER' || c.type == 'FLOAT'}">table-sortable:numeric</c:when
 						><c:when test="${c.type == 'DATE'}">table-sortable:date</c:when
@@ -53,18 +56,22 @@
 			<tbody>
 <c:forEach items="${rs.rows}" var="row"
 >				<tr>
-<c:forEach items="${row.values}" var="v" varStatus="st"
->					<td<c:if test="${fn:length(v) >= 100}"> class="zoomable"</c:if>><ui:dblink value="${v}" fk="${foreignKeys[st.index]}" targetElement="${targetElement}"/><c:if test="${(not empty objectName) && (not empty pkColumns) && (st.index == pkColumns[0])}"
-> <span class="action" title="<fmt:message key="referencedBy"/>" onclick="showDbMenu(event, 'dbrefs', { catalog: '${catalogName}', schema: '${schemaName}', object: '${objectName}', pk: '${v}', target: '${targetElement}' });">&#x25bc;</span><c:set var="args" value="event, '${catalogName}', '${schemaName}', '${objectName}', ["
-/><c:forEach items="${pkColumns}" var="pk" varStatus="pkst"
-	><c:if test="${!pkst.first}"
-		><c:set var="args" value="${args}, "
-	/></c:if
-	><c:set var="args" value="${args}'${row.values[pk]}'"
-/></c:forEach
-><c:set var="args" value="${args}], '${rs.query.name}'"
-						/>&nbsp;<span class="action" title="<fmt:message key="updateRow"/>" onclick="return showUpdateDialog(${args});"><fmt:message key="editIcon"/></span>&nbsp;<span class="action" title="<fmt:message key="copyRow"/>" onclick="return showCopyDialog(${args});"><fmt:message key="copyIcon"/></span>&nbsp;<span class="action" title="<fmt:message key="deleteRow"/>" onclick="return showDeleteDialog(${args});"><fmt:message key="removeIcon"/></span></c:if
-						></td>
+<c:if test="${(not empty objectName) && (not empty pkColumns)}"
+>					<td class="actions"><span class="action" title="<fmt:message key="referencedBy"/>" onclick="showDbMenu(event, 'dbrefs', { catalog: '${catalogName}', schema: '${schemaName}', object: '${objectName}', pk: '${row.values[pkColumns[0]]}', target: '${targetElement}' });">&#x25bc;</span><c:set var="args" value="event, '${catalogName}', '${schemaName}', '${objectName}', ["
+						/><c:forEach items="${pkColumns}" var="pk" varStatus="pkst"
+							><c:if test="${!pkst.first}"
+								><c:set var="args" value="${args}, "
+							/></c:if
+						><c:set var="args" value="${args}'${row.values[pk]}'"
+						/></c:forEach
+						><c:set var="args" value="${args}], '${rs.query.name}'"
+						/>&nbsp;<span class="action" title="<fmt:message key="updateRow"/>" onclick="return showUpdateDialog(${args});"><fmt:message key="editIcon"
+						/></span>&nbsp;<span class="action" title="<fmt:message key="copyRow"/>" onclick="return showCopyDialog(${args});"><fmt:message key="copyIcon"
+						/></span>&nbsp;<span class="action" title="<fmt:message key="deleteRow"/>" onclick="return showDeleteDialog(${args});"><fmt:message key="removeIcon"
+						/></span></td>
+</c:if
+><c:forEach items="${row.values}" var="v" varStatus="st"
+>					<td<c:if test="${fn:length(v) >= 100}"> class="zoomable"</c:if>><ui:dblink value="${v}" fk="${foreignKeys[st.index]}" targetElement="${targetElement}"/></td>
 </c:forEach
 >				</tr>
 </c:forEach
