@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -187,6 +188,7 @@ public class QueryPerformerServiceImpl implements QueryPerformerService
 	public Map<String, Result> performRecursiveQuery(String link, Query query, Map<Integer, String> params) throws PerformQueryException
 		{
 		final DataFormatter fmt = factory.getWebFormatter();
+		final TimeZone timeZone = factory.getTimeZone();
 		final List<Object> qParams = getQueryParameters(link, query, params, fmt);
 		
 		final Map<String, Result> ret;
@@ -194,27 +196,27 @@ public class QueryPerformerServiceImpl implements QueryPerformerService
 		if (query.getType().getName().equals(VisualizationSettings.DASHBOARD_QUERY_TYPE))
 			{
 			// Allow 2 levels of recursion, limit results to DASHBOARD_ROWS
-			ret = recursiveRunner.performRecursiveQuery(link, query, qParams, 2, configService.get(ConfigKeys.DASHBOARD_ROWS), true);
+			ret = recursiveRunner.performRecursiveQuery(link, query, qParams, timeZone, 2, configService.get(ConfigKeys.DASHBOARD_ROWS), true);
 			}
 		else if (query.getType().getName().equals(VisualizationSettings.PANELS_QUERY_TYPE))
 			{
 			// Allow 2 levels of recursion, limit results to PANEL_ROWS
-			ret = recursiveRunner.performRecursiveQuery(link, query, qParams, 2, configService.get(ConfigKeys.PANEL_ROWS), true);
+			ret = recursiveRunner.performRecursiveQuery(link, query, qParams, timeZone, 2, configService.get(ConfigKeys.PANEL_ROWS), true);
 			}
 		else if (query.getType().getName().equals(VisualizationSettings.NAVIGATOR_QUERY_TYPE))
 			{
 			// Allow 3 levels of recursion
-			ret = recursiveRunner.performRecursiveQuery(link, query, qParams, 3, Integer.MAX_VALUE, configService.get(ConfigKeys.SHOW_EMPTY_SUBQUERIES));
+			ret = recursiveRunner.performRecursiveQuery(link, query, qParams, timeZone, 3, Integer.MAX_VALUE, configService.get(ConfigKeys.SHOW_EMPTY_SUBQUERIES));
 			}
 		else if (query.getType().getResultType() == ResultType.RECURSIVE)
 			{
 			// Allow 2 levels of recursion
-			ret = recursiveRunner.performRecursiveQuery(link, query, qParams, 2, Integer.MAX_VALUE, configService.get(ConfigKeys.SHOW_EMPTY_SUBQUERIES));
+			ret = recursiveRunner.performRecursiveQuery(link, query, qParams, timeZone, 2, Integer.MAX_VALUE, configService.get(ConfigKeys.SHOW_EMPTY_SUBQUERIES));
 			}
 		else
 			{
 			// Allow 1 level of recursion
-			ret = recursiveRunner.performRecursiveQuery(link, query, qParams, 1, Integer.MAX_VALUE, configService.get(ConfigKeys.SHOW_EMPTY_SUBQUERIES));
+			ret = recursiveRunner.performRecursiveQuery(link, query, qParams, timeZone, 1, Integer.MAX_VALUE, configService.get(ConfigKeys.SHOW_EMPTY_SUBQUERIES));
 			}
 		
 		for (Map.Entry<String, Result> ent : ret.entrySet())
@@ -230,6 +232,7 @@ public class QueryPerformerServiceImpl implements QueryPerformerService
 	public Result performQuery(String link, Query query, Map<Integer, String> params) throws PerformQueryException
 		{
 		final DataFormatter fmt = factory.getWebFormatter();
+		final TimeZone timeZone = factory.getTimeZone();
 		final List<Object> qParams = getQueryParameters(link, query, params, fmt);
 		
 		if (query.getType().isAccumulatingResults())
@@ -243,12 +246,12 @@ public class QueryPerformerServiceImpl implements QueryPerformerService
 		if (query.getType().getResultType() == ResultType.MULTILEVEL)
 			{
 			// Return empty subqueries for MULTILEVEL queries
-			return (recursiveRunner.performQuery(link, query, qParams, Integer.MAX_VALUE, true));
+			return (recursiveRunner.performQuery(link, query, qParams, timeZone, Integer.MAX_VALUE, true));
 			}
 		else
 			{
 			// Don't return empty subqueries
-			return (recursiveRunner.performQuery(link, query, qParams, Integer.MAX_VALUE, false));
+			return (recursiveRunner.performQuery(link, query, qParams, timeZone, Integer.MAX_VALUE, false));
 			}
 		}
 	
@@ -256,9 +259,10 @@ public class QueryPerformerServiceImpl implements QueryPerformerService
 	public RowProducer createRowProducer(String link, Query query, Map<Integer, String> params)
 		{
 		final DataFormatter fmt = factory.getWebFormatter();
+		final TimeZone timeZone = factory.getTimeZone();
 		final List<Object> qParams = getQueryParameters(link, query, params, fmt);
 		
-		return (new QueryRowProducer(link, query, qParams, runner));
+		return (new QueryRowProducer(link, query, qParams, timeZone, runner));
 		}
 	
 	private List<Object> getQueryParameters(String link, Query query, Map<Integer, String> params, DataFormatter fmt)
@@ -328,9 +332,10 @@ public class QueryPerformerServiceImpl implements QueryPerformerService
 	@Override
 	public Result performCustomQuery(String link, String type, String statement, List<ParameterDef> paramDefs, List<Object> params, String label, boolean export, CancelableProgressMonitor monitor) throws PerformQueryException
 		{
+		final TimeZone timeZone = factory.getTimeZone();
 		final Query q = createCustomQuery(type, statement, paramDefs, label);
 		
-		final Result r = runner.performQuery(link, q, 0, params == null ? Collections.emptyList() : params, export ? Integer.MAX_VALUE : configService.get(ConfigKeys.BROWSER_ROWS), monitor);
+		final Result r = runner.performQuery(link, q, 0, params == null ? Collections.emptyList() : params, timeZone, export ? Integer.MAX_VALUE : configService.get(ConfigKeys.BROWSER_ROWS), monitor);
 		return (r);
 		}
 	
@@ -338,9 +343,10 @@ public class QueryPerformerServiceImpl implements QueryPerformerService
 	public int performCustomQuery(String link, String type, String statement, String label, RowHandler handler) throws PerformQueryException
 		{
 		try	{
+			final TimeZone timeZone = factory.getTimeZone();
 			final Query q = createCustomQuery(type, statement, null, label);
 			
-			final int r = runner.performStreamedQuery(link, q, Collections.emptyList(), Integer.MAX_VALUE, handler);
+			final int r = runner.performStreamedQuery(link, q, Collections.emptyList(), timeZone, Integer.MAX_VALUE, handler);
 			return (r);
 			}
 		finally
@@ -352,41 +358,45 @@ public class QueryPerformerServiceImpl implements QueryPerformerService
 	@Override
 	public Result performCustomQueries(String link, StatementProducer statements, String type, DMLProgressMonitor monitor) throws PerformQueryException
 		{
+		final TimeZone timeZone = factory.getTimeZone();
 		final QueryType t = queryService.findQueryType(type);
 		if (t == null)
 			throw new IllegalArgumentException("Unknown query type: " + type);
 		
-		return (runner.performQueries(link, statements, t, configService.get(ConfigKeys.BROWSER_ROWS), monitor));
+		return (runner.performQueries(link, statements, timeZone, t, configService.get(ConfigKeys.BROWSER_ROWS), monitor));
 		}
 	
 	@Override
 	public Result transferRows(String link, String query, RowTransferer transferer, String type, DMLProgressMonitor monitor) throws PerformQueryException
 		{
+		final TimeZone timeZone = factory.getTimeZone();
 		final QueryType t = queryService.findQueryType(type);
 		if (t == null)
 			throw new IllegalArgumentException("Unknown query type: " + type);
 		
-		return (runner.transferRows(link, query, transferer, t, configService.get(ConfigKeys.BROWSER_ROWS), monitor));
+		return (runner.transferRows(link, query, timeZone, transferer, t, configService.get(ConfigKeys.BROWSER_ROWS), monitor));
 		}
 	
 	@Override
 	public Result transferRows(String link, String query, RowTransferer transferer, StatementHandler handler, String type, DMLProgressMonitor monitor, boolean export) throws PerformQueryException
 		{
+		final TimeZone timeZone = factory.getTimeZone();
 		final QueryType t = queryService.findQueryType(type);
 		if (t == null)
 			throw new IllegalArgumentException("Unknown query type: " + type);
 		
 		final RowTransferer lrt = new LimitingRowTransferer(transferer, handler, export ? Integer.MAX_VALUE : configService.get(ConfigKeys.BROWSER_ROWS));
 		
-		return (runner.transferRows(link, query, lrt, t, configService.get(ConfigKeys.BROWSER_ROWS), monitor));
+		return (runner.transferRows(link, query, timeZone, lrt, t, configService.get(ConfigKeys.BROWSER_ROWS), monitor));
 		}
 	
 	@Override
 	public Result performCustomChartQuery(String link, String type, String statement, String label) throws PerformQueryException
 		{
+		final TimeZone timeZone = factory.getTimeZone();
 		final Query q = createCustomQuery(type, statement, null, label);
 		
-		final Result r = runner.performQuery(link, q, 0, Collections.emptyList(), Integer.MAX_VALUE, null);
+		final Result r = runner.performQuery(link, q, 0, Collections.emptyList(), timeZone, Integer.MAX_VALUE, null);
 		
 		final Query qc = new QueryImpl(label, new SchemaDef(null, null), null, null, queryService.findQueryType(VisualizationSettings.CHART_QUERY_TYPE), null, null, null);
 		final Result rc = new ResultImpl(qc);

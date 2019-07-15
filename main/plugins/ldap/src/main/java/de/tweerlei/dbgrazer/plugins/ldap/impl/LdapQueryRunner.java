@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.TimeZone;
 
 import javax.naming.Name;
 import javax.naming.NamingEnumeration;
@@ -411,7 +412,7 @@ public class LdapQueryRunner extends BaseQueryRunner
 		}
 	
 	@Override
-	public Result performQuery(String link, Query query, int subQueryIndex, List<Object> params, int limit, CancelableProgressMonitor monitor) throws PerformQueryException
+	public Result performQuery(String link, Query query, int subQueryIndex, List<Object> params, TimeZone timeZone, int limit, CancelableProgressMonitor monitor) throws PerformQueryException
 		{
 		final LdapTemplate ldap = ldapAccessService.getLdapTemplate(link);
 		if (ldap == null)

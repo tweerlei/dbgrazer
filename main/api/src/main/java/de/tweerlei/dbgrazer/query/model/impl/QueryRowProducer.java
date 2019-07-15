@@ -16,6 +16,7 @@
 package de.tweerlei.dbgrazer.query.model.impl;
 
 import java.util.List;
+import java.util.TimeZone;
 
 import de.tweerlei.dbgrazer.query.exception.PerformQueryException;
 import de.tweerlei.dbgrazer.query.model.Query;
@@ -34,20 +35,23 @@ public class QueryRowProducer implements RowProducer
 	private final String link;
 	private final Query query;
 	private final List<Object> params;
+	private final TimeZone timeZone;
 	
 	/**
 	 * Constructor
 	 * @param link Link name
 	 * @param query Query
 	 * @param params Query parameters
+	 * @param timeZone TimeZone to use for temporal results
 	 * @param runner QueryRunnerService
 	 */
-	public QueryRowProducer(String link, Query query, List<Object> params,
+	public QueryRowProducer(String link, Query query, List<Object> params, TimeZone timeZone,
 			QueryRunnerService runner)
 		{
 		this.link = link;
 		this.query = query;
 		this.params = params;
+		this.timeZone = timeZone;
 		this.runner = runner;
 		}
 	
@@ -55,7 +59,7 @@ public class QueryRowProducer implements RowProducer
 	public int produceRows(RowHandler h)
 		{
 		try	{
-			return (runner.performStreamedQuery(link, query, params, Integer.MAX_VALUE, h));
+			return (runner.performStreamedQuery(link, query, params, timeZone, Integer.MAX_VALUE, h));
 			}
 		catch (PerformQueryException e)
 			{

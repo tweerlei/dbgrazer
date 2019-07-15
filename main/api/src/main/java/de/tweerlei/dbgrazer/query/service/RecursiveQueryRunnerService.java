@@ -17,6 +17,7 @@ package de.tweerlei.dbgrazer.query.service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 import de.tweerlei.dbgrazer.query.exception.PerformQueryException;
 import de.tweerlei.dbgrazer.query.model.Query;
@@ -34,23 +35,25 @@ public interface RecursiveQueryRunnerService
 	 * @param link Link name
 	 * @param query Query
 	 * @param params Parameters
+	 * @param timeZone TimeZone to use for temporal results
 	 * @param level Maximum recursion depth (0 = top level query only)
 	 * @param limit Fetch limit
 	 * @param showEmpty Return empty results
 	 * @return A single result if the query is not recursive, otherwise a result per immediate subquery but at least a single empty Result
 	 * @throws PerformQueryException on error
 	 */
-	public Map<String, Result> performRecursiveQuery(String link, Query query, List<Object> params, int level, int limit, boolean showEmpty) throws PerformQueryException;
+	public Map<String, Result> performRecursiveQuery(String link, Query query, List<Object> params, TimeZone timeZone, int level, int limit, boolean showEmpty) throws PerformQueryException;
 	
 	/**
 	 * Perform a non-recursive query, returning a single Result
 	 * @param link Link name
 	 * @param query Query
 	 * @param params Parameters
+	 * @param timeZone TimeZone to use for temporal results
 	 * @param limit Fetch limit
 	 * @param showEmpty Return empty results
 	 * @return Result
 	 * @throws PerformQueryException on error
 	 */
-	public Result performQuery(String link, Query query, List<Object> params, int limit, boolean showEmpty) throws PerformQueryException;
+	public Result performQuery(String link, Query query, List<Object> params, TimeZone timeZone, int limit, boolean showEmpty) throws PerformQueryException;
 	}

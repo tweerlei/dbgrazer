@@ -16,13 +16,14 @@
 package de.tweerlei.dbgrazer.plugins.jdbc.mapper;
 
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 import de.tweerlei.dbgrazer.extension.jdbc.SQLGeneratorService;
+import de.tweerlei.dbgrazer.plugins.jdbc.impl.ResultSetAccessor;
 import de.tweerlei.dbgrazer.query.model.ColumnDef;
 import de.tweerlei.dbgrazer.query.model.ResultRow;
 import de.tweerlei.dbgrazer.query.model.RowHandler;
@@ -44,11 +45,12 @@ public class RowHandlerMapper extends RowSetMapper
 	 * Constructor
 	 * @param sqlGenerator SQLGeneratorService
 	 * @param dialect SQLDialect
+	 * @param timeZone TimeZone to use for temporal results
 	 * @param handler RowHandler
 	 */
-	public RowHandlerMapper(SQLGeneratorService sqlGenerator, SQLDialect dialect, RowHandler handler)
+	public RowHandlerMapper(SQLGeneratorService sqlGenerator, SQLDialect dialect, TimeZone timeZone, RowHandler handler)
 		{
-		super(sqlGenerator, dialect);
+		super(sqlGenerator, dialect, timeZone);
 		this.handler = handler;
 		this.columns = null;
 		}
@@ -60,15 +62,14 @@ public class RowHandlerMapper extends RowSetMapper
 		}
 	
 	@Override
-	public void processRow(ResultSet rs) throws SQLException
+	public void processRow(ResultSet rs, ResultSetAccessor accessor) throws SQLException
 		{
 		if (columns == null)
 			{
-			final ResultSetMetaData rsmd = rs.getMetaData();
-			final int c = rsmd.getColumnCount();
+			final int c = accessor.getColumnCount(rs);
 			columns = new ArrayList<ColumnDef>(c);
 			for (int i = 1; i <= c; i++)
-				columns.add(getColumnDef(rsmd, i, null));
+				columns.add(accessor.getColumnDef(rs, i, null));
 			
 			handler.startRows(columns);
 			}
@@ -76,7 +77,7 @@ public class RowHandlerMapper extends RowSetMapper
 		final int c = columns.size();
 		final ResultRow row = new DefaultResultRow(c);
 		for (int i = 1; i <= c; i++)
-			row.getValues().add(rs.getObject(i));
+			row.getValues().add(accessor.getObject(rs, i));
 		
 		handler.handleRow(row);
 		}

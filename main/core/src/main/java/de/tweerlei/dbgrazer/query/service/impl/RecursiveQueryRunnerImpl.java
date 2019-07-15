@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -64,17 +65,17 @@ public class RecursiveQueryRunnerImpl implements RecursiveQueryRunnerService
 		}
 	
 	@Override
-	public Map<String, Result> performRecursiveQuery(String link, Query query, List<Object> params, int level, int limit, boolean showEmpty) throws PerformQueryException
+	public Map<String, Result> performRecursiveQuery(String link, Query query, List<Object> params, TimeZone timeZone, int level, int limit, boolean showEmpty) throws PerformQueryException
 		{
 		if (query.getType().getResultType() != ResultType.RECURSIVE)
-			return (Collections.singletonMap(query.getName(), performQuery(link, query, params, limit, showEmpty)));
+			return (Collections.singletonMap(query.getName(), performQuery(link, query, params, timeZone, limit, showEmpty)));
 		
 		final Map<String, Result> ret = new LinkedHashMap<String, Result>(query.getSubQueries().size());
 		
 		for (SubQueryInfo q : getSubQueries(link, query, params))
 			{
 			// TODO: Nested RECURSIVE queries should be splitted into separate Results, too
-			final Result r = recurse(link, q.getQuery(), 0, q.getSuffix(), q.getCurried(), q.getParams(), level - 1, limit, showEmpty);
+			final Result r = recurse(link, q.getQuery(), 0, q.getSuffix(), q.getCurried(), q.getParams(), timeZone, level - 1, limit, showEmpty);
 			if (!showEmpty && r.getRowSets().isEmpty())
 				continue;
 			
@@ -94,16 +95,16 @@ public class RecursiveQueryRunnerImpl implements RecursiveQueryRunnerService
 		}
 	
 	@Override
-	public Result performQuery(String link, Query query, List<Object> params, int limit, boolean showEmpty) throws PerformQueryException
+	public Result performQuery(String link, Query query, List<Object> params, TimeZone timeZone, int limit, boolean showEmpty) throws PerformQueryException
 		{
 		// Don't skip empty subqueries for visualization queries
 		// Allow one level of subqueries for views
-		final Result r = recurse(link, query, 0, null, null, params, hasSubqueries(query) ? 1 : 0, limit, showEmpty || (query.getType().getResultType() == ResultType.VISUALIZATION));
+		final Result r = recurse(link, query, 0, null, null, params, timeZone, hasSubqueries(query) ? 1 : 0, limit, showEmpty || (query.getType().getResultType() == ResultType.VISUALIZATION));
 		prepareResult(r);
 		return (r);
 		}
 	
-	private Result recurse(String link, Query query, int subQueryIndex, String suffix, List<String> curried, List<Object> params, int level, int limit, boolean showEmpty) throws PerformQueryException
+	private Result recurse(String link, Query query, int subQueryIndex, String suffix, List<String> curried, List<Object> params, TimeZone timeZone, int level, int limit, boolean showEmpty) throws PerformQueryException
 		{
 		if (level < 0)
 			{
@@ -120,7 +121,7 @@ public class RecursiveQueryRunnerImpl implements RecursiveQueryRunnerService
 		
 		if (!hasSubqueries(query))
 			{
-			final Result r = runner.performQuery(link, query, subQueryIndex, params, effectiveLimit, null);
+			final Result r = runner.performQuery(link, query, subQueryIndex, params, timeZone, effectiveLimit, null);
 			if (suffix == null)
 				return (r);
 			
@@ -140,7 +141,7 @@ public class RecursiveQueryRunnerImpl implements RecursiveQueryRunnerService
 		int base = subQueryIndex;
 		for (SubQueryInfo q : getSubQueries(link, query, params))
 			{
-			final Result tmp = recurse(link, q.getQuery(), base, q.getSuffix(), q.getCurried(), q.getParams(), level - 1, effectiveLimit, showEmpty);
+			final Result tmp = recurse(link, q.getQuery(), base, q.getSuffix(), q.getCurried(), q.getParams(), timeZone, level - 1, effectiveLimit, showEmpty);
 			for (Map.Entry<String, RowSet> ent : tmp.getRowSets().entrySet())
 				{
 				if (showEmpty || !ent.getValue().getRows().isEmpty())

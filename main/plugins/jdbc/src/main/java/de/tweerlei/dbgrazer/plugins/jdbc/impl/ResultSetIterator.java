@@ -24,14 +24,9 @@ import java.util.NoSuchElementException;
 
 import org.springframework.dao.DataRetrievalFailureException;
 
-import de.tweerlei.common.util.StringUtils;
-import de.tweerlei.common5.jdbc.model.QualifiedName;
-import de.tweerlei.common5.jdbc.model.TypeDescription;
 import de.tweerlei.dbgrazer.query.model.ColumnDef;
-import de.tweerlei.dbgrazer.query.model.ColumnType;
 import de.tweerlei.dbgrazer.query.model.ResultRow;
 import de.tweerlei.dbgrazer.query.model.RowIterator;
-import de.tweerlei.dbgrazer.query.model.impl.ColumnDefImpl;
 import de.tweerlei.dbgrazer.query.model.impl.DefaultResultRow;
 
 /**
@@ -42,41 +37,19 @@ import de.tweerlei.dbgrazer.query.model.impl.DefaultResultRow;
 public class ResultSetIterator implements RowIterator
 	{
 	private final ResultSet rs;
+	private final ResultSetAccessor accessor;
 	private List<ColumnDef> columns;
 	private ResultRow row;
 	
 	/**
 	 * Constructor
 	 * @param rs ResultSet
+	 * @param accessor ResultSetAccessor
 	 */
-	public ResultSetIterator(ResultSet rs)
+	public ResultSetIterator(ResultSet rs, ResultSetAccessor accessor)
 		{
 		this.rs = rs;
-		}
-	
-	/**
-	 * Get a ColumnDef for a result column
-	 * @param rsmd ResultSetMetaData
-	 * @param column Column index (1-based)
-	 * @return ColumnDef
-	 * @throws SQLException on error
-	 */
-	protected final ColumnDef getColumnDef(ResultSetMetaData rsmd, int column) throws SQLException
-		{
-		final String tn = rsmd.getTableName(column);
-		final QualifiedName qn = StringUtils.empty(tn) ? null : new QualifiedName(rsmd.getCatalogName(column), rsmd.getSchemaName(column), tn);
-		final String label = rsmd.getColumnLabel(column);
-		final String name = rsmd.getColumnName(column);
-		final TypeDescription type = new TypeDescription(rsmd.getColumnTypeName(column), rsmd.getColumnType(column), rsmd.getPrecision(column), rsmd.getScale(column));
-		
-		return (new ColumnDefImpl(
-				label,
-				ColumnType.forSQLType(type),
-				null,	//dialect.dataTypeToString(type),
-				null,
-				qn,
-				name
-				));
+		this.accessor = accessor;
 		}
 	
 	@Override
@@ -95,13 +68,13 @@ public class ResultSetIterator implements RowIterator
 				final int c = rsmd.getColumnCount();
 				columns = new ArrayList<ColumnDef>(c);
 				for (int i = 1; i <= c; i++)
-					columns.add(getColumnDef(rsmd, i));
+					columns.add(accessor.getColumnDef(rs, i, null));
 				}
 			
 			final int c = columns.size();
 			row = new DefaultResultRow(c);
 			for (int i = 1; i <= c; i++)
-				row.getValues().add(rs.getObject(i));
+				row.getValues().add(accessor.getObject(rs, i));
 			
 			return (true);
 			}

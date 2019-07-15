@@ -18,6 +18,7 @@ package de.tweerlei.dbgrazer.query.service.impl;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -75,7 +76,7 @@ public class QueryRunnerServiceImpl implements QueryRunnerService
 		}
 	
 	@Override
-	public Result performQuery(String link, Query query, int subQueryIndex, List<Object> params, int limit, CancelableProgressMonitor monitor) throws PerformQueryException
+	public Result performQuery(String link, Query query, int subQueryIndex, List<Object> params, TimeZone timeZone, int limit, CancelableProgressMonitor monitor) throws PerformQueryException
 		{
 		final Result res;
 		
@@ -84,7 +85,7 @@ public class QueryRunnerServiceImpl implements QueryRunnerService
 			res = new ResultImpl(query);
 		else
 			{
-			res = r.performQuery(link, query, subQueryIndex, params, limit, monitor);
+			res = r.performQuery(link, query, subQueryIndex, params, timeZone, limit, monitor);
 			}
 		
 		prepareResult(res);
@@ -93,7 +94,7 @@ public class QueryRunnerServiceImpl implements QueryRunnerService
 		}
 	
 	@Override
-	public int performStreamedQuery(String link, Query query, List<Object> params, int limit, RowHandler handler) throws PerformQueryException
+	public int performStreamedQuery(String link, Query query, List<Object> params, TimeZone timeZone, int limit, RowHandler handler) throws PerformQueryException
 		{
 		try	{
 			final QueryRunner r = findRunner(query.getType());
@@ -101,7 +102,7 @@ public class QueryRunnerServiceImpl implements QueryRunnerService
 				return (0);
 			else
 				{
-				return (r.performStreamedQuery(link, query, params, limit, handler));
+				return (r.performStreamedQuery(link, query, params, timeZone, limit, handler));
 				}
 			}
 		catch (PerformQueryException e)
@@ -116,7 +117,7 @@ public class QueryRunnerServiceImpl implements QueryRunnerService
 		}
 	
 	@Override
-	public Result performQueries(String link, StatementProducer statements, QueryType type, int commitSize, DMLProgressMonitor monitor) throws PerformQueryException
+	public Result performQueries(String link, StatementProducer statements, TimeZone timeZone, QueryType type, int commitSize, DMLProgressMonitor monitor) throws PerformQueryException
 		{
 		final Result res;
 		
@@ -127,7 +128,7 @@ public class QueryRunnerServiceImpl implements QueryRunnerService
 			res = new ResultImpl(q);
 		else
 			{
-			res = r.performQueries(link, q, statements, commitSize, monitor);
+			res = r.performQueries(link, q, statements, timeZone, commitSize, monitor);
 			}
 		
 		prepareResult(res);
@@ -136,7 +137,7 @@ public class QueryRunnerServiceImpl implements QueryRunnerService
 		}
 	
 	@Override
-	public Result transferRows(String link, String query, RowTransferer transferer, QueryType type, int commitSize, DMLProgressMonitor monitor) throws PerformQueryException
+	public Result transferRows(String link, String query, TimeZone timeZone, RowTransferer transferer, QueryType type, int commitSize, DMLProgressMonitor monitor) throws PerformQueryException
 		{
 		final Result res;
 		
@@ -147,7 +148,7 @@ public class QueryRunnerServiceImpl implements QueryRunnerService
 			res = new ResultImpl(q);
 		else
 			{
-			res = r.transferRows(link, q, transferer, commitSize, monitor);
+			res = r.transferRows(link, q, timeZone, transferer, commitSize, monitor);
 			}
 		
 		prepareResult(res);

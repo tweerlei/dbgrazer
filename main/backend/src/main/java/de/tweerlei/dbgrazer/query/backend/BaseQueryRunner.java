@@ -16,6 +16,7 @@
 package de.tweerlei.dbgrazer.query.backend;
 
 import java.util.List;
+import java.util.TimeZone;
 
 import de.tweerlei.dbgrazer.common.util.impl.NamedBase;
 import de.tweerlei.dbgrazer.query.exception.PerformQueryException;
@@ -43,19 +44,19 @@ public abstract class BaseQueryRunner extends NamedBase implements QueryRunner
 		}
 	
 	@Override
-	public int performStreamedQuery(String link, Query query, List<Object> params, int limit, RowHandler handler) throws PerformQueryException
+	public int performStreamedQuery(String link, Query query, List<Object> params, TimeZone timeZone, int limit, RowHandler handler) throws PerformQueryException
 		{
 		throw new PerformQueryException("performQuery", new IllegalStateException("Operation not supported for " + getName()));
 		}
 	
 	@Override
-	public Result performQueries(String link, Query query, StatementProducer statements, int commitSize, DMLProgressMonitor monitor) throws PerformQueryException
+	public Result performQueries(String link, Query query, StatementProducer statements, TimeZone timeZone, int commitSize, DMLProgressMonitor monitor) throws PerformQueryException
 		{
 		throw new PerformQueryException("performQueries", new IllegalStateException("Operation not supported for " + getName()));
 		}
 	
 	@Override
-	public Result transferRows(String link, Query query, RowTransferer transferer, int commitSize, DMLProgressMonitor monitor) throws PerformQueryException
+	public Result transferRows(String link, Query query, TimeZone timeZone, RowTransferer transferer, int commitSize, DMLProgressMonitor monitor) throws PerformQueryException
 		{
 		throw new PerformQueryException("transferRows", new IllegalStateException("Operation not supported for " + getName()));
 		}

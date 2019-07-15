@@ -15,6 +15,8 @@
  */
 package de.tweerlei.dbgrazer.web.service;
 
+import java.util.TimeZone;
+
 import de.tweerlei.dbgrazer.query.model.StatementHandler;
 import de.tweerlei.dbgrazer.web.formatter.DataFormatter;
 import de.tweerlei.dbgrazer.web.formatter.SQLWriter;
@@ -60,6 +62,12 @@ public interface DataFormatterFactory
 	 * @return SQLWriterService
 	 */
 	public SQLWriter getSQLWriter(StatementHandler h, SQLDialect dialect, boolean pretty);
+	
+	/**
+	 * Get the TimeZone for formatting temporal values
+	 * @return TimeZone
+	 */
+	public TimeZone getTimeZone();
 	
 	/**
 	 * Get a localized message

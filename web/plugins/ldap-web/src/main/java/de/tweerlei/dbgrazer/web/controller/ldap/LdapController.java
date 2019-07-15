@@ -326,7 +326,7 @@ public class LdapController
 		final Query q = new QueryImpl(label, new SchemaDef(null, null), null, statement, t, null, null, null);
 		
 		try	{
-			final Result r = runner.performQuery(connectionSettings.getLinkName(), q, 0, Collections.emptyList(), limit, null);
+			final Result r = runner.performQuery(connectionSettings.getLinkName(), q, 0, Collections.emptyList(), factory.getTimeZone(), limit, null);
 			return (r);
 			}
 		catch (PerformQueryException e)

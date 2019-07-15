@@ -16,14 +16,15 @@
 package de.tweerlei.dbgrazer.plugins.jdbc.mapper;
 
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 import de.tweerlei.dbgrazer.extension.jdbc.SQLGeneratorService;
+import de.tweerlei.dbgrazer.plugins.jdbc.impl.ResultSetAccessor;
 import de.tweerlei.dbgrazer.query.model.ColumnDef;
 import de.tweerlei.dbgrazer.query.model.Query;
 import de.tweerlei.dbgrazer.query.model.ResultRow;
@@ -46,12 +47,13 @@ public class GroupingRowSetMapper extends RowSetMapper
 	 * Constructor
 	 * @param sqlGenerator SQLGeneratorService
 	 * @param dialect SQLDialect
+	 * @param timeZone TimeZone to use for temporal results
 	 * @param query Query
 	 * @param subQueryIndex Base subquery index
 	 */
-	public GroupingRowSetMapper(SQLGeneratorService sqlGenerator, SQLDialect dialect, Query query, int subQueryIndex)
+	public GroupingRowSetMapper(SQLGeneratorService sqlGenerator, SQLDialect dialect, TimeZone timeZone, Query query, int subQueryIndex)
 		{
-		super(sqlGenerator, dialect);
+		super(sqlGenerator, dialect, timeZone);
 		this.query = query;
 		this.rowSets = new LinkedHashMap<String, RowSetImpl>();
 		this.subQueryIndex = subQueryIndex;
@@ -64,17 +66,16 @@ public class GroupingRowSetMapper extends RowSetMapper
 		}
 	
 	@Override
-	public void processRow(ResultSet rs) throws SQLException
+	public void processRow(ResultSet rs, ResultSetAccessor accessor) throws SQLException
 		{
-		final String key = String.valueOf(rs.getObject(1));
+		final String key = String.valueOf(accessor.getObject(rs, 1));
 		RowSetImpl rowSet = rowSets.get(key);
 		if (rowSet == null)
 			{
-			final ResultSetMetaData rsmd = rs.getMetaData();
-			final int c = rsmd.getColumnCount();
+			final int c = accessor.getColumnCount(rs);
 			final List<ColumnDef> columns = new ArrayList<ColumnDef>(c - 1);
 			for (int i = 2; i <= c; i++)
-				columns.add(getColumnDef(rsmd, i, query.getTargetQueries().get(i - 1)));
+				columns.add(accessor.getColumnDef(rs, i, query.getTargetQueries().get(i - 1)));
 			
 			rowSet = new RowSetImpl(query, subQueryIndex++, columns);
 			rowSets.put(key, rowSet);
@@ -83,7 +84,7 @@ public class GroupingRowSetMapper extends RowSetMapper
 		final int c = rowSet.getColumns().size();
 		final ResultRow row = new DefaultResultRow(c);
 		for (int i = 1; i <= c; i++)
-			row.getValues().add(rs.getObject(i + 1));
+			row.getValues().add(accessor.getObject(rs, i + 1));
 		
 		rowSet.getRows().add(row);
 		}

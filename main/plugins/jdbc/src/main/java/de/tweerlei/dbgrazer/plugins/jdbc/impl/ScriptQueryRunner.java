@@ -22,6 +22,7 @@ import java.sql.SQLException;
 import java.sql.SQLWarning;
 import java.sql.Statement;
 import java.util.List;
+import java.util.TimeZone;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -352,6 +353,9 @@ public class ScriptQueryRunner extends BaseQueryRunner
 	private static final class TransferRunnerCallback implements ConnectionCallback, SqlProvider
 		{
 		private final String sql;
+		private final SQLGeneratorService sqlGenerator;
+		private final SQLDialect dialect;
+		private final TimeZone timeZone;
 		private final RowTransferer trans;
 		private final String eol;
 		private final int commitSize;
@@ -364,9 +368,13 @@ public class ScriptQueryRunner extends BaseQueryRunner
 		private int totalRowCount;
 		private int rowCount;
 		
-		public TransferRunnerCallback(String sql, RowTransferer trans, String eol, int commitSize, DMLProgressMonitor monitor, boolean rollback, boolean ignoreErrors, String preDMLStatement, String postDMLStatement)
+		public TransferRunnerCallback(String sql, SQLGeneratorService sqlGenerator, SQLDialect dialect, TimeZone timeZone,
+				RowTransferer trans, String eol, int commitSize, DMLProgressMonitor monitor, boolean rollback, boolean ignoreErrors, String preDMLStatement, String postDMLStatement)
 			{
 			this.sql = sql;
+			this.sqlGenerator = sqlGenerator;
+			this.dialect = dialect;
+			this.timeZone = timeZone;
 			this.trans = trans;
 			this.eol = eol;
 			this.commitSize = commitSize;
@@ -413,7 +421,7 @@ public class ScriptQueryRunner extends BaseQueryRunner
 					try	{
 						final ResultSet rs = srcStmt.executeQuery();
 						try	{
-							final ResultSetIterator rsi = new ResultSetIterator(rs);
+							final ResultSetIterator rsi = new ResultSetIterator(rs, new ResultSetAccessor(sqlGenerator, dialect, timeZone));
 							
 							trans.transfer(rsi, esh);
 							}
@@ -514,7 +522,7 @@ public class ScriptQueryRunner extends BaseQueryRunner
 		}
 	
 	@Override
-	public Result performQuery(String link, Query query, int subQueryIndex, List<Object> params, int limit, CancelableProgressMonitor monitor) throws PerformQueryException
+	public Result performQuery(String link, Query query, int subQueryIndex, List<Object> params, TimeZone timeZone, int limit, CancelableProgressMonitor monitor) throws PerformQueryException
 		{
 		final Result res = new ResultImpl(query);
 		
@@ -575,7 +583,7 @@ public class ScriptQueryRunner extends BaseQueryRunner
 		}
 	
 	@Override
-	public Result performQueries(String link, Query query, StatementProducer statements, int commitSize, DMLProgressMonitor monitor) throws PerformQueryException
+	public Result performQueries(String link, Query query, StatementProducer statements, TimeZone timeZone, int commitSize, DMLProgressMonitor monitor) throws PerformQueryException
 		{
 		final Result res = new ResultImpl(query);
 		
@@ -605,8 +613,8 @@ public class ScriptQueryRunner extends BaseQueryRunner
 		return (res);
 		}
 	
-	private RowSet runScript(TransactionTemplate tx, JdbcTemplate template, SQLDialect dialect, Query query, StatementProducer statements, int commitSize,
-			DMLProgressMonitor monitor, String preDMLStatement, String postDMLStatement)
+	private RowSet runScript(TransactionTemplate tx, JdbcTemplate template, SQLDialect dialect, Query query, StatementProducer statements,
+			int commitSize, DMLProgressMonitor monitor, String preDMLStatement, String postDMLStatement)
 		{
 		final String eol = getStatementTerminator(dialect);
 		final boolean rollback = isRollbackOnly(query.getType());
@@ -640,7 +648,7 @@ public class ScriptQueryRunner extends BaseQueryRunner
 		}
 	
 	@Override
-	public Result transferRows(String link, Query query, RowTransferer transferer, int commitSize, DMLProgressMonitor monitor) throws PerformQueryException
+	public Result transferRows(String link, Query query, TimeZone timeZone, RowTransferer transferer, int commitSize, DMLProgressMonitor monitor) throws PerformQueryException
 		{
 		final Result res = new ResultImpl(query);
 		
@@ -654,7 +662,7 @@ public class ScriptQueryRunner extends BaseQueryRunner
 			if (template != null)
 				{
 				try	{
-					res.getRowSets().put(query.getName(), runScript(tx, template, dialect, query, transferer, commitSize, monitor, preDMLStatement, postDMLStatement));
+					res.getRowSets().put(query.getName(), runScript(tx, template, dialect, query, timeZone, transferer, commitSize, monitor, preDMLStatement, postDMLStatement));
 					}
 				catch (TransactionException e)
 					{
@@ -670,13 +678,13 @@ public class ScriptQueryRunner extends BaseQueryRunner
 		return (res);
 		}
 	
-	private RowSet runScript(TransactionTemplate tx, JdbcTemplate template, SQLDialect dialect, Query query, RowTransferer transferer, int commitSize,
-			DMLProgressMonitor monitor, String preDMLStatement, String postDMLStatement)
+	private RowSet runScript(TransactionTemplate tx, JdbcTemplate template, SQLDialect dialect, Query query, TimeZone timeZone, RowTransferer transferer,
+			int commitSize, DMLProgressMonitor monitor, String preDMLStatement, String postDMLStatement)
 		{
 		final String eol = getStatementTerminator(dialect);
 		final boolean rollback = isRollbackOnly(query.getType());
 		final boolean ignoreErrors = isIgnoreErrors(query.getType());
-		final TransferRunnerCallback runner = new TransferRunnerCallback(query.getStatement(), transferer, eol, commitSize, monitor, rollback, ignoreErrors, preDMLStatement, postDMLStatement);
+		final TransferRunnerCallback runner = new TransferRunnerCallback(query.getStatement(), sqlGenerator, dialect, timeZone, transferer, eol, commitSize, monitor, rollback, ignoreErrors, preDMLStatement, postDMLStatement);
 		final TransactionCallback cb = new ConnectionTxCallback(template, runner);
 		
 		final long start = timeService.getCurrentTime();

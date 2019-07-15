@@ -121,6 +121,12 @@ public class DataFormatterFactoryImpl implements DataFormatterFactory
 		}
 	
 	@Override
+	public TimeZone getTimeZone()
+		{
+		return (themeSettings.getTimeZone());
+		}
+	
+	@Override
 	public String getMessage(String key, Object... args)
 		{
 		return (messageSource.getMessage(key, args, "", themeSettings.getLocale()));

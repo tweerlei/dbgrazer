@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -359,7 +360,7 @@ public class CallQueryRunner extends BaseQueryRunner
 		}
 	
 	@Override
-	public Result performQuery(String link, Query query, int subQueryIndex, List<Object> params, int limit, CancelableProgressMonitor monitor) throws PerformQueryException
+	public Result performQuery(String link, Query query, int subQueryIndex, List<Object> params, TimeZone timeZone, int limit, CancelableProgressMonitor monitor) throws PerformQueryException
 		{
 		final Result res = new ResultImpl(query);
 		
@@ -376,7 +377,7 @@ public class CallQueryRunner extends BaseQueryRunner
 				{
 				try	{
 					if (query.getType() instanceof DMLKeyQueryType)
-						res.getRowSets().putAll(performDMLKeyQuery(tx, template, dialect, query, subQueryIndex, params, limit, preDMLStatement, postDMLStatement));
+						res.getRowSets().putAll(performDMLKeyQuery(tx, template, dialect, query, subQueryIndex, params, timeZone, limit, preDMLStatement, postDMLStatement));
 					else
 						res.getRowSets().put(query.getName(), performQuery(tx, template, dialect, query, subQueryIndex, params, preDMLStatement, postDMLStatement));
 					}
@@ -394,7 +395,7 @@ public class CallQueryRunner extends BaseQueryRunner
 		return (res);
 		}
 	
-	private Map<String, RowSetImpl> performDMLKeyQuery(TransactionTemplate tx, JdbcTemplate template, SQLDialect dialect, Query query, int subQueryIndex, List<Object> params, int limit, String preDMLStatement, String postDMLStatement)
+	private Map<String, RowSetImpl> performDMLKeyQuery(TransactionTemplate tx, JdbcTemplate template, SQLDialect dialect, Query query, int subQueryIndex, List<Object> params, TimeZone timeZone, int limit, String preDMLStatement, String postDMLStatement)
 		{
 		final int maxRows = Math.min(limit, template.getMaxRows());
 		
@@ -402,7 +403,7 @@ public class CallQueryRunner extends BaseQueryRunner
 		final String statement = rep.replaceAll(query.getStatement());
 		final List<Object> args = rep.getRemainingParams();
 		
-		final RowSetMapper mapper = new SingleRowSetMapper(sqlGenerator, dialect, query, subQueryIndex);
+		final RowSetMapper mapper = new SingleRowSetMapper(sqlGenerator, dialect, timeZone, query, subQueryIndex);
 		final LimitedResultSetExtractor extractor = new LimitedResultSetExtractor(mapper, maxRows);
 		final TransactionCallback cb = new DMLKeyQueryCallback(template, statement, args, query.getParameters(), preDMLStatement, postDMLStatement, extractor);
 		

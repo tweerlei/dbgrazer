@@ -17,6 +17,7 @@ package de.tweerlei.dbgrazer.plugins.jdbc.impl;
 
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -214,7 +215,7 @@ public class JdbcQueryRunner extends BaseQueryRunner
 		}
 	
 	@Override
-	public Result performQuery(String link, Query query, int subQueryIndex, List<Object> params, int limit, CancelableProgressMonitor monitor) throws PerformQueryException
+	public Result performQuery(String link, Query query, int subQueryIndex, List<Object> params, TimeZone timeZone, int limit, CancelableProgressMonitor monitor) throws PerformQueryException
 		{
 		final Result res = new ResultImpl(query);
 		
@@ -226,7 +227,7 @@ public class JdbcQueryRunner extends BaseQueryRunner
 			if (template != null)
 				{
 				try	{
-					res.getRowSets().putAll(performQuery(tx, template, dialect, query, subQueryIndex, params, limit));
+					res.getRowSets().putAll(performQuery(tx, template, dialect, query, subQueryIndex, params, timeZone, limit));
 					}
 				catch (TransactionException e)
 					{
@@ -242,11 +243,11 @@ public class JdbcQueryRunner extends BaseQueryRunner
 		return (res);
 		}
 	
-	private Map<String, RowSetImpl> performQuery(TransactionTemplate tx, JdbcTemplate template, SQLDialect dialect, Query query, int subQueryIndex, List<Object> params, int limit)
+	private Map<String, RowSetImpl> performQuery(TransactionTemplate tx, JdbcTemplate template, SQLDialect dialect, Query query, int subQueryIndex, List<Object> params, TimeZone timeZone, int limit)
 		{
 		final int maxRows = Math.min(limit, template.getMaxRows());
 		
-		final RowSetMapper mapper = getRowSetMapper(dialect, query, subQueryIndex);
+		final RowSetMapper mapper = getRowSetMapper(dialect, timeZone, query, subQueryIndex);
 		
 		final LimitedResultSetExtractor extractor = new LimitedResultSetExtractor(mapper, maxRows);
 		final Query runQuery;
@@ -283,16 +284,16 @@ public class JdbcQueryRunner extends BaseQueryRunner
 		return (ret);
 		}
 	
-	private RowSetMapper getRowSetMapper(SQLDialect dialect, Query query, int subQueryIndex)
+	private RowSetMapper getRowSetMapper(SQLDialect dialect, TimeZone timeZone, Query query, int subQueryIndex)
 		{
 		switch (query.getType().getMapMode())
 			{
 			case GROUPED:
-				return (new GroupingRowSetMapper(sqlGenerator, dialect, query, subQueryIndex));
+				return (new GroupingRowSetMapper(sqlGenerator, dialect, timeZone, query, subQueryIndex));
 			case SPLIT:
-				return (new ColumnSplitMapper(sqlGenerator, dialect, query, subQueryIndex));
+				return (new ColumnSplitMapper(sqlGenerator, dialect, timeZone, query, subQueryIndex));
 			default:
-				return (new SingleRowSetMapper(sqlGenerator, dialect, query, subQueryIndex));
+				return (new SingleRowSetMapper(sqlGenerator, dialect, timeZone, query, subQueryIndex));
 			}
 		}
 	
@@ -314,7 +315,7 @@ public class JdbcQueryRunner extends BaseQueryRunner
 		}
 	
 	@Override
-	public int performStreamedQuery(String link, Query query, List<Object> params, int limit, RowHandler handler) throws PerformQueryException
+	public int performStreamedQuery(String link, Query query, List<Object> params, TimeZone timeZone, int limit, RowHandler handler) throws PerformQueryException
 		{
 		if (supports(query.getType()))
 			{
@@ -324,7 +325,7 @@ public class JdbcQueryRunner extends BaseQueryRunner
 			if (template != null)
 				{
 				try	{
-					return (performQuery(tx, template, dialect, query, params, limit, handler));
+					return (performQuery(tx, template, dialect, query, params, timeZone, limit, handler));
 					}
 				catch (TransactionException e)
 					{
@@ -340,9 +341,9 @@ public class JdbcQueryRunner extends BaseQueryRunner
 		return (0);
 		}
 	
-	private int performQuery(TransactionTemplate tx, JdbcTemplate template, SQLDialect dialect, Query query, List<Object> params, int limit, RowHandler handler)
+	private int performQuery(TransactionTemplate tx, JdbcTemplate template, SQLDialect dialect, Query query, List<Object> params, TimeZone timeZone, int limit, RowHandler handler)
 		{
-		final RowHandlerMapper mapper = new RowHandlerMapper(sqlGenerator, dialect, handler);
+		final RowHandlerMapper mapper = new RowHandlerMapper(sqlGenerator, dialect, timeZone, handler);
 		final LimitedResultSetExtractor extractor = new LimitedResultSetExtractor(mapper, limit);
 		final TransactionCallback cb = getTransactionCallback(query, params, template, extractor, tx.isReadOnly());
 		

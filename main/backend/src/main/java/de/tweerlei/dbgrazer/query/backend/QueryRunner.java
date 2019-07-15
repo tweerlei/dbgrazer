@@ -16,6 +16,7 @@
 package de.tweerlei.dbgrazer.query.backend;
 
 import java.util.List;
+import java.util.TimeZone;
 
 import de.tweerlei.dbgrazer.common.util.Named;
 import de.tweerlei.dbgrazer.query.exception.PerformQueryException;
@@ -48,46 +49,50 @@ public interface QueryRunner extends Named
 	 * @param query Query
 	 * @param subQueryIndex Base subquery index
 	 * @param params Parameters
+	 * @param timeZone TimeZone to use for temporal results
 	 * @param limit Limit the number of rows to fetch per result RowSet
 	 * @param monitor CancelableProgressMonitor (may be null)
 	 * @return Result
 	 * @throws PerformQueryException on error
 	 */
-	public Result performQuery(String link, Query query, int subQueryIndex, List<Object> params, int limit, CancelableProgressMonitor monitor) throws PerformQueryException;
+	public Result performQuery(String link, Query query, int subQueryIndex, List<Object> params, TimeZone timeZone, int limit, CancelableProgressMonitor monitor) throws PerformQueryException;
 	
 	/**
 	 * Perform a query, passing results to a RowHandler
 	 * @param link Link name
 	 * @param query Query
 	 * @param params Parameters
+	 * @param timeZone TimeZone to use for temporal results
 	 * @param limit Limit the number of rows to fetch per result RowSet
 	 * @param handler RowHandler
 	 * @return Processed row count
 	 * @throws PerformQueryException on error
 	 */
-	public int performStreamedQuery(String link, Query query, List<Object> params, int limit, RowHandler handler) throws PerformQueryException;
+	public int performStreamedQuery(String link, Query query, List<Object> params, TimeZone timeZone, int limit, RowHandler handler) throws PerformQueryException;
 	
 	/**
 	 * Perform DML queries in a single transaction
 	 * @param link Link name
 	 * @param query Query (statement is ignored in favor of queries)
 	 * @param statements Queries
+	 * @param timeZone TimeZone to use for temporal results
 	 * @param commitSize Perform a COMMIT after this number of rows
 	 * @param monitor DMLProgressMonitor
 	 * @return Result
 	 * @throws PerformQueryException on error
 	 */
-	public Result performQueries(String link, Query query, StatementProducer statements, int commitSize, DMLProgressMonitor monitor) throws PerformQueryException;
+	public Result performQueries(String link, Query query, StatementProducer statements, TimeZone timeZone, int commitSize, DMLProgressMonitor monitor) throws PerformQueryException;
 	
 	/**
 	 * Perform DML queries in a single transaction
 	 * @param link Link name
 	 * @param query Query statement
+	 * @param timeZone TimeZone to use for temporal results
 	 * @param transferer RowTransferer
 	 * @param commitSize Perform a COMMIT after this number of rows
 	 * @param monitor DMLProgressMonitor
 	 * @return Result
 	 * @throws PerformQueryException on error
 	 */
-	public Result transferRows(String link, Query query, RowTransferer transferer, int commitSize, DMLProgressMonitor monitor) throws PerformQueryException;
+	public Result transferRows(String link, Query query, TimeZone timeZone, RowTransferer transferer, int commitSize, DMLProgressMonitor monitor) throws PerformQueryException;
 	}
