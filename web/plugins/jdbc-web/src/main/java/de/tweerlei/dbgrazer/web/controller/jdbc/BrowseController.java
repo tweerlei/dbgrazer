@@ -306,6 +306,7 @@ public class BrowseController
 		model.put("query", query);
 		model.put("tabs", tabs);
 		model.put("params", querySettingsManager.buildParameterMap(null));
+		model.put("extensionJS", JdbcMessageKeys.EXTENSION_JS);
 		
 		return (model);
 		}
@@ -338,6 +339,7 @@ public class BrowseController
 		model.put("query", query);
 		model.put("tabs", tabs);
 		model.put("params", querySettingsManager.buildParameterMap(Arrays.asList(catalog)));
+		model.put("extensionJS", JdbcMessageKeys.EXTENSION_JS);
 		
 		return (model);
 		}

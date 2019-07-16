@@ -39,11 +39,15 @@ var PopupWindow = Class.create({
 		
 		this.create();
 		var m = this.target;
+		var h = Elements.getScrolledY(parent) + Elements.getHeight(parent);
+		if (h + Elements.getHeight(m) >= Elements.getWindowHeight()) {
+			return false;
+		}
 		
 		if (right) {
-			Elements.moveTo(m, 0, Elements.getScrolledY(parent) + Elements.getHeight(parent), true);
+			Elements.moveTo(m, 0, h, true);
 		} else {
-			Elements.moveTo(m, Elements.getScrolledX(parent), Elements.getScrolledY(parent) + Elements.getHeight(parent));
+			Elements.moveTo(m, Elements.getScrolledX(parent), h);
 		}
 		m.innerHTML = content;
 		m.show();

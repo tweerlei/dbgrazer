@@ -128,7 +128,8 @@ public class LocalizationHelperImpl implements LocalizationHelper
 		{
 		final TimeZone tz = getTimeZone(id);
 		final StringBuilder sb = new StringBuilder();
-		sb.append(tz.getDisplayName(false, TimeZone.LONG, locale));
+//		sb.append(tz.getDisplayName(false, TimeZone.LONG, locale));
+		sb.append(tz.getID());
 		sb.append(" (");
 		sb.append(tz.getDisplayName(false, TimeZone.SHORT, locale));
 		sb.append(")");

@@ -133,7 +133,9 @@ public class PooledDataSourceWrapper implements DataSourceWrapper
 		ret.setMaxStatements(config.get(ConfigKeys.MAX_STATEMENTS));
 		ret.setMaxStatementsPerConnection(config.get(ConfigKeys.MAX_STATEMENTS_PER_CONNECTION));
 		ret.setIdleConnectionTestPeriod(config.get(ConfigKeys.IDLE_CONNECTION_TEST_PERIOD));
+		
 		ret.setPreferredTestQuery(preferredTestQuery);
+		ret.setTestConnectionOnCheckout(true);
 		
 		try	{
 			final PoolBackedDataSource pbds = new PoolBackedDataSource();
