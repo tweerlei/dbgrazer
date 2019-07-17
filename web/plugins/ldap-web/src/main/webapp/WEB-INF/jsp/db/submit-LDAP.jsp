@@ -86,7 +86,7 @@
 					<dt><label for="statement"><fmt:message key="sqlStatement"/></label></dt>
 					<dd><div>
 						<span class="action" title="<fmt:message key="clear"/>" onclick="return clearElement('statement');"><fmt:message key="clearIcon"/></span>
-						<span class="action" title="<fmt:message key="maximize"/>" onclick="return zoomContent('statement');"><fmt:message key="maximizeIcon"/></span></div>
+						<span class="action" title="<fmt:message key="maximize"/>" onclick="return zoomForm('statement');"><fmt:message key="maximizeIcon"/></span></div>
 						<spring:textarea id="statement" cssClass="medium" path="query" cols="80" rows="25"/></dd>
 					<dt>&nbsp;</dt>
 					<dd><input type="submit" value="<fmt:message key="execute"/>"/>

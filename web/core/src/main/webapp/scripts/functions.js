@@ -1302,8 +1302,13 @@ function zoomForm(e) {
 	var frm = $('zoomform');
 	var full = $('fullscreen');
 	if (el && frm && full && !full.visible()) {
-		var p = el.up('.tab-body');
-		p.insertBefore(full, p.firstChild);
+		var p = el.up('.tab-page');
+		var h = p.down('.tab-header');
+		var b = p.down('.tab-body');
+		if (h) {
+			h.hide();
+		}
+		b.insertBefore(full, b.firstChild);
 		zoomFormSource = el;
 		var txt = zoomFormSource.value;
 		getFormInto(frm, full, { zoomstmt: txt }, function() {
@@ -1320,6 +1325,11 @@ function unzoomForm() {
 		var el = $('zoomresult');
 		if (el) {
 			zoomFormSource.value = el.value;
+		}
+		var p = full.up('.tab-page');
+		var h = p.down('.tab-header');
+		if (h) {
+			h.show();
 		}
 		full.hide();
 		full.innerHTML = '';

@@ -15,9 +15,8 @@
 --%><%@
 	include file="../../include/include.jspf"
 %><form class="content" action="db/${currentConnection.linkName}/ajax/formatstmt.html" method="post" onsubmit="return getFormInto(this, this.parentNode);">
-	<input id="f1-statement" type="hidden" name="statement" value="${fn:escapeXml(statement)}"/>
 	<div>
-		<select id="f1-format" name="format" onchange="Forms.submit(form);">
+		<fmt:message key="formatter"/> <select id="f1-format" name="format" onchange="Forms.submit(form);">
 			<option value=""><fmt:message key="default"/></option>
 <c:forEach items="${formats}" var="f"
 >			<option value="${f}"<c:if test="${f == format}"> selected="selected"</c:if>><fmt:message key="${f}"/></option>
@@ -25,5 +24,5 @@
 >		</select>
 		&nbsp; <span class="action" title="<fmt:message key="maximize"/>" onclick="return unzoomForm();"><fmt:message key="maximizeIcon"/></span>
 	</div>
-	<textarea id="zoomresult" name="result" style="width: 100%; height: 95%">${result}</textarea>
+	<textarea id="zoomresult" name="statement" style="width: 100%; height: 95%">${result}</textarea>
 </form>

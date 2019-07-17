@@ -83,7 +83,7 @@
 					<dt><label for="statement"><fmt:message key="sqlStatement"/><c:if test="${currentConnection.writable}"> <fmt:message key="dmlAllowed"/></c:if></label></dt>
 					<dd><div>
 						<span class="action" title="<fmt:message key="clear"/>" onclick="return clearElement('statement');"><fmt:message key="clearIcon"/></span>
-						<span class="action" title="<fmt:message key="maximize"/>" onclick="return zoomContent('statement');"><fmt:message key="maximizeIcon"/></span></div>
+						<span class="action" title="<fmt:message key="maximize"/>" onclick="return zoomForm('statement');"><fmt:message key="maximizeIcon"/></span></div>
 						<spring:textarea id="statement" cssClass="medium" path="query" cols="80" rows="25"/></dd>
 					<dt><fmt:message key="queryParams"/></dt>
 					<dd><table class="props">

@@ -272,11 +272,7 @@
 *
 ***********************************************************************
 --%><c:when test="${ix == 4}"
->		<div id="fullscreen" style="display: none;"></div>
-		<form id="zoomform" class="hidden" method="post" action="db/${currentConnection.linkName}/ajax/formatlines.html">
-			<input id="zoomstmt" type="hidden" name="statement" value=""/>
-		</form>
-		<div class="tab-header">
+>		<div class="tab-header">
 			<form id="submitform" class="full" action="db/${currentConnection.linkName}/ajax/submit-simple.html" method="post" onsubmit="return submitForm(this, 'table');">
 				<input type="hidden" name="catalog" value="${catalog}"/>
 				<input type="hidden" name="schema" value="${schema}"/>
