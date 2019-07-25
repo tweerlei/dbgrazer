@@ -15,6 +15,7 @@
  */
 package de.tweerlei.dbgrazer.web.controller;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -32,6 +33,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import de.tweerlei.common.util.StringUtils;
 import de.tweerlei.common5.collections.CollectionUtils;
@@ -101,6 +103,7 @@ public class QueryRunController
 		{
 		private Query query;
 		private final Map<Integer, String> params;
+		private final Map<Integer, MultipartFile> files;
 		
 		/**
 		 * Constructor
@@ -108,6 +111,7 @@ public class QueryRunController
 		public FormBackingObject()
 			{
 			this.params = new TreeMap<Integer, String>();
+			this.files = new TreeMap<Integer, MultipartFile>();
 			}
 		
 		/**
@@ -117,6 +121,15 @@ public class QueryRunController
 		public Map<Integer, String> getParams()
 			{
 			return params;
+			}
+		
+		/**
+		 * Get the files
+		 * @return the files
+		 */
+		public Map<Integer, MultipartFile> getFileparams()
+			{
+			return files;
 			}
 		
 		/**
@@ -135,6 +148,28 @@ public class QueryRunController
 		public void setQuery(Query query)
 			{
 			this.query = query;
+			}
+		
+		/**
+		 * Get the settings
+		 * @return the settings
+		 */
+		public Map<Integer, String> getEffectiveParams()
+			{
+			if (files.isEmpty())
+				return (params);
+			
+			try	{
+				final Map<Integer, String> ret = new TreeMap<Integer, String>(params);
+				for (Map.Entry<Integer, MultipartFile> ent : files.entrySet())
+					ret.put(ent.getKey(), new String(ent.getValue().getBytes(), "UTF-8"));
+				
+				return (ret);
+				}
+			catch (IOException e)
+				{
+				throw new RuntimeException(e);
+				}
 			}
 		}
 	
@@ -474,7 +509,7 @@ public class QueryRunController
 		final DataFormatter fmt = factory.getWebFormatter();
 		final List<String> params = querySettingsManager.getEffectiveParameters(fbo.getQuery(), fbo.getParams());
 		
-		final Map<String, Result> results = performRecursiveQuery(connectionSettings.getLinkName(), fbo.getQuery(), fbo.getParams());
+		final Map<String, Result> results = performRecursiveQuery(connectionSettings.getLinkName(), fbo.getQuery(), fbo.getEffectiveParams());
 		
 		// query successful, historize
 		if (historize && querySettingsManager.isHistoryEnabled())
@@ -664,7 +699,7 @@ public class QueryRunController
 		final DataFormatter fmt = factory.getWebFormatter();
 		final List<String> params = querySettingsManager.getEffectiveParameters(fbo.getQuery(), fbo.getParams());
 		
-		final Map<String, Result> results = performRecursiveQuery(connectionSettings.getLinkName(), fbo.getQuery(), fbo.getParams());
+		final Map<String, Result> results = performRecursiveQuery(connectionSettings.getLinkName(), fbo.getQuery(), fbo.getEffectiveParams());
 		
 		final Result result = new ResultImpl(fbo.getQuery());
 		for (Map.Entry<String, Result> ent : results.entrySet())
@@ -852,7 +887,7 @@ public class QueryRunController
 		{
 		final Map<String, Object> model = new HashMap<String, Object>();
 		
-		final Result r = performQuery(connectionSettings.getLinkName(), fbo.getQuery(), fbo.getParams());
+		final Result r = performQuery(connectionSettings.getLinkName(), fbo.getQuery(), fbo.getEffectiveParams());
 		
 		RowSet rowSet = null;
 		for (RowSet rs : r.getRowSets().values())
@@ -902,7 +937,7 @@ public class QueryRunController
 		{
 		final Map<String, Object> model = new HashMap<String, Object>();
 		
-		model.put(GenericDownloadView.SOURCE_ATTRIBUTE, downloadService.getStreamDownloadSource(connectionSettings.getLinkName(), fbo.getQuery(), fbo.getParams(), format));
+		model.put(GenericDownloadView.SOURCE_ATTRIBUTE, downloadService.getStreamDownloadSource(connectionSettings.getLinkName(), fbo.getQuery(), fbo.getEffectiveParams(), format));
 		
 		return (model);
 		}
@@ -944,8 +979,7 @@ public class QueryRunController
 		final Map<String, Object> model = new HashMap<String, Object>();
 		
 		final DataFormatter fmt = factory.getWebFormatter();
-		
-		final Map<String, Result> results = performRecursiveQuery(connectionSettings.getLinkName(), fbo.getQuery(), fbo.getParams());
+		final Map<String, Result> results = performRecursiveQuery(connectionSettings.getLinkName(), fbo.getQuery(), fbo.getEffectiveParams());
 		
 		final Result r = results.values().iterator().next();
 		if ((r.getQuery().getType().getResultType() == ResultType.VISUALIZATION) && !r.getFirstRowSet().getRows().isEmpty())
@@ -971,8 +1005,7 @@ public class QueryRunController
 		final Map<String, Object> model = new HashMap<String, Object>();
 		
 		final DataFormatter fmt = factory.getWebFormatter();
-		
-		final Map<String, Result> results = performRecursiveQuery(connectionSettings.getLinkName(), fbo.getQuery(), fbo.getParams());
+		final Map<String, Result> results = performRecursiveQuery(connectionSettings.getLinkName(), fbo.getQuery(), fbo.getEffectiveParams());
 		
 		final Result r = results.values().iterator().next();
 		if ((r.getQuery().getType().getResultType() == ResultType.VISUALIZATION) && !r.getFirstRowSet().getRows().isEmpty())
@@ -1016,7 +1049,7 @@ public class QueryRunController
 		
 		try	{
 			final Query q = queryService.findQueryByName(connectionSettings.getLinkName(), fbo.getQuery().getSubQueries().get(level).getName());
-			final Result r = performQuery(connectionSettings.getLinkName(), q, fbo.getParams());
+			final Result r = performQuery(connectionSettings.getLinkName(), q, fbo.getEffectiveParams());
 			
 			boolean allEmpty = true;
 			for (RowSet rs : r.getRowSets().values())
@@ -1075,7 +1108,7 @@ public class QueryRunController
 		
 		try	{
 			final Query q = queryService.findQueryByName(connectionSettings.getLinkName(), fbo.getQuery().getSubQueries().get(level).getName());
-			final Result r = performQuery(connectionSettings.getLinkName(), q, fbo.getParams());
+			final Result r = performQuery(connectionSettings.getLinkName(), q, fbo.getEffectiveParams());
 			final Map<String, TabItem<RowSet>> rowSets = new LinkedHashMap<String, TabItem<RowSet>>();
 			
 			boolean allEmpty = true;
