@@ -41,6 +41,6 @@ public class LdapAttributesQueryType extends AbstractTableQueryType
 	@Autowired
 	public LdapAttributesQueryType(LdapLinkType linkType)
 		{
-		super(NAME, linkType, ResultMapMode.SINGLE);
+		super(NAME, linkType, ResultMapMode.SINGLE, null);
 		}
 	}

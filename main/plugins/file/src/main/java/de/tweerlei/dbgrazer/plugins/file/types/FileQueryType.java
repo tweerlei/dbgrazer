@@ -19,8 +19,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
+import de.tweerlei.common5.collections.MapBuilder;
 import de.tweerlei.dbgrazer.plugins.file.impl.FilesystemLinkType;
 import de.tweerlei.dbgrazer.query.model.impl.AbstractSingleQueryType;
+import de.tweerlei.dbgrazer.text.backend.TextFormatter;
 
 /**
  * Read file contents
@@ -40,6 +42,11 @@ public class FileQueryType extends AbstractSingleQueryType
 	@Autowired
 	public FileQueryType(FilesystemLinkType linkType)
 		{
-		super(NAME, linkType);
+		super(NAME, linkType, MapBuilder.<String, Class<?>>ordered()
+				.put(QueryTypeAttributes.ATTR_FORMATTER, TextFormatter.class)
+				.put(QueryTypeAttributes.ATTR_FORMATTING, Boolean.class)
+				.put(QueryTypeAttributes.ATTR_SYNTAX_COLORING, Boolean.class)
+				.put(QueryTypeAttributes.ATTR_LINE_NUMBERS, Boolean.class)
+				.build());
 		}
 	}

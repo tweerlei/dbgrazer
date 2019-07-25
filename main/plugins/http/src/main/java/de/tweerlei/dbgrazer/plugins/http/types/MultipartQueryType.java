@@ -15,14 +15,11 @@
  */
 package de.tweerlei.dbgrazer.plugins.http.types;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
+import de.tweerlei.common5.collections.MapBuilder;
 import de.tweerlei.dbgrazer.plugins.http.impl.WebserviceLinkType;
 import de.tweerlei.dbgrazer.query.model.impl.AbstractSingleQueryType;
 import de.tweerlei.dbgrazer.text.backend.TextFormatter;
@@ -38,8 +35,6 @@ public class MultipartQueryType extends AbstractSingleQueryType
 	{
 	private static final String NAME = "MULTIPART";
 	
-	private final Map<String, Class<?>> attributes;
-	
 	/**
 	 * Constructor
 	 * @param linkType LinkType
@@ -47,17 +42,9 @@ public class MultipartQueryType extends AbstractSingleQueryType
 	@Autowired
 	public MultipartQueryType(WebserviceLinkType linkType)
 		{
-		super(NAME, linkType);
-		
-		final Map<String, Class<?>> m = new LinkedHashMap<String, Class<?>>();
-		m.put(QueryTypeAttributes.ATTR_ENDPOINT, String.class);
-		m.put(QueryTypeAttributes.ATTR_FORMATTER, TextFormatter.class);
-		attributes = Collections.unmodifiableMap(m);
-		}
-	
-	@Override
-	public Map<String, Class<?>> getSupportedAttributes()
-		{
-		return (attributes);
+		super(NAME, linkType, MapBuilder.<String, Class<?>>ordered()
+				.put(QueryTypeAttributes.ATTR_ENDPOINT, String.class)
+				.put(QueryTypeAttributes.ATTR_FORMATTER, TextFormatter.class)
+				.build());
 		}
 	}

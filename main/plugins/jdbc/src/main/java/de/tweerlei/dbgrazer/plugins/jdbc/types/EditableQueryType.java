@@ -46,7 +46,7 @@ public class EditableQueryType extends AbstractTableQueryType
 	@Autowired
 	public EditableQueryType(JdbcLinkType linkType, AggregateResultEnricher postProcessor)
 		{
-		super(NAME, linkType, ResultMapMode.SINGLE);
+		super(NAME, linkType, ResultMapMode.SINGLE, null);
 		this.postProcessor = postProcessor;
 		}
 	

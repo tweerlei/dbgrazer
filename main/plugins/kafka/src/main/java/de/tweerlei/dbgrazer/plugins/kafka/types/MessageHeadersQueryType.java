@@ -36,6 +36,6 @@ public class MessageHeadersQueryType extends AbstractRowQueryType
 //	@Autowired
 	public MessageHeadersQueryType(KafkaLinkType linkType)
 		{
-		super(NAME, linkType);
+		super(NAME, linkType, null);
 		}
 	}

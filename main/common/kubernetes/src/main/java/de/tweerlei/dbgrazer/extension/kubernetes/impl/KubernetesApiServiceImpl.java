@@ -49,6 +49,7 @@ import io.kubernetes.client.models.V1APIGroupList;
 import io.kubernetes.client.models.V1APIResource;
 import io.kubernetes.client.models.V1APIResourceList;
 import io.kubernetes.client.models.V1ConfigMap;
+import io.kubernetes.client.models.V1ContainerStatus;
 import io.kubernetes.client.models.V1Endpoints;
 import io.kubernetes.client.models.V1Event;
 import io.kubernetes.client.models.V1GroupVersionForDiscovery;
@@ -320,7 +321,7 @@ public class KubernetesApiServiceImpl implements KubernetesApiService, ConfigLis
 		return (null);
 		}
 	
-	private KubernetesApiObject getKubernetesApiObject(V1ObjectMeta metadata, Map<String, String> properties)
+	private KubernetesApiObject getKubernetesApiObject(V1ObjectMeta metadata, Map<String, Object> properties)
 		{
 		return (new KubernetesApiObject(metadata.getName(), metadata.getCreationTimestamp().toDate(), metadata.getLabels(), properties));
 		}
@@ -335,7 +336,7 @@ public class KubernetesApiServiceImpl implements KubernetesApiService, ConfigLis
 				{
 				case ConfigMap:
 					for (V1ConfigMap n : api.listNamespacedConfigMap(namespace, null, null, null, null, null, null, null, null, null).getItems())
-						names.add(getKubernetesApiObject(n.getMetadata(), null));
+						names.add(getKubernetesApiObject(n.getMetadata(), getConfigMapProperties(n)));
 					break;
 				
 				case Endpoints:
@@ -355,7 +356,7 @@ public class KubernetesApiServiceImpl implements KubernetesApiService, ConfigLis
 				
 				case Secret:
 					for (V1Secret n : api.listNamespacedSecret(namespace, null, null, null, null, null, null, null, null, null).getItems())
-						names.add(getKubernetesApiObject(n.getMetadata(), null));
+						names.add(getKubernetesApiObject(n.getMetadata(), getSecretProperties(n)));
 					break;
 				
 				case Service:
@@ -405,23 +406,52 @@ public class KubernetesApiServiceImpl implements KubernetesApiService, ConfigLis
 		return (names);
 		}
 	
-	private Map<String, String> getPodProperties(V1Pod pod)
+	private Map<String, Object> getPodProperties(V1Pod pod)
 		{
-		final Map<String, String> ret = new LinkedHashMap<String, String>();
+		final Map<String, Object> ret = new LinkedHashMap<String, Object>();
+		
+		int containers = 0;
+		int readyContainers = 0;
+		for (V1ContainerStatus s : pod.getStatus().getContainerStatuses())
+			{
+			containers++;
+			if (s.isReady())
+				readyContainers++;
+			}
 		
 		ret.put("Phase", pod.getStatus().getPhase());
-		ret.put("StartTime", pod.getStatus().getStartTime().toString());
+		ret.put("Containers", containers);
+		ret.put("Ready", readyContainers);
+		ret.put("StartTime", pod.getStatus().getStartTime().toDate());
 		ret.put("PodIP", pod.getStatus().getPodIP());
 		ret.put("HostIP", pod.getStatus().getHostIP());
 		
 		return (ret);
 		}
 	
-	private Map<String, String> getEventProperties(V1Event event)
+	private Map<String, Object> getEventProperties(V1Event event)
 		{
-		final Map<String, String> ret = new LinkedHashMap<String, String>();
+		final Map<String, Object> ret = new LinkedHashMap<String, Object>();
 		
 		ret.put("Message", event.getMessage());
+		
+		return (ret);
+		}
+	
+	private Map<String, Object> getConfigMapProperties(V1ConfigMap configMap)
+		{
+		final Map<String, Object> ret = new LinkedHashMap<String, Object>();
+		
+		ret.put("Entries", configMap.getData().size());
+		
+		return (ret);
+		}
+	
+	private Map<String, Object> getSecretProperties(V1Secret secret)
+		{
+		final Map<String, Object> ret = new LinkedHashMap<String, Object>();
+		
+		ret.put("Entries", secret.getData().size());
 		
 		return (ret);
 		}

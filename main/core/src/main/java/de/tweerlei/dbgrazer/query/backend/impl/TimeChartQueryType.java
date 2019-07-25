@@ -15,13 +15,10 @@
  */
 package de.tweerlei.dbgrazer.query.backend.impl;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
+import de.tweerlei.common5.collections.MapBuilder;
 import de.tweerlei.dbgrazer.query.model.impl.AbstractVisualizationQueryType;
 import de.tweerlei.dbgrazer.visualization.service.ChartScaling;
 import de.tweerlei.dbgrazer.visualization.service.ChartType;
@@ -38,25 +35,15 @@ public class TimeChartQueryType extends AbstractVisualizationQueryType
 	/** The NAME */
 	public static final String NAME = "TIMECHART";
 	
-	private final Map<String, Class<?>> attributes;
-	
 	/**
 	 * Constructor
 	 */
 	public TimeChartQueryType()
 		{
-		super(NAME);
-		
-		final Map<String, Class<?>> m = new LinkedHashMap<String, Class<?>>();
-		m.put(ChartType.class.getSimpleName(), ChartType.class);
-		m.put(ChartScaling.class.getSimpleName(), ChartScaling.class);
-		attributes = Collections.unmodifiableMap(m);
-		}
-	
-	@Override
-	public Map<String, Class<?>> getSupportedAttributes()
-		{
-		return (attributes);
+		super(NAME, MapBuilder.<String, Class<?>>ordered()
+				.put(ChartType.class.getSimpleName(), ChartType.class)
+				.put(ChartScaling.class.getSimpleName(), ChartScaling.class)
+				.build());
 		}
 	
 	@Override

@@ -113,6 +113,8 @@ public abstract class AbstractDataFormatter implements DataFormatter
 				case TEXT:
 				case PATTERN:
 					return (formatString(value.toString()));
+				case PASSWORD:
+					return (formatPassword(value.toString()));
 				case DATE:
 					{
 					final Date d = (Date) value;
@@ -234,6 +236,13 @@ public abstract class AbstractDataFormatter implements DataFormatter
 	 * @return String representation
 	 */
 	protected abstract String formatNonemptyString(String s);
+	
+	/**
+	 * Format a password string
+	 * @param value Value
+	 * @return String representation
+	 */
+	protected abstract String formatPassword(String value);
 	
 	private String formatInteger(Number value)
 		{

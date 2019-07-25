@@ -15,6 +15,8 @@
  */
 package de.tweerlei.dbgrazer.query.model.impl;
 
+import java.util.Map;
+
 import org.springframework.validation.Errors;
 
 import de.tweerlei.common.util.StringUtils;
@@ -32,10 +34,11 @@ public abstract class AbstractViewType extends BaseQueryType
 	/**
 	 * Constructor for view types
 	 * @param name Name
+	 * @param attributes Supported attributes
 	 */
-	protected AbstractViewType(String name)
+	protected AbstractViewType(String name, Map<String, Class<?>> attributes)
 		{
-		super(name, null);
+		super(name, null, attributes);
 		}
 	
 	@Override

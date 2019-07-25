@@ -15,13 +15,10 @@
  */
 package de.tweerlei.dbgrazer.query.backend.impl;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
+import de.tweerlei.common5.collections.MapBuilder;
 import de.tweerlei.dbgrazer.query.model.impl.AbstractMultilevelQueryType;
 
 /**
@@ -36,24 +33,14 @@ public class TreeQueryType extends AbstractMultilevelQueryType
 	/** The NAME */
 	public static final String NAME = "TREE";
 	
-	private final Map<String, Class<?>> attributes;
-	
 	/**
 	 * Constructor
 	 */
 	public TreeQueryType()
 		{
-		super(NAME);
-		
-		final Map<String, Class<?>> m = new LinkedHashMap<String, Class<?>>();
-		m.put("hideId", Boolean.class);
-		m.put("tables", Boolean.class);
-		attributes = Collections.unmodifiableMap(m);
-		}
-	
-	@Override
-	public Map<String, Class<?>> getSupportedAttributes()
-		{
-		return (attributes);
+		super(NAME, MapBuilder.<String, Class<?>>ordered()
+				.put("hideId", Boolean.class)
+				.put("tables", Boolean.class)
+				.build());
 		}
 	}

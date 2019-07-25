@@ -56,7 +56,7 @@ public class QuerySettingsManagerImplTest extends TestCase
 		 */
 		public TestQueryType()
 			{
-			super(NAME);
+			super(NAME, null);
 			}
 		}
 	

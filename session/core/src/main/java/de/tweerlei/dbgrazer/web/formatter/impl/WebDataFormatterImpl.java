@@ -28,6 +28,8 @@ import de.tweerlei.common.codec.HexCodec;
  */
 public class WebDataFormatterImpl extends AbstractDataFormatter
 	{
+	private static final String PASSWORD_MASK = "***";
+	
 	private final int hexColumns;
 	
 	/**
@@ -64,6 +66,12 @@ public class WebDataFormatterImpl extends AbstractDataFormatter
 	protected String formatNonemptyString(String s)
 		{
 		return (s);
+		}
+	
+	@Override
+	protected String formatPassword(String value)
+		{
+		return (PASSWORD_MASK);
 		}
 	
 	@Override

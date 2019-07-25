@@ -30,6 +30,12 @@ public final class QueryTypeAttributes
 	public static final String ATTR_CONTENT_TYPE = "contentType";
 	/** RowSet attribute for the TextFormatter name */
 	public static final String ATTR_FORMATTER = "formatter";
+	/** RowSet attribute for the formatting flag */
+	public static final String ATTR_FORMATTING = "formatting";
+	/** RowSet attribute for the syntax coloring flag */
+	public static final String ATTR_SYNTAX_COLORING = "syntaxColoring";
+	/** RowSet attribute for the line numbers flag */
+	public static final String ATTR_LINE_NUMBERS = "lineNumbers";
 	/** RowSet attribute for the link name */
 	public static final String ATTR_LINK = "connectionName";
 	

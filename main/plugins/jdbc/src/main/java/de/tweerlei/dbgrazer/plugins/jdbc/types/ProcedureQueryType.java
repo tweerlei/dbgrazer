@@ -41,7 +41,7 @@ public class ProcedureQueryType extends AbstractSingleQueryType
 	@Autowired
 	public ProcedureQueryType(JdbcLinkType linkType)
 		{
-		super(NAME, linkType);
+		super(NAME, linkType, null);
 		}
 	
 	@Override

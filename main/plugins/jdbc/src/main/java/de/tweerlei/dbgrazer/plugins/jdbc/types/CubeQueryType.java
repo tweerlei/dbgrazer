@@ -15,14 +15,11 @@
  */
 package de.tweerlei.dbgrazer.plugins.jdbc.types;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
+import de.tweerlei.common5.collections.MapBuilder;
 import de.tweerlei.dbgrazer.plugins.jdbc.impl.AggregateSubQueryResolver;
 import de.tweerlei.dbgrazer.plugins.jdbc.impl.JdbcLinkType;
 import de.tweerlei.dbgrazer.query.model.ResultMapMode;
@@ -40,7 +37,6 @@ public class CubeQueryType extends AbstractTableQueryType
 	{
 	private static final String NAME = "CUBE";
 	
-	private final Map<String, Class<?>> attributes;
 	private final SubQueryResolver subQueryResolver;
 	
 	/**
@@ -51,22 +47,13 @@ public class CubeQueryType extends AbstractTableQueryType
 	@Autowired
 	public CubeQueryType(JdbcLinkType linkType, AggregateSubQueryResolver subQueryResolver)
 		{
-		super(NAME, linkType, ResultMapMode.SINGLE);
-		
-		final Map<String, Class<?>> m = new LinkedHashMap<String, Class<?>>();
-		m.put(QueryTypeAttributes.ATTR_DIMENSIONS, String.class);
-		m.put(QueryTypeAttributes.ATTR_RESULTS, String.class);
-		attributes = Collections.unmodifiableMap(m);
-		
+		super(NAME, linkType, ResultMapMode.SINGLE, MapBuilder.<String, Class<?>>ordered()
+				.put(QueryTypeAttributes.ATTR_DIMENSIONS, String.class)
+				.put(QueryTypeAttributes.ATTR_RESULTS, String.class)
+				.build());
 		this.subQueryResolver = subQueryResolver;
 		}
 
-	@Override
-	public Map<String, Class<?>> getSupportedAttributes()
-		{
-		return (attributes);
-		}
-	
 	@Override
 	public SubQueryResolver getSubQueryResolver()
 		{

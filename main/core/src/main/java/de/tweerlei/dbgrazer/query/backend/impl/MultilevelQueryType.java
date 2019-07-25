@@ -15,13 +15,10 @@
  */
 package de.tweerlei.dbgrazer.query.backend.impl;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
+import de.tweerlei.common5.collections.MapBuilder;
 import de.tweerlei.dbgrazer.query.model.impl.AbstractMultilevelQueryType;
 
 /**
@@ -36,29 +33,19 @@ public class MultilevelQueryType extends AbstractMultilevelQueryType
 	/** The NAME */
 	public static final String NAME = "MULTILEVEL";
 	
-	private final Map<String, Class<?>> attributes;
-	
 	/**
 	 * Constructor
 	 */
 	public MultilevelQueryType()
 		{
-		super(NAME);
-		
-		final Map<String, Class<?>> m = new LinkedHashMap<String, Class<?>>();
-		m.put("hideId", Boolean.class);
-		attributes = Collections.unmodifiableMap(m);
+		super(NAME, MapBuilder.<String, Class<?>>ordered()
+				.put("hideId", Boolean.class)
+				.build());
 		}
 	
 	@Override
 	public boolean isExplorer()
 		{
 		return true;
-		}
-	
-	@Override
-	public Map<String, Class<?>> getSupportedAttributes()
-		{
-		return (attributes);
 		}
 	}

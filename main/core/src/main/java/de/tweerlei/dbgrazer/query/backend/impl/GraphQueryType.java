@@ -15,14 +15,11 @@
  */
 package de.tweerlei.dbgrazer.query.backend.impl;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.Errors;
 
+import de.tweerlei.common5.collections.MapBuilder;
 import de.tweerlei.dbgrazer.query.model.Query;
 import de.tweerlei.dbgrazer.query.model.QueryErrorKeys;
 import de.tweerlei.dbgrazer.query.model.impl.AbstractVisualizationQueryType;
@@ -40,24 +37,14 @@ public class GraphQueryType extends AbstractVisualizationQueryType
 	/** The NAME */
 	public static final String NAME = "GRAPH";
 	
-	private final Map<String, Class<?>> attributes;
-	
 	/**
 	 * Constructor
 	 */
 	public GraphQueryType()
 		{
-		super(NAME);
-		
-		final Map<String, Class<?>> m = new LinkedHashMap<String, Class<?>>();
-		m.put(GraphType.class.getSimpleName(), GraphType.class);
-		attributes = Collections.unmodifiableMap(m);
-		}
-	
-	@Override
-	public Map<String, Class<?>> getSupportedAttributes()
-		{
-		return (attributes);
+		super(NAME, MapBuilder.<String, Class<?>>ordered()
+				.put(GraphType.class.getSimpleName(), GraphType.class)
+				.build());
 		}
 	
 	@Override

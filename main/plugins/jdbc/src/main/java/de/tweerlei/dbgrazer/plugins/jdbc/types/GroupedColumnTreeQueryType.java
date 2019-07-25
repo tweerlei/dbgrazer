@@ -15,14 +15,11 @@
  */
 package de.tweerlei.dbgrazer.plugins.jdbc.types;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
+import de.tweerlei.common5.collections.MapBuilder;
 import de.tweerlei.dbgrazer.plugins.jdbc.impl.JdbcLinkType;
 import de.tweerlei.dbgrazer.plugins.jdbc.transformer.ColumnTreeTransformer;
 import de.tweerlei.dbgrazer.query.model.ResultMapMode;
@@ -40,8 +37,6 @@ public class GroupedColumnTreeQueryType extends AbstractHierarchicalQueryType
 	{
 	private static final String NAME = "GROUPED_COLUMN_TREE";
 	
-	private final Map<String, Class<?>> attributes;
-	
 	/**
 	 * Constructor
 	 * @param linkType LinkType
@@ -49,18 +44,10 @@ public class GroupedColumnTreeQueryType extends AbstractHierarchicalQueryType
 	@Autowired
 	public GroupedColumnTreeQueryType(JdbcLinkType linkType)
 		{
-		super(NAME, linkType, ResultMapMode.GROUPED);
-		
-		final Map<String, Class<?>> m = new LinkedHashMap<String, Class<?>>();
-		m.put(QueryTypeAttributes.ATTR_HIDE_ID, Boolean.class);
-		m.put(QueryTypeAttributes.ATTR_TABLES, Boolean.class);
-		attributes = Collections.unmodifiableMap(m);
-		}
-	
-	@Override
-	public Map<String, Class<?>> getSupportedAttributes()
-		{
-		return (attributes);
+		super(NAME, linkType, ResultMapMode.GROUPED, MapBuilder.<String, Class<?>>ordered()
+				.put(QueryTypeAttributes.ATTR_HIDE_ID, Boolean.class)
+				.put(QueryTypeAttributes.ATTR_TABLES, Boolean.class)
+				.build());
 		}
 	
 	@Override

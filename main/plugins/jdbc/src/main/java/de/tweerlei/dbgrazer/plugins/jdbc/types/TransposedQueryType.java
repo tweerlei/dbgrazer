@@ -41,6 +41,6 @@ public class TransposedQueryType extends AbstractTableQueryType
 	@Autowired
 	public TransposedQueryType(JdbcLinkType linkType)
 		{
-		super(NAME, linkType, ResultMapMode.SINGLE);
+		super(NAME, linkType, ResultMapMode.SINGLE, null);
 		}
 	}

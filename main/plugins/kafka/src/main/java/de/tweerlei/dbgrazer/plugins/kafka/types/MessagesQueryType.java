@@ -42,6 +42,6 @@ public class MessagesQueryType extends AbstractTableQueryType
 	@Autowired
 	public MessagesQueryType(KafkaLinkType linkType)
 		{
-		super(NAME, linkType, ResultMapMode.SINGLE);
+		super(NAME, linkType, ResultMapMode.SINGLE, null);
 		}
 	}

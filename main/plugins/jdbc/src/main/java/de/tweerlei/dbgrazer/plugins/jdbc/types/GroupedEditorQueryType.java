@@ -15,14 +15,11 @@
  */
 package de.tweerlei.dbgrazer.plugins.jdbc.types;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
+import de.tweerlei.common5.collections.MapBuilder;
 import de.tweerlei.dbgrazer.plugins.jdbc.impl.JdbcLinkType;
 import de.tweerlei.dbgrazer.query.model.ResultMapMode;
 import de.tweerlei.dbgrazer.query.model.impl.AbstractTableQueryType;
@@ -38,8 +35,6 @@ public class GroupedEditorQueryType extends AbstractTableQueryType
 	{
 	private static final String NAME = "GROUPED_EDITOR";
 	
-	private final Map<String, Class<?>> attributes;
-	
 	/**
 	 * Constructor
 	 * @param linkType LinkType
@@ -47,19 +42,11 @@ public class GroupedEditorQueryType extends AbstractTableQueryType
 	@Autowired
 	public GroupedEditorQueryType(JdbcLinkType linkType)
 		{
-		super(NAME, linkType, ResultMapMode.GROUPED);
-		
-		final Map<String, Class<?>> m = new LinkedHashMap<String, Class<?>>();
-		m.put(QueryTypeAttributes.ATTR_CATALOG, String.class);
-		m.put(QueryTypeAttributes.ATTR_SCHEMA, String.class);
-		m.put(QueryTypeAttributes.ATTR_TABLE, String.class);
-		m.put(QueryTypeAttributes.ATTR_PK_SELECT, String.class);
-		attributes = Collections.unmodifiableMap(m);
-		}
-	
-	@Override
-	public Map<String, Class<?>> getSupportedAttributes()
-		{
-		return (attributes);
+		super(NAME, linkType, ResultMapMode.GROUPED, MapBuilder.<String, Class<?>>ordered()
+				.put(QueryTypeAttributes.ATTR_CATALOG, String.class)
+				.put(QueryTypeAttributes.ATTR_SCHEMA, String.class)
+				.put(QueryTypeAttributes.ATTR_TABLE, String.class)
+				.put(QueryTypeAttributes.ATTR_PK_SELECT, String.class)
+				.build());
 		}
 	}

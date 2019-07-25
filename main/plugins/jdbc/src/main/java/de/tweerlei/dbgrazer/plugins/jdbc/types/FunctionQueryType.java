@@ -41,7 +41,7 @@ public class FunctionQueryType extends AbstractSingleQueryType
 	@Autowired
 	public FunctionQueryType(JdbcLinkType linkType)
 		{
-		super(NAME, linkType);
+		super(NAME, linkType, null);
 		}
 	
 	@Override

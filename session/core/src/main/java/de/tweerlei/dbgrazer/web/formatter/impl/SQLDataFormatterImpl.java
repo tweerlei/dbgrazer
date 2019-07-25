@@ -61,6 +61,12 @@ public class SQLDataFormatterImpl extends AbstractDataFormatter
 		}
 	
 	@Override
+	protected String formatPassword(String value)
+		{
+		return ("");
+		}
+	
+	@Override
 	protected String formatBoolean(boolean b)
 		{
 		return (b ? "1" : "0");

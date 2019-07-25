@@ -41,7 +41,7 @@ public class DMLQueryType extends AbstractTableQueryType
 	@Autowired
 	public DMLQueryType(JdbcLinkType linkType)
 		{
-		super(NAME, linkType, ResultMapMode.SINGLE);
+		super(NAME, linkType, ResultMapMode.SINGLE, null);
 		}
 	
 	@Override

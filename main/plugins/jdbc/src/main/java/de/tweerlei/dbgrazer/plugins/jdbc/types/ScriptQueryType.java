@@ -40,7 +40,7 @@ public class ScriptQueryType extends AbstractSingleQueryType
 	@Autowired
 	public ScriptQueryType(JdbcLinkType linkType)
 		{
-		super(NAME, linkType);
+		super(NAME, linkType, null);
 		}
 	
 	@Override

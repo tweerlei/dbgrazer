@@ -310,14 +310,14 @@ public class KubernetesBrowseController
 	
 	private RowSet buildDetailsRowSet(Query query, Set<KubernetesApiObject> values, long time)
 		{
-		final List<ColumnDef> columns = new ArrayList<ColumnDef>(2);
+		final List<ColumnDef> columns = new ArrayList<ColumnDef>();
 		columns.add(new ColumnDefImpl(KubernetesMessageKeys.OBJECT, ColumnType.STRING, null, null, null, null));
 		columns.add(new ColumnDefImpl(KubernetesMessageKeys.TIMESTAMP, ColumnType.DATE, null, null, null, null));
 		columns.add(new ColumnDefImpl(KubernetesMessageKeys.LABELS, ColumnType.STRING, null, null, null, null));
 		if (!values.isEmpty())
 			{
-			for (String key : values.iterator().next().getProperties().keySet())
-				columns.add(new ColumnDefImpl(key, ColumnType.STRING, null, null, null, null));
+			for (Map.Entry<String, Object> ent : values.iterator().next().getProperties().entrySet())
+				columns.add(new ColumnDefImpl(ent.getKey(), ColumnType.forObject(ent.getValue()), null, null, null, null));
 			}
 		final RowSetImpl rs = new RowSetImpl(query, 0, columns);
 		rs.setQueryTime(time);
@@ -328,7 +328,7 @@ public class KubernetesBrowseController
 			row.getValues().add(n.getName());
 			row.getValues().add(n.getCreationTimestamp());
 			row.getValues().add(n.getLabels().toString());
-			for (String v : n.getProperties().values())
+			for (Object v : n.getProperties().values())
 				row.getValues().add(v);
 			rs.getRows().add(row);
 			}
@@ -386,9 +386,9 @@ public class KubernetesBrowseController
 		if (!connectionSettings.isBrowserEnabled())
 			throw new AccessDeniedException();
 		
-		final String formatName;
-		final boolean formattingActive;
-		if (format == null)
+		final String formatName = "JSON";
+		final boolean formattingActive = true;
+/*		if (format == null)
 			{
 			formatName = querySettingsManager.getFormatName(null);
 			formattingActive = querySettingsManager.isFormattingActive(null);
@@ -399,7 +399,7 @@ public class KubernetesBrowseController
 			formattingActive = (formatting == null) ? false : formatting;
 			querySettingsManager.setFormatName(null, formatName);
 			querySettingsManager.setFormattingActive(null, formattingActive);
-			}
+			}*/
 		
 		final Map<String, Object> model = new HashMap<String, Object>();
 		

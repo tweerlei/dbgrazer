@@ -37,7 +37,7 @@ public class NavigatorQueryType extends AbstractRecursiveQueryType
 	 */
 	public NavigatorQueryType()
 		{
-		super(NAME);
+		super(NAME, null);
 		}
 	
 	@Override

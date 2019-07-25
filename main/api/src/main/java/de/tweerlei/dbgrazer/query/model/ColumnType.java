@@ -37,6 +37,8 @@ public enum ColumnType implements Named
 	STRING(Types.VARCHAR),
 	/** SQL long String -> Java String */
 	TEXT(Types.VARCHAR),
+	/** SQL String -> Java String */
+	PASSWORD(Types.VARCHAR),
 	/** SQL LIKE Pattern -> Java String with wildcard characters */
 	PATTERN(Types.VARCHAR),
 	/** SQL Date -> Java Date */

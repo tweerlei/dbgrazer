@@ -15,14 +15,11 @@
  */
 package de.tweerlei.dbgrazer.plugins.jdbc.types;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
+import de.tweerlei.common5.collections.MapBuilder;
 import de.tweerlei.dbgrazer.plugins.jdbc.impl.JdbcLinkType;
 import de.tweerlei.dbgrazer.query.model.impl.AbstractSingleQueryType;
 import de.tweerlei.dbgrazer.text.backend.TextFormatter;
@@ -38,8 +35,6 @@ public class ListQueryType extends AbstractSingleQueryType
 	{
 	private static final String NAME = "LIST";
 	
-	private final Map<String, Class<?>> attributes;
-	
 	/**
 	 * Constructor
 	 * @param linkType LinkType
@@ -47,19 +42,11 @@ public class ListQueryType extends AbstractSingleQueryType
 	@Autowired
 	public ListQueryType(JdbcLinkType linkType)
 		{
-		super(NAME, linkType);
-		
-		final Map<String, Class<?>> m = new LinkedHashMap<String, Class<?>>();
-		m.put(QueryTypeAttributes.ATTR_FORMATTER, TextFormatter.class);
-		m.put(QueryTypeAttributes.ATTR_FORMATTING, Boolean.class);
-		m.put(QueryTypeAttributes.ATTR_SYNTAX_COLORING, Boolean.class);
-		m.put(QueryTypeAttributes.ATTR_LINE_NUMBERS, Boolean.class);
-		attributes = Collections.unmodifiableMap(m);
-		}
-	
-	@Override
-	public Map<String, Class<?>> getSupportedAttributes()
-		{
-		return (attributes);
+		super(NAME, linkType, MapBuilder.<String, Class<?>>ordered()
+				.put(QueryTypeAttributes.ATTR_FORMATTER, TextFormatter.class)
+				.put(QueryTypeAttributes.ATTR_FORMATTING, Boolean.class)
+				.put(QueryTypeAttributes.ATTR_SYNTAX_COLORING, Boolean.class)
+				.put(QueryTypeAttributes.ATTR_LINE_NUMBERS, Boolean.class)
+				.build());
 		}
 	}

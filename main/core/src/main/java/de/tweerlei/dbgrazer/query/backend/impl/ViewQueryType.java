@@ -37,6 +37,6 @@ public class ViewQueryType extends AbstractRecursiveQueryType
 	 */
 	public ViewQueryType()
 		{
-		super(NAME);
+		super(NAME, null);
 		}
 	}

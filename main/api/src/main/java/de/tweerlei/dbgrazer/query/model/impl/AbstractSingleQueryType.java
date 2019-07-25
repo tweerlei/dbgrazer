@@ -15,6 +15,8 @@
  */
 package de.tweerlei.dbgrazer.query.model.impl;
 
+import java.util.Map;
+
 import de.tweerlei.dbgrazer.link.model.LinkType;
 import de.tweerlei.dbgrazer.query.model.ResultMapMode;
 import de.tweerlei.dbgrazer.query.model.ResultType;
@@ -30,10 +32,11 @@ public abstract class AbstractSingleQueryType extends AbstractQueryType
 	 * Constructor for query types
 	 * @param name Name
 	 * @param linkType LinkType
+	 * @param attributes Supported attributes
 	 */
-	protected AbstractSingleQueryType(String name, LinkType linkType)
+	protected AbstractSingleQueryType(String name, LinkType linkType, Map<String, Class<?>> attributes)
 		{
-		super(name, linkType);
+		super(name, linkType, attributes);
 		}
 	
 	@Override

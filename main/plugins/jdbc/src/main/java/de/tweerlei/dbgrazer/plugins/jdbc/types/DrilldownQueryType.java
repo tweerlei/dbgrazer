@@ -15,14 +15,11 @@
  */
 package de.tweerlei.dbgrazer.plugins.jdbc.types;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
+import de.tweerlei.common5.collections.MapBuilder;
 import de.tweerlei.dbgrazer.plugins.jdbc.impl.JdbcLinkType;
 import de.tweerlei.dbgrazer.query.model.ResultMapMode;
 import de.tweerlei.dbgrazer.query.model.ResultOrientation;
@@ -39,8 +36,6 @@ public class DrilldownQueryType extends AbstractTableQueryType
 	{
 	private static final String NAME = "DRILLDOWN";
 	
-	private final Map<String, Class<?>> attributes;
-	
 	/**
 	 * Constructor
 	 * @param linkType LinkType
@@ -48,22 +43,14 @@ public class DrilldownQueryType extends AbstractTableQueryType
 	@Autowired
 	public DrilldownQueryType(JdbcLinkType linkType)
 		{
-		super(NAME, linkType, ResultMapMode.SINGLE);
-		
-		final Map<String, Class<?>> m = new LinkedHashMap<String, Class<?>>();
-		m.put(QueryTypeAttributes.ATTR_COLORIZE, Boolean.class);
-		attributes = Collections.unmodifiableMap(m);
+		super(NAME, linkType, ResultMapMode.SINGLE, MapBuilder.<String, Class<?>>ordered()
+				.put(QueryTypeAttributes.ATTR_COLORIZE, Boolean.class)
+				.build());
 		}
 	
 	@Override
 	public ResultOrientation getOrientation()
 		{
 		return ResultOrientation.DOWN;
-		}
-	
-	@Override
-	public Map<String, Class<?>> getSupportedAttributes()
-		{
-		return (attributes);
 		}
 	}

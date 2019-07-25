@@ -40,6 +40,6 @@ public class MapQueryType extends AbstractKeyValueQueryType
 	@Autowired
 	public MapQueryType(JdbcLinkType linkType)
 		{
-		super(NAME, linkType);
+		super(NAME, linkType, null);
 		}
 	}

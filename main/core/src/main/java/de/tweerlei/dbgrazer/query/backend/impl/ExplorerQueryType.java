@@ -37,7 +37,7 @@ public class ExplorerQueryType extends AbstractRecursiveQueryType
 	 */
 	public ExplorerQueryType()
 		{
-		super(NAME);
+		super(NAME, null);
 		}
 	
 	@Override

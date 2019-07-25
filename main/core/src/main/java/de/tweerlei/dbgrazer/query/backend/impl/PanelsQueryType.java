@@ -38,7 +38,7 @@ public class PanelsQueryType extends AbstractRecursiveQueryType
 	 */
 	public PanelsQueryType()
 		{
-		super(NAME);
+		super(NAME, null);
 		}
 	
 	@Override

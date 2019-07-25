@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import de.tweerlei.common.util.StringUtils;
+import de.tweerlei.common5.collections.ListBuilder;
 import de.tweerlei.dbgrazer.common.service.KeywordService;
 import de.tweerlei.dbgrazer.extension.jdbc.SQLGeneratorService;
 import de.tweerlei.dbgrazer.extension.jdbc.SQLGeneratorService.AggregateColumn;
@@ -70,19 +71,14 @@ public class AggregateSubQueryResolver implements SubQueryResolver
 			}
 		}
 	
-	private static final List<AggregateFunction> AGGREGATE_FUNCTIONS;
-	static
-		{
-		final List<AggregateFunction> l = new ArrayList<AggregateFunction>();
-		l.add(new AggregateFunction("COUNT\\((\\w+)\\)", AggregationMode.COUNT));
-		l.add(new AggregateFunction("COUNT\\(DISTINCT (\\w+)\\)", AggregationMode.COUNT_DISTINCT));
-		l.add(new AggregateFunction("MIN\\((\\w+)\\)", AggregationMode.MIN));
-		l.add(new AggregateFunction("MAX\\((\\w+)\\)", AggregationMode.MAX));
-		l.add(new AggregateFunction("SUM\\((\\w+)\\)", AggregationMode.SUM));
-		l.add(new AggregateFunction("AVG\\((\\w+)\\)", AggregationMode.AVG));
-		
-		AGGREGATE_FUNCTIONS = Collections.unmodifiableList(l);
-		}
+	private static final List<AggregateFunction> AGGREGATE_FUNCTIONS = new ListBuilder<AggregateFunction>()
+			.add(new AggregateFunction("COUNT\\((\\w+)\\)", AggregationMode.COUNT))
+			.add(new AggregateFunction("COUNT\\(DISTINCT (\\w+)\\)", AggregationMode.COUNT_DISTINCT))
+			.add(new AggregateFunction("MIN\\((\\w+)\\)", AggregationMode.MIN))
+			.add(new AggregateFunction("MAX\\((\\w+)\\)", AggregationMode.MAX))
+			.add(new AggregateFunction("SUM\\((\\w+)\\)", AggregationMode.SUM))
+			.add(new AggregateFunction("AVG\\((\\w+)\\)", AggregationMode.AVG))
+			.buildReadOnly();
 	
 	private static final String SUM_TAB = "$sumTab";
 	

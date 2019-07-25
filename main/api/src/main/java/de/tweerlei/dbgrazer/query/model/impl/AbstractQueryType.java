@@ -15,6 +15,8 @@
  */
 package de.tweerlei.dbgrazer.query.model.impl;
 
+import java.util.Map;
+
 import org.springframework.validation.Errors;
 
 import de.tweerlei.common.util.StringUtils;
@@ -33,10 +35,11 @@ public abstract class AbstractQueryType extends BaseQueryType
 	 * Constructor for query types
 	 * @param name Name
 	 * @param linkType LinkType
+	 * @param attributes Supported attributes
 	 */
-	protected AbstractQueryType(String name, LinkType linkType)
+	protected AbstractQueryType(String name, LinkType linkType, Map<String, Class<?>> attributes)
 		{
-		super(name, linkType);
+		super(name, linkType, attributes);
 		}
 	
 	@Override

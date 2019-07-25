@@ -15,14 +15,11 @@
  */
 package de.tweerlei.dbgrazer.plugins.http.types;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
+import de.tweerlei.common5.collections.MapBuilder;
 import de.tweerlei.dbgrazer.plugins.http.impl.WebserviceLinkType;
 import de.tweerlei.dbgrazer.query.model.impl.AbstractSingleQueryType;
 import de.tweerlei.dbgrazer.text.backend.TextFormatter;
@@ -39,8 +36,6 @@ public class GetQueryType extends AbstractSingleQueryType
 	/** The NAME */
 	public static final String NAME = "GET";
 	
-	private final Map<String, Class<?>> attributes;
-	
 	/**
 	 * Constructor
 	 * @param linkType LinkType
@@ -48,18 +43,13 @@ public class GetQueryType extends AbstractSingleQueryType
 	@Autowired
 	public GetQueryType(WebserviceLinkType linkType)
 		{
-		super(NAME, linkType);
-		
-		final Map<String, Class<?>> m = new LinkedHashMap<String, Class<?>>();
-		m.put(QueryTypeAttributes.ATTR_ENDPOINT, String.class);
-		m.put(QueryTypeAttributes.ATTR_FORMATTER, TextFormatter.class);
-		attributes = Collections.unmodifiableMap(m);
-		}
-	
-	@Override
-	public Map<String, Class<?>> getSupportedAttributes()
-		{
-		return (attributes);
+		super(NAME, linkType, MapBuilder.<String, Class<?>>ordered()
+				.put(QueryTypeAttributes.ATTR_ENDPOINT, String.class)
+				.put(QueryTypeAttributes.ATTR_FORMATTER, TextFormatter.class)
+				.put(QueryTypeAttributes.ATTR_FORMATTING, Boolean.class)
+				.put(QueryTypeAttributes.ATTR_SYNTAX_COLORING, Boolean.class)
+				.put(QueryTypeAttributes.ATTR_LINE_NUMBERS, Boolean.class)
+				.build());
 		}
 	
 	@Override

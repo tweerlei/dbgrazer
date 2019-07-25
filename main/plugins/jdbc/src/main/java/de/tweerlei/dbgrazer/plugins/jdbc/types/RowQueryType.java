@@ -40,6 +40,6 @@ public class RowQueryType extends AbstractRowQueryType
 	@Autowired
 	public RowQueryType(JdbcLinkType linkType)
 		{
-		super(NAME, linkType);
+		super(NAME, linkType, null);
 		}
 	}

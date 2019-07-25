@@ -15,13 +15,10 @@
  */
 package de.tweerlei.dbgrazer.plugins.wiki.types;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
+import de.tweerlei.common5.collections.MapBuilder;
 import de.tweerlei.dbgrazer.query.model.impl.AbstractSingleQueryType;
 import de.tweerlei.dbgrazer.text.backend.TextFormatter;
 
@@ -36,23 +33,13 @@ public class WikiQueryType extends AbstractSingleQueryType
 	{
 	private static final String NAME = "WIKI";
 	
-	private final Map<String, Class<?>> attributes;
-	
 	/**
 	 * Constructor
 	 */
 	public WikiQueryType()
 		{
-		super(NAME, null);
-		
-		final Map<String, Class<?>> m = new LinkedHashMap<String, Class<?>>();
-		m.put(QueryTypeAttributes.ATTR_FORMATTER, TextFormatter.class);
-		attributes = Collections.unmodifiableMap(m);
-		}
-	
-	@Override
-	public Map<String, Class<?>> getSupportedAttributes()
-		{
-		return (attributes);
+		super(NAME, null, MapBuilder.<String, Class<?>>ordered()
+				.put(QueryTypeAttributes.ATTR_FORMATTER, TextFormatter.class)
+				.build());
 		}
 	}

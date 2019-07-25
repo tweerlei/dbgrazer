@@ -43,7 +43,7 @@ public class PivotQueryType extends AbstractTableQueryType
 	@Autowired
 	public PivotQueryType(JdbcLinkType linkType)
 		{
-		super(NAME, linkType, ResultMapMode.SINGLE);
+		super(NAME, linkType, ResultMapMode.SINGLE, null);
 		}
 	
 	@Override

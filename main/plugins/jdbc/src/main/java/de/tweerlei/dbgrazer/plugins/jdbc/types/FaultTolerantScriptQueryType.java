@@ -40,7 +40,7 @@ public class FaultTolerantScriptQueryType extends AbstractSingleQueryType
 	@Autowired
 	public FaultTolerantScriptQueryType(JdbcLinkType linkType)
 		{
-		super(NAME, linkType);
+		super(NAME, linkType, null);
 		}
 	
 	@Override

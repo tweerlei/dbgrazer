@@ -41,6 +41,6 @@ public class FilesQueryType extends AbstractTableQueryType
 	@Autowired
 	public FilesQueryType(FilesystemLinkType linkType)
 		{
-		super(NAME, linkType, ResultMapMode.SINGLE);
+		super(NAME, linkType, ResultMapMode.SINGLE, null);
 		}
 	}

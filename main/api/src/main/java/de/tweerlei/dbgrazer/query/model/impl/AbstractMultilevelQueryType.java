@@ -15,6 +15,8 @@
  */
 package de.tweerlei.dbgrazer.query.model.impl;
 
+import java.util.Map;
+
 import de.tweerlei.dbgrazer.query.model.ResultType;
 
 /**
@@ -27,10 +29,11 @@ public abstract class AbstractMultilevelQueryType extends AbstractViewType
 	/**
 	 * Constructor for query types
 	 * @param name Name
+	 * @param attributes Supported attributes
 	 */
-	protected AbstractMultilevelQueryType(String name)
+	protected AbstractMultilevelQueryType(String name, Map<String, Class<?>> attributes)
 		{
-		super(name);
+		super(name, attributes);
 		}
 	
 	@Override

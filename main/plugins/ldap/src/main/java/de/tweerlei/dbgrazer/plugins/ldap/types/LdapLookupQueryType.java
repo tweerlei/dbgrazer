@@ -40,6 +40,6 @@ public class LdapLookupQueryType extends AbstractRowQueryType
 	@Autowired
 	public LdapLookupQueryType(LdapLinkType linkType)
 		{
-		super(NAME, linkType);
+		super(NAME, linkType, null);
 		}
 	}

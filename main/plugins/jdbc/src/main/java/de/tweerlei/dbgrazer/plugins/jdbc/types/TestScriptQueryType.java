@@ -40,7 +40,7 @@ public class TestScriptQueryType extends AbstractSingleQueryType
 	@Autowired
 	public TestScriptQueryType(JdbcLinkType linkType)
 		{
-		super(NAME, linkType);
+		super(NAME, linkType, null);
 		}
 	
 	@Override

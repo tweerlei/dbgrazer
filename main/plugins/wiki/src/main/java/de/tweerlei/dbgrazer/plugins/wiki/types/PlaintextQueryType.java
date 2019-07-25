@@ -15,14 +15,11 @@
  */
 package de.tweerlei.dbgrazer.plugins.wiki.types;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
+import de.tweerlei.common5.collections.MapBuilder;
 import de.tweerlei.dbgrazer.query.model.DataExtractor;
 import de.tweerlei.dbgrazer.query.model.ResultMapMode;
 import de.tweerlei.dbgrazer.query.model.ResultVisitor;
@@ -45,7 +42,6 @@ public class PlaintextQueryType extends AbstractTableQueryType
 	
 	private final DataExtractorService extractorService;
 	private final RowTransformerService transformerService;
-	private final Map<String, Class<?>> attributes;
 	
 	/**
 	 * Constructor
@@ -55,21 +51,13 @@ public class PlaintextQueryType extends AbstractTableQueryType
 	@Autowired
 	public PlaintextQueryType(DataExtractorService extractorService, RowTransformerService transformerService)
 		{
-		super(NAME, null, ResultMapMode.SINGLE);
-		
+		super(NAME, null, ResultMapMode.SINGLE, MapBuilder.<String, Class<?>>ordered()
+				.put(DataExtractorVisitor.EXTRACTOR_NAME_ATTRIBUTE, DataExtractor.class)
+				.put(DataExtractorVisitor.TRANSFORMER_NAME_ATTRIBUTE, RowTransformer.class)
+				.put(DataExtractorVisitor.TRANSFORMER_RECIPE_ATTRIBUTE, String.class)
+				.build());
 		this.extractorService = extractorService;
 		this.transformerService = transformerService;
-		final Map<String, Class<?>> m = new LinkedHashMap<String, Class<?>>();
-		m.put(DataExtractorVisitor.EXTRACTOR_NAME_ATTRIBUTE, DataExtractor.class);
-		m.put(DataExtractorVisitor.TRANSFORMER_NAME_ATTRIBUTE, RowTransformer.class);
-		m.put(DataExtractorVisitor.TRANSFORMER_RECIPE_ATTRIBUTE, String.class);
-		attributes = Collections.unmodifiableMap(m);
-		}
-	
-	@Override
-	public Map<String, Class<?>> getSupportedAttributes()
-		{
-		return (attributes);
 		}
 	
 	@Override

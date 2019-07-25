@@ -13,32 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.tweerlei.dbgrazer.query.model.impl;
-
-import java.util.Map;
-
-import de.tweerlei.dbgrazer.query.model.ResultType;
+package de.tweerlei.dbgrazer.plugins.file.types;
 
 /**
- * Default impl.
+ * QueryType attribute names
  * 
  * @author Robert Wruck
  */
-public abstract class AbstractVisualizationQueryType extends AbstractViewType
+public final class QueryTypeAttributes
 	{
-	/**
-	 * Constructor for query types
-	 * @param name Name
-	 * @param attributes Supported attributes
-	 */
-	protected AbstractVisualizationQueryType(String name, Map<String, Class<?>> attributes)
-		{
-		super(name, attributes);
-		}
+	/** RowSet attribute for the TextFormatter name */
+	public static final String ATTR_FORMATTER = "formatter";
+	/** RowSet attribute for the formatting flag */
+	public static final String ATTR_FORMATTING = "formatting";
+	/** RowSet attribute for the syntax coloring flag */
+	public static final String ATTR_SYNTAX_COLORING = "syntaxColoring";
+	/** RowSet attribute for the line numbers flag */
+	public static final String ATTR_LINE_NUMBERS = "lineNumbers";
 	
-	@Override
-	public final ResultType getResultType()
+	private QueryTypeAttributes()
 		{
-		return ResultType.VISUALIZATION;
 		}
 	}

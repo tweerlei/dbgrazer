@@ -122,8 +122,9 @@
 >				<dt class="query-bytype<c:forEach items="${resultTypes}" var="j"><c:if test="${tools:containsKey(j.supportedAttributes, a.key)}"> query-${j}</c:if></c:forEach>"<c:if test="${!tools:containsKey(model.resultType.supportedAttributes, a.key)}"> style="display: none;"</c:if>><spring:label path="attributes[${a.key}]"><fmt:message key="${a.key}"/></spring:label></dt>
 				<dd class="query-bytype<c:forEach items="${resultTypes}" var="j"><c:if test="${tools:containsKey(j.supportedAttributes, a.key)}"> query-${j}</c:if></c:forEach>"<c:if test="${!tools:containsKey(model.resultType.supportedAttributes, a.key)}"> style="display: none;"</c:if>><c:choose
 						><c:when test="${a.value.simpleName == 'Boolean'}"><spring:select path="attributes[${a.key}]">
-							<spring:option value=""><fmt:message key="${a.key}No"/></spring:option>
+							<spring:option value=""><fmt:message key="default"/></spring:option>
 							<spring:option value="TRUE"><fmt:message key="${a.key}Yes"/></spring:option>
+							<spring:option value="FALSE"><fmt:message key="${a.key}No"/></spring:option>
 						</spring:select></c:when
 						><c:when test="${a.value.simpleName == 'GraphType'}"><spring:select path="attributes[${a.key}]">
 							<spring:option value=""><fmt:message key="default"/></spring:option>

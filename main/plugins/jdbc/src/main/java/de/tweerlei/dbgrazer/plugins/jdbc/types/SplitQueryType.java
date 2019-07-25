@@ -41,6 +41,6 @@ public class SplitQueryType extends AbstractTableQueryType
 	@Autowired
 	public SplitQueryType(JdbcLinkType linkType)
 		{
-		super(NAME, linkType, ResultMapMode.SPLIT);
+		super(NAME, linkType, ResultMapMode.SPLIT, null);
 		}
 	}

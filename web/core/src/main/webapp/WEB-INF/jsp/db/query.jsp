@@ -62,7 +62,7 @@
 	
 	<ui:explorer><div class="combo-head"><fmt:message key="queryParams"/></div>
 		<div id="left-content"><div class="tab-page"><div class="tab-body">
-		<spring:form cssClass="left" method="get" action="db/${currentConnection.linkName}/ajax/result.html" modelAttribute="model" onsubmit="return getFormInto(this, 'explorer-right');">
+		<spring:form cssClass="left" method="post" enctype="multipart/form-data" action="db/${currentConnection.linkName}/ajax/result.html" modelAttribute="model" onsubmit="return getFormInto(this, 'explorer-right');">
 			<input type="hidden" name="q" value="${model.query.name}"/>
 			<input type="hidden" name="historize" value="true"/>
 			<dl>

@@ -15,14 +15,11 @@
  */
 package de.tweerlei.dbgrazer.plugins.http.types;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
+import de.tweerlei.common5.collections.MapBuilder;
 import de.tweerlei.dbgrazer.plugins.http.impl.WebserviceLinkType;
 import de.tweerlei.dbgrazer.query.model.DataExtractor;
 import de.tweerlei.dbgrazer.query.model.ResultMapMode;
@@ -47,7 +44,6 @@ public class GetDataQueryType extends AbstractTableQueryType
 	
 	private final DataExtractorService extractorService;
 	private final RowTransformerService transformerService;
-	private final Map<String, Class<?>> attributes;
 	
 	/**
 	 * Constructor
@@ -59,22 +55,14 @@ public class GetDataQueryType extends AbstractTableQueryType
 	public GetDataQueryType(WebserviceLinkType linkType,
 			DataExtractorService extractorService, RowTransformerService transformerService)
 		{
-		super(NAME, linkType, ResultMapMode.SINGLE);
-		
+		super(NAME, linkType, ResultMapMode.SINGLE, MapBuilder.<String, Class<?>>ordered()
+				.put(QueryTypeAttributes.ATTR_ENDPOINT, String.class)
+				.put(DataExtractorVisitor.EXTRACTOR_NAME_ATTRIBUTE, DataExtractor.class)
+				.put(DataExtractorVisitor.TRANSFORMER_NAME_ATTRIBUTE, RowTransformer.class)
+				.put(DataExtractorVisitor.TRANSFORMER_RECIPE_ATTRIBUTE, String.class)
+				.build());
 		this.extractorService = extractorService;
 		this.transformerService = transformerService;
-		final Map<String, Class<?>> m = new LinkedHashMap<String, Class<?>>();
-		m.put(QueryTypeAttributes.ATTR_ENDPOINT, String.class);
-		m.put(DataExtractorVisitor.EXTRACTOR_NAME_ATTRIBUTE, DataExtractor.class);
-		m.put(DataExtractorVisitor.TRANSFORMER_NAME_ATTRIBUTE, RowTransformer.class);
-		m.put(DataExtractorVisitor.TRANSFORMER_RECIPE_ATTRIBUTE, String.class);
-		attributes = Collections.unmodifiableMap(m);
-		}
-	
-	@Override
-	public Map<String, Class<?>> getSupportedAttributes()
-		{
-		return (attributes);
 		}
 	
 	@Override

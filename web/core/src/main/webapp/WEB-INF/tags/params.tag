@@ -47,6 +47,7 @@
 			><c:when test="${p.type == 'BOOLEAN'}"><spring:checkbox path="${path}[${st.index}]" value="true" label="&nbsp;" disabled="${disabled}"/></c:when
 			><c:when test="${p.type == 'DATE'}"><spring:input path="${path}[${st.index}]" disabled="${disabled}"/><span class="action" onclick="return showDatePicker(event, '${path}${st.index}');"> &#x25bc;</span></c:when
 			><c:when test="${p.type == 'TEXT'}"><spring:textarea cssClass="small" path="${path}[${st.index}]" cols="80" rows="5" disabled="${disabled}"/></c:when
+			><c:when test="${p.type == 'PASSWORD'}"><spring:password path="${path}[${st.index}]" disabled="${disabled}"/></c:when
 			><c:otherwise><spring:input path="${path}[${st.index}]" disabled="${disabled}"/><fmt:message key="help_${p.type}" var="msg"/><c:if test="${not empty msg}"> <ui:info name="${path}${st.index}">${msg}</ui:info></c:if></c:otherwise
 			></c:choose></dd>
 </c:forEach

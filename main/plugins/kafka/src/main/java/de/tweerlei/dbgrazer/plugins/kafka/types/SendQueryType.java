@@ -15,14 +15,11 @@
  */
 package de.tweerlei.dbgrazer.plugins.kafka.types;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
+import de.tweerlei.common5.collections.MapBuilder;
 import de.tweerlei.dbgrazer.plugins.kafka.impl.KafkaLinkType;
 import de.tweerlei.dbgrazer.query.model.ResultMapMode;
 import de.tweerlei.dbgrazer.query.model.impl.AbstractTableQueryType;
@@ -39,8 +36,6 @@ public class SendQueryType extends AbstractTableQueryType
 	/** The NAME */
 	public static final String NAME = "KAFKA_SEND";
 	
-	private final Map<String, Class<?>> attributes;
-	
 	/**
 	 * Constructor
 	 * @param linkType LinkType
@@ -48,23 +43,15 @@ public class SendQueryType extends AbstractTableQueryType
 	@Autowired
 	public SendQueryType(KafkaLinkType linkType)
 		{
-		super(NAME, linkType, ResultMapMode.SINGLE);
-		
-		final Map<String, Class<?>> m = new LinkedHashMap<String, Class<?>>();
-		m.put(QueryTypeAttributes.ATTR_TOPIC, String.class);
-		m.put(QueryTypeAttributes.ATTR_PARTITION, Integer.class);
-		attributes = Collections.unmodifiableMap(m);
+		super(NAME, linkType, ResultMapMode.SINGLE, MapBuilder.<String, Class<?>>ordered()
+				.put(QueryTypeAttributes.ATTR_TOPIC, String.class)
+				.put(QueryTypeAttributes.ATTR_PARTITION, Integer.class)
+				.build());
 		}
 	
 	@Override
 	public boolean isManipulation()
 		{
 		return true;
-		}
-	
-	@Override
-	public Map<String, Class<?>> getSupportedAttributes()
-		{
-		return (attributes);
 		}
 	}

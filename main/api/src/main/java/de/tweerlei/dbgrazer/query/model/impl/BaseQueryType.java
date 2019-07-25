@@ -33,16 +33,19 @@ import de.tweerlei.dbgrazer.query.model.SubQueryResolver;
 public abstract class BaseQueryType extends NamedBase implements QueryType
 	{
 	private final LinkType linkType;
+	private final Map<String, Class<?>> attributes;
 	
 	/**
 	 * Constructor for query types
 	 * @param name Name
 	 * @param linkType LinkType
+	 * @param attributes Supported attributes
 	 */
-	protected BaseQueryType(String name, LinkType linkType)
+	protected BaseQueryType(String name, LinkType linkType, Map<String, Class<?>> attributes)
 		{
 		super(name);
 		this.linkType = linkType;
+		this.attributes = (attributes == null) ? Collections.<String, Class<?>>emptyMap() : Collections.unmodifiableMap(attributes);
 		}
 	
 	@Override
@@ -52,9 +55,9 @@ public abstract class BaseQueryType extends NamedBase implements QueryType
 		}
 	
 	@Override
-	public Map<String, Class<?>> getSupportedAttributes()
+	public final Map<String, Class<?>> getSupportedAttributes()
 		{
-		return (Collections.emptyMap());
+		return (attributes);
 		}
 	
 	@Override

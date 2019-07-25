@@ -416,7 +416,7 @@ public class QueryRunController
 	 * @return Model
 	 * @throws AjaxRedirectException when trying to perform an explorer query
 	 */
-	@RequestMapping(value = "/db/*/ajax/result.html", method = RequestMethod.GET)
+	@RequestMapping(value = "/db/*/ajax/result.html", method = RequestMethod.POST)
 	public Map<String, Object> performAjaxQuery(@ModelAttribute("model") FormBackingObject fbo,
 			@RequestParam(value = "historize", required = false) Boolean historize,
 			@RequestParam(value = "related", required = false) Boolean showRelated

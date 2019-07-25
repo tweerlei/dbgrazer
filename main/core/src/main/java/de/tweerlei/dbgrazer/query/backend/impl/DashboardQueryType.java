@@ -15,13 +15,10 @@
  */
 package de.tweerlei.dbgrazer.query.backend.impl;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
+import de.tweerlei.common5.collections.MapBuilder;
 import de.tweerlei.dbgrazer.query.model.ResultOrientation;
 import de.tweerlei.dbgrazer.query.model.impl.AbstractRecursiveQueryType;
 
@@ -37,29 +34,19 @@ public class DashboardQueryType extends AbstractRecursiveQueryType
 	/** The NAME */
 	public static final String NAME = "DASHBOARD";
 	
-	private final Map<String, Class<?>> attributes;
-	
 	/**
 	 * Constructor
 	 */
 	public DashboardQueryType()
 		{
-		super(NAME);
-		
-		final Map<String, Class<?>> m = new LinkedHashMap<String, Class<?>>();
-		m.put("orientation", Boolean.class);
-		attributes = Collections.unmodifiableMap(m);
+		super(NAME, MapBuilder.<String, Class<?>>ordered()
+				.put("orientation", Boolean.class)
+				.build());
 		}
 	
 	@Override
 	public ResultOrientation getOrientation()
 		{
 		return ResultOrientation.NONE;
-		}
-	
-	@Override
-	public Map<String, Class<?>> getSupportedAttributes()
-		{
-		return (attributes);
 		}
 	}

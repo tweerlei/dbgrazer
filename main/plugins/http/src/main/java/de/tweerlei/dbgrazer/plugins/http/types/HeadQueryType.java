@@ -36,7 +36,7 @@ public class HeadQueryType extends AbstractKeyValueQueryType
 //	@Autowired
 	public HeadQueryType(WebserviceLinkType linkType)
 		{
-		super(NAME, linkType);
+		super(NAME, linkType, null);
 		}
 	
 	@Override

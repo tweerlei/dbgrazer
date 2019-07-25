@@ -29,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import de.tweerlei.common.util.StringUtils;
+import de.tweerlei.common5.collections.MapBuilder;
 import de.tweerlei.dbgrazer.query.model.ColumnType;
 import de.tweerlei.dbgrazer.query.model.ParameterDef;
 import de.tweerlei.dbgrazer.query.model.Query;
@@ -57,17 +58,12 @@ public class QuerySettingsManagerImpl implements QuerySettingsManager
 	private static final String CACHE_KEY = "<custom>";
 	
 	// Default attribute settings
-	private static final Map<String, Boolean> ATTR_DEFAULTS;
-	static
-		{
-		final Map<String, Boolean> m = new HashMap<String, Boolean>();
-		m.put(RowSetConstants.ATTR_TRIM, Boolean.FALSE);
-		m.put(RowSetConstants.ATTR_FORMATTING, Boolean.FALSE);
-		m.put(RowSetConstants.ATTR_SYNTAX_COLORING, Boolean.TRUE);
-		m.put(RowSetConstants.ATTR_LINE_NUMBERS, Boolean.FALSE);
-		
-		ATTR_DEFAULTS = Collections.unmodifiableMap(m);
-		}
+	private static final Map<String, Boolean> ATTR_DEFAULTS = new MapBuilder<String, Boolean>()
+			.put(RowSetConstants.ATTR_TRIM, Boolean.FALSE)
+			.put(RowSetConstants.ATTR_FORMATTING, Boolean.FALSE)
+			.put(RowSetConstants.ATTR_SYNTAX_COLORING, Boolean.TRUE)
+			.put(RowSetConstants.ATTR_LINE_NUMBERS, Boolean.FALSE)
+			.buildReadOnly();
 	
 	private final TimeService timeService;
 	private final ConfigAccessor configService;

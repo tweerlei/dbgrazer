@@ -36,7 +36,7 @@ public abstract class LdapSearchQueryType extends AbstractTableQueryType
 	 */
 	public LdapSearchQueryType(String name, LdapLinkType linkType, int scope)
 		{
-		super(name, linkType, ResultMapMode.SINGLE);
+		super(name, linkType, ResultMapMode.SINGLE, null);
 		this.scope = scope;
 		}
 	

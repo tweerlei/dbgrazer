@@ -93,7 +93,7 @@ public class QueryPersisterImplTest extends TestCase
 		 */
 		public TestQueryType()
 			{
-			super(NAME, new TestLinkType(), ResultMapMode.SINGLE);
+			super(NAME, new TestLinkType(), ResultMapMode.SINGLE, null);
 			}
 		}
 	
