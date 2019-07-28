@@ -52,7 +52,7 @@
 					<td><fmt:message key="help_${c.key}"/></td>
 <c:if test="${currentUser.configEditorEnabled}"
 >					<td><span class="action" title="<fmt:message key="change"/>" onclick="showDialog(event, 'config', {q: '${fn:escapeXml(c.key)}'}, '${fn:escapeXml(c.key)}');"><fmt:message key="editIcon"/></span><c:if test="${settings[c.key] != null}"
->						<span class="action" title="<fmt:message key="remove"/>" onclick="showConfirmDialog('${fn:escapeXml(c.key)}', '<fmt:message key="deleteConfigText"/>', 'unset-config.html', '${fn:escapeXml(c.key)}');"><fmt:message key="removeIcon"/></span></c:if
+>						<span class="action" title="<fmt:message key="remove"/>" onclick="showConfirmDialog('${fn:escapeXml(c.key)}', '<fmt:message key="deleteConfigText"/>', 'unset-config.html', { q: '${fn:escapeXml(c.key)}' });"><fmt:message key="removeIcon"/></span></c:if
 >						</td>
 </c:if
 >					<td><c:choose

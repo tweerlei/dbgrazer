@@ -33,8 +33,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import de.tweerlei.dbgrazer.extension.kubernetes.KubernetesApiService;
-import de.tweerlei.dbgrazer.extension.kubernetes.KubernetesApiService.KubernetesApiObject;
-import de.tweerlei.dbgrazer.extension.kubernetes.KubernetesApiService.KubernetesApiResource;
+import de.tweerlei.dbgrazer.extension.kubernetes.model.KubernetesApiObject;
+import de.tweerlei.dbgrazer.extension.kubernetes.model.KubernetesApiResource;
 import de.tweerlei.dbgrazer.query.model.ColumnDef;
 import de.tweerlei.dbgrazer.query.model.ColumnType;
 import de.tweerlei.dbgrazer.query.model.Query;
@@ -215,7 +215,7 @@ public class KubernetesBrowseController
 				for (Map.Entry<String, KubernetesApiResource> ent3 : ent2.getValue().entrySet())
 					{
 					if (ent3.getValue().isNamespaced() == namespaced)
-						rs.getRows().add(new DefaultResultRow(ent.getKey() + "/" + ent2.getKey() + "/" + ent3.getValue().getName(), ent3.getKey(), ent.getKey(), ent2.getKey()));
+						rs.getRows().add(new DefaultResultRow(new ObjectKind(ent.getKey(), ent2.getKey(), ent3.getValue().getName()).toString(), ent3.getKey(), ent.getKey(), ent2.getKey()));
 					}
 				}
 			}
@@ -260,10 +260,10 @@ public class KubernetesBrowseController
 		model.put("namespace", namespace);
 		model.put("kind", kind);
 		
-		final String[] parts = kind.split("/", 3);
+		final ObjectKind parts = ObjectKind.parse(kind);
 		
 		final long start = timeService.getCurrentTime();
-		final Set<KubernetesApiObject> apiObjects = clientService.listApiObjects(connectionSettings.getLinkName(), namespace, parts[0], parts[1], parts[2]);
+		final Set<KubernetesApiObject> apiObjects = clientService.listApiObjects(connectionSettings.getLinkName(), namespace, parts.group, parts.version, parts.kind);
 		final long end = timeService.getCurrentTime();
 		
 		final Map<String, TabItem<RowSet>> results = new LinkedHashMap<String, TabItem<RowSet>>();
@@ -411,9 +411,9 @@ public class KubernetesBrowseController
 		
 		model.put("formats", textFormatterService.getSupportedTextFormats());
 		
-		final String[] parts = kind.split("/", 3);
+		final ObjectKind parts = ObjectKind.parse(kind);
 		
-		final String json = clientService.getApiObject(connectionSettings.getLinkName(), namespace, parts[0], parts[1], parts[2], name);
+		final String json = clientService.getApiObject(connectionSettings.getLinkName(), namespace, parts.group, parts.version, parts.kind, name);
 		
 		final Map<String, TabItem<Object>> tabs = new HashMap<String, TabItem<Object>>(1);
 		final String txt;

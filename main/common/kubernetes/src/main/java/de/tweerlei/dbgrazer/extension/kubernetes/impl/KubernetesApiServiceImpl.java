@@ -16,7 +16,6 @@
 package de.tweerlei.dbgrazer.extension.kubernetes.impl;
 
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -33,11 +32,15 @@ import org.springframework.stereotype.Service;
 import de.tweerlei.common.util.StringUtils;
 import de.tweerlei.dbgrazer.common.service.ConfigListener;
 import de.tweerlei.dbgrazer.common.service.ConfigService;
+import de.tweerlei.dbgrazer.common.util.impl.NamedMap;
 import de.tweerlei.dbgrazer.extension.kubernetes.KubernetesApiService;
 import de.tweerlei.dbgrazer.extension.kubernetes.KubernetesClientService;
+import de.tweerlei.dbgrazer.extension.kubernetes.model.KubernetesApiObject;
+import de.tweerlei.dbgrazer.extension.kubernetes.model.KubernetesApiResource;
+import de.tweerlei.dbgrazer.extension.kubernetes.resource.KubernetesApiAdapter;
+import de.tweerlei.dbgrazer.extension.kubernetes.resource.impl.AbstractCoreV1ApiAdapter;
+import de.tweerlei.dbgrazer.extension.kubernetes.resource.impl.CustomObjectApiAdapter;
 import de.tweerlei.dbgrazer.extension.kubernetes.support.CustomObjectsApiExtension;
-import de.tweerlei.dbgrazer.extension.kubernetes.support.V1Item;
-import de.tweerlei.dbgrazer.extension.kubernetes.support.V1ItemList;
 import de.tweerlei.dbgrazer.link.service.LinkListener;
 import de.tweerlei.dbgrazer.link.service.LinkService;
 import io.kubernetes.client.ApiClient;
@@ -48,23 +51,9 @@ import io.kubernetes.client.models.V1APIGroup;
 import io.kubernetes.client.models.V1APIGroupList;
 import io.kubernetes.client.models.V1APIResource;
 import io.kubernetes.client.models.V1APIResourceList;
-import io.kubernetes.client.models.V1ConfigMap;
-import io.kubernetes.client.models.V1ContainerStatus;
-import io.kubernetes.client.models.V1Endpoints;
-import io.kubernetes.client.models.V1Event;
 import io.kubernetes.client.models.V1GroupVersionForDiscovery;
-import io.kubernetes.client.models.V1LimitRange;
 import io.kubernetes.client.models.V1Namespace;
 import io.kubernetes.client.models.V1NamespaceList;
-import io.kubernetes.client.models.V1ObjectMeta;
-import io.kubernetes.client.models.V1PersistentVolumeClaim;
-import io.kubernetes.client.models.V1Pod;
-import io.kubernetes.client.models.V1PodTemplate;
-import io.kubernetes.client.models.V1ReplicationController;
-import io.kubernetes.client.models.V1ResourceQuota;
-import io.kubernetes.client.models.V1Secret;
-import io.kubernetes.client.models.V1Service;
-import io.kubernetes.client.models.V1ServiceAccount;
 
 /**
  * Default impl.
@@ -74,35 +63,6 @@ import io.kubernetes.client.models.V1ServiceAccount;
 @Service
 public class KubernetesApiServiceImpl implements KubernetesApiService, ConfigListener, LinkListener
 	{
-	private static enum Kind
-		{
-		ConfigMap,
-		Endpoints,
-		Event,
-		LimitRange,
-		Pod,
-		PodTemplate,
-		ReplicationController,
-		ResourceQuota,
-		Secret,
-		Service,
-		ServiceAccount,
-		PersistentVolumeClaim,
-		/** unknown kind */
-		Other;
-		
-		public static Kind forName(String name)
-			{
-			try	{
-				return (Kind.valueOf(name));
-				}
-			catch (IllegalArgumentException e)
-				{
-				return (Kind.Other);
-				}
-			}
-		}
-	
 	private static class KubernetesMetadataHolder
 		{
 		private final Map<String, Map<String, Map<String, KubernetesApiResource>>> apiResources;
@@ -129,6 +89,7 @@ public class KubernetesApiServiceImpl implements KubernetesApiService, ConfigLis
 	private final ConfigService configService;
 	private final LinkService linkService;
 	private final KubernetesClientService clientService;
+	private final Map<String, KubernetesApiAdapter> adapters;
 	private final Logger logger;
 	private final Map<String, KubernetesMetadataHolder> metadataCache;
 	
@@ -137,13 +98,16 @@ public class KubernetesApiServiceImpl implements KubernetesApiService, ConfigLis
 	 * @param configService ConfigService
 	 * @param linkService LinkService
 	 * @param clientService KubernetesClientService
+	 * @param adapters Known KubernetesApiAdapters
 	 */
 	@Autowired
-	public KubernetesApiServiceImpl(ConfigService configService, LinkService linkService, KubernetesClientService clientService)
+	public KubernetesApiServiceImpl(ConfigService configService, LinkService linkService, KubernetesClientService clientService,
+			Set<KubernetesApiAdapter> adapters)
 		{
 		this.configService = configService;
 		this.linkService = linkService;
 		this.clientService = clientService;
+		this.adapters = new NamedMap<KubernetesApiAdapter>(adapters);
 		this.logger = Logger.getLogger(getClass().getCanonicalName());
 		this.metadataCache = new ConcurrentHashMap<String, KubernetesMetadataHolder>();
 		}
@@ -246,8 +210,8 @@ public class KubernetesApiServiceImpl implements KubernetesApiService, ConfigLis
 					}
 				
 				final Map<String, Map<String, KubernetesApiResource>> map = new TreeMap<String, Map<String, KubernetesApiResource>>();
-				map.put("v1", rsrc);
-				apiResources.put("(core)", map);
+				map.put(AbstractCoreV1ApiAdapter.CORE_VERSION, rsrc);
+				apiResources.put(AbstractCoreV1ApiAdapter.CORE_GROUP, map);
 				}
 			catch (ApiException e)
 				{
@@ -286,254 +250,102 @@ public class KubernetesApiServiceImpl implements KubernetesApiService, ConfigLis
 		return (names);
 		}
 	
+	private KubernetesApiAdapter getAdapter(String group, String version, String kind)
+		{
+		KubernetesApiAdapter ret = adapters.get(group + "/" + version + "/" + kind);
+		if (ret != null)
+			return (ret);
+		
+		synchronized(adapters)
+			{
+			ret = new CustomObjectApiAdapter(group, version, kind);
+			adapters.put(ret.getName(), ret);
+			}
+		
+		return (ret);
+		}
+	
 	@Override
 	public Set<KubernetesApiObject> listApiObjects(String c, String namespace, String group, String version, String kind)
 		{
-		if ("(core)".equals(group) && "v1".equals(version))
-			return (listCoreObjects(c, namespace, kind));
-		
-		final CustomObjectsApiExtension api = new CustomObjectsApiExtension(clientService.getApiClient(c));
-		final Set<KubernetesApiObject> names = new TreeSet<KubernetesApiObject>();
+		final KubernetesApiAdapter api = getAdapter(group, version, kind);
 		try	{
-			final Object list = api.listNamespacedCustomObject(group, version, namespace, kind, null, null, null, null);
-			for (V1Item item : extractList(list, api.getApiClient()).getItems())
-				{
-				final KubernetesApiObject name = getKubernetesApiObject(item.getMetadata(), null);
-				names.add(name);
-				}
+			return (api.list(clientService.getApiClient(c), namespace));
 			}
 		catch (ApiException e)
 			{
 			logger.log(Level.WARNING, e.getResponseBody(), e);
+			return (Collections.emptySet());
 			}
-		
-		return (names);
-		}
-	
-	private V1ItemList extractList(Object listObj, ApiClient client)
-		{
-		if (listObj instanceof Map)
-			{
-			final String json = client.getJSON().serialize(listObj);
-			return (client.getJSON().deserialize(json, V1ItemList.class));
-			}
-		
-		return (null);
-		}
-	
-	private KubernetesApiObject getKubernetesApiObject(V1ObjectMeta metadata, Map<String, Object> properties)
-		{
-		return (new KubernetesApiObject(metadata.getName(), metadata.getCreationTimestamp().toDate(), metadata.getLabels(), properties));
-		}
-	
-	private Set<KubernetesApiObject> listCoreObjects(String c, String namespace, String kind)
-		{
-		final CoreV1Api api = new CoreV1Api(clientService.getApiClient(c));
-		
-		final Set<KubernetesApiObject> names = new TreeSet<KubernetesApiObject>();
-		try	{
-			switch (Kind.forName(kind))
-				{
-				case ConfigMap:
-					for (V1ConfigMap n : api.listNamespacedConfigMap(namespace, null, null, null, null, null, null, null, null, null).getItems())
-						names.add(getKubernetesApiObject(n.getMetadata(), getConfigMapProperties(n)));
-					break;
-				
-				case Endpoints:
-					for (V1Endpoints n : api.listNamespacedEndpoints(namespace, null, null, null, null, null, null, null, null, null).getItems())
-						names.add(getKubernetesApiObject(n.getMetadata(), null));
-					break;
-				
-				case Event:
-					for (V1Event n : api.listNamespacedEvent(namespace, null, null, null, null, null, null, null, null, null).getItems())
-						names.add(getKubernetesApiObject(n.getMetadata(), getEventProperties(n)));
-					break;
-				
-				case Pod:
-					for (V1Pod n : api.listNamespacedPod(namespace, null, null, null, null, null, null, null, null, null).getItems())
-						names.add(getKubernetesApiObject(n.getMetadata(), getPodProperties(n)));
-					break;
-				
-				case Secret:
-					for (V1Secret n : api.listNamespacedSecret(namespace, null, null, null, null, null, null, null, null, null).getItems())
-						names.add(getKubernetesApiObject(n.getMetadata(), getSecretProperties(n)));
-					break;
-				
-				case Service:
-					for (V1Service n : api.listNamespacedService(namespace, null, null, null, null, null, null, null, null, null).getItems())
-						names.add(getKubernetesApiObject(n.getMetadata(), null));
-					break;
-				
-				case LimitRange:
-					for (V1LimitRange n : api.listNamespacedLimitRange(namespace, null, null, null, null, null, null, null, null, null).getItems())
-						names.add(getKubernetesApiObject(n.getMetadata(), null));
-					break;
-				
-				case PodTemplate:
-					for (V1PodTemplate n : api.listNamespacedPodTemplate(namespace, null, null, null, null, null, null, null, null, null).getItems())
-						names.add(getKubernetesApiObject(n.getMetadata(), null));
-					break;
-				
-				case ReplicationController:
-					for (V1ReplicationController n : api.listNamespacedReplicationController(namespace, null, null, null, null, null, null, null, null, null).getItems())
-						names.add(getKubernetesApiObject(n.getMetadata(), null));
-					break;
-				
-				case ResourceQuota:
-					for (V1ResourceQuota n : api.listNamespacedResourceQuota(namespace, null, null, null, null, null, null, null, null, null).getItems())
-						names.add(getKubernetesApiObject(n.getMetadata(), null));
-					break;
-				
-				case ServiceAccount:
-					for (V1ServiceAccount n : api.listNamespacedServiceAccount(namespace, null, null, null, null, null, null, null, null, null).getItems())
-						names.add(getKubernetesApiObject(n.getMetadata(), null));
-					break;
-				
-				case PersistentVolumeClaim:
-					for (V1PersistentVolumeClaim n : api.listNamespacedPersistentVolumeClaim(namespace, null, null, null, null, null, null, null, null, null).getItems())
-						names.add(getKubernetesApiObject(n.getMetadata(), null));
-					break;
-				
-				case Other:
-					break;
-				}
-			}
-		catch (ApiException e)
-			{
-			logger.log(Level.WARNING, e.getResponseBody(), e);
-			}
-		
-		return (names);
-		}
-	
-	private Map<String, Object> getPodProperties(V1Pod pod)
-		{
-		final Map<String, Object> ret = new LinkedHashMap<String, Object>();
-		
-		int containers = 0;
-		int readyContainers = 0;
-		for (V1ContainerStatus s : pod.getStatus().getContainerStatuses())
-			{
-			containers++;
-			if (s.isReady())
-				readyContainers++;
-			}
-		
-		ret.put("Phase", pod.getStatus().getPhase());
-		ret.put("Containers", containers);
-		ret.put("Ready", readyContainers);
-		ret.put("StartTime", pod.getStatus().getStartTime().toDate());
-		ret.put("PodIP", pod.getStatus().getPodIP());
-		ret.put("HostIP", pod.getStatus().getHostIP());
-		
-		return (ret);
-		}
-	
-	private Map<String, Object> getEventProperties(V1Event event)
-		{
-		final Map<String, Object> ret = new LinkedHashMap<String, Object>();
-		
-		ret.put("Message", event.getMessage());
-		
-		return (ret);
-		}
-	
-	private Map<String, Object> getConfigMapProperties(V1ConfigMap configMap)
-		{
-		final Map<String, Object> ret = new LinkedHashMap<String, Object>();
-		
-		ret.put("Entries", configMap.getData().size());
-		
-		return (ret);
-		}
-	
-	private Map<String, Object> getSecretProperties(V1Secret secret)
-		{
-		final Map<String, Object> ret = new LinkedHashMap<String, Object>();
-		
-		ret.put("Entries", secret.getData().size());
-		
-		return (ret);
 		}
 	
 	@Override
 	public String getApiObject(String c, String namespace, String group, String version, String kind, String name)
 		{
-		if ("(core)".equals(group) && "v1".equals(version))
-			return (getCoreObject(c, namespace, kind, name));
-		
-		final CustomObjectsApiExtension api = new CustomObjectsApiExtension(clientService.getApiClient(c));
-		Object content = null;
+		final KubernetesApiAdapter api = getAdapter(group, version, kind);
 		try	{
-			content = api.getNamespacedCustomObject(group, version, namespace, kind, name);
+			return (api.read(clientService.getApiClient(c), namespace, name));
 			}
 		catch (ApiException e)
 			{
 			logger.log(Level.WARNING, e.getResponseBody(), e);
+			return (e.getResponseBody());
 			}
-		
-		if (content == null)
-			return (null);
-		
-		return (api.getApiClient().getJSON().serialize(content));
 		}
 	
-	private String getCoreObject(String c, String namespace, String kind, String name)
+	@Override
+	public String createApiObject(String c, String namespace, String group, String version, String kind, String json)
 		{
-		final CoreV1Api api = new CoreV1Api(clientService.getApiClient(c));
-		
-		Object content = null;
+		final KubernetesApiAdapter api = getAdapter(group, version, kind);
 		try	{
-			switch (Kind.forName(kind))
-				{
-				case ConfigMap:
-					content = api.readNamespacedConfigMap(name, namespace, null, null, null);
-					break;
-				case Endpoints:
-					content = api.readNamespacedEndpoints(name, namespace, null, null, null);
-					break;
-				case Event:
-					content = api.readNamespacedEvent(name, namespace, null, null, null);
-					break;
-				case LimitRange:
-					content = api.readNamespacedLimitRange(name, namespace, null, null, null);
-					break;
-				case PersistentVolumeClaim:
-					content = api.readNamespacedPersistentVolumeClaim(name, namespace, null, null, null);
-					break;
-				case Pod:
-					content = api.readNamespacedPod(name, namespace, null, null, null);
-					break;
-				case PodTemplate:
-					content = api.readNamespacedPodTemplate(name, namespace, null, null, null);
-					break;
-				case ReplicationController:
-					content = api.readNamespacedReplicationController(name, namespace, null, null, null);
-					break;
-				case ResourceQuota:
-					content = api.readNamespacedResourceQuota(name, namespace, null, null, null);
-					break;
-				case Secret:
-					content = api.readNamespacedSecret(name, namespace, null, null, null);
-					break;
-				case Service:
-					content = api.readNamespacedService(name, namespace, null, null, null);
-					break;
-				case ServiceAccount:
-					content = api.readNamespacedServiceAccount(name, namespace, null, null, null);
-					break;
-				case Other:
-					break;
-				}
+			return (api.create(clientService.getApiClient(c), namespace, json));
 			}
 		catch (ApiException e)
 			{
 			logger.log(Level.WARNING, e.getResponseBody(), e);
+			return (e.getResponseBody());
 			}
-		
-		if (content == null)
-			return (null);
-		
-		return (api.getApiClient().getJSON().serialize(content));
+		}
+	
+	@Override
+	public String replaceApiObject(String c, String namespace, String group, String version, String kind, String name, String json)
+		{
+		final KubernetesApiAdapter api = getAdapter(group, version, kind);
+		try	{
+			return (api.replace(clientService.getApiClient(c), namespace, name, json));
+			}
+		catch (ApiException e)
+			{
+			logger.log(Level.WARNING, e.getResponseBody(), e);
+			return (e.getResponseBody());
+			}
+		}
+	
+	@Override
+	public String patchApiObject(String c, String namespace, String group, String version, String kind, String name, String json)
+		{
+		final KubernetesApiAdapter api = getAdapter(group, version, kind);
+		try	{
+			return (api.patch(clientService.getApiClient(c), namespace, name, json));
+			}
+		catch (ApiException e)
+			{
+			logger.log(Level.WARNING, e.getResponseBody(), e);
+			return (e.getResponseBody());
+			}
+		}
+	
+	@Override
+	public String deleteApiObject(String c, String namespace, String group, String version, String kind, String name)
+		{
+		final KubernetesApiAdapter api = getAdapter(group, version, kind);
+		try	{
+			return (api.delete(clientService.getApiClient(c), namespace, name));
+			}
+		catch (ApiException e)
+			{
+			logger.log(Level.WARNING, e.getResponseBody(), e);
+			return (e.getResponseBody());
+			}
 		}
 	}

@@ -67,6 +67,7 @@ import de.tweerlei.dbgrazer.web.exception.AjaxRedirectException;
 import de.tweerlei.dbgrazer.web.exception.QueryException;
 import de.tweerlei.dbgrazer.web.exception.QueryNotFoundException;
 import de.tweerlei.dbgrazer.web.formatter.DataFormatter;
+import de.tweerlei.dbgrazer.web.model.QueryParameters;
 import de.tweerlei.dbgrazer.web.model.TabItem;
 import de.tweerlei.dbgrazer.web.model.Visualization;
 import de.tweerlei.dbgrazer.web.service.DataFormatterFactory;
@@ -421,7 +422,7 @@ public class QueryRunController
 		
 		final DataFormatter fmt = factory.getWebFormatter();
 		
-		final Result r = performQuery(connectionSettings.getLinkName(), fbo.getQuery(), Collections.<Integer, String>emptyMap());
+		final Result r = performQuery(connectionSettings.getLinkName(), new QueryParameters(fbo.getQuery()));
 		final Map<String, String> values = resultTransformer.convertToMap(r.getFirstRowSet(), fmt);
 		
 		model.put("values", values);
@@ -507,13 +508,13 @@ public class QueryRunController
 		final Map<String, Object> model = new HashMap<String, Object>();
 		
 		final DataFormatter fmt = factory.getWebFormatter();
-		final List<String> params = querySettingsManager.getEffectiveParameters(fbo.getQuery(), fbo.getParams());
+		final QueryParameters query = querySettingsManager.prepareParameters(fbo.getQuery(), fbo.getEffectiveParams());
 		
-		final Map<String, Result> results = performRecursiveQuery(connectionSettings.getLinkName(), fbo.getQuery(), fbo.getEffectiveParams());
+		final Map<String, Result> results = performRecursiveQuery(connectionSettings.getLinkName(), query);
 		
 		// query successful, historize
 		if (historize && querySettingsManager.isHistoryEnabled())
-			querySettingsManager.addHistoryEntry(fbo.getQuery(), params);
+			querySettingsManager.addHistoryEntry(query.getQuery(), query.getVisibleParameters());
 		
 		final Map<String, TabItem<RowSet>> rowSets = new LinkedHashMap<String, TabItem<RowSet>>();
 		int imageIndex = 0;
@@ -521,15 +522,15 @@ public class QueryRunController
 		resultCache.clearCachedObjects(CacheClass.RESULT_VISUALIZATION);
 		
 		// Show related queries on top for PANELS and DASHBOARD
-		if (showRelated && (fbo.getQuery().getType().getOrientation() != ResultOrientation.ACROSS))
-			addRelatedQueries(rowSets, fbo.getQuery(), fbo.getParams());
+		if (showRelated && (query.getQuery().getType().getOrientation() != ResultOrientation.ACROSS))
+			addRelatedQueries(rowSets, query);
 		
 		for (Map.Entry<String, Result> ent : results.entrySet())
 			{
 			final Result r = ent.getValue();
 			if (r.getQuery().getType().getResultType() == ResultType.VISUALIZATION)
 				{
-				final Map<Integer, String> effectiveParams = querySettingsManager.buildParameterMap(CollectionUtils.concat(r.getParameterValues(), params));
+				final Map<Integer, String> effectiveParams = querySettingsManager.buildParameterMap(CollectionUtils.concat(r.getParameterValues(), query.getEffectiveParameters()));
 				
 				final RowSetImpl rowSet = new RowSetImpl(r.getQuery(), RowSetConstants.INDEX_VISUALIZATION, null);
 				rowSets.put(ent.getKey(), new TabItem<RowSet>(rowSet, -1, r.getQuery().getName(), effectiveParams, frontendHelper.getQueryParams(effectiveParams, true)));
@@ -561,17 +562,17 @@ public class QueryRunController
 					}
 				
 				// Don't show subqueries when the visualization is a subquery itself
-				if (fbo.getQuery().getType().getResultType() != ResultType.RECURSIVE)
+				if (query.getQuery().getType().getResultType() != ResultType.RECURSIVE)
 					{
 					if (r.getQuery().getType().getName().equals(VisualizationSettings.GRAPH_QUERY_TYPE))
-						addRowSets(rowSets, r, fbo.getParams().values(), fmt, configService.get(ConfigKeys.SHOW_GRAPH_SUBQUERIES) ? 0 : 2, false);
+						addRowSets(rowSets, r, query.getAllParameters(), fmt, configService.get(ConfigKeys.SHOW_GRAPH_SUBQUERIES) ? 0 : 2, false);
 					else if (configService.get(ConfigKeys.SHOW_CHART_SUBQUERIES))
-						addRowSets(rowSets, r, fbo.getParams().values(), fmt, 0, false);
+						addRowSets(rowSets, r, query.getAllParameters(), fmt, 0, false);
 					}
 				}
 			else if (r.getQuery().getType().getName().equals(VisualizationSettings.TREE_QUERY_TYPE))
 				{
-				final Map<Integer, String> effectiveParams = querySettingsManager.buildParameterMap(CollectionUtils.concat(r.getParameterValues(), params));
+				final Map<Integer, String> effectiveParams = querySettingsManager.buildParameterMap(CollectionUtils.concat(r.getParameterValues(), query.getAllParameters()));
 				
 				final RowSetImpl rowSet = new RowSetImpl(r.getFirstRowSet().getQuery(), RowSetConstants.INDEX_TREE, r.getFirstRowSet().getColumns());
 				rowSet.setMoreAvailable(r.getFirstRowSet().isMoreAvailable());
@@ -585,17 +586,17 @@ public class QueryRunController
 				rowSets.put(ent.getKey(), new TabItem<RowSet>(rowSet, rowSet.getRows().size(), r.getQuery().getName(), effectiveParams, frontendHelper.getQueryParams(effectiveParams, true)));
 				
 				// Don't show subqueries when the tree is a subquery itself
-				if (fbo.getQuery().getType().getResultType() != ResultType.RECURSIVE)
+				if (query.getQuery().getType().getResultType() != ResultType.RECURSIVE)
 					{
 					if (configService.get(ConfigKeys.SHOW_TREE_SUBQUERIES));
-						addRowSets(rowSets, r, fbo.getParams().values(), fmt, 1, false);
+						addRowSets(rowSets, r, query.getAllParameters(), fmt, 1, false);
 					}
 				}
 			else if (r.getQuery().getType().getName().equals(VisualizationSettings.MULTILEVEL_QUERY_TYPE))
 				{
 				for (Map.Entry<String, RowSet> rent : r.getRowSets().entrySet())
 					{
-					final Map<Integer, String> effectiveParams = querySettingsManager.buildParameterMap(CollectionUtils.concat(rent.getValue().getParameterValues(), params));
+					final Map<Integer, String> effectiveParams = querySettingsManager.buildParameterMap(CollectionUtils.concat(rent.getValue().getParameterValues(), query.getAllParameters()));
 					
 					final RowSetImpl rowSet = new RowSetImpl(rent.getValue().getQuery(), RowSetConstants.INDEX_MULTILEVEL, rent.getValue().getColumns());
 					rowSet.setMoreAvailable(rent.getValue().isMoreAvailable());
@@ -612,31 +613,31 @@ public class QueryRunController
 				model.put("subquery", r.getFirstRowSet().getQuery());
 				}
 			else
-				addRowSets(rowSets, r, fbo.getParams().values(), fmt, 0, querySettingsManager.isTrimColumnsActive(r.getQuery()));
+				addRowSets(rowSets, r, query.getAllParameters(), fmt, 0, querySettingsManager.isTrimColumnsActive(r.getQuery()));
 			}
 		
 		// Show related queries last for all other types
-		if (fbo.getQuery().getType().getName().equals(VisualizationSettings.NAVIGATOR_QUERY_TYPE))
-			model.put("rs", getNavigatorQueries(fbo.getQuery()));
-		else if (showRelated && (fbo.getQuery().getType().getOrientation() == ResultOrientation.ACROSS))
-			addRelatedQueries(rowSets, fbo.getQuery(), fbo.getParams());
+		if (query.getQuery().getType().getName().equals(VisualizationSettings.NAVIGATOR_QUERY_TYPE))
+			model.put("rs", getNavigatorQueries(query.getQuery()));
+		else if (showRelated && (query.getQuery().getType().getOrientation() == ResultOrientation.ACROSS))
+			addRelatedQueries(rowSets, query);
 		
 		model.put("results", rowSets);
-		model.put("title", frontendHelper.getQueryTitle(fbo.getQuery().getName(), params));
+		model.put("title", frontendHelper.getQueryTitle(query.getQuery().getName(), query.getVisibleParameters()));
 		model.put("paramString", frontendHelper.getQueryParams(fbo.getParams(), true));
 		model.put("formats", exportService.getSupportedExportFormats());
 		model.put("downloadFormats", downloadService.getSupportedDownloadFormats());
 		model.put("formatters", textFormatterService.getSupportedTextFormats());
-		model.put("extensions", extensionService.getQueryViewExtensions(fbo.getQuery()));
-		model.put("extensionJS", extensionService.getQueryViewJS(fbo.getQuery()));
+		model.put("extensions", extensionService.getQueryViewExtensions(query.getQuery()));
+		model.put("extensionJS", extensionService.getQueryViewJS(query.getQuery()));
 		model.put("pkColumns", PKCOLUMN_0);
 		
 		// If a second subquery is defined for an EXPLORER view, load it as initial detail view
-		if (fbo.getQuery().getType().getName().equals(VisualizationSettings.EXPLORER_QUERY_TYPE) && (fbo.getQuery().getSubQueries().size() > 1))
-			model.put("detailQuery", fbo.getQuery().getSubQueries().get(1).getName());
+		if (query.getQuery().getType().getName().equals(VisualizationSettings.EXPLORER_QUERY_TYPE) && (query.getQuery().getSubQueries().size() > 1))
+			model.put("detailQuery", query.getQuery().getSubQueries().get(1).getName());
 		
-		if (fbo.getQuery().getType().getSubQueryResolver() != null)
-			model.put("additionalParams", fbo.getQuery().getType().getSubQueryResolver().getAdditionalParameters(fbo.getQuery()));
+		if (query.getQuery().getType().getSubQueryResolver() != null)
+			model.put("additionalParams", query.getQuery().getType().getSubQueryResolver().getAdditionalParameters(query.getQuery()));
 		
 		final List<List<ColumnDef>> tableColumns = new ArrayList<List<ColumnDef>>(rowSets.size());
 		for (TabItem<RowSet> rs : rowSets.values())
@@ -697,9 +698,9 @@ public class QueryRunController
 		final Map<String, Object> model = new HashMap<String, Object>();
 		
 		final DataFormatter fmt = factory.getWebFormatter();
-		final List<String> params = querySettingsManager.getEffectiveParameters(fbo.getQuery(), fbo.getParams());
+		final QueryParameters query = querySettingsManager.prepareParameters(fbo.getQuery(), fbo.getEffectiveParams());
 		
-		final Map<String, Result> results = performRecursiveQuery(connectionSettings.getLinkName(), fbo.getQuery(), fbo.getEffectiveParams());
+		final Map<String, Result> results = performRecursiveQuery(connectionSettings.getLinkName(), query);
 		
 		final Result result = new ResultImpl(fbo.getQuery());
 		for (Map.Entry<String, Result> ent : results.entrySet())
@@ -710,7 +711,7 @@ public class QueryRunController
 				final RowSetImpl rowSet = new RowSetImpl(r.getQuery(), RowSetConstants.INDEX_VISUALIZATION, null);
 				result.getRowSets().put(ent.getKey(), rowSet);
 				
-				final VisualizationBuilder v = new VisualizationBuilder(visualizationService, querySettingsManager, frontendHelper, fmt, r, ViewConstants.IMAGEMAP_ID, null, params);
+				final VisualizationBuilder v = new VisualizationBuilder(visualizationService, querySettingsManager, frontendHelper, fmt, r, ViewConstants.IMAGEMAP_ID, null, query.getEffectiveParameters());
 				factory.doWithDefaultTheme(v);
 				rowSet.getAttributes().put(RowSetConstants.ATTR_VISUALIZATION, v.getVisualization());
 				
@@ -732,17 +733,17 @@ public class QueryRunController
 		return (model);
 		}
 	
-	private void addRelatedQueries(Map<String, TabItem<RowSet>> rowSets, Query query, Map<Integer, String> params)
+	private void addRelatedQueries(Map<String, TabItem<RowSet>> rowSets, QueryParameters query)
 		{
-		final RowSet rowSet = getRelatedQueries(query);
+		final RowSet rowSet = getRelatedQueries(query.getQuery());
 		if (rowSet != null)
 			{
 			rowSets.put(MessageKeys.EMPTY_TAB, new TabItem<RowSet>(
 					rowSet,
 					-1, //rowSet.getRows().size()
 					null,
-					params,
-					frontendHelper.getQueryParams(params, true)
+					query.getActualParameters(),
+					frontendHelper.getQueryParams(query.getActualParameters(), true)
 					));
 			}
 		}
@@ -887,7 +888,8 @@ public class QueryRunController
 		{
 		final Map<String, Object> model = new HashMap<String, Object>();
 		
-		final Result r = performQuery(connectionSettings.getLinkName(), fbo.getQuery(), fbo.getEffectiveParams());
+		final QueryParameters query = querySettingsManager.prepareParameters(fbo.getQuery(), fbo.getEffectiveParams());
+		final Result r = performQuery(connectionSettings.getLinkName(), query);
 		
 		RowSet rowSet = null;
 		for (RowSet rs : r.getRowSets().values())
@@ -937,7 +939,8 @@ public class QueryRunController
 		{
 		final Map<String, Object> model = new HashMap<String, Object>();
 		
-		model.put(GenericDownloadView.SOURCE_ATTRIBUTE, downloadService.getStreamDownloadSource(connectionSettings.getLinkName(), fbo.getQuery(), fbo.getEffectiveParams(), format));
+		final QueryParameters query = querySettingsManager.prepareParameters(fbo.getQuery(), fbo.getEffectiveParams());
+		model.put(GenericDownloadView.SOURCE_ATTRIBUTE, downloadService.getStreamDownloadSource(connectionSettings.getLinkName(), query, format));
 		
 		return (model);
 		}
@@ -979,7 +982,8 @@ public class QueryRunController
 		final Map<String, Object> model = new HashMap<String, Object>();
 		
 		final DataFormatter fmt = factory.getWebFormatter();
-		final Map<String, Result> results = performRecursiveQuery(connectionSettings.getLinkName(), fbo.getQuery(), fbo.getEffectiveParams());
+		final QueryParameters query = querySettingsManager.prepareParameters(fbo.getQuery(), fbo.getEffectiveParams());
+		final Map<String, Result> results = performRecursiveQuery(connectionSettings.getLinkName(), query);
 		
 		final Result r = results.values().iterator().next();
 		if ((r.getQuery().getType().getResultType() == ResultType.VISUALIZATION) && !r.getFirstRowSet().getRows().isEmpty())
@@ -1005,7 +1009,8 @@ public class QueryRunController
 		final Map<String, Object> model = new HashMap<String, Object>();
 		
 		final DataFormatter fmt = factory.getWebFormatter();
-		final Map<String, Result> results = performRecursiveQuery(connectionSettings.getLinkName(), fbo.getQuery(), fbo.getEffectiveParams());
+		final QueryParameters query = querySettingsManager.prepareParameters(fbo.getQuery(), fbo.getEffectiveParams());
+		final Map<String, Result> results = performRecursiveQuery(connectionSettings.getLinkName(), query);
 		
 		final Result r = results.values().iterator().next();
 		if ((r.getQuery().getType().getResultType() == ResultType.VISUALIZATION) && !r.getFirstRowSet().getRows().isEmpty())
@@ -1049,7 +1054,8 @@ public class QueryRunController
 		
 		try	{
 			final Query q = queryService.findQueryByName(connectionSettings.getLinkName(), fbo.getQuery().getSubQueries().get(level).getName());
-			final Result r = performQuery(connectionSettings.getLinkName(), q, fbo.getEffectiveParams());
+			final QueryParameters query = querySettingsManager.prepareParameters(q, fbo.getEffectiveParams());
+			final Result r = performQuery(connectionSettings.getLinkName(), query);
 			
 			boolean allEmpty = true;
 			for (RowSet rs : r.getRowSets().values())
@@ -1100,21 +1106,20 @@ public class QueryRunController
 			}
 		
 		final DataFormatter fmt = factory.getWebFormatter();
-		final List<String> allParams = new ArrayList<String>(fbo.getParams().size());
-		allParams.addAll(querySettingsManager.getEffectiveParameters(fbo.getQuery(), fbo.getParams()));
-		allParams.addAll(querySettingsManager.getAdditionalParameters(fbo.getQuery(), fbo.getParams()));
+		final QueryParameters query = querySettingsManager.prepareParameters(fbo.getQuery(), fbo.getEffectiveParams());
+		final List<String> allParams = query.getAllParameters();
 		Collections.reverse(allParams);
 		final Map<Integer, String> params = querySettingsManager.buildParameterMap(allParams);
 		
 		try	{
 			final Query q = queryService.findQueryByName(connectionSettings.getLinkName(), fbo.getQuery().getSubQueries().get(level).getName());
-			final Result r = performQuery(connectionSettings.getLinkName(), q, fbo.getEffectiveParams());
+			final Result r = performQuery(connectionSettings.getLinkName(), query);
 			final Map<String, TabItem<RowSet>> rowSets = new LinkedHashMap<String, TabItem<RowSet>>();
 			
 			boolean allEmpty = true;
 			for (Map.Entry<String, RowSet> ent : r.getRowSets().entrySet())
 				{
-				final Map<Integer, String> effectiveParams = querySettingsManager.buildParameterMap(CollectionUtils.concat(ent.getValue().getParameterValues(), fbo.getParams().values()));
+				final Map<Integer, String> effectiveParams = querySettingsManager.buildParameterMap(CollectionUtils.concat(ent.getValue().getParameterValues(), query.getAllParameters()));
 				
 				final RowSetImpl rowSet = new RowSetImpl(ent.getValue().getQuery(), RowSetConstants.INDEX_MULTILEVEL, ent.getValue().getColumns());
 				rowSet.setMoreAvailable(ent.getValue().isMoreAvailable());
@@ -1155,33 +1160,33 @@ public class QueryRunController
 		return (frontendHelper.buildPath(MessageKeys.PATH_DB, connectionSettings.getLinkName(), "result.html", "q=" + target.getQueryName()));
 		}
 	
-	private Result performQuery(String connection, Query query, Map<Integer, String> params)
+	private Result performQuery(String connection, QueryParameters query)
 		{
 		try	{
-			return (runner.performQuery(connection, query, params));
+			return (runner.performQuery(connection, query));
 			}
 		catch (PerformQueryException e)
 			{
-			throw new QueryException(e.getQueryName(), query.getName(), e.getCause());
+			throw new QueryException(e.getQueryName(), query.getQuery().getName(), e.getCause());
 			}
 		catch (RuntimeException e)
 			{
-			throw new QueryException(query.getName(), null, e);
+			throw new QueryException(query.getQuery().getName(), null, e);
 			}
 		}
 	
-	private Map<String, Result> performRecursiveQuery(String connection, Query query, Map<Integer, String> params)
+	private Map<String, Result> performRecursiveQuery(String connection, QueryParameters query)
 		{
 		try	{
-			return (runner.performRecursiveQuery(connection, query, params));
+			return (runner.performRecursiveQuery(connection, query));
 			}
 		catch (PerformQueryException e)
 			{
-			throw new QueryException(e.getQueryName(), query.getName(), e.getCause());
+			throw new QueryException(e.getQueryName(), query.getQuery().getName(), e.getCause());
 			}
 		catch (RuntimeException e)
 			{
-			throw new QueryException(query.getName(), null, e);
+			throw new QueryException(query.getQuery().getName(), null, e);
 			}
 		}
 	}

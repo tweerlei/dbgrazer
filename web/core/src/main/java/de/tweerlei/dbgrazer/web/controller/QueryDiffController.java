@@ -48,6 +48,7 @@ import de.tweerlei.dbgrazer.query.service.QueryService;
 import de.tweerlei.dbgrazer.web.exception.QueryException;
 import de.tweerlei.dbgrazer.web.exception.QueryNotFoundException;
 import de.tweerlei.dbgrazer.web.formatter.DataFormatter;
+import de.tweerlei.dbgrazer.web.model.QueryParameters;
 import de.tweerlei.dbgrazer.web.model.TabItem;
 import de.tweerlei.dbgrazer.web.service.DataFormatterFactory;
 import de.tweerlei.dbgrazer.web.service.ExportService;
@@ -301,11 +302,11 @@ public class QueryDiffController
 		final Map<String, Object> model = new HashMap<String, Object>();
 		
 		final DataFormatter fmt = factory.getWebFormatter();
-		final List<String> values = querySettingsManager.getEffectiveParameters(fbo.getQuery(), fbo.getParams());
-		final List<Object> params = querySettingsManager.translateParameters(fbo.getQuery(), values, fmt);
+		final QueryParameters query = querySettingsManager.prepareParameters(fbo.getQuery(), fbo.getParams());
+		final QueryParameters query2 = querySettingsManager.prepareParameters(fbo.getQuery(), fbo.getParams2());
 		
-		final Map<String, Result> results1 = performRecursiveQuery(connectionSettings.getLinkName(), fbo.getQuery(), fbo.getParams());
-		final Map<String, Result> results2 = performRecursiveQuery(fbo.getConnection2(), fbo.getQuery(), fbo.getParams2());
+		final Map<String, Result> results1 = performRecursiveQuery(connectionSettings.getLinkName(), query);
+		final Map<String, Result> results2 = performRecursiveQuery(fbo.getConnection2(), query2);
 		
 		final Result r;
 		try	{
@@ -320,7 +321,7 @@ public class QueryDiffController
 		for (Map.Entry<String, RowSet> ent : r.getRowSets().entrySet())
 			{
 			final RowSet rs = ent.getValue();
-			final Map<Integer, String> effectiveParams = (fbo.getQuery() == null) ? null : querySettingsManager.buildParameterMap(CollectionUtils.concat(values, rs.getParameterValues()));
+			final Map<Integer, String> effectiveParams = (fbo.getQuery() == null) ? null : querySettingsManager.buildParameterMap(CollectionUtils.concat(query.getVisibleParameters(), rs.getParameterValues()));
 			
 			rowSets.put(ent.getKey(), new TabItem<RowSet>(
 					rs,
@@ -332,7 +333,7 @@ public class QueryDiffController
 			}
 		
 		model.put("results", rowSets);
-		model.put("title", frontendHelper.getQueryTitle(fbo.getQuery().getName(), params));
+		model.put("title", frontendHelper.getQueryTitle(query.getQuery().getName(), query.getVisibleParameters()));
 //		model.put("favorite", connectionSettings.getFavorites().contains(fbo.getQuery().getName()));
 		model.put("isdiff", Boolean.TRUE);
 		model.put("paramString", frontendHelper.getQueryParams(fbo.getParams(), true));
@@ -379,9 +380,11 @@ public class QueryDiffController
 		final Map<String, Object> model = new HashMap<String, Object>();
 		
 		final DataFormatter fmt = factory.getWebFormatter();
+		final QueryParameters query = querySettingsManager.prepareParameters(fbo.getQuery(), fbo.getParams());
+		final QueryParameters query2 = querySettingsManager.prepareParameters(fbo.getQuery(), fbo.getParams2());
 		
-		final Result r1 = performQuery(connectionSettings.getLinkName(), fbo.getQuery(), fbo.getParams());
-		final Result r2 = performQuery(fbo.getConnection2(), fbo.getQuery(), fbo.getParams2());
+		final Result r1 = performQuery(connectionSettings.getLinkName(), query);
+		final Result r2 = performQuery(fbo.getConnection2(), query2);
 		
 		final RowSet rowSet = mergeResults(r1, r2, connectionSettings.getLinkName(), fbo.getConnection2(), fmt, subQueryIndex);
 		
@@ -406,9 +409,11 @@ public class QueryDiffController
 		final Map<String, Object> model = new HashMap<String, Object>();
 		
 		final DataFormatter fmt = factory.getWebFormatter();
+		final QueryParameters query = querySettingsManager.prepareParameters(fbo.getQuery(), fbo.getParams());
+		final QueryParameters query2 = querySettingsManager.prepareParameters(fbo.getQuery(), fbo.getParams2());
 		
-		final Map<String, Result> results1 = performRecursiveQuery(connectionSettings.getLinkName(), fbo.getQuery(), fbo.getParams());
-		final Map<String, Result> results2 = performRecursiveQuery(fbo.getConnection2(), fbo.getQuery(), fbo.getParams2());
+		final Map<String, Result> results1 = performRecursiveQuery(connectionSettings.getLinkName(), query);
+		final Map<String, Result> results2 = performRecursiveQuery(fbo.getConnection2(), query2);
 		
 		final Result r = mergeResults(fbo.getQuery(), results1, results2, connectionSettings.getLinkName(), fbo.getConnection2(), fmt, false);
 		
@@ -419,33 +424,33 @@ public class QueryDiffController
 		return (model);
 		}
 	
-	private Result performQuery(String connection, Query query, Map<Integer, String> params)
+	private Result performQuery(String connection, QueryParameters query)
 		{
 		try	{
-			return (runner.performQuery(connection, query, params));
+			return (runner.performQuery(connection, query));
 			}
 		catch (PerformQueryException e)
 			{
-			throw new QueryException(e.getQueryName(), query.getName(), e.getCause());
+			throw new QueryException(e.getQueryName(), query.getQuery().getName(), e.getCause());
 			}
 		catch (RuntimeException e)
 			{
-			throw new QueryException(query.getName(), null, e);
+			throw new QueryException(query.getQuery().getName(), null, e);
 			}
 		}
 	
-	private Map<String, Result> performRecursiveQuery(String connection, Query query, Map<Integer, String> params)
+	private Map<String, Result> performRecursiveQuery(String connection, QueryParameters query)
 		{
 		try	{
-			return (runner.performRecursiveQuery(connection, query, params));
+			return (runner.performRecursiveQuery(connection, query));
 			}
 		catch (PerformQueryException e)
 			{
-			throw new QueryException(e.getQueryName(), query.getName(), e.getCause());
+			throw new QueryException(e.getQueryName(), query.getQuery().getName(), e.getCause());
 			}
 		catch (RuntimeException e)
 			{
-			throw new QueryException(query.getName(), null, e);
+			throw new QueryException(query.getQuery().getName(), null, e);
 			}
 		}
 	

@@ -43,6 +43,7 @@ import de.tweerlei.dbgrazer.query.service.QueryService;
 import de.tweerlei.dbgrazer.web.exception.QueryException;
 import de.tweerlei.dbgrazer.web.exception.QueryNotFoundException;
 import de.tweerlei.dbgrazer.web.formatter.DataFormatter;
+import de.tweerlei.dbgrazer.web.model.QueryParameters;
 import de.tweerlei.dbgrazer.web.service.DataFormatterFactory;
 import de.tweerlei.dbgrazer.web.service.QueryPerformerService;
 import de.tweerlei.dbgrazer.web.service.QuerySettingsManager;
@@ -225,8 +226,9 @@ public class AggregateQueryRunController
 			}
 		
 		final Query agg = buildAggregateQuery(fbo);
+		final QueryParameters query = querySettingsManager.prepareParameters(agg, fbo.getParams());
 		
-		final Result r = performQuery(connectionSettings.getLinkName(), agg, fbo.getParams());
+		final Result r = performQuery(connectionSettings.getLinkName(), query);
 		
 		RowSet rowSet = null;
 		int i = 0;
@@ -268,9 +270,10 @@ public class AggregateQueryRunController
 		final DataFormatter fmt = factory.getWebFormatter();
 		
 		final Query agg = buildAggregateQuery(fbo);
+		final QueryParameters query = querySettingsManager.prepareParameters(agg, fbo.getParams());
 		
 		try	{
-			final Result r = performQuery(connectionSettings.getLinkName(), agg, fbo.getParams());
+			final Result r = performQuery(connectionSettings.getLinkName(), query);
 			
 			RowSet rowSet = null;
 			int i = 0;
@@ -311,18 +314,18 @@ public class AggregateQueryRunController
 		return (new QueryImpl(fbo.getQuery().getName(), new SchemaDef(null, null), null, q, fbo.getQuery().getType(), fbo.getQuery().getParameters(), fbo.getQuery().getTargetQueries(), fbo.getQuery().getAttributes()));
 		}
 	
-	private Result performQuery(String connection, Query query, Map<Integer, String> params)
+	private Result performQuery(String connection, QueryParameters query)
 		{
 		try	{
-			return (runner.performQuery(connection, query, params));
+			return (runner.performQuery(connection, query));
 			}
 		catch (PerformQueryException e)
 			{
-			throw new QueryException(e.getQueryName(), query.getName(), e.getCause());
+			throw new QueryException(e.getQueryName(), query.getQuery().getName(), e.getCause());
 			}
 		catch (RuntimeException e)
 			{
-			throw new QueryException(query.getName(), null, e);
+			throw new QueryException(query.getQuery().getName(), null, e);
 			}
 		}
 	}

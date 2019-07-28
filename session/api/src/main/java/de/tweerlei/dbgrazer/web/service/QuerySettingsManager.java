@@ -21,6 +21,7 @@ import java.util.Set;
 
 import de.tweerlei.dbgrazer.query.model.Query;
 import de.tweerlei.dbgrazer.web.formatter.DataFormatter;
+import de.tweerlei.dbgrazer.web.model.QueryParameters;
 import de.tweerlei.dbgrazer.web.session.SchemaSettings;
 
 /**
@@ -170,6 +171,14 @@ public interface QuerySettingsManager
 	 * @return Additional parameters
 	 */
 	public List<String> getAdditionalParameters(Query query, Map<Integer, String> model);
+	
+	/**
+	 * Normalize query parameters
+	 * @param query Query
+	 * @param model Raw parameters
+	 * @return QueryParameters
+	 */
+	public QueryParameters prepareParameters(Query query, Map<Integer, String> model);
 	
 	/**
 	 * Build a parameter map

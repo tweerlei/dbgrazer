@@ -37,7 +37,7 @@
 >		</form>
 </c:if
 >		<div class="menuitem"><span onclick="return toggleTextField('name');"><fmt:message key="rename"/></span></div>
-		<div class="menuitem"><span onclick="return showConfirmDialog('<fmt:message key="delete"/>', '<fmt:message key="deleteQueryText"/>', 'db/${currentConnection.linkName}/remove-query.html', '${model.originalName}');"><fmt:message key="delete"/></span></div>
+		<div class="menuitem"><span onclick="return showConfirmDialog('<fmt:message key="delete"/>', '<fmt:message key="deleteQueryText"/>', 'db/${currentConnection.linkName}/remove-query.html', { q: '${model.originalName}' });"><fmt:message key="delete"/></span></div>
 		<div class="menuitem"><span onclick="return gotoPage('db/${currentConnection.linkName}/edit.html?template=${model.originalName}');"><fmt:message key="copy"/></span></div>
 <c:if test="${!model.viewType}"
 >		<div class="menuitem"><span onclick="return postForm('toolsform-1', event);"><fmt:message key="sqlQuery"/></span></div>

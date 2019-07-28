@@ -46,7 +46,12 @@
 		<a class="action" title="<fmt:message key="newWindow"/>" href="db/${currentConnection.linkName}/apiobject.html?namespace=${namespace}&amp;kind=${kind}&amp;name=${name}" target="_blank"><fmt:message key="newWindowIcon"/></a>
 	</div>
 	<div id="tools-1" class="hidden"><div class="menucolumn">
-		<div class="menuitem"><a href="#" onclick="return clearClusterCache();"><fmt:message key="clearCache"/></a></div>
+<c:if test="${currentConnection.writable}"
+>		<div class="menuitem"><a href="db/${currentConnection.linkName}/kube-apply.html?namespace=${namespace}&amp;kind=${kind}&amp;name=${name}" target="_blank"><fmt:message key="applyApiObject"/></a></div>
+		<div class="menuitem"><span onclick="return showConfirmDialog('<fmt:message key="deleteApiObject"/>', '<fmt:message key="confirmDeleteApiObject"/>', 'db/${currentConnection.linkName}/kube-delete.html', { namespace: '${namespace}', kind: '${kind}', name: '${name}' });"><fmt:message key="deleteApiObject"/></span></div>
+		<hr class="menuseparator"/>
+</c:if
+>		<div class="menuitem"><a href="#" onclick="return clearClusterCache();"><fmt:message key="clearCache"/></a></div>
 	</div></div>
 	</ui:headline1>
 	

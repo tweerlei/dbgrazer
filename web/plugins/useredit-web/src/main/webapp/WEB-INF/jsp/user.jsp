@@ -28,7 +28,7 @@
 	
 	<div id="tools-1" class="hidden"><div class="menucolumn">
 		<div class="menuitem"><span onclick="return toggleTextField('login');"><fmt:message key="rename"/></span></div>
-		<div class="menuitem"><span onclick="return showConfirmDialog('<fmt:message key="delete"/>', '<fmt:message key="deleteUserText"/>', 'remove-user.html', '${model.originalLogin}');"><fmt:message key="delete"/></span></div>
+		<div class="menuitem"><span onclick="return showConfirmDialog('<fmt:message key="delete"/>', '<fmt:message key="deleteUserText"/>', 'remove-user.html', { q: '${model.originalLogin}' });"><fmt:message key="delete"/></span></div>
 		<div class="menuitem"><span onclick="return gotoPage('user.html?template=${model.originalLogin}');"><fmt:message key="copy"/></span></div>
 	</div></div>
 </c:if

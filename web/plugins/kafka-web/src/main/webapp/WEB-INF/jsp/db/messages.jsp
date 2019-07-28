@@ -38,7 +38,7 @@
 	<div id="tools-1" class="hidden"><div class="menucolumn">
 <c:if test="${currentConnection.writable}"
 >		<div class="menuitem"><span onclick="return showDbDialog(event, 'send-message', { topic: '${topic}', partition: '${partition}' }, '<fmt:message key="send"/>');"><fmt:message key="send"/></span></div>
-		<div class="menuitem"><span onclick="return showConfirmDialog('<fmt:message key="deleteTopic"/>', '<fmt:message key="confirmDeleteTopic"/>', 'db/${currentConnection.linkName}/delete-topic.html', '${topic}');"><fmt:message key="deleteTopic"/></span></div>
+		<div class="menuitem"><span onclick="return showConfirmDialog('<fmt:message key="deleteTopic"/>', '<fmt:message key="confirmDeleteTopic"/>', 'db/${currentConnection.linkName}/delete-topic.html', { q: '${topic}' });"><fmt:message key="deleteTopic"/></span></div>
 </c:if
 >		<div class="menuitem"><a href="#" onclick="return clearKafkaCache();"><fmt:message key="clearCache"/></a></div>
 	</div></div>

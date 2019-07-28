@@ -25,9 +25,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import de.tweerlei.dbgrazer.common.util.impl.NamedMap;
-import de.tweerlei.dbgrazer.query.model.Query;
 import de.tweerlei.dbgrazer.query.model.RowSet;
 import de.tweerlei.dbgrazer.web.backend.ResultDownloader;
+import de.tweerlei.dbgrazer.web.model.QueryParameters;
 import de.tweerlei.dbgrazer.web.service.QueryPerformerService;
 import de.tweerlei.dbgrazer.web.service.ResultDownloadService;
 import de.tweerlei.spring.web.view.DownloadSource;
@@ -87,11 +87,11 @@ public class ResultDownloadServiceImpl implements ResultDownloadService
 		}
 	
 	@Override
-	public DownloadSource getStreamDownloadSource(String link, Query query, Map<Integer, String> params, String format)
+	public DownloadSource getStreamDownloadSource(String link, QueryParameters query, String format)
 		{
 		final ResultDownloader c = getResultDownloader(format);
 		if (c != null)
-			return (c.getStreamDownloadSource(link, runner.createRowProducer(link, query, params), query.getName(), query.getName()));
+			return (c.getStreamDownloadSource(link, runner.createRowProducer(link, query), query.getQuery().getName(), query.getQuery().getName()));
 		
 		return (new ErrorDownloadSource());
 		}

@@ -16,10 +16,18 @@
 	include file="../../include/include.jspf"
 %><c:set var="targetElement" value="explorer-right"
 /><ui:headline2 label="${name}" zoomable="true">
-	<div class="h2-actions">
+<c:if test="${currentConnection.writable}"
+>	<div class="h2-actions">
+		<span class="menu" onclick="return showElementMenu(event, 'tools-2');"><fmt:message key="actions"/></span>
+	</div>
+</c:if
+>	<div class="h2-actions">
 		<a class="action" title="<fmt:message key="showQuery"/>" href="db/${currentConnection.linkName}/apiobject.html?namespace=${namespace}&amp;kind=${kind}&amp;name=${name}"><fmt:message key="showQueryIcon"/></a>
 	</div>
-	
+	<div id="tools-2" class="hidden"><div class="menucolumn">
+		<div class="menuitem"><a href="db/${currentConnection.linkName}/kube-apply.html?namespace=${namespace}&amp;kind=${kind}&amp;name=${name}" target="_blank"><fmt:message key="applyApiObject"/></a></div>
+        <div class="menuitem"><span onclick="return showConfirmDialog('<fmt:message key="deleteApiObject"/>', '<fmt:message key="confirmDeleteApiObject"/>', 'db/${currentConnection.linkName}/kube-delete.html', { namespace: '${namespace}', kind: '${kind}', name: '${name}' });"><fmt:message key="deleteApiObject"/></span></div>
+	</div></div>
 	</ui:headline2>
 	
 	<ui:tabs items="${tabs}" var="rs" varKey="label" varLink="detailLink" varParams="detailParams" varParamString="detailParamString" name="result"><%@

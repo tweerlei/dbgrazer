@@ -15,7 +15,6 @@
  */
 package de.tweerlei.dbgrazer.web.service.impl;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +23,7 @@ import java.util.TimeZone;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import de.tweerlei.common5.collections.CollectionUtils;
 import de.tweerlei.dbgrazer.link.model.SchemaDef;
 import de.tweerlei.dbgrazer.query.exception.PerformQueryException;
 import de.tweerlei.dbgrazer.query.model.CancelableProgressMonitor;
@@ -51,6 +51,7 @@ import de.tweerlei.dbgrazer.web.constant.CacheClass;
 import de.tweerlei.dbgrazer.web.constant.MessageKeys;
 import de.tweerlei.dbgrazer.web.constant.VisualizationSettings;
 import de.tweerlei.dbgrazer.web.formatter.DataFormatter;
+import de.tweerlei.dbgrazer.web.model.QueryParameters;
 import de.tweerlei.dbgrazer.web.service.DataFormatterFactory;
 import de.tweerlei.dbgrazer.web.service.QueryPerformerService;
 import de.tweerlei.dbgrazer.web.service.QuerySettingsManager;
@@ -185,116 +186,111 @@ public class QueryPerformerServiceImpl implements QueryPerformerService
 		}
 	
 	@Override
-	public Map<String, Result> performRecursiveQuery(String link, Query query, Map<Integer, String> params) throws PerformQueryException
+	public Map<String, Result> performRecursiveQuery(String link, QueryParameters query) throws PerformQueryException
 		{
 		final DataFormatter fmt = factory.getWebFormatter();
 		final TimeZone timeZone = factory.getTimeZone();
-		final List<Object> qParams = getQueryParameters(link, query, params, fmt);
+		final List<Object> qParams = getQueryParameters(link, query, fmt);
 		
 		final Map<String, Result> ret;
 		
-		if (query.getType().getName().equals(VisualizationSettings.DASHBOARD_QUERY_TYPE))
+		if (query.getQuery().getType().getName().equals(VisualizationSettings.DASHBOARD_QUERY_TYPE))
 			{
 			// Allow 2 levels of recursion, limit results to DASHBOARD_ROWS
-			ret = recursiveRunner.performRecursiveQuery(link, query, qParams, timeZone, 2, configService.get(ConfigKeys.DASHBOARD_ROWS), true);
+			ret = recursiveRunner.performRecursiveQuery(link, query.getQuery(), qParams, timeZone, 2, configService.get(ConfigKeys.DASHBOARD_ROWS), true);
 			}
-		else if (query.getType().getName().equals(VisualizationSettings.PANELS_QUERY_TYPE))
+		else if (query.getQuery().getType().getName().equals(VisualizationSettings.PANELS_QUERY_TYPE))
 			{
 			// Allow 2 levels of recursion, limit results to PANEL_ROWS
-			ret = recursiveRunner.performRecursiveQuery(link, query, qParams, timeZone, 2, configService.get(ConfigKeys.PANEL_ROWS), true);
+			ret = recursiveRunner.performRecursiveQuery(link, query.getQuery(), qParams, timeZone, 2, configService.get(ConfigKeys.PANEL_ROWS), true);
 			}
-		else if (query.getType().getName().equals(VisualizationSettings.NAVIGATOR_QUERY_TYPE))
+		else if (query.getQuery().getType().getName().equals(VisualizationSettings.NAVIGATOR_QUERY_TYPE))
 			{
 			// Allow 3 levels of recursion
-			ret = recursiveRunner.performRecursiveQuery(link, query, qParams, timeZone, 3, Integer.MAX_VALUE, configService.get(ConfigKeys.SHOW_EMPTY_SUBQUERIES));
+			ret = recursiveRunner.performRecursiveQuery(link, query.getQuery(), qParams, timeZone, 3, Integer.MAX_VALUE, configService.get(ConfigKeys.SHOW_EMPTY_SUBQUERIES));
 			}
-		else if (query.getType().getResultType() == ResultType.RECURSIVE)
+		else if (query.getQuery().getType().getResultType() == ResultType.RECURSIVE)
 			{
 			// Allow 2 levels of recursion
-			ret = recursiveRunner.performRecursiveQuery(link, query, qParams, timeZone, 2, Integer.MAX_VALUE, configService.get(ConfigKeys.SHOW_EMPTY_SUBQUERIES));
+			ret = recursiveRunner.performRecursiveQuery(link, query.getQuery(), qParams, timeZone, 2, Integer.MAX_VALUE, configService.get(ConfigKeys.SHOW_EMPTY_SUBQUERIES));
 			}
 		else
 			{
 			// Allow 1 level of recursion
-			ret = recursiveRunner.performRecursiveQuery(link, query, qParams, timeZone, 1, Integer.MAX_VALUE, configService.get(ConfigKeys.SHOW_EMPTY_SUBQUERIES));
+			ret = recursiveRunner.performRecursiveQuery(link, query.getQuery(), qParams, timeZone, 1, Integer.MAX_VALUE, configService.get(ConfigKeys.SHOW_EMPTY_SUBQUERIES));
 			}
 		
 		for (Map.Entry<String, Result> ent : ret.entrySet())
 			{
 			if (ent.getValue().getQuery().getType().isAccumulatingResults())
-				ent.setValue(addTimechartResult(link, ent.getValue(), params));
+				ent.setValue(addTimechartResult(link, ent.getValue(), query.getActualParameters()));
 			}
 		
 		return (ret);
 		}
 	
 	@Override
-	public Result performQuery(String link, Query query, Map<Integer, String> params) throws PerformQueryException
+	public Result performQuery(String link, QueryParameters query) throws PerformQueryException
 		{
 		final DataFormatter fmt = factory.getWebFormatter();
 		final TimeZone timeZone = factory.getTimeZone();
-		final List<Object> qParams = getQueryParameters(link, query, params, fmt);
+		final List<Object> qParams = getQueryParameters(link, query, fmt);
 		
-		if (query.getType().isAccumulatingResults())
+		if (query.getQuery().getType().isAccumulatingResults())
 			{
 			// Return cached result if available
-			final Result cached = resultCache.getCachedObject(CacheClass.RESULT, link, query.getName(), params, Result.class);
+			final Result cached = resultCache.getCachedObject(CacheClass.RESULT, link, query.getQuery().getName(), query.getActualParameters(), Result.class);
 			if (cached != null)
 				return (cached.clone());
 			}
 		
-		if (query.getType().getResultType() == ResultType.MULTILEVEL)
+		if (query.getQuery().getType().getResultType() == ResultType.MULTILEVEL)
 			{
 			// Return empty subqueries for MULTILEVEL queries
-			return (recursiveRunner.performQuery(link, query, qParams, timeZone, Integer.MAX_VALUE, true));
+			return (recursiveRunner.performQuery(link, query.getQuery(), qParams, timeZone, Integer.MAX_VALUE, true));
 			}
 		else
 			{
 			// Don't return empty subqueries
-			return (recursiveRunner.performQuery(link, query, qParams, timeZone, Integer.MAX_VALUE, false));
+			return (recursiveRunner.performQuery(link, query.getQuery(), qParams, timeZone, Integer.MAX_VALUE, false));
 			}
 		}
 	
 	@Override
-	public RowProducer createRowProducer(String link, Query query, Map<Integer, String> params)
+	public RowProducer createRowProducer(String link, QueryParameters query)
 		{
 		final DataFormatter fmt = factory.getWebFormatter();
 		final TimeZone timeZone = factory.getTimeZone();
-		final List<Object> qParams = getQueryParameters(link, query, params, fmt);
+		final List<Object> qParams = getQueryParameters(link, query, fmt);
 		
-		return (new QueryRowProducer(link, query, qParams, timeZone, runner));
+		return (new QueryRowProducer(link, query.getQuery(), qParams, timeZone, runner));
 		}
 	
-	private List<Object> getQueryParameters(String link, Query query, Map<Integer, String> params, DataFormatter fmt)
+	private List<Object> getQueryParameters(String link, QueryParameters query, DataFormatter fmt)
 		{
-		final List<String> effParams = querySettingsManager.getEffectiveParameters(query, params);
-		final List<Object> qParams = querySettingsManager.translateParameters(query, effParams, fmt);
+		final List<Object> qParams = querySettingsManager.translateParameters(query.getQuery(), query.getEffectiveParameters(), fmt);
 		
 		// Pass any additional parameters to the SubQueryResolver
-		if (query.getType().getSubQueryResolver() != null)
+		if (query.getQuery().getType().getSubQueryResolver() != null)
 			{
-			final List<String> additional = querySettingsManager.getAdditionalParameters(query, params);
-			if (!additional.isEmpty())
+			if (!CollectionUtils.empty(query.getAdditionalParameters()))
 				{
 				// Hack: Translate additional parameters for first target query if fully specified
-				for (TargetDef t : query.getTargetQueries().values())
+				for (TargetDef t : query.getQuery().getTargetQueries().values())
 					{
 					if (!t.isParameter())
 						{
 						final Query tq = queryService.findQueryByName(link, t.getQueryName());
 						if (tq != null)
 							{
-							final List<String> all = new ArrayList<String>(params.size());
-							all.addAll(effParams);
-							all.addAll(additional);
-							final List<Object> translated = querySettingsManager.translatePartialParameters(tq, all, fmt);
+							final List<Object> translated = querySettingsManager.translatePartialParameters(tq, query.getAllParameters(), fmt);
 							if (translated != null)
 								return (translated);
 							}
 						}
 					}
 				
-				qParams.addAll(additional);
+				qParams.addAll(query.getAdditionalParameters());
 				}
 			}
 		

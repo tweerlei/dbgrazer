@@ -15,13 +15,12 @@
  */
 package de.tweerlei.dbgrazer.web.service;
 
-import java.util.Map;
 import java.util.Set;
 
-import de.tweerlei.dbgrazer.query.model.Query;
 import de.tweerlei.dbgrazer.query.model.RowProducer;
 import de.tweerlei.dbgrazer.query.model.RowSet;
 import de.tweerlei.dbgrazer.query.model.RowSetProducer;
+import de.tweerlei.dbgrazer.web.model.QueryParameters;
 import de.tweerlei.ermtools.dialect.SQLDialect;
 import de.tweerlei.spring.web.view.DownloadSource;
 
@@ -54,14 +53,13 @@ public interface DownloadService
 	 * Create a streamed DownloadSource for a query
 	 * @param link Link name
 	 * @param query Query
-	 * @param params Query parameters
 	 * @param tableName Table name for INSERT
 	 * @param pk Optional PK column indices for MERGE
 	 * @param dialect SQLDialect
 	 * @param format Format tag
 	 * @return DownloadSource
 	 */
-	public DownloadSource getStreamDownloadSource(String link, Query query, Map<Integer, String> params, String tableName, Set<Integer> pk, SQLDialect dialect, String format);
+	public DownloadSource getStreamDownloadSource(String link, QueryParameters query, String tableName, Set<Integer> pk, SQLDialect dialect, String format);
 	
 	/**
 	 * Create a streamed DownloadSource for a RowProducer

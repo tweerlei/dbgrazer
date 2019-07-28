@@ -43,9 +43,11 @@ import de.tweerlei.dbgrazer.query.service.QueryService;
 import de.tweerlei.dbgrazer.web.constant.RowSetConstants;
 import de.tweerlei.dbgrazer.web.exception.AccessDeniedException;
 import de.tweerlei.dbgrazer.web.formatter.DataFormatter;
+import de.tweerlei.dbgrazer.web.model.QueryParameters;
 import de.tweerlei.dbgrazer.web.service.DataFormatterFactory;
 import de.tweerlei.dbgrazer.web.service.FrontendHelperService;
 import de.tweerlei.dbgrazer.web.service.QueryPerformerService;
+import de.tweerlei.dbgrazer.web.service.QuerySettingsManager;
 import de.tweerlei.dbgrazer.web.service.jdbc.QueryGeneratorService;
 import de.tweerlei.dbgrazer.web.session.ConnectionSettings;
 import de.tweerlei.ermtools.dialect.SQLDialect;
@@ -175,6 +177,7 @@ public class DataEditController
 	
 	private final MetadataService metadataService;
 	private final QueryService queryService;
+	private final QuerySettingsManager querySettingsManager;
 	private final QueryPerformerService runner;
 	private final QueryGeneratorService queryGeneratorService;
 	private final ConnectionSettings connectionSettings;
@@ -185,6 +188,7 @@ public class DataEditController
 	 * Constructor
 	 * @param metadataService MetadataService
 	 * @param queryService QueryService
+	 * @param querySettingsManager QuerySettingsManager
 	 * @param runner QueryPerformerService
 	 * @param queryGeneratorService QueryGeneratorService
 	 * @param connectionSettings ConnectionSettings
@@ -192,12 +196,14 @@ public class DataEditController
 	 * @param frontendHelperService FrontendHelperService
 	 */
 	@Autowired
-	public DataEditController(MetadataService metadataService, QueryService queryService, QueryPerformerService runner,
+	public DataEditController(MetadataService metadataService, QueryService queryService,
+			QuerySettingsManager querySettingsManager, QueryPerformerService runner,
 			QueryGeneratorService queryGeneratorService, ConnectionSettings connectionSettings,
 			DataFormatterFactory factory, FrontendHelperService frontendHelperService)
 		{
 		this.metadataService = metadataService;
 		this.queryService = queryService;
+		this.querySettingsManager = querySettingsManager;
 		this.runner = runner;
 		this.queryGeneratorService = queryGeneratorService;
 		this.connectionSettings = connectionSettings;
@@ -287,8 +293,10 @@ public class DataEditController
 		else
 			q = queryGeneratorService.createInsertQuery(t, getSQLDialect(), fmt, src.getAttributes().get(RowSetConstants.ATTR_TABLE_PK_SELECT), fbo.getParams());
 		
+		final QueryParameters query = querySettingsManager.prepareParameters(q, fbo.getParams());
+		
 		try	{
-			final Result r = runner.performQuery(connectionSettings.getLinkName(), q, fbo.getParams());
+			final Result r = runner.performQuery(connectionSettings.getLinkName(), query);
 			model.put("result", frontendHelperService.toJSONString(String.valueOf(r.getFirstRowSet().getFirstValue())));
 			model.put("exceptionText", null);
 			}
@@ -322,8 +330,9 @@ public class DataEditController
 		
 		try	{
 			final Query sel = queryGeneratorService.createSelectQuery(info, getSQLDialect(), fmt);
+			final QueryParameters query = querySettingsManager.prepareParameters(sel, fbo.getIds());
 			
-			final Result r = runner.performQuery(connectionSettings.getLinkName(), sel, fbo.getIds());
+			final Result r = runner.performQuery(connectionSettings.getLinkName(), query);
 			
 			final RowSet rs = r.getFirstRowSet();
 			if (!rs.getRows().isEmpty())
@@ -395,8 +404,10 @@ public class DataEditController
 		for (int i = 0; (i < ni) && (np + i < n); i++)
 			fbo.getParams().put(np + i, fbo.getIds().get(i));
 		
+		final QueryParameters query = querySettingsManager.prepareParameters(q, fbo.getParams());
+		
 		try	{
-			final Result r = runner.performQuery(connectionSettings.getLinkName(), q, fbo.getParams());
+			final Result r = runner.performQuery(connectionSettings.getLinkName(), query);
 			model.put("result", frontendHelperService.toJSONString(String.valueOf(r.getFirstRowSet().getFirstValue())));
 			model.put("exceptionText", null);
 			}
@@ -429,24 +440,25 @@ public class DataEditController
 		final DataFormatter fmt = factory.getExportFormatter();
 		
 		final Query src = queryService.findQueryByName(connectionSettings.getLinkName(), fbo.getBackTo());
-		final Query query;
+		final Query insert;
 		final boolean includePK;
 		if (src == null)
 			{
-			query = queryGeneratorService.createInsertQuery(info, getSQLDialect(), fmt, null, null);
+			insert = queryGeneratorService.createInsertQuery(info, getSQLDialect(), fmt, null, null);
 			includePK = true;
 			}
 		else
 			{
 			final String pkExpr = src.getAttributes().get(RowSetConstants.ATTR_TABLE_PK_SELECT);
-			query = queryGeneratorService.createInsertQuery(info, getSQLDialect(), fmt, pkExpr, null);
+			insert = queryGeneratorService.createInsertQuery(info, getSQLDialect(), fmt, pkExpr, null);
 			includePK = StringUtils.empty(pkExpr);
 			}
 		
 		try	{
 			final Query sel = queryGeneratorService.createSelectQuery(info, getSQLDialect(), fmt);
+			final QueryParameters query = querySettingsManager.prepareParameters(sel, fbo.getIds());
 			
-			final Result r = runner.performQuery(connectionSettings.getLinkName(), sel, fbo.getIds());
+			final Result r = runner.performQuery(connectionSettings.getLinkName(), query);
 			
 			final RowSet rs = r.getFirstRowSet();
 			if (!rs.getRows().isEmpty())
@@ -491,9 +503,9 @@ public class DataEditController
 			model.put("exceptionText", e.getMessage());
 			}
 		
-		model.put("parameters", query.getParameters());
-		model.put("fkTables", extractFkTables(query));
-		for (int i = 0, n = query.getParameters().size(); i < n; i++)
+		model.put("parameters", insert.getParameters());
+		model.put("fkTables", extractFkTables(insert));
+		for (int i = 0, n = insert.getParameters().size(); i < n; i++)
 			{
 			if (!fbo.getNulls().containsKey(i))
 				fbo.getNulls().put(i, fbo.getParams().get(i) != null);
@@ -550,9 +562,10 @@ public class DataEditController
 		final DataFormatter fmt = factory.getExportFormatter();
 		
 		final Query q = queryGeneratorService.createDeleteQuery(t, getSQLDialect(), fmt);
+		final QueryParameters query = querySettingsManager.prepareParameters(q, fbo.getIds());
 		
 		try	{
-			final Result r = runner.performQuery(connectionSettings.getLinkName(), q, fbo.getIds());
+			final Result r = runner.performQuery(connectionSettings.getLinkName(), query);
 			model.put("result", frontendHelperService.toJSONString(String.valueOf(r.getFirstRowSet().getFirstValue())));
 			model.put("exceptionText", null);
 			}

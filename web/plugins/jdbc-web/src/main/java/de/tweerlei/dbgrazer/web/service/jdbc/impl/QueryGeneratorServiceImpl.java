@@ -80,7 +80,7 @@ public class QueryGeneratorServiceImpl implements QueryGeneratorService
 		{
 		final String stmt = sqlGenerator.generatePKSelect(t, Style.INDENTED, dialect);
 		
-		return (new QueryImpl("select", null, null, stmt, queryService.findQueryType(JdbcConstants.QUERYTYPE_MULTIPLE), getPKParameters(t), null, null));
+		return (new QueryImpl("", null, null, stmt, queryService.findQueryType(JdbcConstants.QUERYTYPE_MULTIPLE), getPKParameters(t), null, null));
 		}
 	
 	@Override
@@ -150,7 +150,7 @@ public class QueryGeneratorServiceImpl implements QueryGeneratorService
 		else
 			tp = queryService.findQueryType(JdbcConstants.QUERYTYPE_DML_KEY);
 		
-		return (new QueryImpl("insert", null, null, sw.toString(), tp, params, null, null));
+		return (new QueryImpl("", null, null, sw.toString(), tp, params, null, null));
 		}
 	
 	@Override
@@ -186,7 +186,7 @@ public class QueryGeneratorServiceImpl implements QueryGeneratorService
 		
 		sqlWriter.writeUpdate(tableName, columns, null, null, t.getPKColumns());
 		
-		return (new QueryImpl("update", null, null, sw.toString(), queryService.findQueryType(JdbcConstants.QUERYTYPE_DML), params, null, null));
+		return (new QueryImpl("", null, null, sw.toString(), queryService.findQueryType(JdbcConstants.QUERYTYPE_DML), params, null, null));
 		}
 	
 	@Override
@@ -205,7 +205,7 @@ public class QueryGeneratorServiceImpl implements QueryGeneratorService
 		
 		sqlWriter.writeDelete(tableName, columns, null, t.getPKColumns());
 		
-		return (new QueryImpl("insert", null, null, sw.toString(), queryService.findQueryType(JdbcConstants.QUERYTYPE_DML), getPKParameters(t), null, null));
+		return (new QueryImpl("", null, null, sw.toString(), queryService.findQueryType(JdbcConstants.QUERYTYPE_DML), getPKParameters(t), null, null));
 		}
 	
 	private List<ParameterDef> getPKParameters(TableDescription t)

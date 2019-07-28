@@ -37,6 +37,7 @@ import de.tweerlei.dbgrazer.query.model.SubQueryInfo;
 import de.tweerlei.dbgrazer.web.constant.RowSetConstants;
 import de.tweerlei.dbgrazer.web.formatter.DataFormatter;
 import de.tweerlei.dbgrazer.web.model.QueryHistoryEntry;
+import de.tweerlei.dbgrazer.web.model.QueryParameters;
 import de.tweerlei.dbgrazer.web.service.QuerySettingsManager;
 import de.tweerlei.dbgrazer.web.service.TextTransformerService;
 import de.tweerlei.dbgrazer.web.session.ConnectionSettings;
@@ -357,20 +358,27 @@ public class QuerySettingsManagerImpl implements QuerySettingsManager
 		{
 		final int n = query.getParameters().size();
 		final List<String> params = new ArrayList<String>(n);
+		final boolean historize = !StringUtils.empty(query.getName());
 		
 		for (int i = 0; i < n; i++)
 			{
 			final ParameterDef p = query.getParameters().get(i);
 			String v = model.get(i);
 			if (v != null)
-				userSettings.getParameterHistory().put(p.getName(), v);
+				{
+				if (historize)
+					userSettings.getParameterHistory().put(p.getName(), v);
+				}
 			else if (p.getType() == ColumnType.BOOLEAN)
 				{
 				// Hack: Since we are using checkboxes for booleans, FALSE will not show up
 				v = Boolean.FALSE.toString();
 				}
 			else
-				v = userSettings.getParameterHistory().get(p.getName());
+				{
+				if (historize)
+					v = userSettings.getParameterHistory().get(p.getName());
+				}
 			params.add(v);
 			}
 		
@@ -398,6 +406,36 @@ public class QuerySettingsManagerImpl implements QuerySettingsManager
 			params.add(model.get(i));
 		
 		return (params);
+		}
+	
+	@Override
+	public QueryParameters prepareParameters(Query query, Map<Integer, String> model)
+		{
+		final int n = query.getParameters().size();
+		final List<String> params = new ArrayList<String>(n);
+		
+		for (int i = 0; i < n; i++)
+			{
+			final String v = model.get(i);
+			if (v == null)
+				params.add(v);
+			else
+				{
+				final ParameterDef p = query.getParameters().get(i);
+				if (p.getType() == ColumnType.PASSWORD)
+					params.add("");
+				else if (p.getType() == ColumnType.CLOB)
+					params.add("");
+				else
+					params.add(v);
+				}
+			}
+		
+		return (new QueryParameters(query, model,
+				getEffectiveParameters(query, model),
+				params,
+				getAdditionalParameters(query, model)
+				));
 		}
 	
 	@Override

@@ -15,11 +15,10 @@
  */
 package de.tweerlei.dbgrazer.web.service;
 
-import java.util.Map;
 import java.util.Set;
 
-import de.tweerlei.dbgrazer.query.model.Query;
 import de.tweerlei.dbgrazer.query.model.RowSet;
+import de.tweerlei.dbgrazer.web.model.QueryParameters;
 import de.tweerlei.spring.web.view.DownloadSource;
 
 /**
@@ -48,9 +47,8 @@ public interface ResultDownloadService
 	 * Create a streamed DownloadSource for a query
 	 * @param link Link name
 	 * @param query Query
-	 * @param params Query parameters
 	 * @param format Format tag
 	 * @return DownloadSource
 	 */
-	public DownloadSource getStreamDownloadSource(String link, Query query, Map<Integer, String> params, String format);
+	public DownloadSource getStreamDownloadSource(String link, QueryParameters query, String format);
 	}

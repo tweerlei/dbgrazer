@@ -29,6 +29,7 @@ import de.tweerlei.dbgrazer.query.model.RowProducer;
 import de.tweerlei.dbgrazer.query.model.RowTransferer;
 import de.tweerlei.dbgrazer.query.model.StatementHandler;
 import de.tweerlei.dbgrazer.query.model.StatementProducer;
+import de.tweerlei.dbgrazer.web.model.QueryParameters;
 
 /**
  * Perform queries
@@ -41,30 +42,27 @@ public interface QueryPerformerService
 	 * Perform a recursive query, returning a separate Result per direct subquery
 	 * @param link Link name
 	 * @param query Query
-	 * @param params Parameters
 	 * @return A single result if the query is not recursive, otherwise a result per immediate subquery but at least a single empty Result
 	 * @throws PerformQueryException on error
 	 */
-	public Map<String, Result> performRecursiveQuery(String link, Query query, Map<Integer, String> params) throws PerformQueryException;
+	public Map<String, Result> performRecursiveQuery(String link, QueryParameters query) throws PerformQueryException;
 	
 	/**
 	 * Perform a non-recursive query, returning a single Result
 	 * @param link Link name
 	 * @param query Query
-	 * @param params Parameters
 	 * @return Result
 	 * @throws PerformQueryException on error
 	 */
-	public Result performQuery(String link, Query query, Map<Integer, String> params) throws PerformQueryException;
+	public Result performQuery(String link, QueryParameters query) throws PerformQueryException;
 	
 	/**
 	 * Create a RowProducer for a non-recursive query
 	 * @param link Link name
 	 * @param query Query
-	 * @param params Parameters
 	 * @return Result
 	 */
-	public RowProducer createRowProducer(String link, Query query, Map<Integer, String> params);
+	public RowProducer createRowProducer(String link, QueryParameters query);
 	
 	/**
 	 * Create a custom query

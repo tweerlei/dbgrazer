@@ -16,7 +16,6 @@
 package de.tweerlei.dbgrazer.web.controller.jdbc;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +45,7 @@ import de.tweerlei.dbgrazer.query.model.Result;
 import de.tweerlei.dbgrazer.query.model.RowSet;
 import de.tweerlei.dbgrazer.web.exception.AccessDeniedException;
 import de.tweerlei.dbgrazer.web.formatter.DataFormatter;
+import de.tweerlei.dbgrazer.web.model.QueryParameters;
 import de.tweerlei.dbgrazer.web.service.DataFormatterFactory;
 import de.tweerlei.dbgrazer.web.service.DownloadService;
 import de.tweerlei.dbgrazer.web.service.QueryPerformerService;
@@ -411,7 +411,7 @@ public class DataExportController
 				{
 				final Query query = runner.createCustomQuery(JdbcConstants.QUERYTYPE_MULTIPLE, statement, null, fbo.getObject());
 				
-				model.put(GenericDownloadView.SOURCE_ATTRIBUTE, downloadService.getStreamDownloadSource(connectionSettings.getLinkName(), query, Collections.<Integer, String>emptyMap(), tableName, desc.getPKColumns(), dialect, fbo.getFormat()));
+				model.put(GenericDownloadView.SOURCE_ATTRIBUTE, downloadService.getStreamDownloadSource(connectionSettings.getLinkName(), new QueryParameters(query), tableName, desc.getPKColumns(), dialect, fbo.getFormat()));
 				}
 			else
 				{
@@ -501,7 +501,7 @@ public class DataExportController
 		
 		final Query query = runner.createCustomQuery(JdbcConstants.QUERYTYPE_MULTIPLE, statement, null, fbo.getObject());
 		
-		model.put(GenericDownloadView.SOURCE_ATTRIBUTE, downloadService.getStreamDownloadSource(connectionSettings.getLinkName(), query, Collections.<Integer, String>emptyMap(), tableName, null, dialect, fbo.getFormat()));
+		model.put(GenericDownloadView.SOURCE_ATTRIBUTE, downloadService.getStreamDownloadSource(connectionSettings.getLinkName(), new QueryParameters(query), tableName, null, dialect, fbo.getFormat()));
 		
 		return (model);
 		}

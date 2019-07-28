@@ -48,6 +48,7 @@ import de.tweerlei.dbgrazer.web.constant.RowSetConstants;
 import de.tweerlei.dbgrazer.web.constant.ViewConstants;
 import de.tweerlei.dbgrazer.web.exception.AccessDeniedException;
 import de.tweerlei.dbgrazer.web.formatter.DataFormatter;
+import de.tweerlei.dbgrazer.web.model.QueryParameters;
 import de.tweerlei.dbgrazer.web.model.Visualization;
 import de.tweerlei.dbgrazer.web.service.DataFormatterFactory;
 import de.tweerlei.dbgrazer.web.service.DownloadService;
@@ -579,7 +580,7 @@ public class SQLController
 		try	{
 			if (fbo.isAllRows())
 				{
-				final Query query = runner.createCustomQuery(JdbcConstants.QUERYTYPE_CUSTOM, fbo.getStatement(), null, queryName);
+				final Query q = runner.createCustomQuery(JdbcConstants.QUERYTYPE_CUSTOM, fbo.getStatement(), null, queryName);
 				
 				final String tableName;
 				if (!StringUtils.empty(fbo.getTableName()))
@@ -591,7 +592,8 @@ public class SQLController
 				for (Map.Entry<Integer, ParameterFBO> ent : fbo.getParams().entrySet())
 					params.put(ent.getKey(), ent.getValue().getValue());
 				
-				model.put(GenericDownloadView.SOURCE_ATTRIBUTE, downloadService.getStreamDownloadSource(connectionSettings.getLinkName(), query, params, tableName, null, dialect, fbo.getFormat()));
+				final QueryParameters query = querySettingsManager.prepareParameters(q, params);
+				model.put(GenericDownloadView.SOURCE_ATTRIBUTE, downloadService.getStreamDownloadSource(connectionSettings.getLinkName(), query, tableName, null, dialect, fbo.getFormat()));
 				}
 			else
 				{
@@ -640,7 +642,7 @@ public class SQLController
 			
 			final Query query = runner.createCustomQuery(JdbcConstants.QUERYTYPE_MULTIPLE, fbo.getQuery(), null, queryName);
 			
-			model.put(GenericDownloadView.SOURCE_ATTRIBUTE, downloadService.getStreamDownloadSource(connectionSettings.getLinkName(), query, Collections.<Integer, String>emptyMap(), tableName, null, getSQLDialect(), fbo.getFormat()));
+			model.put(GenericDownloadView.SOURCE_ATTRIBUTE, downloadService.getStreamDownloadSource(connectionSettings.getLinkName(), new QueryParameters(query), tableName, null, getSQLDialect(), fbo.getFormat()));
 			}
 		catch (RuntimeException e)
 			{

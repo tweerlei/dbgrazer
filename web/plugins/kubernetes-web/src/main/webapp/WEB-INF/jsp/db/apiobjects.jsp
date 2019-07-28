@@ -32,17 +32,21 @@
 	</div>
 	<div class="h1-actions">
 		<span class="action" title="<fmt:message key="refresh"/>" onclick="return reloadPage();"><fmt:message key="refreshIcon"/></span>
-		<a class="action" title="<fmt:message key="newWindow"/>" href="db/${currentConnection.linkName}/apiobjects.html?namespace=${namespace}&kind=${kind}" target="_blank"><fmt:message key="newWindowIcon"/></a>
+		<a class="action" title="<fmt:message key="newWindow"/>" href="db/${currentConnection.linkName}/apiobjects.html?namespace=${namespace}&amp;kind=${kind}" target="_blank"><fmt:message key="newWindowIcon"/></a>
 	</div>
 	<div id="tools-1" class="hidden"><div class="menucolumn">
-		<div class="menuitem"><a href="#" onclick="return clearClusterCache();"><fmt:message key="clearCache"/></a></div>
+<c:if test="${currentConnection.writable}"
+>		<div class="menuitem"><a href="db/${currentConnection.linkName}/kube-apply.html?namespace=${namespace}&amp;kind=${kind}" target="_blank"><fmt:message key="applyApiObject"/></a></div>
+		<hr class="menuseparator"/>
+</c:if
+>		<div class="menuitem"><a href="#" onclick="return clearClusterCache();"><fmt:message key="clearCache"/></a></div>
 	</div></div>
 	</ui:headline1>
 	
-	<c:set var="links" value="db/${currentConnection.linkName}/cluster.html,db/${currentConnection.linkName}/namespace.html?namespace=${namespace},db/${currentConnection.linkName}/apiobjects.html?namespace=${namespace}&kind=${kind}"
+	<c:set var="links" value="db/${currentConnection.linkName}/cluster.html,db/${currentConnection.linkName}/namespace.html?namespace=${namespace},db/${currentConnection.linkName}/apiobjects.html?namespace=${namespace}&amp;kind=${kind}"
 	/><c:set var="links" value="${fn:split(links, ',')}"
 	/><div id="explorer-left"><ui:multilevel query="${query.name}" levels="${query.subQueries}" params="${params}" links="${links}" items="${tabs}" var="rs" varKey="label" varParams="detailParams" varParamString="detailParamString" name="combo"
-		><ui:result-apiobjects rs="${rs}" label="${label}" link="db/${currentConnection.linkName}/apiobject.html?namespace=${namespace}&kind=${kind}&name=%%" jsLink="return showApiObject(event, '${namespace}', '${kind}', '%%');" targetElement="${targetElement}"
+		><ui:result-apiobjects rs="${rs}" label="${label}" link="db/${currentConnection.linkName}/apiobject.html?namespace=${namespace}&amp;kind=${kind}&amp;name=%%" jsLink="return showApiObject(event, '${namespace}', '${kind}', '%%');" targetElement="${targetElement}"
 	/></ui:multilevel></div>
 	
 	<div id="explorer-right"><ui:tabs items="${results}" var="rs" varKey="label" varLink="detailLink" varParams="detailParams" varParamString="detailParamString" name="result"><%@

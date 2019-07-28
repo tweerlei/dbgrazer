@@ -34,7 +34,7 @@
 	<c:set var="links" value="db/${currentConnection.linkName}/cluster.html,db/${currentConnection.linkName}/namespace.html?namespace=${namespace}"
 	/><c:set var="links" value="${fn:split(links, ',')}"
 	/><div id="explorer-left"><ui:multilevel query="${query.name}" levels="${query.subQueries}" params="${params}" links="${links}" items="${tabs}" var="rs" varKey="label" varParams="detailParams" varParamString="detailParamString" name="combo"
-		><ui:result-apiobjects rs="${rs}" label="${label}" link="db/${currentConnection.linkName}/apiobjects.html?namespace=${namespace}&kind=%%" targetElement="${targetElement}"
+		><ui:result-apiobjects rs="${rs}" label="${label}" link="db/${currentConnection.linkName}/apiobjects.html?namespace=${namespace}&amp;kind=%%" targetElement="${targetElement}"
 	/></ui:multilevel></div>
 	
 	<div id="explorer-right"><ui:tabs items="${results}" var="rs" varKey="label" varLink="detailLink" varParams="detailParams" varParamString="detailParamString" name="result"><%@

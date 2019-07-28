@@ -15,10 +15,11 @@
  */
 package de.tweerlei.dbgrazer.extension.kubernetes;
 
-import java.util.Collections;
-import java.util.Date;
 import java.util.Map;
 import java.util.Set;
+
+import de.tweerlei.dbgrazer.extension.kubernetes.model.KubernetesApiObject;
+import de.tweerlei.dbgrazer.extension.kubernetes.model.KubernetesApiResource;
 
 /**
  * Retrieve Kubernetes metadata
@@ -27,180 +28,6 @@ import java.util.Set;
  */
 public interface KubernetesApiService
 	{
-	/**
-	 * Kubernetes API resource
-	 */
-	public static class KubernetesApiResource implements Comparable<KubernetesApiResource>
-		{
-		private final String name;
-		private final String kind;
-		private final boolean namespaced;
-		private final Set<String> verbs;
-		
-		/**
-		 * Constructor
-		 * @param name Name
-		 * @param kind Kind
-		 * @param namespaced Namespaced
-		 * @param verbs Supported verbs
-		 */
-		public KubernetesApiResource(String name, String kind, boolean namespaced, Set<String> verbs)
-			{
-			this.name = name;
-			this.kind = kind;
-			this.namespaced = namespaced;
-			this.verbs = Collections.unmodifiableSet(verbs);
-			}
-		
-		/**
-		 * Get the name
-		 * @return the name
-		 */
-		public String getName()
-			{
-			return name;
-			}
-		
-		/**
-		 * Get the kind
-		 * @return the kind
-		 */
-		public String getKind()
-			{
-			return kind;
-			}
-		
-		/**
-		 * Get the namespaced
-		 * @return the namespaced
-		 */
-		public boolean isNamespaced()
-			{
-			return namespaced;
-			}
-		
-		/**
-		 * Get the verbs
-		 * @return the verbs
-		 */
-		public Set<String> getVerbs()
-			{
-			return verbs;
-			}
-		
-		@Override
-		public int hashCode()
-			{
-			return name.hashCode() ^ kind.hashCode() ^ (namespaced ? 31 : 0);
-			}
-		
-		@Override
-		public boolean equals(Object o)
-			{
-			if (o == this)
-				return (true);
-			if (o == null)
-				return (false);
-			if (!(o instanceof KubernetesApiResource))
-				return (false);
-			final KubernetesApiResource other = (KubernetesApiResource) o;
-			return (name.equals(other.name) && kind.equals(other.kind) && namespaced == other.namespaced);
-			}
-		
-		@Override
-		public int compareTo(KubernetesApiResource o)
-			{
-			return (kind.compareTo(o.kind));
-			}
-		}
-	
-	/**
-	 * Kubernetes API object
-	 */
-	public static class KubernetesApiObject implements Comparable<KubernetesApiObject>
-		{
-		private final String name;
-		private final Date creationTimestamp;
-		private Map<String, String> labels;
-		private Map<String, Object> properties;
-		
-		/**
-		 * Constructor
-		 * @param name Name
-		 * @param creationTimestamp Creation timestamp
-		 * @param labels Labels
-		 * @param properties Additional properties
-		 */
-		public KubernetesApiObject(String name, Date creationTimestamp, Map<String, String> labels, Map<String, Object> properties)
-			{
-			this.name = name;
-			this.creationTimestamp = creationTimestamp;
-			this.labels = (labels == null) ? Collections.<String, String>emptyMap() : Collections.unmodifiableMap(labels);
-			this.properties = (properties == null) ? Collections.<String, Object>emptyMap() : Collections.unmodifiableMap(properties);
-			}
-		
-		/**
-		 * Get the name
-		 * @return the name
-		 */
-		public String getName()
-			{
-			return name;
-			}
-		
-		/**
-		 * Get the creationTimestamp
-		 * @return the creationTimestamp
-		 */
-		public Date getCreationTimestamp()
-			{
-			return creationTimestamp;
-			}
-		
-		/**
-		 * Get the labels
-		 * @return the labels
-		 */
-		public Map<String, String> getLabels()
-			{
-			return labels;
-			}
-		
-		/**
-		 * Get the labels
-		 * @return the labels
-		 */
-		public Map<String, Object> getProperties()
-			{
-			return properties;
-			}
-		
-		@Override
-		public int hashCode()
-			{
-			return name.hashCode();
-			}
-		
-		@Override
-		public boolean equals(Object o)
-			{
-			if (o == this)
-				return (true);
-			if (o == null)
-				return (false);
-			if (!(o instanceof KubernetesApiObject))
-				return (false);
-			final KubernetesApiObject other = (KubernetesApiObject) o;
-			return (name.equals(other.name));
-			}
-		
-		@Override
-		public int compareTo(KubernetesApiObject o)
-			{
-			return (name.compareTo(o.name));
-			}
-		}
-	
 	/**
 	 * Get the supported namespaced API resources for a link
 	 * @param c Link name
@@ -237,6 +64,56 @@ public interface KubernetesApiService
 	 * @return JSON or null
 	 */
 	public String getApiObject(String c, String namespace, String group, String version, String kind, String name);
+	
+	/**
+	 * Get an object as JSON
+	 * @param c Link name
+	 * @param namespace Namespace name
+	 * @param group API group name
+	 * @param version API version
+	 * @param kind Resource kind
+	 * @param json Object definition
+	 * @return JSON or null
+	 */
+	public String createApiObject(String c, String namespace, String group, String version, String kind, String json);
+	
+	/**
+	 * Get an object as JSON
+	 * @param c Link name
+	 * @param namespace Namespace name
+	 * @param group API group name
+	 * @param version API version
+	 * @param kind Resource kind
+	 * @param name Object name
+	 * @param json Object definition
+	 * @return JSON or null
+	 */
+	public String replaceApiObject(String c, String namespace, String group, String version, String kind, String name, String json);
+	
+	/**
+	 * Get an object as JSON
+	 * @param c Link name
+	 * @param namespace Namespace name
+	 * @param group API group name
+	 * @param version API version
+	 * @param kind Resource kind
+	 * @param name Object name
+	 * @param json Object definition
+	 * @return JSON or null
+	 */
+	public String patchApiObject(String c, String namespace, String group, String version, String kind, String name, String json);
+	
+	/**
+	 * Get an object as JSON
+	 * @param c Link name
+	 * @param namespace Namespace name
+	 * @param group API group name
+	 * @param version API version
+	 * @param kind Resource kind
+	 * @param name Object name
+	 * @return JSON or null
+	 */
+	public String deleteApiObject(String c, String namespace, String group, String version, String kind, String name);
 	
 	/**
 	 * Flush the metadata cache

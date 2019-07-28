@@ -641,8 +641,14 @@ function showConfirmDialog(title, content, action, params) {
 	AutoRefresh.stop();
 	Menu.hide();
 	Popup.hide();
+	var paramInputs = '';
+	if (params) {
+		Object.keys(params).each(function(k) {
+			paramInputs = paramInputs + '<input type="hidden" name="'+k+'" value="'+params[k]+'"/>'
+		});
+	}
 	Dialog.show(title, '<form id="f1" action="' + action + '" method="get" onreset="return closeDialog();">'
-		+(params ? '<input type="hidden" name="q" value="'+params+'"/>' : '')
+		+paramInputs
 		+'<p>' + content + '</p>'
 		+'<dl><dt>&nbsp;</dt><dd><input id="f1-submit" type="submit" value="' + Messages.yes + '"/> <input id="f1-reset" type="reset" value="' + Messages.no + '"/></dd></dl><hr/>'
 		+'</form>');
