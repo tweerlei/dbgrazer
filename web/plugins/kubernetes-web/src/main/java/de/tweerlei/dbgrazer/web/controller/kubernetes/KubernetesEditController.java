@@ -134,6 +134,7 @@ public class KubernetesEditController
 		
 		model.put("content", txt);
 		model.put("modes", Arrays.asList("create", "replace", "patch"));
+		model.put("mode", (txt == null) ? "create" : "replace");
 		model.put("extensionJS", KubernetesMessageKeys.EXTENSION_JS);
 		
 		return (model);

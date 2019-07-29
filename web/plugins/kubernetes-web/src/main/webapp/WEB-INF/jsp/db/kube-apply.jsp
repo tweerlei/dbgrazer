@@ -43,7 +43,7 @@
 				<dt><label for="f1-mode"><fmt:message key="executeAs"/></label></dt>
 				<dd><select id="f1-mode" name="mode">
 <c:forEach items="${modes}" var="t"
->					<option value="${t}">${t}</option>
+>					<option value="${t}"<c:if test="${t == mode}"> selected="selected"</c:if>>${t}</option>
 </c:forEach
 >				</select></dd>
 				<dt>&nbsp;</dt>

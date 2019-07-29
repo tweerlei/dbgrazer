@@ -66,6 +66,7 @@ import de.tweerlei.dbgrazer.web.exception.AccessDeniedException;
 import de.tweerlei.dbgrazer.web.exception.AjaxRedirectException;
 import de.tweerlei.dbgrazer.web.exception.QueryException;
 import de.tweerlei.dbgrazer.web.exception.QueryNotFoundException;
+import de.tweerlei.dbgrazer.web.exception.RedirectException;
 import de.tweerlei.dbgrazer.web.formatter.DataFormatter;
 import de.tweerlei.dbgrazer.web.model.QueryParameters;
 import de.tweerlei.dbgrazer.web.model.TabItem;
@@ -437,10 +438,14 @@ public class QueryRunController
 	 * Show a parameter input form
 	 * @param fbo FormBackingObject
 	 * @return Model
+	 * @throws RedirectException when trying to perform an query with not historizable parameters
 	 */
 	@RequestMapping(value = "/db/*/result.html", method = RequestMethod.GET)
-	public Map<String, Object> performQuery(@ModelAttribute("model") FormBackingObject fbo)
+	public Map<String, Object> performQuery(@ModelAttribute("model") FormBackingObject fbo) throws RedirectException
 		{
+		if (fbo.getQuery().getType().isManipulation() || querySettingsManager.hasFilteredParameters(fbo.getQuery()))
+			throw new RedirectException("query.html?q=" + stringTransformerService.toURL(fbo.getQuery().getName()));
+		
 		return (performQuery(fbo, true, true));
 		}
 	
@@ -452,7 +457,7 @@ public class QueryRunController
 	 * @return Model
 	 * @throws AjaxRedirectException when trying to perform an explorer query
 	 */
-	@RequestMapping(value = "/db/*/ajax/result.html", method = RequestMethod.POST)
+	@RequestMapping(value = "/db/*/ajax/result.html", method = { RequestMethod.GET, RequestMethod.POST })
 	public Map<String, Object> performAjaxQuery(@ModelAttribute("model") FormBackingObject fbo,
 			@RequestParam(value = "historize", required = false) Boolean historize,
 			@RequestParam(value = "related", required = false) Boolean showRelated

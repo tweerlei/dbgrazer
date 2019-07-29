@@ -422,9 +422,7 @@ public class QuerySettingsManagerImpl implements QuerySettingsManager
 			else
 				{
 				final ParameterDef p = query.getParameters().get(i);
-				if (p.getType() == ColumnType.PASSWORD)
-					params.add("");
-				else if (p.getType() == ColumnType.CLOB)
+				if (isFiltered(p.getType()))
 					params.add("");
 				else
 					params.add(v);
@@ -436,6 +434,22 @@ public class QuerySettingsManagerImpl implements QuerySettingsManager
 				params,
 				getAdditionalParameters(query, model)
 				));
+		}
+	
+	@Override
+	public boolean hasFilteredParameters(Query query)
+		{
+		for (ParameterDef p : query.getParameters())
+			{
+			if (isFiltered(p.getType()))
+				return (true);
+			}
+		return (false);
+		}
+	
+	private boolean isFiltered(ColumnType t)
+		{
+		return ((t == ColumnType.PASSWORD) || (t == ColumnType.CLOB));
 		}
 	
 	@Override

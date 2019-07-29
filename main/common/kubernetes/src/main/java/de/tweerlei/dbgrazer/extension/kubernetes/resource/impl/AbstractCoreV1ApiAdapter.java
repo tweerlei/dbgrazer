@@ -144,7 +144,7 @@ public abstract class AbstractCoreV1ApiAdapter<T> extends NamedBase implements K
 		{
 		final CoreV1Api api = new CoreV1Api(client);
 		final JSON json = client.getJSON();
-		return (json.serialize(replace(api, name, namespace, deserialize(json, content))));
+		return (json.serialize(replace(api, namespace, name, deserialize(json, content))));
 		}
 	
 	/**
@@ -163,7 +163,7 @@ public abstract class AbstractCoreV1ApiAdapter<T> extends NamedBase implements K
 		{
 		final CoreV1Api api = new CoreV1Api(client);
 		final JSON json = client.getJSON();
-		return (json.serialize(patch(api, name, namespace, deserialize(json, content))));
+		return (json.serialize(patch(api, namespace, name, deserialize(json, content))));
 		}
 	
 	/**
@@ -182,7 +182,7 @@ public abstract class AbstractCoreV1ApiAdapter<T> extends NamedBase implements K
 		{
 		final CoreV1Api api = new CoreV1Api(client);
 		final JSON json = client.getJSON();
-		return (json.serialize(delete(api, name, namespace)));
+		return (json.serialize(delete(api, namespace, name)));
 		}
 	
 	/**

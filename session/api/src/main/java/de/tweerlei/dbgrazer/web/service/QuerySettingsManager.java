@@ -181,6 +181,13 @@ public interface QuerySettingsManager
 	public QueryParameters prepareParameters(Query query, Map<Integer, String> model);
 	
 	/**
+	 * Check whether the given query has filtered parameters, e.g. PASSWORD
+	 * @param query Query
+	 * @return true if filtered
+	 */
+	public boolean hasFilteredParameters(Query query);
+	
+	/**
 	 * Build a parameter map
 	 * @param params Parameter values
 	 * @return Parameter map
