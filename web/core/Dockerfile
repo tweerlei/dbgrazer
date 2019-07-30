@@ -37,6 +37,7 @@ COPY target/dbgrazer-web-*.war /usr/local/tomcat/webapps/dbgrazer.war
 
 # Add static resources
 COPY examples/styles/*.css /usr/local/tomcat/webapps/ROOT/
+COPY examples/styles/*.png /usr/local/tomcat/webapps/ROOT/
 
 # Setup config directory
 COPY examples/*.properties /root/.dbgrazer/
