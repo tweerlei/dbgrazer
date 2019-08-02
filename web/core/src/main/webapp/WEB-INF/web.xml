@@ -110,6 +110,7 @@
 		<!-- Use dispatcher servlet to handle all html URLs -->
 		<servlet-name>dispatcher</servlet-name>
 		<url-pattern>*.html</url-pattern>
+		<url-pattern>/static/*</url-pattern>
 	</servlet-mapping>
 	
 </web-app>

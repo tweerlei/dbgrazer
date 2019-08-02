@@ -17,7 +17,7 @@
 %><form id="f1" action="db/${currentConnection.linkName}/index.html" method="get" onsubmit="return submitDialog(this);" onreset="return closeDialog();">
 	<dl>
 		<dt><label for="f1-to"><fmt:message key="searchTerm"/></label></dt>
-		<dd><input id="f1-to" type="text" name="q" value="${fn:escapeXml(term)}" onkeyup="searchTimer.start(500, this.value);"/></dd>
+		<dd><input id="f1-to" type="text" name="q" value="${fn:escapeXml(term)}" oninput="searchTimer.start(500, this.value);"/></dd>
 <%--		<dt>&nbsp;</dt>
 		<dd><input id="f1-submit" type="submit" value="<fmt:message key="searchQueries"/>"/> <input id="f1-reset" type="reset" value="<fmt:message key="cancel"/>"/></dd>
 --%>	</dl><hr/>

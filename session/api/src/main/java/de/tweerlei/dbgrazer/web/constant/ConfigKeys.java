@@ -36,6 +36,12 @@ public final class ConfigKeys
 	/** Base name for custom themes */
 	public static final ConfigKey<String> THEME_PATH = ConfigKey.create(PACKAGE_NAME, "ui.themePath", String.class, "themes");
 	
+	/** Base name for custom static resources */
+	public static final ConfigKey<String> STATIC_RESOURCE_PATH = ConfigKey.create(PACKAGE_NAME, "ui.staticResourcePath", String.class, "static");
+	
+	/** TTL in seconds for custom static resources */
+	public static final ConfigKey<Integer> STATIC_RESOURCE_TTL = ConfigKey.create(PACKAGE_NAME, "ui.staticResourceTTL", Integer.class, 86400);
+	
 	/*
 	 * Result settings (config.properties only)
 	 */

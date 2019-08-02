@@ -22,7 +22,7 @@
 	taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"
 %><div class="h1-buttons"><form action="db/${currentConnection.linkName}/index.html" method="get">
 		<label for="searchTerm"><fmt:message key="searchTerm"/>:</label>
-		<input id="searchTerm" type="text" name="q" value="${fn:escapeXml(currentConnection.search)}" onkeyup="newSearchTimer.start(500, this.value);"/>
+		<input id="searchTerm" type="text" name="q" value="${fn:escapeXml(currentConnection.search)}" oninput="newSearchTimer.start(500, this.value);"/>
 <c:if test="${not empty currentConnection.search}"><a class="action" href="db/${currentConnection.linkName}/index.html?q=" title="<fmt:message key="clear"/>"><fmt:message key="clearIcon"/></a>
 </c:if
 ><%--<input type="submit" value="<fmt:message key="searchQueries"/>"/>

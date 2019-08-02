@@ -26,6 +26,6 @@
 	taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
 %><c:if test="${form}"
 ><form class="filter" action="#" method="get" onsubmit="return false;"></c:if
-><label for="${id}"><fmt:message key="filter"/>:</label> <input type="text" name="${id}" id="${id}" onkeyup="selectFilter.start(500, this.value, 'filtercount-${id}'<c:forTokens items="${target}" delims=", " var="f">, '${f}'</c:forTokens>);"/><span id="filtercount-${id}"></span><c:if test="${form}"
+><label for="${id}"><fmt:message key="filter"/>:</label> <input type="text" name="${id}" id="${id}" oninput="selectFilter.start(500, this.value, 'filtercount-${id}'<c:forTokens items="${target}" delims=", " var="f">, '${f}'</c:forTokens>);"/><span id="filtercount-${id}"></span><c:if test="${form}"
 ></form></c:if
 >

@@ -21,7 +21,7 @@
 	
 	<div class="tab-page"><div class="tab-body"><c:choose
 ><c:when test="${loginRequired && currentUser.principal == null}"
-		><fmt:message key="loginRequired"/>
+		><div class="login"><fmt:message key="loginRequired"/>
 		<form id="f1" action="login.html" method="post">
 			<dl>
 				<dt><label for="f1-username"><fmt:message key="username"/></label></dt>
@@ -31,9 +31,9 @@
 				<dt>&nbsp;</dt>
 				<dd><input id="f1-submit" type="submit" value="<fmt:message key="login"/>"/></dd>
 			</dl><hr/>
-		</form>
+		</form></div>
 </c:when><c:otherwise
-		><fmt:message key="loginRequired"/></c:otherwise
+		><div class="login"><fmt:message key="loginRequired"/></div></c:otherwise
 ></c:choose></div></div>
 <%@
 	include file="include/footer.jspf"

@@ -43,6 +43,7 @@
 		<property name="excludedPaths">
 			<!-- Paths the user should not be redirected to after login or choosing a connection -->
 			<list>
+				<value>static/</value>
 				<value>ajax/</value>
 				<value>login.html</value>
 				<value>logout.html</value>
