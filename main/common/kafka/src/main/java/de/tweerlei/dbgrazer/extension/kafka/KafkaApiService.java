@@ -20,10 +20,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.kafka.clients.admin.Config;
+import org.apache.kafka.clients.admin.ConsumerGroupDescription;
+import org.apache.kafka.clients.admin.ConsumerGroupListing;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.consumer.OffsetAndMetadata;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.Node;
 import org.apache.kafka.common.PartitionInfo;
+import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.acl.AclBinding;
 import org.apache.kafka.common.config.ConfigResource;
 
@@ -184,6 +188,29 @@ public interface KafkaApiService
 	 * @return PartitionInfos
 	 */
 	public List<PartitionInfo> getPartitions(String c, String topic);
+	
+	/**
+	 * Get consumer groups
+	 * @param c Link name
+	 * @return Consumer groups
+	 */
+	public Collection<ConsumerGroupListing> getConsumerGroups(String c);
+	
+	/**
+	 * Get consumer group details
+	 * @param c Link name
+	 * @param group Consumer group name
+	 * @return ConsumerGroupDescription
+	 */
+	public ConsumerGroupDescription getConsumerGroup(String c, String group);
+	
+	/**
+	 * Get consumer group offsets per topic partition
+	 * @param c Link name
+	 * @param group Consumer group name
+	 * @return Map: TopicPartition -> OffsetAndMetadata
+	 */
+	public Map<TopicPartition, OffsetAndMetadata> getConsumerGroupOffsets(String c, String group);
 	
 	/**
 	 * Flush the metadata cache

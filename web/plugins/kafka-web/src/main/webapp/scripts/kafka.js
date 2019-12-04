@@ -46,6 +46,24 @@ function showMessage(ev, topic, partition, offset, format, formatting) {
 	return false;
 }
 
+function showConsumerGroup(ev, group) {
+	if (ev) {
+		Event.stop(ev);
+	}
+	AutoRefresh.stop();
+	var el = $('explorer-right');
+	if (el) {
+		var params = { group: group };
+		WSApi.getDBAsync('consumergroup', params, function(txt) {
+			el.innerHTML = extractLocalStyles(txt);
+			tw_contentChanged();
+			HashMonitor.set(params);
+			Tabs.hashChanged(HashMonitor.values);
+		});
+	}
+	return false;
+}
+
 function refreshTopic() {
 	var topic = HashMonitor.get('topic');
 	var partition = HashMonitor.get('partition');

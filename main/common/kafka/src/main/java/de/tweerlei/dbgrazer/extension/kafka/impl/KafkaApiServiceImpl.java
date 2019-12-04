@@ -28,9 +28,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.kafka.clients.admin.Config;
+import org.apache.kafka.clients.admin.ConsumerGroupDescription;
+import org.apache.kafka.clients.admin.ConsumerGroupListing;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.clients.consumer.OffsetAndMetadata;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
@@ -513,6 +516,48 @@ public class KafkaApiServiceImpl implements KafkaApiService
 		{
 		final TopicMetadataHolder md = getTopicMetadataHolder(c, topic);
 		return (md.getPartitions());
+		}
+	
+	@Override
+	public Collection<ConsumerGroupListing> getConsumerGroups(String c)
+		{
+		try	{
+			final Collection<ConsumerGroupListing> groups = clientService.getAdminClient(c).listConsumerGroups().all().get();
+			return (groups);
+			}
+		catch (Exception e)
+			{
+			logger.log(Level.WARNING, "getConsumerGroups", e);
+			return (Collections.emptyList());
+			}
+		}
+
+	@Override
+	public ConsumerGroupDescription getConsumerGroup(String c, String group)
+		{
+		try	{
+			final ConsumerGroupDescription ret = clientService.getAdminClient(c).describeConsumerGroups(Collections.singleton(group)).all().get().get(group);
+			return (ret);
+			}
+		catch (Exception e)
+			{
+			logger.log(Level.WARNING, "getConsumerGroup", e);
+			return (null);
+			}
+		}
+
+	@Override
+	public Map<TopicPartition, OffsetAndMetadata> getConsumerGroupOffsets(String c, String group)
+		{
+		try	{
+			final Map<TopicPartition, OffsetAndMetadata> ret = clientService.getAdminClient(c).listConsumerGroupOffsets(group).partitionsToOffsetAndMetadata().get();
+			return (ret);
+			}
+		catch (Exception e)
+			{
+			logger.log(Level.WARNING, "getConsumerGroupOffsets", e);
+			return (null);
+			}
 		}
 	
 	@Override

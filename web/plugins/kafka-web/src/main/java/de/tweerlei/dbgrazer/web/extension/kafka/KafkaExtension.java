@@ -66,6 +66,7 @@ public class KafkaExtension extends FrontendExtensionAdapter
 		if (connectionSettings.isBrowserEnabled())
 			{
 			ret.add(new ExtensionLink("kafkaBrowser", frontendHelper.buildPath(MessageKeys.PATH_DB, connectionSettings.getLinkName(), "topics.html", null), null, null));
+			ret.add(new ExtensionLink("kafkaConsumerGroups", frontendHelper.buildPath(MessageKeys.PATH_DB, connectionSettings.getLinkName(), "consumergroups.html", null), null, null));
 			}
 		
 		return (ret);

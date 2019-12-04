@@ -35,6 +35,8 @@ public final class KafkaMessageKeys
 	public static final String PARTITION_LEVEL = "$partitionLevel";
 	/** Message tab title */
 	public static final String MESSAGE_LEVEL = "$partitionLevel";
+	/** ConsumerGroup tab title */
+	public static final String CONSUMERGROUP_LEVEL = "$consumerGroupLevel";
 	
 	/*
 	 * Tab titles, prefixed with "$" for detection by tabs.tag
@@ -46,6 +48,12 @@ public final class KafkaMessageKeys
 	public static final String PARTITIONS_TAB = "$kafkaPartitionsTab";
 	/** Messages tab title */
 	public static final String MESSAGES_TAB = "$kafkaMessagesTab";
+	/** ConsumerGroup tab title */
+	public static final String CONSUMERGROUP_TAB = "$kafkaConsumerGroupsTab";
+	/** ConsumerGroup tab title */
+	public static final String ASSIGNMENTS_TAB = "$consumerGroupAssignmentsTab";
+	/** ConsumerGroup tab title */
+	public static final String MEMBERS_TAB = "$consumerGroupMembersTab";
 	
 	/*
 	 * Column names
