@@ -100,7 +100,7 @@
 	
 	<!-- Fix character sets -->
 	<properties>
-		<jdk>1.7</jdk>
+		<jdk>1.8</jdk>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss</maven.build.timestamp.format>
