@@ -62,12 +62,17 @@ import de.tweerlei.spring.service.TimeService;
 @Controller
 public class KafkaConsumerGroupController
 	{
+	/** Re-package Kafka objects as Java Beans */
 	public static class ConsumerGroupBean
 		{
 		private final String id;
 		private final boolean simple;
 		private final ConsumerGroupState state;
 		
+		/**
+		 * Constructor
+		 * @param desc ConsumerGroupDescription
+		 */
 		public ConsumerGroupBean(ConsumerGroupDescription desc)
 			{
 			this.id = desc.groupId();
@@ -75,28 +80,44 @@ public class KafkaConsumerGroupController
 			this.state = desc.state();
 			}
 		
+		/**
+		 * @return id
+		 */
 		public String getId()
 			{
 			return (id);
 			}
 		
+		/**
+		 * @return simple
+		 */
 		public boolean isSimple()
 			{
 			return (simple);
 			}
 		
+		/**
+		 * @return state
+		 */
 		public ConsumerGroupState getState()
 			{
 			return (state);
 			}
 		}
 	
+	/** Re-package Kafka objects as Java Beans */
 	public static class ConsumerGroupAssignmentBean implements Comparable<ConsumerGroupAssignmentBean>
 		{
 		private final String topic;
 		private final int partition;
 		private final long offset;
 		
+		/**
+		 * Constructor
+		 * @param topic Topic
+		 * @param partition Partition
+		 * @param offset Offset
+		 */
 		public ConsumerGroupAssignmentBean(String topic, int partition, long offset)
 			{
 			this.topic = topic;
@@ -309,13 +330,81 @@ public class KafkaConsumerGroupController
 		columns.add(new ColumnDefImpl("consumerId", ColumnType.STRING, null, null, null, null));
 		columns.add(new ColumnDefImpl("clientId", ColumnType.STRING, null, null, null, null));
 		columns.add(new ColumnDefImpl("host", ColumnType.STRING, null, null, null, null));
-		columns.add(new ColumnDefImpl("assignedPartitions", ColumnType.INTEGER, null, null, null, null));
+		columns.add(new ColumnDefImpl("assignedPartitions", ColumnType.STRING, null, null, null, null));
 		final RowSetImpl rs = new RowSetImpl(query, 1, columns);
 		rs.setQueryTime(time);
 		
 		for (MemberDescription a : members)
-			rs.getRows().add(new DefaultResultRow(a.consumerId(), a.clientId(), a.host(), String.valueOf(a.assignment().topicPartitions().size())));
+			{
+			final StringBuilder sb = new StringBuilder();
+			for (TopicPartition tp : a.assignment().topicPartitions())
+				sb.append(tp.topic()).append(":").append(tp.partition()).append("\n");
+			
+			rs.getRows().add(new DefaultResultRow(a.consumerId(), a.clientId(), a.host(), sb.toString()));
+			}
 		
 		return (rs);
+		}
+	
+	/**
+	 * Show the file browser
+	 * @param group Consumer group name
+	 * @param topic Topic name
+	 * @param partition Partition
+	 * @return Model
+	 */
+	@RequestMapping(value = "/db/*/ajax/seek-consumergroup.html", method = RequestMethod.GET)
+	public Map<String, Object> showSeekConsumerGroupForm(
+			@RequestParam("group") String group,
+			@RequestParam("topic") String topic,
+			@RequestParam("partition") int partition
+			)
+		{
+		if (!connectionSettings.isBrowserEnabled() || !connectionSettings.isWritable())
+			throw new AccessDeniedException();
+		
+		final Map<String, Object> model = new HashMap<String, Object>();
+		model.put("group", group);
+		model.put("topic", topic);
+		model.put("partition", partition);
+		
+		return (model);
+		}
+	
+	/**
+	 * Show the file browser
+	 * @param group Consumer group name
+	 * @param topic Topic name
+	 * @param partition Partition
+	 * @param offset Offset
+	 * @return Model
+	 */
+	@RequestMapping(value = "/db/*/seek-consumergroup.html", method = RequestMethod.POST)
+	public Map<String, Object> seekConsumerGroup(
+			@RequestParam("group") String group,
+			@RequestParam("topic") String topic,
+			@RequestParam("partition") int partition,
+			@RequestParam("offset") long offset
+			)
+		{
+		if (!connectionSettings.isBrowserEnabled() || !connectionSettings.isWritable())
+			throw new AccessDeniedException();
+		
+		final Map<String, Object> model = new HashMap<String, Object>();
+		model.put("group", group);
+		model.put("topic", topic);
+		model.put("partition", partition);
+		model.put("offset", offset);
+		
+		try	{
+			kafkaClientService.seekConsumerGroup(connectionSettings.getLinkName(), group, topic, partition, offset);
+			model.put("result", "Seek successful");
+			}
+		catch (RuntimeException e)
+			{
+			model.put("exceptionText", e.getMessage());
+			}
+		
+		return (model);
 		}
 	}

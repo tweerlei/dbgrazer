@@ -183,6 +183,27 @@ public class KafkaClientServiceImpl implements KafkaClientService, LinkListener,
 		}
 	
 	@Override
+	public Consumer<String, String> createTemporaryConsumer(String c, String group)
+		{
+		final Properties props = initKafkaProperties(c);
+		
+		// Always treat contents as Strings
+		props.setProperty("key.deserializer", StringDeserializer.class.getName());
+		props.setProperty("value.deserializer", StringDeserializer.class.getName());
+		
+		// Don't commit offsets, start at earliest message
+		props.setProperty("enable.auto.commit", "false");
+		props.setProperty("auto.offset.reset", "earliest");
+		
+		// Group ID is required for subscribe()
+		props.setProperty("group.id", group);
+		
+		final Consumer<String, String> ret = new KafkaConsumer<String, String>(props);
+		
+		return (ret);
+		}
+	
+	@Override
 	public Consumer<String, String> getConsumer(String c)
 		{
 		final KafkaConnectionHolder holder = activeConnections.get(c);

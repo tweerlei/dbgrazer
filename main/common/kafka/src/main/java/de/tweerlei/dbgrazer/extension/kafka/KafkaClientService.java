@@ -29,6 +29,14 @@ public interface KafkaClientService
 	/**
 	 * Get a KafkaConsumer for a link
 	 * @param c Link name
+	 * @param group Consumer group name
+	 * @return KafkaConsumer
+	 */
+	public Consumer<String, String> createTemporaryConsumer(String c, String group);
+	
+	/**
+	 * Get a KafkaConsumer for a link
+	 * @param c Link name
 	 * @return KafkaConsumer
 	 */
 	public Consumer<String, String> getConsumer(String c);

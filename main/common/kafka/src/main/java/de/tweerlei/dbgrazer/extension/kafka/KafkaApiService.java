@@ -213,6 +213,16 @@ public interface KafkaApiService
 	public Map<TopicPartition, OffsetAndMetadata> getConsumerGroupOffsets(String c, String group);
 	
 	/**
+	 * Seek a consumer group to a given offset in a topic partition
+	 * @param c Link name
+	 * @param group Consumer group name
+	 * @param topic Topic name
+	 * @param partition Partition
+	 * @param offset Offset
+	 */
+	public void seekConsumerGroup(String c, String group, String topic, int partition, long offset);
+	
+	/**
 	 * Flush the metadata cache
 	 * @param link Link name
 	 */

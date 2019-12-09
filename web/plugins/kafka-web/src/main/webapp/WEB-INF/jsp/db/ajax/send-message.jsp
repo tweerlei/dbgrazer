@@ -22,9 +22,9 @@
 		<dt><label for="f3-partition"><fmt:message key="kafkaPartition"/></label></dt>
 		<dd><input type="text" id="f3-partition" name="partition" value="${partition}"/></dd>
 		<dt><label for="f3-key"><fmt:message key="key"/></label></dt>
-		<dd><input type="text" id="f3-key" name="key" value="${fn:escapeXml(key)}"/></dd>
+		<dd><input type="checkbox" name="sendkey" value="true" checked="checked" onchange="toggleTextField('f3-key');"/> <input type="text" id="f3-key" name="key" value="${fn:escapeXml(key)}"/></dd>
 		<dt><label for="f3-message"><fmt:message key="body"/></label></dt>
-		<dd><textarea id="f3-message" name="message" class="large" cols="80" rows="25">${fn:escapeXml(message)}</textarea></dd>
+		<dd><input type="checkbox" name="sendmessage" value="true" checked="checked" onchange="toggleTextField('f3-message');"/><br/><textarea id="f3-message" name="message" class="large" cols="80" rows="25">${fn:escapeXml(message)}</textarea></dd>
 		<dt>&nbsp;</dt>
 		<dd><input id="f3-submit" type="submit" value="<fmt:message key="send"/>"/> <input id="f3-reset" type="reset" value="<fmt:message key="cancel"/>"/></dd>
 	</dl><hr/>

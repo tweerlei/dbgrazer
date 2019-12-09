@@ -117,8 +117,8 @@ public class KafkaSendController
 	public Map<String, Object> sendMessage(
 			@RequestParam("topic") String topic,
 			@RequestParam(value = "partition", required = false) Integer partition,
-			@RequestParam("key") String key,
-			@RequestParam("message") String message
+			@RequestParam(value = "key", required = false) String key,
+			@RequestParam(value = "message", required = false) String message
 			)
 		{
 		if (!connectionSettings.isBrowserEnabled() || !connectionSettings.isWritable())

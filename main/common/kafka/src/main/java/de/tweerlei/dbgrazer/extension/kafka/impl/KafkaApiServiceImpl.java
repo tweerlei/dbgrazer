@@ -561,6 +561,23 @@ public class KafkaApiServiceImpl implements KafkaApiService
 		}
 	
 	@Override
+	public void seekConsumerGroup(String c, String group, String topic, int partition, long offset)
+		{
+		final Consumer<String, String> consumer = clientService.createTemporaryConsumer(c, group);
+		try	{
+			final TopicPartition tp = new TopicPartition(topic, partition);
+			
+			consumer.assign(Collections.singleton(tp));
+			consumer.seek(tp, offset);
+			consumer.commitSync();
+			}
+		finally
+			{
+			consumer.close();
+			}
+		}
+	
+	@Override
 	public void flushCache(String link)
 		{
 		if (link == null)
