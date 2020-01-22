@@ -22,6 +22,7 @@ import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ldap.NamingException;
 import org.springframework.ldap.core.LdapEntryIdentification;
 import org.springframework.ldap.core.LdapEntryIdentificationContextMapper;
 import org.springframework.ldap.core.LdapTemplate;
@@ -97,21 +98,27 @@ public class LdapBindUserLoader implements UserAuthenticator, ConfigListener
 		
 		final String base = configService.get(ConfigKeys.LDAP_USER_DN);
 		final String filter = configService.get(ConfigKeys.LDAP_USER_FILTER);
-		
 		final String userFilter = filter.replace("?", username);
 		
 		logger.log(Level.INFO, "Trying to authenticate: [" + ldapUsername + "] [" + base + "] [" + userFilter + "]");
 		
-		@SuppressWarnings("unchecked")
-		final List<LdapEntryIdentification> l = ldap.search(base, userFilter, new LdapEntryIdentificationContextMapper());
-		if (l.size() != 1)
+		try	{
+			@SuppressWarnings("unchecked")
+			final List<LdapEntryIdentification> l = ldap.search(base, userFilter, new LdapEntryIdentificationContextMapper());
+			if (l.size() != 1)
+				{
+				logger.log(Level.WARNING, "Found " + l.size() + " results");
+				return (false);
+				}
+			
+			final LdapEntryIdentification entryIdentification = l.get(0);
+			logger.log(Level.INFO, "Found " + entryIdentification.getAbsoluteDn());
+			return (true);
+			}
+		catch (NamingException e)
 			{
-			logger.log(Level.WARNING, "Found " + l.size() + " results");
+			logger.log(Level.SEVERE, "LDAP search failed for bind user DN: " + ldapUsername, e);
 			return (false);
 			}
-		
-		final LdapEntryIdentification entryIdentification = l.get(0);
-		logger.log(Level.INFO, "Found " + entryIdentification.getAbsoluteDn());
-		return (true);
 		}
 	}
