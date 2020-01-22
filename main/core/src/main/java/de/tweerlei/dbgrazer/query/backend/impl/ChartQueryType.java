@@ -43,6 +43,7 @@ public class ChartQueryType extends AbstractVisualizationQueryType
 		super(NAME, MapBuilder.<String, Class<?>>ordered()
 				.put(ChartType.class.getSimpleName(), ChartType.class)
 				.put(ChartScaling.class.getSimpleName(), ChartScaling.class)
+				.put("showSubqueries", Boolean.class)
 				.build());
 		}
 	}

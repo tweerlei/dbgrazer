@@ -49,15 +49,6 @@ public final class ConfigKeys
 	/** Max. levels for drilldown queries */
 	public static final ConfigKey<Integer> DRILLDOWN_LEVELS = ConfigKey.create(PACKAGE_NAME, "result.drilldownLevels", Integer.class, 10);
 	
-	/** Whether to show query results used for graph drawing */
-	public static final ConfigKey<Boolean> SHOW_GRAPH_SUBQUERIES = ConfigKey.create(PACKAGE_NAME, "result.showGraphSubqueries", Boolean.class, Boolean.FALSE);
-	
-	/** Whether to show query results used for chart drawing */
-	public static final ConfigKey<Boolean> SHOW_CHART_SUBQUERIES = ConfigKey.create(PACKAGE_NAME, "result.showChartSubqueries", Boolean.class, Boolean.FALSE);
-	
-	/** Whether to show query results used for tree drawing */
-	public static final ConfigKey<Boolean> SHOW_TREE_SUBQUERIES = ConfigKey.create(PACKAGE_NAME, "result.showTreeSubqueries", Boolean.class, Boolean.FALSE);
-	
 	
 	private ConfigKeys()
 		{

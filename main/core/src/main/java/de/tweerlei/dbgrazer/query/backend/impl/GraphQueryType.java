@@ -44,6 +44,7 @@ public class GraphQueryType extends AbstractVisualizationQueryType
 		{
 		super(NAME, MapBuilder.<String, Class<?>>ordered()
 				.put(GraphType.class.getSimpleName(), GraphType.class)
+				.put("showSubqueries", Boolean.class)
 				.build());
 		}
 	

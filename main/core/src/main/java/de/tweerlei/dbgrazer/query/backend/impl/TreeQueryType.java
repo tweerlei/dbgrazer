@@ -41,6 +41,7 @@ public class TreeQueryType extends AbstractMultilevelQueryType
 		super(NAME, MapBuilder.<String, Class<?>>ordered()
 				.put("hideId", Boolean.class)
 				.put("tables", Boolean.class)
+				.put("showSubqueries", Boolean.class)
 				.build());
 		}
 	}

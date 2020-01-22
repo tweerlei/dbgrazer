@@ -81,6 +81,8 @@ public final class RowSetConstants
 	public static final String ATTR_TABLE_NAME = "tableName";
 	/** RowSet attribute for the table PK generation subselect */
 	public static final String ATTR_TABLE_PK_SELECT = "tablePKSelect";
+	/** RowSet attribute for showing subquery data */
+	public static final String ATTR_SHOW_SUBQUERIES = "showSubqueries";
 	
 	private RowSetConstants()
 		{

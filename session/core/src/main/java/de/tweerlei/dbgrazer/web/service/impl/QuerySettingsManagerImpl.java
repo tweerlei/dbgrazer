@@ -176,6 +176,12 @@ public class QuerySettingsManagerImpl implements QuerySettingsManager
 		}
 	
 	@Override
+	public boolean isShowSubqueriesActive(Query query)
+		{
+		return (Boolean.valueOf(query.getAttributes().get(RowSetConstants.ATTR_SHOW_SUBQUERIES)));
+		}
+	
+	@Override
 	public boolean isHistoryEnabled()
 		{
 		return (configService.get(ConfigKeys.ENABLE_HISTORY));

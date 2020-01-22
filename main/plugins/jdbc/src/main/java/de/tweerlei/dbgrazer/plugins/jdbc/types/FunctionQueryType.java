@@ -19,7 +19,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
+import de.tweerlei.common5.collections.MapBuilder;
 import de.tweerlei.dbgrazer.plugins.jdbc.impl.JdbcLinkType;
+import de.tweerlei.dbgrazer.query.model.ColumnType;
 import de.tweerlei.dbgrazer.query.model.impl.AbstractSingleQueryType;
 
 /**
@@ -41,7 +43,9 @@ public class FunctionQueryType extends AbstractSingleQueryType
 	@Autowired
 	public FunctionQueryType(JdbcLinkType linkType)
 		{
-		super(NAME, linkType, null);
+		super(NAME, linkType, MapBuilder.<String, Class<?>>ordered()
+				.put(QueryTypeAttributes.ATTR_RESULT_TYPE, ColumnType.class)
+				.build());
 		}
 	
 	@Override

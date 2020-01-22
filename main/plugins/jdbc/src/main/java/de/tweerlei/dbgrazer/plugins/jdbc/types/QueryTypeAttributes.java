@@ -54,6 +54,8 @@ public final class QueryTypeAttributes
 	public static final String ATTR_DIMENSION = "dimension";
 	/** RowSet attribute for the aggregation functions */
 	public static final String ATTR_FUNCS = "funcs";
+	/** RowSet attribute for the result type */
+	public static final String ATTR_RESULT_TYPE = "resultType";
 	
 	private QueryTypeAttributes()
 		{

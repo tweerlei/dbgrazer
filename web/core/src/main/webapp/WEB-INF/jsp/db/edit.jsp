@@ -162,6 +162,12 @@
 >							<spring:option value="${v}"><fmt:message key="${v}"/></spring:option>
 </c:forEach
 >						</spring:select></c:when
+						><c:when test="${a.value.simpleName == 'ColumnType'}"><spring:select path="attributes[${a.key}]">
+							<spring:option value=""><fmt:message key="default"/></spring:option>
+<c:forEach items="${columnTypes}" var="v"
+>							<spring:option value="${v}"><fmt:message key="${v}"/></spring:option>
+</c:forEach
+>						</spring:select></c:when
 						><c:otherwise><spring:input path="attributes[${a.key}]"/></c:otherwise
 				></c:choose> <ui:info name="attributes-${a.key}"><fmt:message key="help_${a.key}"/></ui:info></dd>
 </c:forEach

@@ -54,9 +54,11 @@ import de.tweerlei.dbgrazer.plugins.jdbc.types.DMLKeyQueryType;
 import de.tweerlei.dbgrazer.plugins.jdbc.types.DMLQueryType;
 import de.tweerlei.dbgrazer.plugins.jdbc.types.FunctionQueryType;
 import de.tweerlei.dbgrazer.plugins.jdbc.types.ProcedureQueryType;
+import de.tweerlei.dbgrazer.plugins.jdbc.types.QueryTypeAttributes;
 import de.tweerlei.dbgrazer.query.backend.BaseQueryRunner;
 import de.tweerlei.dbgrazer.query.exception.PerformQueryException;
 import de.tweerlei.dbgrazer.query.model.CancelableProgressMonitor;
+import de.tweerlei.dbgrazer.query.model.ColumnType;
 import de.tweerlei.dbgrazer.query.model.ParameterDef;
 import de.tweerlei.dbgrazer.query.model.Query;
 import de.tweerlei.dbgrazer.query.model.QueryType;
@@ -209,13 +211,15 @@ public class CallQueryRunner extends BaseQueryRunner
 		private final String statement;
 		private final List<Object> args;
 		private final List<ParameterDef> params;
+		private final ColumnType resultType;
 		
-		public FunctionCallback(JdbcTemplate template, String statement, List<Object> args, List<ParameterDef> params)
+		public FunctionCallback(JdbcTemplate template, String statement, List<Object> args, List<ParameterDef> params, ColumnType resultType)
 			{
 			this.template = template;
 			this.statement = statement;
 			this.args = args;
 			this.params = params;
+			this.resultType = resultType;
 			}
 		
 		@Override
@@ -224,16 +228,12 @@ public class CallQueryRunner extends BaseQueryRunner
 			final int n = args.size();
 			final List<SqlParameter> sqlParams = new ArrayList<SqlParameter>(n);
 			final Map<String, Object> sqlValues = new HashMap<String, Object>(n);
+			sqlParams.add(new SqlOutParameter("FunctionCallResult", resultType.getDefaultSQLType()));
 			for (int i = 0; i < n; i++)
 				{
 				final ParameterDef def = params.get(i);
-				if (i == 0)
-					sqlParams.add(new SqlOutParameter(def.getName(), def.getType().getDefaultSQLType()));
-				else
-					{
-					sqlParams.add(new SqlParameter(def.getName(), def.getType().getDefaultSQLType()));
-					sqlValues.put(def.getName(), args.get(i));
-					}
+				sqlParams.add(new SqlParameter(def.getName(), def.getType().getDefaultSQLType()));
+				sqlValues.put(def.getName(), args.get(i));
 				}
 			
 			final CallableStatementCreatorFactory factory = new CallableStatementCreatorFactory(statement, sqlParams);
@@ -455,7 +455,17 @@ public class CallQueryRunner extends BaseQueryRunner
 		else if (type instanceof ProcedureQueryType)
 			return (new ProcedureCallback(template, statement, args, query.getParameters(), timeService, dialect));
 		else if (type instanceof FunctionQueryType)
-			return (new FunctionCallback(template, statement, args, query.getParameters()));
+			{
+			ColumnType resultType;
+			try	{
+				resultType = ColumnType.valueOf(query.getAttributes().get(QueryTypeAttributes.ATTR_RESULT_TYPE));
+				}
+			catch (RuntimeException e)
+				{
+				resultType = ColumnType.STRING;
+				}
+			return (new FunctionCallback(template, statement, args, query.getParameters(), resultType));
+			}
 		else
 			throw new RuntimeException("Unknown query type: " + type);
 		}

@@ -570,8 +570,8 @@ public class QueryRunController
 				if (query.getQuery().getType().getResultType() != ResultType.RECURSIVE)
 					{
 					if (r.getQuery().getType().getName().equals(VisualizationSettings.GRAPH_QUERY_TYPE))
-						addRowSets(rowSets, r, query.getAllParameters(), fmt, configService.get(ConfigKeys.SHOW_GRAPH_SUBQUERIES) ? 0 : 2, false);
-					else if (configService.get(ConfigKeys.SHOW_CHART_SUBQUERIES))
+						addRowSets(rowSets, r, query.getAllParameters(), fmt, querySettingsManager.isShowSubqueriesActive(r.getQuery()) ? 0 : 2, false);
+					else if (r.getQuery().getType().getName().equals(VisualizationSettings.CHART_QUERY_TYPE) && querySettingsManager.isShowSubqueriesActive(r.getQuery()))
 						addRowSets(rowSets, r, query.getAllParameters(), fmt, 0, false);
 					}
 				}
@@ -593,7 +593,7 @@ public class QueryRunController
 				// Don't show subqueries when the tree is a subquery itself
 				if (query.getQuery().getType().getResultType() != ResultType.RECURSIVE)
 					{
-					if (configService.get(ConfigKeys.SHOW_TREE_SUBQUERIES));
+					if (querySettingsManager.isShowSubqueriesActive(r.getQuery()));
 						addRowSets(rowSets, r, query.getAllParameters(), fmt, 1, false);
 					}
 				}
@@ -721,8 +721,8 @@ public class QueryRunController
 				rowSet.getAttributes().put(RowSetConstants.ATTR_VISUALIZATION, v.getVisualization());
 				
 				if (r.getQuery().getType().getName().equals(VisualizationSettings.GRAPH_QUERY_TYPE))
-					addRowSets(result, r, configService.get(ConfigKeys.SHOW_GRAPH_SUBQUERIES) ? 0 : 2);
-				else if (configService.get(ConfigKeys.SHOW_CHART_SUBQUERIES))
+					addRowSets(result, r, querySettingsManager.isShowSubqueriesActive(r.getQuery()) ? 0 : 2);
+				else if (r.getQuery().getType().getName().equals(VisualizationSettings.CHART_QUERY_TYPE) && querySettingsManager.isShowSubqueriesActive(r.getQuery()))
 					addRowSets(result, r, 0);
 				}
 			else if (r.getQuery().getType().getName().equals(VisualizationSettings.TREE_QUERY_TYPE) && !r.getFirstRowSet().getRows().isEmpty())

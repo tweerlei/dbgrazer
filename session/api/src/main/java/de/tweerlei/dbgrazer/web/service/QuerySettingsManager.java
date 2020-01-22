@@ -109,6 +109,13 @@ public interface QuerySettingsManager
 	public void setFormatName(Query query, String f);
 	
 	/**
+	 * Check whether subqueries should be shown
+	 * @param query Query
+	 * @return Show subqueries active
+	 */
+	public boolean isShowSubqueriesActive(Query query);
+	
+	/**
 	 * Get the format options to use for result text formatting
 	 * @param query Query
 	 * @return Options
