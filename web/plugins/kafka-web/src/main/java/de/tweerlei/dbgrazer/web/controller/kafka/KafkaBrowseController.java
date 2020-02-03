@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -277,6 +278,29 @@ public class KafkaBrowseController
 			
 			return (o.partition - partition);
 			}
+		
+		@Override
+		public boolean equals(Object o)
+			{
+			if (o == null)
+				return false;
+			if (o == this)
+				return true;
+			if (!(o instanceof ConsumerRecordBean))
+				return false;
+			final ConsumerRecordBean b = (ConsumerRecordBean) o;
+			return ((b.partition == partition) && StringUtils.equals(b.key, key));
+			}
+		
+		@Override
+		public int hashCode()
+			{
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + partition;
+			result = prime * result + ((key == null) ? 0 : key.hashCode());
+			return result;
+			}
 		}
 	
 	private final KafkaApiService kafkaClientService;
@@ -521,6 +545,7 @@ public class KafkaBrowseController
 	 * @param partition Partition number
 	 * @param offset Message offset
 	 * @param key Key to match
+	 * @param compact Compact messages
 	 * @return Model
 	 */
 	@RequestMapping(value = "/db/*/messages.html", method = RequestMethod.GET)
@@ -528,10 +553,11 @@ public class KafkaBrowseController
 			@RequestParam("topic") String topic,
 			@RequestParam(value = "partition", required = false) Integer partition,
 			@RequestParam(value = "offset", required = false) Long offset,
-			@RequestParam(value = "key", required = false) String key
+			@RequestParam(value = "key", required = false) String key,
+			@RequestParam(value = "compact", required = false) Boolean compact
 			)
 		{
-		return (showMessagesInternal(topic, partition, offset, key));
+		return (showMessagesInternal(topic, partition, offset, key, compact));
 		}
 	
 	/**
@@ -540,6 +566,7 @@ public class KafkaBrowseController
 	 * @param partition Partition number
 	 * @param offset Message offset
 	 * @param key Key to match
+	 * @param compact Compact messages
 	 * @return Model
 	 */
 	@RequestMapping(value = "/db/*/ajax/messages.html", method = RequestMethod.GET)
@@ -547,17 +574,19 @@ public class KafkaBrowseController
 			@RequestParam("topic") String topic,
 			@RequestParam(value = "partition", required = false) Integer partition,
 			@RequestParam(value = "offset", required = false) Long offset,
-			@RequestParam(value = "key", required = false) String key
+			@RequestParam(value = "key", required = false) String key,
+			@RequestParam(value = "compact", required = false) Boolean compact
 			)
 		{
-		return (showMessagesInternal(topic, partition, offset, key));
+		return (showMessagesInternal(topic, partition, offset, key, compact));
 		}
 	
 	private Map<String, Object> showMessagesInternal(
 			String topic,
 			Integer partition,
 			Long offset,
-			String key
+			String key,
+			Boolean compact
 			)
 		{
 		if (!connectionSettings.isBrowserEnabled())
@@ -568,6 +597,7 @@ public class KafkaBrowseController
 		model.put("topic", topic);
 		model.put("partition", partition);
 		model.put("key", key);
+		model.put("compact", compact);
 		
 		final OffsetInfo offsets = kafkaClientService.getOffsetInfo(connectionSettings.getLinkName(), topic, partition);
 		model.put("startOffset", offsets.getMinOffset());
@@ -583,16 +613,36 @@ public class KafkaBrowseController
 		
 		final List<ConsumerRecord<String, String>> records = kafkaClientService.fetchRecords(connectionSettings.getLinkName(), topic, partition, effectiveOffset, null, StringUtils.nullIfEmpty(key));
 		
-		final List<ConsumerRecordBean> l = new ArrayList<ConsumerRecordBean>(records.size());
+		final List<ConsumerRecordBean> l;
 		Long minOffset = null;
 		Long maxOffset = null;
-		for (ConsumerRecord<String, String> record : records)
+		if ((compact != null) && compact.booleanValue())
 			{
-			l.add(new ConsumerRecordBean(record));
-			if ((minOffset == null) || (record.offset() < minOffset))
-				minOffset = record.offset();
-			if ((maxOffset == null) || (record.offset() > maxOffset))
-				maxOffset = record.offset();
+			final Set<ConsumerRecordBean> s = new HashSet<ConsumerRecordBean>();
+			for (ConsumerRecord<String, String> record : records)
+				{
+				if (record.value() == null)
+					s.remove(new ConsumerRecordBean(record));
+				else
+					s.add(new ConsumerRecordBean(record));
+				if ((minOffset == null) || (record.offset() < minOffset))
+					minOffset = record.offset();
+				if ((maxOffset == null) || (record.offset() > maxOffset))
+					maxOffset = record.offset();
+				}
+			l = new ArrayList<ConsumerRecordBean>(s);
+			}
+		else
+			{
+			l = new ArrayList<ConsumerRecordBean>(records.size());
+			for (ConsumerRecord<String, String> record : records)
+				{
+				l.add(new ConsumerRecordBean(record));
+				if ((minOffset == null) || (record.offset() < minOffset))
+					minOffset = record.offset();
+				if ((maxOffset == null) || (record.offset() > maxOffset))
+					maxOffset = record.offset();
+				}
 			}
 		Collections.sort(l);
 		

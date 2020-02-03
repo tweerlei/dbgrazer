@@ -1,4 +1,4 @@
-function showPartition(ev, topic, partition, offset, key) {
+function showPartition(ev, topic, partition, offset, key, compact) {
 	if (ev) {
 		Event.stop(ev);
 	}
@@ -11,6 +11,9 @@ function showPartition(ev, topic, partition, offset, key) {
 		}
 		if (!Object.isUndefined(key)) {
 			params.key = key;
+		}
+		if (compact) {
+			params.compact = true;
 		}
 		WSApi.getDBAsync('messages', params, function(txt) {
 			el.innerHTML = extractLocalStyles(txt);
@@ -68,6 +71,8 @@ function refreshTopic() {
 	var topic = HashMonitor.get('topic');
 	var partition = HashMonitor.get('partition');
 	var offset = HashMonitor.get('offset');
+	var key = HashMonitor.get('key');
+	var compact = HashMonitor.get('compact');
 	var format = HashMonitor.get('format');
 	var formatting = HashMonitor.get('formatting');
 	if (topic) {
@@ -88,8 +93,17 @@ function refreshTopic() {
 					Tabs.hashChanged(HashMonitor.values);
 					startAutoRefresh();
 				});
-			} else if (topic && partition) {
+			} else if (topic) {
 				var params = { topic: topic, partition: partition };
+				if (!Object.isUndefined(offset)) {
+					params.offset = offset;
+				}
+				if (!Object.isUndefined(key)) {
+					params.key = key;
+				}
+				if (compact) {
+					params.compact = true;
+				}
 				WSApi.getDBAsync('messages', params, function(txt) {
 					el.innerHTML = extractLocalStyles(txt);
 					tw_contentChanged();
@@ -106,13 +120,15 @@ function restoreTopic() {
 	var topic = HashMonitor.get('topic');
 	var partition = HashMonitor.get('partition');
 	var offset = HashMonitor.get('offset');
+	var key = HashMonitor.get('key');
+	var compact = HashMonitor.get('compact');
 	var format = HashMonitor.get('format');
 	var formatting = HashMonitor.get('formatting');
 	
 	if (topic && partition && offset) {
 		showMessage(null, topic, partition, offset, format, formatting);
-	} else if (topic && partition) {
-		showPartition(null, topic, partition, null);
+	} else if (topic) {
+		showPartition(null, topic, partition, offset, key, compact);
 	}
 }
 
