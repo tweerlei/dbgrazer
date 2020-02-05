@@ -156,10 +156,6 @@ hr {
 	display: none;
 }
 
-.nowrap {
-	white-space: nowrap;
-}
-
 /********************************************************************
  *
  * Header and footer
@@ -223,9 +219,14 @@ hr {
 	margin-left: 1em;
 }
 
-.filter {
+form.filter {
+	float: left;
+}
+
+div.filter {
 	float: left;
 	margin-right: 1em;
+	white-space: nowrap;
 }
 
 /********************************************************************

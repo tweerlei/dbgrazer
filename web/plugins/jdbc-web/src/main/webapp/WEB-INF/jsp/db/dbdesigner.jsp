@@ -58,16 +58,18 @@
 			<div class="filter">
 				<span class="menu" onclick="return showElementMenu(event, 'tools-2');"><fmt:message key="download"/></span>
 			</div>
-			<form id="dlform" class="filter" action="db/${currentConnection.linkName}/dbdesigner.html" method="get" onsubmit="return false;">
+			<form id="dlform" class="filter" action="db/${currentConnection.linkName}/dbdesigner.html" method="get" onsubmit="return false;"><div class="filter">
 				<input type="hidden" name="preview" value="${!browserSettings.designerPreviewMode}"/>
 				<input id="preview" type="checkbox" name="dummy" value="true"<c:if test="${browserSettings.designerPreviewMode}"> checked="checked"</c:if> onchange="postForm(form, event);"/> <label for="preview"><fmt:message key="designerPreviewMode"/></label>
-			</form><form class="filter" action="db/${currentConnection.linkName}/dbdesigner.html" method="get" onsubmit="return false;">
+			</div></form>
+			<form class="filter" action="db/${currentConnection.linkName}/dbdesigner.html" method="get" onsubmit="return false;"><div class="filter">
 				<input type="hidden" name="compact" value="${!browserSettings.designerCompactMode}"/>
 				<input id="compact" type="checkbox" name="dummy" value="true"<c:if test="${browserSettings.designerCompactMode}"> checked="checked"</c:if> onchange="postForm(form, event);"/> <label for="compact"><fmt:message key="compactMode"/></label>
-			</form><form class="filter" action="db/${currentConnection.linkName}/dbdesigner.html" method="get" onsubmit="return false;">
+			</div></form>
+			<form class="filter" action="db/${currentConnection.linkName}/dbdesigner.html" method="get" onsubmit="return false;"><div class="filter">
 				<input type="hidden" name="sort" value="${!browserSettings.sortColumns}"/>
 				<input id="sort" type="checkbox" name="dummy" value="true"<c:if test="${browserSettings.sortColumns}"> checked="checked"</c:if> onchange="postForm(form, event);"/> <label for="sort"><fmt:message key="sortColumns"/></label>
-			</form>
+			</div></form>
 			<hr/>
 		</div>
 		<div class="tab-body">

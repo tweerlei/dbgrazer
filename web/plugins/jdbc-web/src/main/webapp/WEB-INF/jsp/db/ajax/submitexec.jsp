@@ -46,13 +46,13 @@
 				<span class="button" onclick="return downloadElement('text-result0', 'text/plain;charset=utf-8');"><fmt:message key="downloadText"/></span>
 			</div>
 			<div class="filter">
-				<span class="nowrap"><fmt:message key="rowCount"><fmt:param value="${rs.affectedRows}"/></fmt:message></span>
+				<fmt:message key="rowCount"><fmt:param value="${rs.affectedRows}"/></fmt:message>
 			</div>
 			<div class="filter">
 				<span class="action" title="<fmt:message key="maximize"/>" onclick="return toggleElement('zoomable1');"><fmt:message key="maximizeIcon"/></span>
 			</div>
 			<div class="filter">
-				<span class="nowrap"><fmt:message key="duration"><fmt:param value="${rs.queryTime}"/></fmt:message></span>
+				<fmt:message key="duration"><fmt:param value="${rs.queryTime}"/></fmt:message>
 			</div>
 <c:if test="${rs.moreAvailable}"
 >			<div class="filter">

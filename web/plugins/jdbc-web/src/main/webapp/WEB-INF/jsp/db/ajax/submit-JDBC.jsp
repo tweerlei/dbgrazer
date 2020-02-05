@@ -20,7 +20,7 @@
 		</div>
 </c:when><c:when test="${model.view == 'plan'}">
 		<div class="tab-header">
-			<span class="nowrap"><fmt:message key="rowCount"><fmt:param value="${plan.size}"/></fmt:message></span>
+			<fmt:message key="rowCount"><fmt:param value="${plan.size}"/></fmt:message>
 			<span class="action" title="<fmt:message key="maximize"/>" onclick="return toggleElement('zoomable1');"><fmt:message key="maximizeIcon"/></span>
 		</div>
 		<div class="tab-body">
@@ -68,10 +68,10 @@
 				<span class="button" onclick="return showElementDialog(event, '<fmt:message key="columnTypes"/>', 'sql');"><fmt:message key="showColumnTypes"/></span>
 			</div>
 --%>			<div class="filter">
-				<span class="nowrap"><fmt:message key="rowCount"><fmt:param value="${rs.affectedRows}"/></fmt:message></span>
+				<fmt:message key="rowCount"><fmt:param value="${rs.affectedRows}"/></fmt:message>
 			</div>
 			<div class="filter">
-				<span class="nowrap"><fmt:message key="duration"><fmt:param value="${rs.queryTime}"/></fmt:message></span>
+				<fmt:message key="duration"><fmt:param value="${rs.queryTime}"/></fmt:message>
 			</div>
 			<div class="filter">
 				<span class="action" title="<fmt:message key="maximize"/>" onclick="return toggleElement('zoomable1');"><fmt:message key="maximizeIcon"/></span>

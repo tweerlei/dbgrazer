@@ -30,20 +30,20 @@
 			<div class="filter">
 				<span class="action" title="<fmt:message key="maximize"/>" onclick="return toggleElement('zoomable1');"><fmt:message key="maximizeIcon"/></span>
 			</div>
-			<form class="filter" action="#" method="get" onsubmit="return false;">
+			<form class="filter" action="#" method="get" onsubmit="return false;"><div class="filter">
 				<input id="format-result" type="checkbox" name="dummy1" value="true"<c:if test="${!rs.attributes['verbatim']}"> checked="checked"</c:if> onchange="toggleFormatMode('', ${rs.attributes['verbatim'] ? 'true' : 'false'});"/> <label for="format-result"><fmt:message key="format"><fmt:param value="${rs.query.attributes['formatter']}"/></fmt:message></label>
-			</form>
-			<form class="filter" action="#" method="get" onsubmit="return false;">
+			</div></form>
+			<form class="filter" action="#" method="get" onsubmit="return false;"><div class="filter">
 				<input id="coloring-result" type="checkbox" name="dummy2" value="true"<c:if test="${!rs.attributes['plainColoring']}"> checked="checked"</c:if> onchange="toggleColoringMode('', ${rs.attributes['plainColoring'] ? 'true' : 'false'});"/> <label for="coloring-result"><fmt:message key="syntaxColoring"/></label>
-			</form>
-			<form class="filter" action="#" method="get" onsubmit="return false;">
+			</div></form>
+			<form class="filter" action="#" method="get" onsubmit="return false;"><div class="filter">
 				<input id="lineno-result" type="checkbox" name="dummy4" value="true"<c:if test="${rs.attributes['lineNumbers']}"> checked="checked"</c:if> onchange="toggleLineNumberMode('', ${rs.attributes['lineNumbers'] ? 'false' : 'true'});"/> <label for="lineno-result"><fmt:message key="lineNumbers"/></label>
-			</form>
+			</div></form>
 			<div class="filter">
 				<span class="button" onclick="return showElementDialog(event, '<fmt:message key="headerTab"/>', 'sql');"><fmt:message key="showHeaders"/></span>
 			</div>
 			<div class="filter">
-				<span class="nowrap"><fmt:message key="duration"><fmt:param value="${rs.queryTime}"/></fmt:message></span>
+				<fmt:message key="duration"><fmt:param value="${rs.queryTime}"/></fmt:message>
 			</div>
 <c:if test="${rs.moreAvailable}"
 >			<div class="filter">

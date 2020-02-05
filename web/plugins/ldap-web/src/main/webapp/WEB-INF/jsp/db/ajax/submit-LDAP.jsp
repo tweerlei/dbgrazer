@@ -40,10 +40,10 @@
 				<span class="button" onclick="return showElementDialog(event, '<fmt:message key="columnTypes"/>', 'sql');"><fmt:message key="columnTypes"/></span>
 			</div>
 --%>			<div class="filter">
-				<span class="nowrap"><fmt:message key="rowCount"><fmt:param value="${fn:length(rs.rows)}"/></fmt:message></span>
+				<fmt:message key="rowCount"><fmt:param value="${fn:length(rs.rows)}"/></fmt:message>
 			</div>
 			<div class="filter">
-				<span class="nowrap"><fmt:message key="duration"><fmt:param value="${rs.queryTime}"/></fmt:message></span>
+				<fmt:message key="duration"><fmt:param value="${rs.queryTime}"/></fmt:message>
 			</div>
 			<div class="filter">
 				<span class="action" title="<fmt:message key="maximize"/>" onclick="return toggleElement('zoomable1');"><fmt:message key="maximizeIcon"/></span>

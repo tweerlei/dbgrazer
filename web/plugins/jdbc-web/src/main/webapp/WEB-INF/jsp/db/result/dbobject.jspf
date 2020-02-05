@@ -190,7 +190,9 @@
 				<input type="hidden" name="schema" value="${schema}"/>
 				<input type="hidden" name="object" value="${object}"/>
 				<input type="hidden" name="depth" value="${depth}"/>
-				<span class="menu" onclick="return showElementMenu(event, 'tools-${object}');"><fmt:message key="download"/></span>
+				<div class="filter">
+					<span class="menu" onclick="return showElementMenu(event, 'tools-${object}');"><fmt:message key="download"/></span>
+				</div>
 			</form>
 <c:if test="${depth > 0}"
 >			<div class="filter">
@@ -201,12 +203,12 @@
 				<span class="button" onclick="showDBObject(event, '${catalog}', '${schema}', '${object}', ${depth+1}, ${browserSettings.expandOtherSchemas});"><fmt:message key="more"/></span>
 			</div>
 </c:if
->			<form class="filter" action="#" method="get" onsubmit="return false;">
+>			<form class="filter" action="#" method="get" onsubmit="return false;"><div class="filter">
 				<input id="allSchemas" type="checkbox" name="allSchemas" value="true"<c:if test="${browserSettings.expandOtherSchemas}"> checked="checked"</c:if> onchange="showDBObject(event, '${catalog}', '${schema}', '${object}', ${depth}, \$('allSchemas').checked, ${browserSettings.sortColumns});"/> <label for="allSchemas"><fmt:message key="allSchemas"/></label>
-			</form>
-			<form class="filter" action="#" method="get" onsubmit="return false;">
+			</div></form>
+			<form class="filter" action="#" method="get" onsubmit="return false;"><div class="filter">
 				<input id="sort" type="checkbox" name="sort" value="true"<c:if test="${browserSettings.sortColumns}"> checked="checked"</c:if> onchange="showDBObject(event, '${catalog}', '${schema}', '${object}', ${depth}, ${browserSettings.expandOtherSchemas}, \$('sort').checked);"/> <label for="sort"><fmt:message key="sortColumns"/></label>
-			</form>
+			</div></form>
 </c:when><c:otherwise
 >			<div class="filter">
 				<span class="menu" onclick="return showElementMenu(event, 'tools-${object}');"><fmt:message key="download"/></span>
@@ -217,12 +219,12 @@
 				<input type="hidden" name="object" value="${object}"/>
 				<input type="hidden" name="depth" value="${depth}"/>
 <c:if test="${depth > 0}"
->				<input type="button" value="<fmt:message key="less"/>" onclick="form.elements['depth'].value = ${depth-1}; Forms.submit(form, event);"/>
+>				<div class="filter"><input type="button" value="<fmt:message key="less"/>" onclick="form.elements['depth'].value = ${depth-1}; Forms.submit(form, event);"/></div>
 </c:if><c:if test="${depth < maxDepth}"
->				<input type="button" value="<fmt:message key="more"/>" onclick="form.elements['depth'].value = ${depth+1}; Forms.submit(form, event);"/>
+>				<div class="filter"><input type="button" value="<fmt:message key="more"/>" onclick="form.elements['depth'].value = ${depth+1}; Forms.submit(form, event);"/></div>
 </c:if
->				<input id="allSchemas" type="checkbox" name="allSchemas" value="true"<c:if test="${browserSettings.expandOtherSchemas}"> checked="checked"</c:if> onchange="Forms.submit(form, event);"/> <label for="allSchemas"><fmt:message key="allSchemas"/></label>
-				<input id="sort" type="checkbox" name="sort" value="true"<c:if test="${browserSettings.sortColumns}"> checked="checked"</c:if> onchange="Forms.submit(form, event);"/> <label for="sort"><fmt:message key="sortColumns"/></label>
+>				<div class="filter"><input id="allSchemas" type="checkbox" name="allSchemas" value="true"<c:if test="${browserSettings.expandOtherSchemas}"> checked="checked"</c:if> onchange="Forms.submit(form, event);"/> <label for="allSchemas"><fmt:message key="allSchemas"/></label></div>
+				<div class="filter"><input id="sort" type="checkbox" name="sort" value="true"<c:if test="${browserSettings.sortColumns}"> checked="checked"</c:if> onchange="Forms.submit(form, event);"/> <label for="sort"><fmt:message key="sortColumns"/></label></div>
 			</form>
 </c:otherwise></c:choose>
 			<hr/>

@@ -15,14 +15,13 @@
 --%><%@
 	include file="../../include/include.jspf"
 %><form class="content" action="db/${currentConnection.linkName}/ajax/formatstmt.html" method="post" onsubmit="return getFormInto(this, this.parentNode);">
-	<div>
-		<fmt:message key="formatter"/> <select id="f1-format" name="format" onchange="Forms.submit(form);">
+	<div class="filter"><fmt:message key="formatter"/> <select id="f1-format" name="format" onchange="Forms.submit(form);">
 			<option value=""><fmt:message key="default"/></option>
 <c:forEach items="${formats}" var="f"
 >			<option value="${f}"<c:if test="${f == format}"> selected="selected"</c:if>><fmt:message key="${f}"/></option>
 </c:forEach
->		</select>
-		&nbsp; <span class="action" title="<fmt:message key="maximize"/>" onclick="return unzoomForm();"><fmt:message key="maximizeIcon"/></span>
-	</div>
+>	</select></div>
+	<div class="filter"><span class="action" title="<fmt:message key="maximize"/>" onclick="return unzoomForm();"><fmt:message key="maximizeIcon"/></span></div>
+	<hr/>
 	<textarea id="zoomresult" name="statement" style="width: 100%; height: 95%">${result}</textarea>
 </form>

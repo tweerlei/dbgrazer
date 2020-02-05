@@ -31,10 +31,10 @@
 				<span class="button" onclick="return showElementDialog(event, '<fmt:message key="columnTypes"/>', 'sql');"><fmt:message key="showColumnTypes"/></span>
 			</div>
 --%>			<div class="filter">
-				<span class="nowrap"><fmt:message key="rowCount"><fmt:param value="${fn:length(rs.rows)}"/></fmt:message></span>
+				<fmt:message key="rowCount"><fmt:param value="${fn:length(rs.rows)}"/></fmt:message>
 			</div>
 			<div class="filter">
-				<span class="nowrap"><fmt:message key="duration"><fmt:param value="${rs.queryTime}"/></fmt:message></span>
+				<fmt:message key="duration"><fmt:param value="${rs.queryTime}"/></fmt:message>
 			</div>
 <c:if test="${rs.moreAvailable}"
 >			<div class="filter">
@@ -64,10 +64,10 @@
 				<span class="button" onclick="return showElementDialog(event, '<fmt:message key="columnTypes"/>', 'sql');"><fmt:message key="showColumnTypes"/></span>
 			</div>
 --%>			<div class="filter">
-				<span class="nowrap"><fmt:message key="rowCount"><fmt:param value="${rs.affectedRows}"/></fmt:message></span>
+				<fmt:message key="rowCount"><fmt:param value="${rs.affectedRows}"/></fmt:message>
 			</div>
 			<div class="filter">
-				<span class="nowrap"><fmt:message key="duration"><fmt:param value="${rs.queryTime}"/></fmt:message></span>
+				<fmt:message key="duration"><fmt:param value="${rs.queryTime}"/></fmt:message>
 			</div>
 <c:if test="${rs.moreAvailable}"
 >			<div class="filter">

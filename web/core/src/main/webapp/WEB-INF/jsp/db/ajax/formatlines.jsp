@@ -16,16 +16,14 @@
 	include file="../../include/include.jspf"
 %><div class="tab-header"><form class="filter" action="db/${currentConnection.linkName}/ajax/formatlines.html" method="post" onsubmit="return getFormInto(this, this.parentNode.parentNode);">
 	<input id="f1-statement" type="hidden" name="statement" value="${fn:escapeXml(statement)}"/>
-	<div>
-		<select id="f1-format" name="format" onchange="Forms.submit(form);">
+	<div class="filter"><select id="f1-format" name="format" onchange="Forms.submit(form);">
 			<option value=""><fmt:message key="default"/></option>
 <c:forEach items="${formats}" var="f"
 >			<option value="${f}"<c:if test="${f == format}"> selected="selected"</c:if>><fmt:message key="${f}"/></option>
 </c:forEach
->		</select>
-		&nbsp; <input id="f1-formatting" type="checkbox" name="formatting" value="true"<c:if test="${formatting}"> checked="checked"</c:if> onchange="Forms.submit(form);"/> <label for="f1-formatting"><fmt:message key="formatter"/></label>
-		&nbsp; <span class="action" title="<fmt:message key="maximize"/>" onclick="return unzoomForm();"><fmt:message key="maximizeIcon"/></span>
-	</div>
+>	</select></div>
+	<div class="filter"><input id="f1-formatting" type="checkbox" name="formatting" value="true"<c:if test="${formatting}"> checked="checked"</c:if> onchange="Forms.submit(form);"/> <label for="f1-formatting"><fmt:message key="formatter"/></label></div>
+	<div class="filter"><span class="action" title="<fmt:message key="maximize"/>" onclick="return unzoomForm();"><fmt:message key="maximizeIcon"/></span></div>
 </form><hr/></div><div class="tab-body">
 	<pre class="code">${result}</pre>
 </div>

@@ -48,7 +48,7 @@
 <c:if test="${(fn:length(rs.rows) > 0) && rs.query.type.resultType == 'SINGLE' && currentConnection.submitEnabled && currentConnection.type.customQuerySupported && not isdiff && not empty rs.query.attributes['formatter']}"
 >			<form class="filter" action="db/${currentConnection.linkName}/submit-${currentConnection.type}.html" method="post" onsubmit="return setFieldContent('stmt-${label}', 'text-${label}');">
 				<input id="stmt-${label}" type="hidden" name="statement" value=""/>
-				<input type="submit" value="<fmt:message key="sqlQuery"/>"/>
+				<div class="filter"><input type="submit" value="<fmt:message key="sqlQuery"/>"/></div>
 			</form> 
 </c:if
 >			<form class="filter" id="dlform-${label}" action="db/${currentConnection.linkName}/query-export.html" method="get" onsubmit="return false;">
@@ -60,35 +60,35 @@
 >				<input type="hidden" name="connection2" value="${connection2}"/>
 				<ui:hidden items="${model.params2}" name="params2"/>
 </c:if><c:if test="${(fn:length(rs.rows) > 0) && (rs.query.type.resultType == 'SINGLE' || not empty downloadFormats)}"
->				<span class="menu" onclick="return showElementMenu(event, 'tools-${label}');"><fmt:message key="download"/></span>
+>				<div class="filter"><span class="menu" onclick="return showElementMenu(event, 'tools-${label}');"><fmt:message key="download"/></span></div>
 </c:if><c:if test="${(fn:length(rs.rows) > 0) && rs.query.type.resultType == 'SINGLE' && not isdiff && rs.query.attributes['formatter'] != 'HTML' && rs.query.attributes['formatter'] != 'WIKI'}"
 ><c:choose><c:when test="${not empty rs.query.attributes['formatter']}"
 >				<div id="outline-${label}" class="hidden"><div class="menuitem"><fmt:message key="noOutline"/></div></div>
-				&nbsp; <span class="menu" onclick="return showOutline(event, '${label}');"><fmt:message key="outline"/></span>
+				<div class="filter"><span class="menu" onclick="return showOutline(event, '${label}');"><fmt:message key="outline"/></span></div>
 <c:if test="${empty rs.query.attributes['formatting']}"
->				&nbsp; <input id="format-${label}" type="checkbox" name="dummy1" value="true"<c:if test="${rs.attributes['formatting']}"> checked="checked"</c:if> onchange="toggleFormatMode('${rs.query.name}', ${rs.attributes['formatting'] ? 'false' : 'true'});"/> <label for="format-${label}"><fmt:message key="format"><fmt:param value="${rs.query.attributes['formatter']}"/></fmt:message></label>
+>				<div class="filter"><input id="format-${label}" type="checkbox" name="dummy1" value="true"<c:if test="${rs.attributes['formatting']}"> checked="checked"</c:if> onchange="toggleFormatMode('${rs.query.name}', ${rs.attributes['formatting'] ? 'false' : 'true'});"/> <label for="format-${label}"><fmt:message key="format"><fmt:param value="${rs.query.attributes['formatter']}"/></fmt:message></label></div>
 </c:if
 ></c:when><c:otherwise
->				&nbsp; <label for="formatter-${label}"><fmt:message key="formatter"/></label> <select id="formatter-${label}" name="dummy0" onchange="toggleFormatter('${rs.query.name}', 'formatter-${label}');">
+>				<div class="filter"><label for="formatter-${label}"><fmt:message key="formatter"/></label> <select id="formatter-${label}" name="dummy0" onchange="toggleFormatter('${rs.query.name}', 'formatter-${label}');">
 					<option value=""><fmt:message key="default"/></option>
 <c:forEach items="${formatters}" var="v"
 >					<option value="${v}"<c:if test="${rs.attributes['formatter'] == v}"> selected="selected"</c:if>><fmt:message key="${v}"/></option>
 </c:forEach
->				</select>
+>				</select></div>
 </c:otherwise></c:choose
 ><c:if test="${empty rs.query.attributes['syntaxColoring']}"
->				&nbsp; <input id="coloring-${label}" type="checkbox" name="dummy2" value="true"<c:if test="${rs.attributes['syntaxColoring']}"> checked="checked"</c:if> onchange="toggleColoringMode('${rs.query.name}', ${rs.attributes['syntaxColoring'] ? 'false' : 'true'});"/> <label for="coloring-${label}"><fmt:message key="syntaxColoring"/></label>
+>				<div class="filter"><input id="coloring-${label}" type="checkbox" name="dummy2" value="true"<c:if test="${rs.attributes['syntaxColoring']}"> checked="checked"</c:if> onchange="toggleColoringMode('${rs.query.name}', ${rs.attributes['syntaxColoring'] ? 'false' : 'true'});"/> <label for="coloring-${label}"><fmt:message key="syntaxColoring"/></label></div>
 </c:if><c:if test="${empty rs.query.attributes['lineNumbers']}"
->				&nbsp; <input id="lineno-${label}" type="checkbox" name="dummy4" value="true"<c:if test="${rs.attributes['lineNumbers']}"> checked="checked"</c:if> onchange="toggleLineNumberMode('${rs.query.name}', ${rs.attributes['lineNumbers'] ? 'false' : 'true'});"/> <label for="lineno-${label}"><fmt:message key="lineNumbers"/></label>
+>				<div class="filter"><input id="lineno-${label}" type="checkbox" name="dummy4" value="true"<c:if test="${rs.attributes['lineNumbers']}"> checked="checked"</c:if> onchange="toggleLineNumberMode('${rs.query.name}', ${rs.attributes['lineNumbers'] ? 'false' : 'true'});"/> <label for="lineno-${label}"><fmt:message key="lineNumbers"/></label></div>
 </c:if
 ></c:if><c:if test="${(fn:length(rs.rows) > 0) && rs.query.type.resultType == 'TABLE' && rs.query.type != 'REPORT'}"
->				&nbsp; <input id="trim-${label}" type="checkbox" name="dummy5" value="true"<c:if test="${rs.attributes['trim']}"> checked="checked"</c:if> onchange="toggleTrimColumnsMode('${rs.query.name}', ${rs.attributes['trim'] ? 'false' : 'true'});"/> <label for="trim-${label}"><fmt:message key="trim"/></label>
+>				<div class="filter"><input id="trim-${label}" type="checkbox" name="dummy5" value="true"<c:if test="${rs.attributes['trim']}"> checked="checked"</c:if> onchange="toggleTrimColumnsMode('${rs.query.name}', ${rs.attributes['trim'] ? 'false' : 'true'});"/> <label for="trim-${label}"><fmt:message key="trim"/></label></div>
 </c:if><c:if test="${currentUser.sqlDisplayEnabled}"
->				&nbsp; <span class="button" onclick="showDbDialog(event, 'sql', { q: '${rs.query.name}' }, '${rs.query.name}');"><fmt:message key="showSQL"/></span>
+>				<div class="filter"><span class="button" onclick="showDbDialog(event, 'sql', { q: '${rs.query.name}' }, '${rs.query.name}');"><fmt:message key="showSQL"/></span></div>
 </c:if
->				&nbsp; <span class="nowrap"><fmt:message key="duration"><fmt:param value="${rs.queryTime}"/></fmt:message></span>
+>				<div class="filter"><fmt:message key="duration"><fmt:param value="${rs.queryTime}"/></fmt:message></div>
 <c:if test="${rs.moreAvailable}"
->				&nbsp; <strong><fmt:message key="moreData"/></strong>
+>				<div class="filter"><strong><fmt:message key="moreData"/></strong></div>
 </c:if
 >			</form><hr/>
 		</div>
@@ -234,13 +234,13 @@
 				<input id="resultfmt${label}" type="hidden" name="format" value=""/>
 				<ui:hidden items="${model.params}" name="params"/>
 <c:if test="${(fn:length(rs.rows) > 0) && (not empty downloadFormats)}"
->				<span class="menu" onclick="return showElementMenu(event, 'tools-${label}');"><fmt:message key="download"/></span>
+>				<div class="filter"><span class="menu" onclick="return showElementMenu(event, 'tools-${label}');"><fmt:message key="download"/></span></div>
 </c:if><c:if test="${currentUser.sqlDisplayEnabled}"
->				&nbsp; <span class="button" onclick="showDbDialog(event, 'sql', { q: '${rs.query.name}' }, '${rs.query.name}');"><fmt:message key="showSQL"/></span>
+>				<div class="filter"><span class="button" onclick="showDbDialog(event, 'sql', { q: '${rs.query.name}' }, '${rs.query.name}');"><fmt:message key="showSQL"/></span></div>
 </c:if
->				&nbsp; <span class="nowrap"><fmt:message key="duration"><fmt:param value="${rs.queryTime}"/></fmt:message></span>
+>				<div class="filter"><fmt:message key="duration"><fmt:param value="${rs.queryTime}"/></fmt:message></div>
 <c:if test="${rs.moreAvailable}"
->				&nbsp; <strong><fmt:message key="moreData"/></strong>
+>				<div class="filter"><strong><fmt:message key="moreData"/></strong></div>
 </c:if
 >			</form><hr/>
 		</div>

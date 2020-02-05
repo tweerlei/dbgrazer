@@ -23,7 +23,7 @@
 			<span class="action" title="<fmt:message key="maximize"/>" onclick="return toggleElement('zoomable1');"><fmt:message key="maximizeIcon"/></span>
 		</div>
 		<div class="h2-actions">
-			<span class="nowrap"><fmt:message key="duration"><fmt:param value="${rs.queryTime}"/></fmt:message></span>
+			<fmt:message key="duration"><fmt:param value="${rs.queryTime}"/></fmt:message>
 		</div>
 		</ui:headline2>
 		
