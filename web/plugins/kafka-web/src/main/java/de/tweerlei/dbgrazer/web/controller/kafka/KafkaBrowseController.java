@@ -23,7 +23,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -277,29 +276,6 @@ public class KafkaBrowseController
 				return (d2);
 			
 			return (o.partition - partition);
-			}
-		
-		@Override
-		public boolean equals(Object o)
-			{
-			if (o == null)
-				return false;
-			if (o == this)
-				return true;
-			if (!(o instanceof ConsumerRecordBean))
-				return false;
-			final ConsumerRecordBean b = (ConsumerRecordBean) o;
-			return ((b.partition == partition) && StringUtils.equals(b.key, key));
-			}
-		
-		@Override
-		public int hashCode()
-			{
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + partition;
-			result = prime * result + ((key == null) ? 0 : key.hashCode());
-			return result;
 			}
 		}
 	
@@ -618,30 +594,33 @@ public class KafkaBrowseController
 		Long maxOffset = null;
 		if ((compact != null) && compact.booleanValue())
 			{
-			final Set<ConsumerRecordBean> s = new HashSet<ConsumerRecordBean>();
+			final Map<String, ConsumerRecordBean> s = new HashMap<String, ConsumerRecordBean>();
 			for (ConsumerRecord<String, String> record : records)
 				{
-				if (record.value() == null)
-					s.remove(new ConsumerRecordBean(record));
+				final ConsumerRecordBean bean = new ConsumerRecordBean(record);
+				final String ukey = bean.getPartition() + ":" + bean.getKey();
+				if (bean.getValue() == null)
+					s.remove(ukey);
 				else
-					s.add(new ConsumerRecordBean(record));
-				if ((minOffset == null) || (record.offset() < minOffset))
-					minOffset = record.offset();
-				if ((maxOffset == null) || (record.offset() > maxOffset))
-					maxOffset = record.offset();
+					s.put(ukey, bean);
+				if ((minOffset == null) || (bean.getOffset() < minOffset))
+					minOffset = bean.getOffset();
+				if ((maxOffset == null) || (bean.getOffset() > maxOffset))
+					maxOffset = bean.getOffset();
 				}
-			l = new ArrayList<ConsumerRecordBean>(s);
+			l = new ArrayList<ConsumerRecordBean>(s.values());
 			}
 		else
 			{
 			l = new ArrayList<ConsumerRecordBean>(records.size());
 			for (ConsumerRecord<String, String> record : records)
 				{
-				l.add(new ConsumerRecordBean(record));
-				if ((minOffset == null) || (record.offset() < minOffset))
-					minOffset = record.offset();
-				if ((maxOffset == null) || (record.offset() > maxOffset))
-					maxOffset = record.offset();
+				final ConsumerRecordBean bean = new ConsumerRecordBean(record);
+				l.add(bean);
+				if ((minOffset == null) || (bean.getOffset() < minOffset))
+					minOffset = bean.getOffset();
+				if ((maxOffset == null) || (bean.getOffset() > maxOffset))
+					maxOffset = bean.getOffset();
 				}
 			}
 		Collections.sort(l);

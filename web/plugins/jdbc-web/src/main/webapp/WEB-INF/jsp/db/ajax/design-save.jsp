@@ -20,7 +20,7 @@
 		<dd><input id="f1-name" type="text" name="q" value="${design}"/></dd>
 	</dl><hr/>
 	<br/>
-	<div><ui:filter id="filter-select-1" target="select-1"/></div>
+	<div><ui:filter id="filter-select-1" target="select-1"/><hr/></div>
 	<ui:headline3 key="designs"/>
 	<select name="dummy" id="select-1" size="20" onclick="\$('f1-name').value = \$F(this);" ondblclick="Forms.submit(form, event);">
 <c:forEach items="${designs}" var="v"

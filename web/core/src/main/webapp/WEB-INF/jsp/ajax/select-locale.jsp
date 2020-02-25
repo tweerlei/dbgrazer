@@ -15,7 +15,7 @@
 --%><%@
 	include file="../include/include.jspf"
 %><form action="#" method="get" onsubmit="return false;">
-	<div><ui:filter id="filter-select-1" target="select-1"/></div>
+	<div><ui:filter id="filter-select-1" target="select-1"/><hr/></div>
 	<ui:headline3 key="language"/>
 	<select name="value1" id="select-1" size="20" ondblclick="return applySelection(this, '${fn:escapeXml(target)}');">
 		<option value=""<c:if test="${value == ''}"> selected="selected"</c:if>><fmt:message key="default"/></option>

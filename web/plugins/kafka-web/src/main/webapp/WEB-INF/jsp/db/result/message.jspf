@@ -50,7 +50,7 @@
 				<dt><fmt:message key="key"/></dt>
 				<dd>${fn:escapeXml(rs.key)}</dd>
 				<dt><fmt:message key="size"/></dt>
-				<dd>${fn:escapeXml(rs.size)}</dd>
+				<dd>${rs.valueSize}</dd>
 			</dl><hr/></div>
 <c:if test="${not empty rs.headers}"
 >			<div class="column3"><dl class="result">

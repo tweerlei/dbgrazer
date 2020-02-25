@@ -16,7 +16,7 @@
 	include file="../../include/include.jspf"
 %><form action="db/${currentConnection.linkName}/query-load.html" method="post" onsubmit="return loadCustomQuery(\$F('select-1'), \$F('f1-delete') == 'true');" onreset="return closeDialog();">
 	<input id="f1-delete" type="hidden" name="delete" value="false"/>
-	<div><ui:filter id="filter-select-1" target="select-1"/></div>
+	<div><ui:filter id="filter-select-1" target="select-1"/><hr/></div>
 	<ui:headline3 key="customQueries"/>
 	<select name="q" id="select-1" size="20" ondblclick="Forms.submit(form, event);">
 <c:forEach items="${designs}" var="v"
