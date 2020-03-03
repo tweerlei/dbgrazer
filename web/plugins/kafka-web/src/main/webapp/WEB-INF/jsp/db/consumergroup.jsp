@@ -27,7 +27,10 @@
 	</div>
 	
 	<div id="tools-1" class="hidden"><div class="menucolumn">
-		<div class="menuitem"><a href="#" onclick="return clearKafkaCache();"><fmt:message key="clearCache"/></a></div>
+<c:if test="${currentConnection.writable}"
+>		<div class="menuitem"><span onclick="return showDbDialog(event, 'seek-consumergroup', { group: '${group}' }, '<fmt:message key="seek"/>');"><fmt:message key="seek"/></span></div>
+</c:if
+>		<div class="menuitem"><a href="#" onclick="return clearKafkaCache();"><fmt:message key="clearCache"/></a></div>
 	</div></div>
 	</ui:headline1>
 	

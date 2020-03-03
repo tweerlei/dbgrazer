@@ -15,6 +15,6 @@
 --%><%@
 	include file="../include/js.jspf"
 %><c:choose
-><c:when test="${exceptionText == null}">submitDMLSuccess('<fmt:message key="result"/>: ' + ${result});</c:when
++><c:when test="${exceptionText == null}">submitDMLSuccess('<fmt:message key="result"/>: ${result}');</c:when
 ><c:otherwise>submitDMLError(${exceptionText});</c:otherwise
 ></c:choose>

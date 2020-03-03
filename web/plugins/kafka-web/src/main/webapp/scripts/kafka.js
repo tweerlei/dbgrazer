@@ -116,6 +116,24 @@ function refreshTopic() {
 	return false;
 }
 
+function refreshConsumerGroup() {
+	var group = HashMonitor.get('group');
+	if (group) {
+		AutoRefresh.stop();
+		var el = $('explorer-right');
+		if (el) {
+			var params = { group: group };
+			WSApi.getDBAsync('consumergroup', params, function(txt) {
+				el.innerHTML = extractLocalStyles(txt);
+				tw_contentChanged();
+				Tabs.hashChanged(HashMonitor.values);
+				startAutoRefresh();
+			});
+		}
+	}
+	return false;
+}
+
 function restoreTopic() {
 	var topic = HashMonitor.get('topic');
 	var partition = HashMonitor.get('partition');
@@ -124,11 +142,14 @@ function restoreTopic() {
 	var compact = HashMonitor.get('compact');
 	var format = HashMonitor.get('format');
 	var formatting = HashMonitor.get('formatting');
+	var group = HashMonitor.get('group');
 	
 	if (topic && partition && offset) {
 		showMessage(null, topic, partition, offset, format, formatting);
 	} else if (topic) {
 		showPartition(null, topic, partition, offset, key, compact);
+	} else if (group) {
+		showConsumerGroup(null, group);
 	}
 }
 

@@ -16,7 +16,15 @@
 	include file="../../include/include.jspf"
 %><c:set var="targetElement" value="explorer-right"
 /><ui:headline2 label="${group}" zoomable="true">
-	</ui:headline2>
+<c:if test="${currentConnection.writable}"
+>		<div class="h2-actions">
+			<span class="menu" onclick="return showElementMenu(event, 'tools-2');"><fmt:message key="actions"/></span>
+		</div>
+		<div id="tools-2" class="hidden"><div class="menucolumn">
+			<div class="menuitem"><span onclick="return showDbDialog(event, 'seek-consumergroup', { group: '${group}' }, '<fmt:message key="seek"/>');"><fmt:message key="seek"/></span></div>
+		</div></div>
+</c:if
+>	</ui:headline2>
 	
 	<ui:tabs items="${tabs}" var="rs" varKey="label" varLink="detailLink" varParams="detailParams" varParamString="detailParamString" name="result"><%@
 		include file="../result/tab.jspf"

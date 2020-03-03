@@ -21,7 +21,7 @@
 	<script type="text/javascript">/*<![CDATA[*/
 	
 	function reloadPage() {
-		return refreshTopic();
+		return refreshConsumerGroup();
 	}
 	
 	/*]]>*/</script>

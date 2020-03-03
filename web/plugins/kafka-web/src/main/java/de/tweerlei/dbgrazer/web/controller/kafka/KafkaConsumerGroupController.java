@@ -356,8 +356,8 @@ public class KafkaConsumerGroupController
 	@RequestMapping(value = "/db/*/ajax/seek-consumergroup.html", method = RequestMethod.GET)
 	public Map<String, Object> showSeekConsumerGroupForm(
 			@RequestParam("group") String group,
-			@RequestParam("topic") String topic,
-			@RequestParam("partition") int partition
+			@RequestParam(value = "topic", required = false) String topic,
+			@RequestParam(value = "partition", required = false) Integer partition
 			)
 		{
 		if (!connectionSettings.isBrowserEnabled() || !connectionSettings.isWritable())

@@ -17,9 +17,11 @@
 %><spring:form id="f3" action="db/${currentConnection.linkName}/seek-consumergroup.html" method="post" modelAttribute="model" onsubmit="return submitDML(this);" onreset="return closeDialog();">
 	<div id="dmlerror"></div>
 	<input type="hidden" name="group" value="${fn:escapeXml(group)}"/>
-	<input type="hidden" name="topic" value="${fn:escapeXml(topic)}"/>
-	<input type="hidden" name="partition" value="${partition}"/>
 	<dl>
+		<dt><label for="f3-topic"><fmt:message key="kafkaTopic"/></label></dt>
+		<dd><input type="text" id="f3-topic" name="topic" value="${fn:escapeXml(topic)}"/></dd>
+		<dt><label for="f3-partition"><fmt:message key="kafkaPartition"/></label></dt>
+		<dd><input type="text" id="f3-partition" name="partition" value="${partition}"/></dd>
 		<dt><label for="f3-offset"><fmt:message key="kafkaOffset"/></label></dt>
 		<dd><input type="text" id="f3-offset" name="offset" value="${offset}"/></dd>
 		<dt>&nbsp;</dt>
