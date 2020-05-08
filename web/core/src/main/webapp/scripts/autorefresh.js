@@ -26,6 +26,7 @@ var AutoRefresh = {
 		if (this.elem) {
 			this.timeout--;
 			if (this.timeout <= 0) {
+				this.elem.innerHTML = '';
 				this.elem = null;
 				this.onRefresh();
 			} else {

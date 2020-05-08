@@ -1550,6 +1550,7 @@ function aggsubmit(f, frm) {
 	getFormInto(f, node, null, function(el) {
 		var rows = el.select('tr').length;
 		$('aggcount-'+frm).innerHTML = rows;
+		startAutoRefresh();
 	});
 	return false;
 }
