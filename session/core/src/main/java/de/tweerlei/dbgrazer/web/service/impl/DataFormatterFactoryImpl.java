@@ -101,7 +101,7 @@ public class DataFormatterFactoryImpl implements DataFormatterFactory
 	@Override
 	public DataFormatter getSQLFormatter(SQLDialect dialect)
 		{
-		return (new SQLDataFormatterImpl(dialect.getTimestampFormat(), dialect.getDatetimeFormat(), dialect.getDateFormat(), TimeZone.getDefault(), Integer.MAX_VALUE));
+		return (new SQLDataFormatterImpl(dialect.getTimestampFormat(), dialect.getDatetimeFormat(), dialect.getDateFormat(), dialect.supportsBoolean(), TimeZone.getDefault(), Integer.MAX_VALUE));
 		}
 	
 	@Override

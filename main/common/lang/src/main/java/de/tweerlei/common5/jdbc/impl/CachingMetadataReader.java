@@ -34,6 +34,8 @@ import de.tweerlei.common5.jdbc.model.TableDescription;
 public class CachingMetadataReader implements MetadataReader
 	{
 	private final MetadataReader target;
+	private String defaultCatalog;
+	private String defaultSchema;
 	private List<String> catalogs;
 	private List<String> schemas;
 	private final Map<String, Map<String, String>> tables;
@@ -61,6 +63,8 @@ public class CachingMetadataReader implements MetadataReader
 	 */
 	public void flush()
 		{
+		defaultCatalog = null;
+		defaultSchema = null;
 		catalogs = null;
 		schemas = null;
 		tables.clear();
@@ -68,6 +72,20 @@ public class CachingMetadataReader implements MetadataReader
 		types.clear();
 		tableDescs.clear();
 		procedureDescs.clear();
+		}
+	
+	public String getDefaultCatalogName() throws SQLException
+		{
+		if (defaultCatalog == null)
+			defaultCatalog = target.getDefaultCatalogName();
+		return (defaultCatalog);
+		}
+	
+	public String getDefaultSchemaName() throws SQLException
+		{
+		if (defaultSchema == null)
+			defaultSchema = target.getDefaultSchemaName();
+		return (defaultSchema);
 		}
 	
 	public List<String> getCatalogNames() throws SQLException

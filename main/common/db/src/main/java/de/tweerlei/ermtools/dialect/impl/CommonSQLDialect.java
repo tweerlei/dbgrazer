@@ -135,6 +135,11 @@ public abstract class CommonSQLDialect implements SQLDialect
 		return (TIMESTAMP_FORMAT);
 		}
 	
+	public boolean supportsBoolean()
+		{
+		return (false);
+		}
+	
 	public boolean supportsMerge()
 		{
 		return (false);

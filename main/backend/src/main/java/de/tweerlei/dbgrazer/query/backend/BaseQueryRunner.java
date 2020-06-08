@@ -24,6 +24,7 @@ import de.tweerlei.dbgrazer.query.model.DMLProgressMonitor;
 import de.tweerlei.dbgrazer.query.model.Query;
 import de.tweerlei.dbgrazer.query.model.Result;
 import de.tweerlei.dbgrazer.query.model.RowHandler;
+import de.tweerlei.dbgrazer.query.model.RowInterpreter;
 import de.tweerlei.dbgrazer.query.model.RowTransferer;
 import de.tweerlei.dbgrazer.query.model.StatementProducer;
 
@@ -57,6 +58,12 @@ public abstract class BaseQueryRunner extends NamedBase implements QueryRunner
 	
 	@Override
 	public Result transferRows(String link, Query query, TimeZone timeZone, RowTransferer transferer, int commitSize, DMLProgressMonitor monitor) throws PerformQueryException
+		{
+		throw new PerformQueryException("transferRows", new IllegalStateException("Operation not supported for " + getName()));
+		}
+	
+	@Override
+	public Result transferRows(String link, Query query, TimeZone timeZone, RowInterpreter interpreter, int commitSize, DMLProgressMonitor monitor) throws PerformQueryException
 		{
 		throw new PerformQueryException("transferRows", new IllegalStateException("Operation not supported for " + getName()));
 		}

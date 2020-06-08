@@ -30,9 +30,9 @@ import de.tweerlei.common5.jdbc.model.ColumnDescription;
 import de.tweerlei.common5.jdbc.model.ForeignKeyDescription;
 import de.tweerlei.common5.jdbc.model.IndexDescription;
 import de.tweerlei.common5.jdbc.model.ParameterDescription;
-import de.tweerlei.common5.jdbc.model.PrivilegeDescription;
 import de.tweerlei.common5.jdbc.model.ParameterDescription.Direction;
 import de.tweerlei.common5.jdbc.model.PrimaryKeyDescription;
+import de.tweerlei.common5.jdbc.model.PrivilegeDescription;
 import de.tweerlei.common5.jdbc.model.ProcedureDescription;
 import de.tweerlei.common5.jdbc.model.TableDescription;
 
@@ -52,6 +52,26 @@ public class JdbcMetadataReader implements MetadataReader
 	public JdbcMetadataReader(DatabaseMetaData md)
 		{
 		this.md = md;
+		}
+	
+	/**
+	 * Get the DatabaseMetaData
+	 * @return DatabaseMetaData
+	 */
+	protected final DatabaseMetaData getMetaData()
+		{
+		return (md);
+		}
+	
+	public String getDefaultCatalogName() throws SQLException
+		{
+		return (md.getConnection().getCatalog());
+		}
+	
+	public String getDefaultSchemaName() throws SQLException
+		{
+		throw new SQLException("Connection.getSchema() is only available on JDK 1.7");
+//		return (md.getConnection().getSchema());
 		}
 	
 	public List<String> getCatalogNames() throws SQLException

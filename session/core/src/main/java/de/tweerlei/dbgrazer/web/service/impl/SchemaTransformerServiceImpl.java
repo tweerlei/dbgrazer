@@ -62,6 +62,7 @@ import de.tweerlei.ermtools.schema.matchers.LaxForeignKeyMatcher;
 import de.tweerlei.ermtools.schema.matchers.LaxIndexMatcher;
 import de.tweerlei.ermtools.schema.matchers.LaxPrivilegeMatcher;
 import de.tweerlei.ermtools.schema.matchers.StrictTypeMatcher;
+import de.tweerlei.ermtools.schema.matchers.UnorderedIndexMatcher;
 import de.tweerlei.ermtools.schema.naming.CrossNamingStrategy;
 import de.tweerlei.ermtools.schema.naming.StrictNamingStrategy;
 
@@ -234,7 +235,7 @@ public class SchemaTransformerServiceImpl implements SchemaTransformerService
 		right.accept(new CompareVisitor(left, handler,
 				namingStrategy,
 				new LaxColumnMatcher(typeMatcher),
-				new LaxIndexMatcher(),
+				crossDialect ? new UnorderedIndexMatcher() : new LaxIndexMatcher(),
 				new LaxForeignKeyMatcher(namingStrategy),
 				privMatcher
 				));

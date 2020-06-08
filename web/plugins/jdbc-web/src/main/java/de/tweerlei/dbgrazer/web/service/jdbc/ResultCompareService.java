@@ -16,6 +16,7 @@
 package de.tweerlei.dbgrazer.web.service.jdbc;
 
 import de.tweerlei.common5.jdbc.model.TableDescription;
+import de.tweerlei.dbgrazer.query.model.RowHandler;
 import de.tweerlei.dbgrazer.query.model.RowIterator;
 import de.tweerlei.dbgrazer.query.model.RowSet;
 import de.tweerlei.dbgrazer.query.model.StatementHandler;
@@ -75,6 +76,19 @@ public interface ResultCompareService
 	 * @param dialect SQLDialect
 	 */
 	public void compareResultsIgnoringPK(RowIterator l, RowIterator r, StatementHandler h, CompareProgressMonitor monitor, TableDescription tableDesc, SQLDialect dialect);
+	
+	/**
+	 * Compare two ResultSets matching rows by PK and returning SQL statements to transform l to r
+	 * @param l LHS
+	 * @param r RHS
+	 * @param insert RowHandler for inserting
+	 * @param update RowHandler for updating
+	 * @param delete RowHandler for deleting
+	 * @param monitor CompareProgressMonitor
+	 * @param tableDesc TableDescription
+	 * @param dialect SQLDialect
+	 */
+	public void compareResultsByPK(RowIterator l, RowIterator r, RowHandler insert, RowHandler update, RowHandler delete, CompareProgressMonitor monitor, TableDescription tableDesc, SQLDialect dialect);
 	
 	/**
 	 * Compare two sets of DDL objects. The returned columns are expected to conform to SQLObjectDDLWriter.findObjectSource

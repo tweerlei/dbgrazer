@@ -35,6 +35,7 @@ import de.tweerlei.dbgrazer.query.model.QueryType;
 import de.tweerlei.dbgrazer.query.model.Result;
 import de.tweerlei.dbgrazer.query.model.ResultVisitor;
 import de.tweerlei.dbgrazer.query.model.RowHandler;
+import de.tweerlei.dbgrazer.query.model.RowInterpreter;
 import de.tweerlei.dbgrazer.query.model.RowSet;
 import de.tweerlei.dbgrazer.query.model.RowTransferer;
 import de.tweerlei.dbgrazer.query.model.StatementProducer;
@@ -149,6 +150,26 @@ public class QueryRunnerServiceImpl implements QueryRunnerService
 		else
 			{
 			res = r.transferRows(link, q, timeZone, transferer, commitSize, monitor);
+			}
+		
+		prepareResult(res);
+		
+		return (res);
+		}
+	
+	@Override
+	public Result transferRows(String link, String query, TimeZone timeZone, RowInterpreter interpreter, QueryType type, int commitSize, DMLProgressMonitor monitor) throws PerformQueryException
+		{
+		final Result res;
+		
+		final Query q = new QueryImpl(type.getName(), null, null, query, type, null, null, null);
+		
+		final QueryRunner r = findRunner(type);
+		if (r == null)
+			res = new ResultImpl(q);
+		else
+			{
+			res = r.transferRows(link, q, timeZone, interpreter, commitSize, monitor);
 			}
 		
 		prepareResult(res);

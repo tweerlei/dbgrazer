@@ -30,7 +30,8 @@
 			<input type="hidden" name="schema2" value="${model.schema}"/>
 			<input type="hidden" name="filter" value="${model.filter}"/>
 			<input type="hidden" name="order" value="${model.order}"/>
-			<input type="hidden" name="merge" value="${model.merge}"/>
+			<input type="hidden" name="stmtMode" value="${model.stmtMode}"/>
+			<input type="hidden" name="execMode" value="${model.execMode}"/>
 			<input type="submit" value="<fmt:message key="reverse"/>"/>
 		</form>
 		<div class="h2-actions">

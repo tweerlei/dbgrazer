@@ -40,6 +40,7 @@ public class ResultSetIterator implements RowIterator
 	private final ResultSetAccessor accessor;
 	private List<ColumnDef> columns;
 	private ResultRow row;
+	private int rows;
 	
 	/**
 	 * Constructor
@@ -92,6 +93,7 @@ public class ResultSetIterator implements RowIterator
 		
 		final ResultRow ret = row;
 		row = null;
+		rows++;
 		return (ret);
 		}
 	
@@ -113,5 +115,14 @@ public class ResultSetIterator implements RowIterator
 	@Override
 	public void abort()
 		{
+		}
+	
+	/**
+	 * Get the number of returned rows so far
+	 * @return Row count
+	 */
+	public int getRowCount()
+		{
+		return (rows);
 		}
 	}

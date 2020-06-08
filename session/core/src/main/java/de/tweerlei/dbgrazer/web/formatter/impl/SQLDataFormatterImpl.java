@@ -29,6 +29,8 @@ public class SQLDataFormatterImpl extends AbstractDataFormatter
 	private static final String SQL_INTEGER_FORMAT = "0";
 	private static final String SQL_FLOAT_FORMAT = "0.00######";
 	
+	private final boolean hasBoolean;
+	
 	/**
 	 * Constructor
 	 * @param tsfmt Timestamp date format
@@ -37,9 +39,10 @@ public class SQLDataFormatterImpl extends AbstractDataFormatter
 	 * @param tz Time zone
 	 * @param sizeLimit Size limit (characters) for formatted output
 	 */
-	public SQLDataFormatterImpl(String tsfmt, String ldfmt, String sdfmt, TimeZone tz, int sizeLimit)
+	public SQLDataFormatterImpl(String tsfmt, String ldfmt, String sdfmt, boolean hasBoolean, TimeZone tz, int sizeLimit)
 		{
 		super(tsfmt, ldfmt, sdfmt, SQL_INTEGER_FORMAT, SQL_FLOAT_FORMAT, Locale.US, tz, sizeLimit);
+		this.hasBoolean = hasBoolean;
 		}
 	
 	@Override
@@ -69,7 +72,10 @@ public class SQLDataFormatterImpl extends AbstractDataFormatter
 	@Override
 	protected String formatBoolean(boolean b)
 		{
-		return (b ? "1" : "0");
+		if (hasBoolean)
+			return (b ? "true" : "false");
+		else
+			return (b ? "1" : "0");
 		}
 	
 	@Override

@@ -35,6 +35,7 @@ import de.tweerlei.dbgrazer.query.model.QueryType;
 import de.tweerlei.dbgrazer.query.model.Result;
 import de.tweerlei.dbgrazer.query.model.ResultType;
 import de.tweerlei.dbgrazer.query.model.RowHandler;
+import de.tweerlei.dbgrazer.query.model.RowInterpreter;
 import de.tweerlei.dbgrazer.query.model.RowIterator;
 import de.tweerlei.dbgrazer.query.model.RowProducer;
 import de.tweerlei.dbgrazer.query.model.RowTransferer;
@@ -359,7 +360,7 @@ public class QueryPerformerServiceImpl implements QueryPerformerService
 		if (t == null)
 			throw new IllegalArgumentException("Unknown query type: " + type);
 		
-		return (runner.performQueries(link, statements, timeZone, t, configService.get(ConfigKeys.BROWSER_ROWS), monitor));
+		return (runner.performQueries(link, statements, timeZone, t, configService.get(ConfigKeys.COMMIT_ROWS), monitor));
 		}
 	
 	@Override
@@ -370,7 +371,7 @@ public class QueryPerformerServiceImpl implements QueryPerformerService
 		if (t == null)
 			throw new IllegalArgumentException("Unknown query type: " + type);
 		
-		return (runner.transferRows(link, query, timeZone, transferer, t, configService.get(ConfigKeys.BROWSER_ROWS), monitor));
+		return (runner.transferRows(link, query, timeZone, transferer, t, configService.get(ConfigKeys.COMMIT_ROWS), monitor));
 		}
 	
 	@Override
@@ -383,7 +384,18 @@ public class QueryPerformerServiceImpl implements QueryPerformerService
 		
 		final RowTransferer lrt = new LimitingRowTransferer(transferer, handler, export ? Integer.MAX_VALUE : configService.get(ConfigKeys.BROWSER_ROWS));
 		
-		return (runner.transferRows(link, query, timeZone, lrt, t, configService.get(ConfigKeys.BROWSER_ROWS), monitor));
+		return (runner.transferRows(link, query, timeZone, lrt, t, configService.get(ConfigKeys.COMMIT_ROWS), monitor));
+		}
+	
+	@Override
+	public Result transferRows(String link, String query, RowInterpreter interpreter, String type, DMLProgressMonitor monitor, boolean export) throws PerformQueryException
+		{
+		final TimeZone timeZone = factory.getTimeZone();
+		final QueryType t = queryService.findQueryType(type);
+		if (t == null)
+			throw new IllegalArgumentException("Unknown query type: " + type);
+		
+		return (runner.transferRows(link, query, timeZone, interpreter, t, configService.get(ConfigKeys.COMMIT_ROWS), monitor));
 		}
 	
 	@Override

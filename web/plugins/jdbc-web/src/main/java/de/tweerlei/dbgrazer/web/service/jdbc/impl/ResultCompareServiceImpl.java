@@ -29,6 +29,7 @@ import de.tweerlei.common5.util.ObjectUtils;
 import de.tweerlei.dbgrazer.extension.jdbc.ConfigKeys;
 import de.tweerlei.dbgrazer.query.model.ColumnDef;
 import de.tweerlei.dbgrazer.query.model.ResultRow;
+import de.tweerlei.dbgrazer.query.model.RowHandler;
 import de.tweerlei.dbgrazer.query.model.RowIterator;
 import de.tweerlei.dbgrazer.query.model.RowSet;
 import de.tweerlei.dbgrazer.query.model.StatementHandler;
@@ -229,6 +230,50 @@ public class ResultCompareServiceImpl implements ResultCompareService
 			final String log = getLogMessage();
 			if (log != null)
 				sqlWriter.writeComment(log);
+			}
+		}
+	
+	private static class DirectCompareHandler extends LoggingCompareHandler
+		{
+		private final RowHandler insert;
+		private final RowHandler update;
+		private final RowHandler delete;
+		
+		public DirectCompareHandler(RowHandler insert, RowHandler update, RowHandler delete)
+			{
+			this.insert = insert;
+			this.update = update;
+			this.delete = delete;
+			}
+		
+		@Override
+		public void rowAdded(String tableName, List<ColumnDef> columns, ResultRow values, Set<Integer> pk)
+			{
+			if (insert.handleRow(values))
+				logRow(tableName, columns, values, pk);
+			}
+		
+		@Override
+		public boolean rowChanged(String tableName, List<ColumnDef> columns, ResultRow oldValues, ResultRow newValues, Set<Integer> pk)
+			{
+			if (oldValues.getValues().equals(newValues.getValues()))
+				return (false);
+			
+			if (update.handleRow(newValues))
+				logRow(tableName, columns, newValues, pk);
+			return (true);
+			}
+		
+		@Override
+		public void rowRemoved(String tableName, List<ColumnDef> columns, ResultRow values, Set<Integer> pk)
+			{
+			if (delete.handleRow(values))
+				logRow(tableName, columns, values, pk);
+			}
+		
+		@Override
+		public void flush()
+			{
 			}
 		}
 	
@@ -561,6 +606,12 @@ public class ResultCompareServiceImpl implements ResultCompareService
 		
 		// Can't use MergeCompareHandler because we're ignoring the PK
 		compareResults(new SimpleResultRowFetcher(l), new SimpleResultRowFetcher(r), new InsertCompareHandler(sqlWriter), monitor, dialect.getQualifiedTableName(tableDesc.getName()), tableDesc.getPKColumns(), false);
+		}
+	
+	@Override
+	public void compareResultsByPK(RowIterator l, RowIterator r, RowHandler insert, RowHandler update, RowHandler delete, CompareProgressMonitor monitor, TableDescription tableDesc, SQLDialect dialect)
+		{
+		compareResults(new SimpleResultRowFetcher(l), new SimpleResultRowFetcher(r), new DirectCompareHandler(insert, update, delete), monitor, dialect.getQualifiedTableName(tableDesc.getName()), tableDesc.getPKColumns(), true);
 		}
 	
 	@Override

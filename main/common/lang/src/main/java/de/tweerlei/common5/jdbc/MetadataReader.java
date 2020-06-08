@@ -30,6 +30,20 @@ import de.tweerlei.common5.jdbc.model.TableDescription;
 public interface MetadataReader
 	{
 	/**
+	 * Get the default catalog name
+	 * @return Catalog name
+	 * @throws SQLException on error
+	 */
+	public String getDefaultCatalogName() throws SQLException;
+	
+	/**
+	 * Get the default schema name
+	 * @return Schema name
+	 * @throws SQLException on error
+	 */
+	public String getDefaultSchemaName() throws SQLException;
+	
+	/**
 	 * Get available catalog names
 	 * @return Catalog names
 	 * @throws SQLException on error

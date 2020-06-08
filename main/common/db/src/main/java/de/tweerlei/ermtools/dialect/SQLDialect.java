@@ -87,6 +87,12 @@ public interface SQLDialect
 	public String getTimestampFormat();
 	
 	/**
+	 * Get whether this dialect supports boolean literals
+	 * @return true if true/false can be used
+	 */
+	public boolean supportsBoolean();
+	
+	/**
 	 * Check whether SQL:2003 MERGE statements are supported
 	 * @return Merge support
 	 */

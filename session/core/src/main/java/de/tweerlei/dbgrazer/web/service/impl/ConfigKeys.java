@@ -105,6 +105,9 @@ public final class ConfigKeys
 	/** Fetch limit for browser queries */
 	public static final ConfigKey<Integer> BROWSER_ROWS = ConfigKey.create(PACKAGE_NAME, "result.browserRows", Integer.class, 100);
 	
+	/** Commit block size for bulk queries */
+	public static final ConfigKey<Integer> COMMIT_ROWS = ConfigKey.create(PACKAGE_NAME, "result.commitRows", Integer.class, 100);
+	
 	/** Whether to show empty query results */
 	public static final ConfigKey<Boolean> SHOW_EMPTY_SUBQUERIES = ConfigKey.create(PACKAGE_NAME, "result.showEmptySubqueries", Boolean.class, Boolean.FALSE);
 	

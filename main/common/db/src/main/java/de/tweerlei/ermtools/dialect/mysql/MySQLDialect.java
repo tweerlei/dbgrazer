@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import de.tweerlei.common5.jdbc.MetadataReader;
 import de.tweerlei.common5.jdbc.model.ColumnDescription;
 import de.tweerlei.common5.jdbc.model.ForeignKeyDescription;
 import de.tweerlei.common5.jdbc.model.IndexDescription;
@@ -290,6 +291,12 @@ public class MySQLDialect extends CommonSQLDialect
 		sb.append("\n\tDROP FOREIGN KEY ");
 		sb.append(fk.getName());
 		return (sb.toString());
+		}
+	
+	@Override
+	public MetadataReader getMetadataReader(Connection c) throws SQLException
+		{
+		return (new MySQLMetadataReader(c.getMetaData()));
 		}
 	
 	@Override

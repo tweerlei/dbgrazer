@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -49,19 +50,28 @@ import de.tweerlei.dbgrazer.extension.jdbc.SQLGeneratorService.Style;
 import de.tweerlei.dbgrazer.link.service.LinkService;
 import de.tweerlei.dbgrazer.query.exception.CancelledByUserException;
 import de.tweerlei.dbgrazer.query.exception.PerformQueryException;
+import de.tweerlei.dbgrazer.query.model.ColumnDef;
+import de.tweerlei.dbgrazer.query.model.ColumnType;
 import de.tweerlei.dbgrazer.query.model.QueryType;
 import de.tweerlei.dbgrazer.query.model.Result;
+import de.tweerlei.dbgrazer.query.model.ResultRow;
+import de.tweerlei.dbgrazer.query.model.ResultRowMapper;
 import de.tweerlei.dbgrazer.query.model.RowHandler;
+import de.tweerlei.dbgrazer.query.model.RowInterpreter;
 import de.tweerlei.dbgrazer.query.model.RowIterator;
 import de.tweerlei.dbgrazer.query.model.RowTransferer;
 import de.tweerlei.dbgrazer.query.model.StatementHandler;
 import de.tweerlei.dbgrazer.query.model.impl.AsyncRowIterator;
+import de.tweerlei.dbgrazer.query.model.impl.ColumnDefImpl;
+import de.tweerlei.dbgrazer.query.model.impl.DefaultResultRow;
+import de.tweerlei.dbgrazer.query.model.impl.IdentityResultRowMapper;
 import de.tweerlei.dbgrazer.query.model.impl.MonitoringStatementHandler;
 import de.tweerlei.dbgrazer.query.model.impl.StatementCollection;
 import de.tweerlei.dbgrazer.query.model.impl.StatementWriter;
 import de.tweerlei.dbgrazer.query.service.QueryService;
 import de.tweerlei.dbgrazer.web.constant.MessageKeys;
 import de.tweerlei.dbgrazer.web.exception.AccessDeniedException;
+import de.tweerlei.dbgrazer.web.formatter.SQLWriter;
 import de.tweerlei.dbgrazer.web.model.CompareProgressMonitor;
 import de.tweerlei.dbgrazer.web.model.TaskCompareProgressMonitor;
 import de.tweerlei.dbgrazer.web.model.TaskDMLProgressMonitor;
@@ -88,6 +98,19 @@ import de.tweerlei.spring.service.TimeService;
 public class DataDiffController
 	{
 	/**
+	 * Statement mode
+	 */
+	public static enum StmtMode
+		{
+		/** Use INSERT */
+		INSERT,
+		/** Use MERGE */
+		MERGE,
+		/** Use Batch INSERT */
+		BATCH
+		}
+	
+	/**
 	 * Helper class used as form backing object
 	 */
 	public static final class FormBackingObject
@@ -100,10 +123,19 @@ public class DataDiffController
 		private String schema2;
 		private String filter;
 		private OrderBy order;
-		private boolean merge;
-		private String mode;
+		private StmtMode stmtMode;
+		private String execMode;
 		private String[] pkColumns;
 		private String[] dataColumns;
+		
+		/**
+		 * Constructor
+		 */
+		public FormBackingObject()
+			{
+			order = OrderBy.NONE;
+			stmtMode = StmtMode.INSERT;
+			}
 		
 		/**
 		 * Get the catalog
@@ -250,39 +282,39 @@ public class DataDiffController
 			}
 		
 		/**
-		 * Get the merge
-		 * @return the merge
+		 * Get the stmtMode
+		 * @return the stmtMode
 		 */
-		public boolean isMerge()
+		public StmtMode getStmtMode()
 			{
-			return merge;
+			return stmtMode;
 			}
 		
 		/**
-		 * Set the merge
-		 * @param merge the merge to set
+		 * Set the stmtMode
+		 * @param stmtMode the stmtMode to set
 		 */
-		public void setMerge(boolean merge)
+		public void setStmtMode(StmtMode stmtMode)
 			{
-			this.merge = merge;
+			this.stmtMode = stmtMode;
 			}
 		
 		/**
-		 * Get the mode
-		 * @return the mode
+		 * Get the execMode
+		 * @return the execMode
 		 */
-		public String getMode()
+		public String getExecMode()
 			{
-			return mode;
+			return execMode;
 			}
 		
 		/**
-		 * Set the mode
-		 * @param mode the mode to set
+		 * Set the execMode
+		 * @param execMode the execMode to set
 		 */
-		public void setMode(String mode)
+		public void setExecMode(String execMode)
 			{
-			this.mode = mode;
+			this.execMode = execMode;
 			}
 		
 		/**
@@ -502,6 +534,128 @@ public class DataDiffController
 			}
 		}
 	
+	// UPDATE SET <non-pk-columns> WHERE <pk-columns>
+	private static final class UpdateResultRowMapper implements ResultRowMapper
+		{
+		private final Set<Integer> pk;
+		private final ResultRow ret;
+		
+		public UpdateResultRowMapper(Set<Integer> pk)
+			{
+			this.pk = pk;
+			this.ret = new DefaultResultRow();
+			}
+		
+		@Override
+		public ResultRow map(ResultRow row)
+			{
+			final List<Object> values = row.getValues();
+			final List<Object> out = ret.getValues();
+			out.clear();
+			for (int i = 0; i < values.size(); i++)
+				{
+				if (!pk.contains(i))
+					out.add(values.get(i));
+				}
+			for (Integer i : pk)
+				out.add(values.get(i));
+			return (ret);
+			}
+		
+		@Override
+		public List<ColumnDef> map(List<ColumnDef> columns)
+			{
+			final List<ColumnDef> r = new ArrayList<ColumnDef>(pk.size());
+			for (int i = 0; i < columns.size(); i++)
+				{
+				if (!pk.contains(i))
+					r.add(columns.get(i));
+				}
+			for (Integer i : pk)
+				r.add(columns.get(i));
+			return (r);
+			}
+		}
+	
+	// DELETE WHERE <pk-columns>
+	private static final class DeleteResultRowMapper implements ResultRowMapper
+		{
+		private final Set<Integer> pk;
+		private final ResultRow ret;
+		
+		public DeleteResultRowMapper(Set<Integer> pk)
+			{
+			this.pk = pk;
+			this.ret = new DefaultResultRow(pk.size());
+			}
+		
+		@Override
+		public ResultRow map(ResultRow row)
+			{
+			ret.getValues().clear();
+			for (Integer i : pk)
+				ret.getValues().add(row.getValues().get(i));
+			return (ret);
+			}
+		
+		@Override
+		public List<ColumnDef> map(List<ColumnDef> columns)
+			{
+			final List<ColumnDef> r = new ArrayList<ColumnDef>(pk.size());
+			for (Integer i : pk)
+				r.add(columns.get(i));
+			return (r);
+			}
+		}
+	
+	private static final class DiffRowInterpreter implements RowInterpreter
+		{
+		private final ResultCompareService transformer;
+		private final RowIterator dst;
+		private final CompareProgressMonitor monitor;
+		private final TableDescription tableDesc;
+		private final List<RowHandlerDef> statements;
+		private final SQLDialect dialect;
+		
+		public DiffRowInterpreter(ResultCompareService transformer, RowIterator dst, CompareProgressMonitor monitor, TableDescription tableDesc, List<ColumnDef> columns, String insert, String update, String delete, SQLDialect dialect)
+			{
+			this.transformer = transformer;
+			this.dst = dst;
+			this.monitor = monitor;
+			this.tableDesc = tableDesc;
+			this.statements = new ArrayList<RowHandlerDef>(3);
+			this.statements.add(new RowHandlerDef(insert, columns, new IdentityResultRowMapper()));
+			this.statements.add(new RowHandlerDef(update, columns, new UpdateResultRowMapper(tableDesc.getPKColumns())));
+			this.statements.add(new RowHandlerDef(delete, columns, new DeleteResultRowMapper(tableDesc.getPKColumns())));
+			this.dialect = dialect;
+			}
+		
+		@Override
+		public Object transfer(RowIterator rows, List<RowHandler> handlers)
+			{
+			transformer.compareResultsByPK(rows, dst, handlers.get(0), handlers.get(1), handlers.get(2), monitor, tableDesc, dialect);
+			return null;
+			}
+		
+		@Override
+		public List<RowHandlerDef> getStatements()
+			{
+			return (statements);
+			}
+		
+		@Override
+		public String getPrepareStatement()
+			{
+			return (dialect.prepareInsert(tableDesc));
+			}
+		
+		@Override
+		public String getCleanupStatement()
+			{
+			return (dialect.finishInsert(tableDesc));
+			}
+		}
+	
 	private final TimeService timeService;
 	private final MetadataService metadataService;
 	private final QueryService queryService;
@@ -614,8 +768,9 @@ public class DataDiffController
 		
 		if (connectionSettings.getParameterHistory().get("order") != null)
 			fbo.setOrder(OrderBy.valueOf(connectionSettings.getParameterHistory().get("order")));
-		fbo.setMerge(Boolean.valueOf(connectionSettings.getParameterHistory().get("merge")));
-		fbo.setMode(connectionSettings.getParameterHistory().get("mode"));
+		if (connectionSettings.getParameterHistory().get("merge") != null)
+			fbo.setStmtMode(StmtMode.valueOf(connectionSettings.getParameterHistory().get("merge")));
+		fbo.setExecMode(connectionSettings.getParameterHistory().get("mode"));
 		
 		final Map<String, String> all = linkService.findAllLinkNames(userSettingsManager.getEffectiveUserGroups(userSettings.getPrincipal()), null, null);
 		model.put("allConnections", all);
@@ -710,7 +865,7 @@ public class DataDiffController
 		try	{
 			final DiffResult result = runDMLInternal(fbo.getCatalog(), fbo.getSchema(), fbo.getObject(),
 					fbo.getConnection2(), fbo.getCatalog2(), fbo.getSchema2(),
-					fbo.getFilter(), fbo.getOrder(), fbo.isMerge(), fbo.getMode(),
+					fbo.getFilter(), fbo.getOrder(), fbo.getStmtMode(), fbo.getExecMode(),
 					toSet(fbo.getPkColumns()), toSet(fbo.getDataColumns()),
 					p, c, false);
 			
@@ -720,8 +875,8 @@ public class DataDiffController
 			connectionSettings.getParameterHistory().put("catalog2", fbo.getCatalog2());
 			connectionSettings.getParameterHistory().put("schema2", fbo.getSchema2());
 			connectionSettings.getParameterHistory().put("order", (fbo.getOrder() == null) ? null : fbo.getOrder().name());
-			connectionSettings.getParameterHistory().put("merge", String.valueOf(fbo.isMerge()));
-			connectionSettings.getParameterHistory().put("mode", fbo.getMode());
+			connectionSettings.getParameterHistory().put("merge", (fbo.getStmtMode() == null) ? null : fbo.getStmtMode().name());
+			connectionSettings.getParameterHistory().put("mode", fbo.getExecMode());
 			
 			final TableFilterEntry ent = browserSettingsManager.getTableFilters().get(qn.toString());
 			if (ent != null)
@@ -769,7 +924,7 @@ public class DataDiffController
 		try	{
 			final DiffResult result = runDMLInternal(fbo.getCatalog(), fbo.getSchema(), fbo.getObject(),
 					fbo.getConnection2(), fbo.getCatalog2(), fbo.getSchema2(),
-					fbo.getFilter(), fbo.getOrder(), fbo.isMerge(), fbo.getMode(),
+					fbo.getFilter(), fbo.getOrder(), fbo.getStmtMode(), fbo.getExecMode(),
 					toSet(fbo.getPkColumns()), toSet(fbo.getDataColumns()),
 					p, c, true);
 			
@@ -801,7 +956,7 @@ public class DataDiffController
 			String schema2,
 			String filter,
 			OrderBy order,
-			boolean merge,
+			StmtMode merge,
 			String mode,
 			Set<String> pkColumns,
 			Set<String> dataColumns,
@@ -826,7 +981,7 @@ public class DataDiffController
 			}
 		}
 	
-	private DiffResult compareFull(QualifiedName srcName, QualifiedName dstName, String conn2, String filter, boolean merge, TaskCompareProgressMonitor c, TaskDMLProgressMonitor p, boolean flush) throws PerformQueryException
+	private DiffResult compareFull(QualifiedName srcName, QualifiedName dstName, String conn2, String filter, StmtMode merge, TaskCompareProgressMonitor c, TaskDMLProgressMonitor p, boolean flush) throws PerformQueryException
 		{
 		if (flush)
 			metadataService.flushCache(connectionSettings.getLinkName());
@@ -855,7 +1010,7 @@ public class DataDiffController
 		return (new DiffResult(sw.toString(), tempResult.getComparisonResult(), tempResult.getDuration(), tempResult.isMoreAvailable()));
 		}
 	
-	private DiffResult runCompareFull(QualifiedName srcName, QualifiedName dstName, String conn2, String filter, boolean merge, String mode, TaskCompareProgressMonitor c, TaskDMLProgressMonitor p, boolean flush) throws PerformQueryException
+	private DiffResult runCompareFull(QualifiedName srcName, QualifiedName dstName, String conn2, String filter, StmtMode merge, String mode, TaskCompareProgressMonitor c, TaskDMLProgressMonitor p, boolean flush) throws PerformQueryException
 		{
 		if (flush)
 			metadataService.flushCache(connectionSettings.getLinkName());
@@ -877,7 +1032,7 @@ public class DataDiffController
 		return (new DiffResult(String.valueOf(r.getFirstRowSet().getFirstValue()), tempResult.getComparisonResult(), tempResult.getDuration(), tempResult.isMoreAvailable()));
 		}
 	
-	private DiffResult compareFull(TableDescription srcDesc, TableDescription dstDesc, String conn2, SQLDialect dialect, String filter, boolean merge, StatementHandler h, TaskCompareProgressMonitor c, boolean export) throws PerformQueryException
+	private DiffResult compareFull(TableDescription srcDesc, TableDescription dstDesc, String conn2, SQLDialect dialect, String filter, StmtMode merge, StatementHandler h, TaskCompareProgressMonitor c, boolean export) throws PerformQueryException
 		{
 		final long start = timeService.getCurrentTime();
 		
@@ -887,7 +1042,7 @@ public class DataDiffController
 		final String dstStmt = sqlGenerator.generateSelect(dstDesc, Style.SIMPLE, Joins.NONE, filter, OrderBy.PK, dialect);
 		final Result r2 = runner.performCustomQuery(conn2, JdbcConstants.QUERYTYPE_MULTIPLE, dstStmt, null, null, "diff", export, null);
 		
-		transformer.compareResults(r1.getFirstRowSet(), r2.getFirstRowSet(), h, c, srcDesc, dialect, merge);
+		transformer.compareResults(r1.getFirstRowSet(), r2.getFirstRowSet(), h, c, srcDesc, dialect, merge == StmtMode.MERGE);
 		
 		final long end = timeService.getCurrentTime();
 		
@@ -906,7 +1061,7 @@ public class DataDiffController
 		return (SQLDialectFactory.getSQLDialect(connectionSettings.getDialectName()));
 		}
 	
-	private DiffResult compareByPK(QualifiedName srcName, QualifiedName dstName, String conn2, String filter, boolean merge, Set<String> pkColumns, Set<String> dataColumns, OrderBy order, TaskCompareProgressMonitor c, TaskDMLProgressMonitor p, boolean flush) throws PerformQueryException
+	private DiffResult compareByPK(QualifiedName srcName, QualifiedName dstName, String conn2, String filter, StmtMode merge, Set<String> pkColumns, Set<String> dataColumns, OrderBy order, TaskCompareProgressMonitor c, TaskDMLProgressMonitor p, boolean flush) throws PerformQueryException
 		{
 		final SQLDialect dialect = getSQLDialect();
 		
@@ -937,7 +1092,7 @@ public class DataDiffController
 		return (new DiffResult(sw.toString(), tempResult.getComparisonResult(), tempResult.getDuration(), tempResult.isMoreAvailable()));
 		}
 	
-	private DiffResult runCompareByPK(QualifiedName srcName, QualifiedName dstName, String conn2, String filter, boolean merge, String mode, Set<String> pkColumns, Set<String> dataColumns, OrderBy order, TaskCompareProgressMonitor c, TaskDMLProgressMonitor p, boolean flush) throws PerformQueryException
+	private DiffResult runCompareByPK(QualifiedName srcName, QualifiedName dstName, String conn2, String filter, StmtMode merge, String mode, Set<String> pkColumns, Set<String> dataColumns, OrderBy order, TaskCompareProgressMonitor c, TaskDMLProgressMonitor p, boolean flush) throws PerformQueryException
 		{
 		final SQLDialect dialect = getSQLDialect();
 		
@@ -978,7 +1133,7 @@ public class DataDiffController
 		return (new TableDescription(srcDesc.getName().getCatalogName(), srcDesc.getName().getSchemaName(), srcDesc.getName().getObjectName(), srcDesc.getComment(), srcDesc.getType(), pk, columns, null, null, null, null));
 		}
 	
-	private DiffResult compareByPK(TableDescription srcDesc, TableDescription dstDesc, String conn2, SQLDialect dialect, String filter, boolean merge, OrderBy order, StatementHandler h3, String type, TaskCompareProgressMonitor c, TaskDMLProgressMonitor p, boolean export) throws PerformQueryException
+	private DiffResult compareByPK(TableDescription srcDesc, TableDescription dstDesc, String conn2, SQLDialect dialect, String filter, StmtMode merge, OrderBy order, StatementHandler h3, String type, TaskCompareProgressMonitor c, TaskDMLProgressMonitor p, boolean export) throws PerformQueryException
 		{
 		final String srcStmt = sqlGenerator.generateSelect(srcDesc, Style.SIMPLE, Joins.NONE, filter, order, dialect);
 		final String dstStmt = sqlGenerator.generateSelect(dstDesc, Style.SIMPLE, Joins.NONE, filter, order, dialect);
@@ -993,8 +1148,31 @@ public class DataDiffController
 		
 		final Result res;
 		try	{
-			final DiffRowTransferer transferer = new DiffRowTransferer(transformer, h2, c, srcDesc, order, dialect, merge);
-			res = runner.transferRows(connectionSettings.getLinkName(), srcStmt, transferer, h3, type, p, export);
+			if (merge == StmtMode.BATCH)
+				{
+				final List<ColumnDef> columns = new ArrayList<ColumnDef>(srcDesc.getColumns().size());
+				for (ColumnDescription cd : srcDesc.getColumns())
+					{
+					final ColumnType ct = ColumnType.forSQLType(cd.getType());
+					columns.add(new ColumnDefImpl(cd.getName(), ct, dialect.dataTypeToString(cd.getType()), null, srcDesc.getName(), cd.getName()));
+					}
+				
+				final StatementCollection sc = new StatementCollection(null, null);
+				final SQLWriter sw = dataFormatterFactory.getSQLWriter(sc, dialect, false);
+				sw.writeInsert(dialect.getQualifiedTableName(srcDesc.getName()), columns, null);
+				if (!sw.writeUpdate(dialect.getQualifiedTableName(srcDesc.getName()), columns, null, null, srcDesc.getPKColumns()))
+					sc.statement(null);
+				sw.writeDelete(dialect.getQualifiedTableName(srcDesc.getName()), columns, null, srcDesc.getPKColumns());
+				final Iterator<String> it = sc.iterator();
+				
+				final DiffRowInterpreter transferer = new DiffRowInterpreter(transformer, h2, c, srcDesc, columns, it.next(), it.next(), it.next(), dialect);
+				res = runner.transferRows(connectionSettings.getLinkName(), srcStmt, transferer, type, p, export);
+				}
+			else
+				{
+				final DiffRowTransferer transferer = new DiffRowTransferer(transformer, h2, c, srcDesc, order, dialect, merge == StmtMode.MERGE);
+				res = runner.transferRows(connectionSettings.getLinkName(), srcStmt, transferer, h3, type, p, export);
+				}
 			}
 		finally
 			{

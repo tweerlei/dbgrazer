@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import de.tweerlei.common5.jdbc.MetadataReader;
 import de.tweerlei.common5.jdbc.model.ColumnDescription;
 import de.tweerlei.common5.jdbc.model.ForeignKeyDescription;
 import de.tweerlei.common5.jdbc.model.IndexDescription;
@@ -79,6 +80,12 @@ public class PostgreSQLDialect extends CommonSQLDialect
 	public PostgreSQLDialect()
 		{
 		super(TYPE_MAP);
+		}
+	
+	@Override
+	public boolean supportsBoolean()
+		{
+		return (true);
 		}
 	
 	public String createTable(TableDescription t)
@@ -290,6 +297,12 @@ public class PostgreSQLDialect extends CommonSQLDialect
 		sb.append("\n\tDROP FOREIGN KEY ");
 		sb.append(fk.getName());
 		return (sb.toString());
+		}
+	
+	@Override
+	public MetadataReader getMetadataReader(Connection c) throws SQLException
+		{
+		return (new PostgreSQLMetadataReader(c.getMetaData()));
 		}
 	
 	@Override

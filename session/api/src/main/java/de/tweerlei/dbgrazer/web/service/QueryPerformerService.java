@@ -25,6 +25,7 @@ import de.tweerlei.dbgrazer.query.model.ParameterDef;
 import de.tweerlei.dbgrazer.query.model.Query;
 import de.tweerlei.dbgrazer.query.model.Result;
 import de.tweerlei.dbgrazer.query.model.RowHandler;
+import de.tweerlei.dbgrazer.query.model.RowInterpreter;
 import de.tweerlei.dbgrazer.query.model.RowProducer;
 import de.tweerlei.dbgrazer.query.model.RowTransferer;
 import de.tweerlei.dbgrazer.query.model.StatementHandler;
@@ -137,6 +138,19 @@ public interface QueryPerformerService
 	 * @throws PerformQueryException on error
 	 */
 	public Result transferRows(String link, String query, RowTransferer transferer, StatementHandler handler, String type, DMLProgressMonitor monitor, boolean export) throws PerformQueryException;
+	
+	/**
+	 * Perform modifications in a single transaction
+	 * @param link Link name
+	 * @param query Source query statement
+	 * @param interpreter RowInterpreter
+	 * @param type DML query type
+	 * @param monitor DMLProgressMonitor
+	 * @param export Whether to return ALL result rows
+	 * @return Result
+	 * @throws PerformQueryException on error
+	 */
+	public Result transferRows(String link, String query, RowInterpreter interpreter, String type, DMLProgressMonitor monitor, boolean export) throws PerformQueryException;
 	
 	/**
 	 * Perform a custom chart query

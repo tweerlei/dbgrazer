@@ -76,10 +76,12 @@
 </c:forEach
 >				</spring:select></dd>
 				<dt>&nbsp;</dt>
-				<dd><fmt:message key="useMerge" var="lbl"/><spring:checkbox path="merge" label=" ${lbl}"/></dd>
+				<dd><fmt:message key="stmtInsert" var="lbl"/><spring:radiobutton path="stmtMode" value="INSERT" label=" ${lbl}"/><br/>
+					<fmt:message key="stmtMerge" var="lbl"/><spring:radiobutton path="stmtMode" value="MERGE" label=" ${lbl}"/><br/>
+					<fmt:message key="stmtInsertBatch" var="lbl"/><spring:radiobutton path="stmtMode" value="BATCH" label=" ${lbl}"/></dd>
 <c:if test="${currentConnection.writable}"
->				<dt><spring:label path="mode"><fmt:message key="executeAs"/></spring:label></dt>
-				<dd><spring:select path="mode">
+>				<dt><spring:label path="execMode"><fmt:message key="executeAs"/></spring:label></dt>
+				<dd><spring:select path="execMode">
 					<spring:option value=""><fmt:message key="preview"/></spring:option>
 <c:forEach items="${resultTypes}" var="t"
 >					<spring:option value="${t}"><fmt:message key="execute_${t}"/></spring:option>

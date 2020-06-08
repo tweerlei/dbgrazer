@@ -58,7 +58,6 @@ public class CompareVisitor implements SQLVisitor
 	private final ObjectMatcher<ForeignKeyDescription> fkMatcher;
 	private final ObjectMatcher<PrivilegeDescription> privMatcher;
 	
-	private TableDescription currentTable;
 	private TableDescription rightTable;
 	private Map<String, ColumnDescription> rightCols;
 	private Set<IndexDescription> rightIndices;
@@ -151,7 +150,6 @@ public class CompareVisitor implements SQLVisitor
 		
 		handler.startTable(otherTable, table);
 		
-		currentTable = table;
 		rightTable = otherTable;
 		
 		// Handle PK
@@ -177,7 +175,6 @@ public class CompareVisitor implements SQLVisitor
 		
 		handler.endTable(rightTable, table);
 		
-		currentTable = null;
 		rightTable = null;
 		}
 	
@@ -198,11 +195,11 @@ public class CompareVisitor implements SQLVisitor
 		
 		final ColumnDescription b = rightCols.get(namingStrategy.getColumnName(a.getName()));
 		if (b == null)
-			handler.columnAdded(currentTable, a);
+			handler.columnAdded(rightTable, a);
 		else
 			{
 			if (!columnMatcher.equals(a, b))
-				handler.columnChanged(currentTable, a, b);
+				handler.columnChanged(rightTable, a, b);
 			rightCols.remove(b.getName());
 			}
 		}
@@ -247,7 +244,7 @@ public class CompareVisitor implements SQLVisitor
 				}
 			}
 		if (!found)
-			handler.indexAdded(currentTable, a);
+			handler.indexAdded(rightTable, a);
 		}
 	
 	public void endIndices()
@@ -286,7 +283,7 @@ public class CompareVisitor implements SQLVisitor
 				}
 			}
 		if (!found)
-			handler.fkAdded(currentTable, a);
+			handler.fkAdded(rightTable, a);
 		}
 	
 	public void endForeignKeys()
@@ -325,7 +322,7 @@ public class CompareVisitor implements SQLVisitor
 				}
 			}
 		if (!found)
-			handler.privilegeAdded(currentTable, a);
+			handler.privilegeAdded(rightTable, a);
 		}
 	
 	public void endPrivileges()
