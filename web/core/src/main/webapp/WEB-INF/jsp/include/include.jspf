@@ -40,5 +40,6 @@
 	response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, post-check=0, pre-check=0");
 	response.setHeader("Pragma", "no-cache");
 %><fmt:setTimeZone value="${currentRequest.timeZone}"
-/><c:set var="baseURI" value="${fn:replace(pageContext.request.requestURL, pageContext.request.requestURI, pageContext.request.contextPath)}/"
-/>
+/><c:if test="${baseURI == null}"
+	><c:set var="baseURI" value="${fn:replace(pageContext.request.requestURL, pageContext.request.requestURI, pageContext.request.contextPath)}/"
+/></c:if>

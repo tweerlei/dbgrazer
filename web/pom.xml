@@ -18,5 +18,6 @@
 	<modules>
 		<module>core</module>
 		<module>plugins</module>
+		<module>image</module>
 	</modules>
 </project>

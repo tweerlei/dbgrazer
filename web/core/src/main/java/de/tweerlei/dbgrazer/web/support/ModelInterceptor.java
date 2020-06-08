@@ -401,6 +401,7 @@ public class ModelInterceptor implements HandlerInterceptor, HandlerExceptionRes
 		modelAndView.addObject("appVersion", webappResourceService.getManifestParser().getRevision());
 		modelAndView.addObject("appDate", webappResourceService.getManifestParser().getDate());
 		
+		modelAndView.addObject("baseURI", userSettingsManager.getBaseURI());
 		modelAndView.addObject("loginEnabled", userSettingsManager.isLoginEnabled());
 		modelAndView.addObject("loginRequired", userSettingsManager.isLoginRequired());
 		modelAndView.addObject("historyEnabled", querySettingsManager.isHistoryEnabled());

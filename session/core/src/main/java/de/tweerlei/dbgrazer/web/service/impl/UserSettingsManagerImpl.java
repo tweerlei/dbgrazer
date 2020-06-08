@@ -65,6 +65,12 @@ public class UserSettingsManagerImpl implements UserSettingsManager
 		}
 	
 	@Override
+	public String getBaseURI()
+		{
+		return (configService.get(ConfigKeys.BASE_URI));
+		}
+	
+	@Override
 	public boolean isLoginEnabled()
 		{
 		return (configService.get(ConfigKeys.ENABLE_LOGIN));

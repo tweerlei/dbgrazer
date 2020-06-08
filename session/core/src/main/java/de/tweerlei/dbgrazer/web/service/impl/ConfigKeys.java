@@ -31,6 +31,9 @@ public final class ConfigKeys
 	
 	private static final String PACKAGE_NAME = "dbgrazer.web";
 	
+	/** Override base URI */
+	public static final ConfigKey<String> BASE_URI = ConfigKey.create(PACKAGE_NAME, "baseURI", String.class, null);
+	
 	/** Whether to enable login */
 	public static final ConfigKey<Boolean> ENABLE_LOGIN = ConfigKey.create(PACKAGE_NAME, "enableLogin", Boolean.class, Boolean.TRUE);
 	

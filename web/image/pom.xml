@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	
+	<modelVersion>4.0.0</modelVersion>
+	
+	<groupId>de.tweerlei</groupId>
+	<artifactId>dbgrazer-web-image</artifactId>
+	<version>3.1-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	
+	<name>dbgrazer-web-image</name>
+	<description>Web application for browsing DB schemas</description>
+	<url>http://www.tweerlei.de/</url>
+	
+	<parent>
+		<groupId>de.tweerlei</groupId>
+		<artifactId>dbgrazer-pom-library</artifactId>
+		<version>3.1-SNAPSHOT</version>
+		<relativePath></relativePath>
+	</parent>
+	
+	<dependencies>
+		<!--
+			tweerlei packages
+		-->
+		<dependency>
+			<groupId>de.tweerlei</groupId>
+			<artifactId>dbgrazer-web</artifactId>
+			<version>${project.version}</version>
+			<type>war</type>
+		</dependency>
+		<!--
+			Some JDBC drivers
+		-->
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>5.1.48</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.jtds</groupId>
+			<artifactId>jtds</artifactId>
+			<version>1.2.5</version>
+		</dependency>
+		<dependency>
+			<groupId>com.microsoft.sqlserver</groupId>
+			<artifactId>mssql-jdbc</artifactId>
+			<version>7.0.0.jre8</version>
+		</dependency>
+		<!--
+			JavaEE APIs not included in Tomcat
+		-->
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>jstl</artifactId>
+			<version>1.2</version>
+		</dependency>
+	</dependencies>
+	
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<excludeTransitive>true</excludeTransitive>
+					<outputDirectory>${project.build.directory}</outputDirectory>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+	
+	<repositories>
+		<repository>
+			<id>tweerlei</id>
+			<url>http://localhost</url>
+		</repository>
+	</repositories>
+</project>

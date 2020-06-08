@@ -31,6 +31,12 @@ import de.tweerlei.dbgrazer.security.model.User;
 public interface UserSettingsManager
 	{
 	/**
+	 * Get the base URI
+	 * @return base URI
+	 */
+	public String getBaseURI();
+	
+	/**
 	 * Check whether logins are enabled
 	 * @return true if enabled
 	 */

@@ -18,6 +18,7 @@ package de.tweerlei.dbgrazer.link.backend.impl;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
@@ -66,11 +67,21 @@ public class LinkPersisterImpl implements LinkPersister
 	 * @param keywordService KeywordService
 	 * @param linkTypes All known link types
 	 */
-	@Autowired
+	@Autowired(required = false)
 	public LinkPersisterImpl(KeywordService keywordService, Set<LinkType> linkTypes)
 		{
 		this.keywordService = keywordService;
 		this.linkTypes = new NamedMap<LinkType>(linkTypes);
+		}
+	
+	/**
+	 * Constructor
+	 * @param keywordService KeywordService
+	 */
+	@Autowired(required = false)
+	public LinkPersisterImpl(KeywordService keywordService)
+		{
+		this(keywordService, Collections.<LinkType>emptySet());
 		}
 	
 	@Override
