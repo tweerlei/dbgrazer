@@ -44,7 +44,7 @@ COPY examples/themes/*.properties /root/.dbgrazer/themes/
 
 # Add static resources
 COPY examples/static/*.css /root/.dbgrazer/static/
-#COPY examples/static/*.png /root/.dbgrazer/static/
+COPY examples/static/*.png /root/.dbgrazer/static/
 
 # Set Tomcat options
 ENV CATALINA_OPTS -Xmx512m -XX:-OmitStackTraceInFastThrow -Duser.language=de -Duser.country=DE -Duser.timezone=Europe/Berlin
