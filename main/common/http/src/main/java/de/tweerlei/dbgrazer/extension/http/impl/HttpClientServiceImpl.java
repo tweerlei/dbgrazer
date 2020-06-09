@@ -145,7 +145,7 @@ public class HttpClientServiceImpl implements HttpClientService, ConfigListener,
 	@Override
 	public HttpEntity get(String c, String endpoint, Map<String, String> headers) throws IOException
 		{
-		final LinkDef def = linkService.getLink(c, null);
+		final LinkDef def = linkService.getLinkData(c);
 		if (def == null)
 			throw new IOException("Unknown link " + c);
 		
@@ -167,7 +167,7 @@ public class HttpClientServiceImpl implements HttpClientService, ConfigListener,
 	@Override
 	public HttpEntity post(String c, String endpoint, HttpEntity request) throws IOException
 		{
-		final LinkDef def = linkService.getLink(c, null);
+		final LinkDef def = linkService.getLinkData(c);
 		if (def == null)
 			throw new IOException("Unknown link " + c);
 		
@@ -177,7 +177,7 @@ public class HttpClientServiceImpl implements HttpClientService, ConfigListener,
 	@Override
 	public HttpEntity post(String c, String endpoint, List<HttpEntity> request) throws IOException
 		{
-		final LinkDef def = linkService.getLink(c, null);
+		final LinkDef def = linkService.getLinkData(c);
 		if (def == null)
 			throw new IOException("Unknown link " + c);
 		
@@ -210,7 +210,7 @@ public class HttpClientServiceImpl implements HttpClientService, ConfigListener,
 		if (ret != null)
 			return (ret);
 		
-		final LinkDef def = linkService.getLink(c, null);
+		final LinkDef def = linkService.getLinkData(c);
 		if ((def == null) /*|| !(def.getType() instanceof WebserviceLinkType)*/)
 			throw new RuntimeException("Unknown link " + c);
 		

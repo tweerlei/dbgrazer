@@ -349,7 +349,7 @@ public class KafkaClientServiceImpl implements KafkaClientService, LinkListener,
 	
 	private Properties initKafkaProperties(String c)
 		{
-		final LinkDef def = linkService.getLink(c, null);
+		final LinkDef def = linkService.getLinkData(c);
 		if ((def == null) /*|| !(def.getType() instanceof WebserviceLinkType)*/)
 			throw new RuntimeException("Unknown link " + c);
 		

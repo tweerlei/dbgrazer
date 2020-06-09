@@ -129,7 +129,7 @@ public class LdapAccessServiceImpl implements LdapAccessService, LinkListener, L
 	@Override
 	public LdapTemplate getLdapTemplate(String c, String username, String password)
 		{
-		final LinkDef def = linkService.getLink(c, null);
+		final LinkDef def = linkService.getLinkData(c);
 		if ((def == null) /*|| !(def.getType() instanceof LdapLinkType)*/)
 			throw new RuntimeException("Unknown link " + c);
 		
@@ -150,7 +150,7 @@ public class LdapAccessServiceImpl implements LdapAccessService, LinkListener, L
 		if (ldapTemplate != null)
 			return (ldapTemplate);
 		
-		final LinkDef def = linkService.getLink(c, null);
+		final LinkDef def = linkService.getLinkData(c);
 		if ((def == null) /*|| !(def.getType() instanceof LdapLinkType)*/)
 			throw new RuntimeException("Unknown link " + c);
 		

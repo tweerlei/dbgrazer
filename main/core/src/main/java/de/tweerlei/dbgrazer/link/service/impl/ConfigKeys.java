@@ -33,6 +33,9 @@ public final class ConfigKeys
 	/** Module prefix for the link loader impl. */
 	public static final ConfigKey<String> LINK_LOADER = ConfigKey.create(PACKAGE_NAME, "linkLoader", String.class, "file");
 	
+	/** Enable substitution of environment variables in link definitions */
+	public static final ConfigKey<Boolean> LINK_ENVSUBST = ConfigKey.create(PACKAGE_NAME, "linkEnvSubst", Boolean.class, Boolean.FALSE);
+	
 	
 	private ConfigKeys()
 		{

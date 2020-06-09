@@ -178,7 +178,7 @@ public class KubernetesClientServiceImpl implements KubernetesClientService, Lin
 			activeConnections.put(c, holder);
 			}
 		
-		final LinkDef def = linkService.getLink(c, null);
+		final LinkDef def = linkService.getLinkData(c);
 		if ((def == null) /*|| !(def.getType() instanceof WebserviceLinkType)*/)
 			throw new RuntimeException("Unknown link " + c);
 		

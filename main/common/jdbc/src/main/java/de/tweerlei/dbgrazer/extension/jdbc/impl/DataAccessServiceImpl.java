@@ -247,7 +247,7 @@ public class DataAccessServiceImpl implements DataAccessService, ConfigListener,
 		if (ret != null)
 			return (ret);
 		
-		final LinkDef def = linkService.getLink(c, null);
+		final LinkDef def = linkService.getLinkData(c);
 		if ((def == null) /*|| !(def.getType() instanceof JdbcLinkType)*/)
 			throw new DataSourceLookupFailureException(c);
 		

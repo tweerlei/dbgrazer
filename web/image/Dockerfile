@@ -40,6 +40,7 @@ COPY target/dbgrazer-web-*.war /usr/local/tomcat/webapps/dbgrazer.war
 
 # Setup config directory
 COPY examples/*.properties /root/.dbgrazer/
+COPY examples/bin/*.sh /root/.dbgrazer/bin/
 COPY examples/themes/*.properties /root/.dbgrazer/themes/
 
 # Add static resources
@@ -48,3 +49,6 @@ COPY examples/static/*.png /root/.dbgrazer/static/
 
 # Set Tomcat options
 ENV CATALINA_OPTS -Xmx512m -XX:-OmitStackTraceInFastThrow -Duser.language=de -Duser.country=DE -Duser.timezone=Europe/Berlin
+
+# Possibly run /root/init.sh and launch Tomcat afterwards
+CMD [ "/root/startup.sh" ]

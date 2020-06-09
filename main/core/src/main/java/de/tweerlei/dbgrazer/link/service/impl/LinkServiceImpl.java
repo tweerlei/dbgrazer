@@ -22,6 +22,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
@@ -49,6 +50,7 @@ import de.tweerlei.dbgrazer.link.model.LinkDef;
 import de.tweerlei.dbgrazer.link.model.LinkErrorKeys;
 import de.tweerlei.dbgrazer.link.model.LinkType;
 import de.tweerlei.dbgrazer.link.model.SchemaDef;
+import de.tweerlei.dbgrazer.link.model.impl.LinkDefImpl;
 import de.tweerlei.dbgrazer.link.service.LinkListener;
 import de.tweerlei.dbgrazer.link.service.LinkManager;
 import de.tweerlei.dbgrazer.link.service.LinkService;
@@ -274,6 +276,46 @@ public class LinkServiceImpl implements LinkService, ConfigListener
 			return (def);
 		
 		return (null);
+		}
+	
+	@Override
+	public LinkDef getLinkData(String name)
+		{
+		final LinkDef def = getLink(name, null);
+		
+		if (configService.get(ConfigKeys.LINK_ENVSUBST))
+			return (envSubst(def));
+		else
+			return (def);
+		}
+	
+	private LinkDef envSubst(LinkDef def)
+		{
+		final ShellVarReplacer rep = new ShellVarReplacer(System.getenv());
+		
+		final Properties p = new Properties();
+		for (Map.Entry<Object, Object> ent : def.getProperties().entrySet())
+			p.put(ent.getKey(), rep.replaceAll(ent.getValue().toString()));
+		
+		return (new LinkDefImpl(
+				def.getType(),
+				def.getName(),
+				def.getDescription(),
+				rep.replaceAll(def.getDriver()),
+				rep.replaceAll(def.getUrl()),
+				rep.replaceAll(def.getUsername()),
+				rep.replaceAll(def.getPassword()),
+				def.isWritable(),
+				def.getPreDMLStatement(),
+				def.getPostDMLStatement(),
+				def.getGroupName(),
+				def.getSetName(),
+				def.getDialectName(),
+				p,
+				def.getSchema().getName(),
+				def.getSchema().getVersion(),
+				def.getQuerySetNames()
+				));
 		}
 	
 	@Override

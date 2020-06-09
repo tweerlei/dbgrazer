@@ -88,7 +88,7 @@ public class FilesystemQueryRunner extends BaseQueryRunner
 	@Override
 	public Result performQuery(String link, Query query, int subQueryIndex, List<Object> params, TimeZone timeZone, int limit, CancelableProgressMonitor monitor) throws PerformQueryException
 		{
-		final LinkDef def = linkService.getLink(link, null);
+		final LinkDef def = linkService.getLinkData(link);
 		if ((def == null) || !(def.getType() instanceof FilesystemLinkType))
 			throw new PerformQueryException(query.getName(), new RuntimeException("Unknown link " + link));
 		

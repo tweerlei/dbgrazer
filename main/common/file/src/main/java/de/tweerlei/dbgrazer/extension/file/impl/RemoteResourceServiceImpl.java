@@ -97,7 +97,7 @@ public class RemoteResourceServiceImpl implements RemoteResourceService
 	
 	private File getFile(String link, String path) throws IOException
 		{
-		final LinkDef c = linkService.getLink(link, null);
+		final LinkDef c = linkService.getLinkData(link);
 		if (c == null)
 			throw new IOException("Link not found: " + link);
 		

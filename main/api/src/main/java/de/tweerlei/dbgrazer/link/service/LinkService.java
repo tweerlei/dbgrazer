@@ -75,6 +75,13 @@ public interface LinkService
 	public LinkDef getLink(String name, Set<String> groups);
 	
 	/**
+	 * Get link data for creating a connection
+	 * @param name Link name
+	 * @return Link
+	 */
+	public LinkDef getLinkData(String name);
+	
+	/**
 	 * Get all known link group names
 	 * @return Link group names
 	 */

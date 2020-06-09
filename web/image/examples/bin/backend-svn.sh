@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# dbgrazer backend script for Git repository access
+# DBExplorer backend script for Subversion repository access
 #
 
 function usage
@@ -17,8 +17,8 @@ EOT
 function createQuery # (userName, tempName, finalName)
 	{
 	cat > "$3" &&
-		git add "$3" &&
-		git commit -m "$1 added $3"
+		svn add "$3" &&
+		svn commit -m "$1 added $3"
 	}
 
 function updateQuery # (userName, oldName, tempName, finalName)
@@ -26,34 +26,30 @@ function updateQuery # (userName, oldName, tempName, finalName)
 	if [ "$2" != "$4" ]; then
 		# double rename because direct rename is not always possible on case-insensitive file systems (Windows) 
 		cat > "$2" &&
-			git mv "$2" "$3" &&
-			git mv "$3" "$4" &&
-			git add "$4" &&
-			git commit -m "$1 renamed $2 to $4"
+			svn mv "$2" "$3" &&
+			svn mv "$3" "$4" &&
+			svn commit -m "$1 renamed $2 to $4"
 	else
 		cat > "$4" &&
-			git add "$4" &&
-			git commit -m "$1 updated $4"
+			svn commit -m "$1 updated $4"
 	fi
 	}
 
 function removeQuery # (userName, oldName)
 	{
-	git rm "$2" &&
-		git commit -m "$1 removed $2"
+	svn rm "$2" &&
+		svn commit -m "$1 removed $2"
 	}
 
 function createDir # (username, dirName)
 	{
-	mkdir "$2"
-	# Git does not track directories, so no add/commit here
+	svn mkdir "$2" &&
+		svn commit -m "$1 created subdir $2"
 	}
 
 function showHistory # (limit, name)
 	{
-	echo "<log>" &&
-		git log "-$1" --pretty='format:<logentry revision="%H"><author>%an</author><date>%ai</date><msg>%s</msg></logentry>' "$2" &&
-		echo "</log>"
+	svn log --xml --limit "$1" "$2"
 	}
 
 case "$1" in
