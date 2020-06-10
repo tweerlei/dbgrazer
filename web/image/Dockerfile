@@ -39,6 +39,7 @@ COPY target/*.jar /usr/local/tomcat/lib/
 COPY target/dbgrazer-web-*.war /usr/local/tomcat/webapps/dbgrazer.war
 
 # Setup config directory
+COPY examples/startup.sh /root/
 COPY examples/*.properties /root/.dbgrazer/
 COPY examples/bin/*.sh /root/.dbgrazer/bin/
 COPY examples/themes/*.properties /root/.dbgrazer/themes/
@@ -46,6 +47,9 @@ COPY examples/themes/*.properties /root/.dbgrazer/themes/
 # Add static resources
 COPY examples/static/*.css /root/.dbgrazer/static/
 COPY examples/static/*.png /root/.dbgrazer/static/
+
+# Set permissions
+RUN chmod +x /root/startup.sh /root/.dbgrazer/bin/*.sh
 
 # Set Tomcat options
 ENV CATALINA_OPTS -Xmx512m -XX:-OmitStackTraceInFastThrow -Duser.language=de -Duser.country=DE -Duser.timezone=Europe/Berlin
