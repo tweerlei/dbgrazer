@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Set;
 
 import de.tweerlei.common5.jdbc.model.QualifiedName;
+import de.tweerlei.dbgrazer.web.model.TaskProgress;
 import de.tweerlei.ermtools.dialect.SQLDialect;
 
 /**
@@ -122,9 +123,10 @@ public interface RowCountService
 	 * @param link Link name
 	 * @param tables Table names
 	 * @param dialect SQLDialect
+	 * @param monitor For tracking progress
 	 * @return Row counts
 	 */
-	public Map<QualifiedName, Object> countRows(String link, Set<QualifiedName> tables, SQLDialect dialect);
+	public Map<QualifiedName, Object> countRows(String link, Set<QualifiedName> tables, SQLDialect dialect, TaskProgress monitor);
 	
 	/**
 	 * Merge two sets of row counts

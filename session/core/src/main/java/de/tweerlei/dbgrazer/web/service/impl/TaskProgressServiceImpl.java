@@ -113,7 +113,11 @@ public class TaskProgressServiceImpl implements TaskProgressService
 	@Override
 	public TaskCompareProgressMonitor createCompareProgressMonitor()
 		{
-		createTaskProgress(MessageKeys.SOURCE_ROWS);
+		// Synchronize on SOURCE_ROWS only
+		final TaskProgress p = createTaskProgress(MessageKeys.SOURCE_ROWS);
+		if (p == null)
+			return (null);
+		
 		createTaskProgress(MessageKeys.DESTINATION_ROWS);
 		createTaskProgress(MessageKeys.MATCHED);
 		createTaskProgress(MessageKeys.INSERTED);
@@ -133,11 +137,13 @@ public class TaskProgressServiceImpl implements TaskProgressService
 	@Override
 	public void removeCompareProgressMonitor()
 		{
-		removeTaskProgress(MessageKeys.SOURCE_ROWS);
 		removeTaskProgress(MessageKeys.DESTINATION_ROWS);
 		removeTaskProgress(MessageKeys.MATCHED);
 		removeTaskProgress(MessageKeys.INSERTED);
 		removeTaskProgress(MessageKeys.UPDATED);
 		removeTaskProgress(MessageKeys.DELETED);
+		
+		// Synchronize on SOURCE_ROWS only
+		removeTaskProgress(MessageKeys.SOURCE_ROWS);
 		}
 	}

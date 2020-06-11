@@ -30,6 +30,7 @@ import de.tweerlei.dbgrazer.extension.jdbc.SQLGeneratorService;
 import de.tweerlei.dbgrazer.extension.jdbc.SQLGeneratorService.Style;
 import de.tweerlei.dbgrazer.query.exception.PerformQueryException;
 import de.tweerlei.dbgrazer.query.model.Result;
+import de.tweerlei.dbgrazer.web.model.TaskProgress;
 import de.tweerlei.dbgrazer.web.service.QueryPerformerService;
 import de.tweerlei.dbgrazer.web.service.jdbc.RowCountService;
 import de.tweerlei.ermtools.dialect.SQLDialect;
@@ -76,12 +77,15 @@ public class RowCountServiceImpl implements RowCountService
 		}
 	
 	@Override
-	public Map<QualifiedName, Object> countRows(String conn, Set<QualifiedName> tables, SQLDialect dialect)
+	public Map<QualifiedName, Object> countRows(String conn, Set<QualifiedName> tables, SQLDialect dialect, TaskProgress monitor)
 		{
 		final Map<QualifiedName, Object> ret = new TreeMap<QualifiedName, Object>();
 		
 		for (QualifiedName qn : tables)
+			{
 			ret.put(qn, countRows(conn, qn, dialect));
+			monitor.progress(1);
+			}
 		
 		return (ret);
 		}
@@ -103,7 +107,7 @@ public class RowCountServiceImpl implements RowCountService
 				{
 				final String key = qualified ? dialect.getQualifiedTableName(ent.getKey()) : ent.getKey().getObjectName();
 				final RowCounts rc = ret.get(key);
-				if (key != null)
+				if (rc != null)
 					{
 					rc.setDstName(ent.getKey());
 					rc.setDstCount(ent.getValue());

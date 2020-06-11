@@ -30,6 +30,8 @@ import de.tweerlei.common5.jdbc.model.QualifiedName;
 import de.tweerlei.dbgrazer.extension.jdbc.MetadataService;
 import de.tweerlei.dbgrazer.link.service.LinkService;
 import de.tweerlei.dbgrazer.web.exception.AccessDeniedException;
+import de.tweerlei.dbgrazer.web.model.TaskCompareProgressMonitor;
+import de.tweerlei.dbgrazer.web.service.TaskProgressService;
 import de.tweerlei.dbgrazer.web.service.UserSettingsManager;
 import de.tweerlei.dbgrazer.web.service.jdbc.RowCountService;
 import de.tweerlei.dbgrazer.web.session.ConnectionSettings;
@@ -175,6 +177,7 @@ public class RowCountController
 	private final MetadataService metadataService;
 	private final LinkService linkService;
 	private final RowCountService rowCountService;
+	private final TaskProgressService taskProgressService;
 	private final UserSettingsManager userSettingsManager;
 	private final UserSettings userSettings;
 	private final ConnectionSettings connectionSettings;
@@ -184,18 +187,20 @@ public class RowCountController
 	 * @param metadataService MetadataService
 	 * @param linkService LinkService
 	 * @param rowCountService RowCountService
+	 * @param taskProgressService TaskProgressService
 	 * @param userSettingsManager UserSettingsManager
 	 * @param userSettings UserSettings
 	 * @param connectionSettings ConnectionSettings
 	 */
 	@Autowired
 	public RowCountController(MetadataService metadataService, LinkService linkService,
-			RowCountService rowCountService, UserSettingsManager userSettingsManager,
+			TaskProgressService taskProgressService, RowCountService rowCountService, UserSettingsManager userSettingsManager,
 			UserSettings userSettings, ConnectionSettings connectionSettings)
 		{
 		this.metadataService = metadataService;
 		this.linkService = linkService;
 		this.rowCountService = rowCountService;
+		this.taskProgressService = taskProgressService;
 		this.userSettingsManager = userSettingsManager;
 		this.userSettings = userSettings;
 		this.connectionSettings = connectionSettings;
@@ -275,14 +280,21 @@ public class RowCountController
 		final Set<QualifiedName> tablesRight = Collections.singleton(new QualifiedName(fbo.getCatalog2(), fbo.getSchema2(), fbo.getObject()));
 		
 		final SQLDialect dialect = getSQLDialect();
-		final Map<QualifiedName, Object> srcCounts = rowCountService.countRows(connectionSettings.getLinkName(), tablesLeft, dialect);
-		final Map<QualifiedName, Object> dstCounts = rowCountService.countRows(fbo.getConnection2(), tablesRight, dialect);
-		
-		model.put("rowCounts", rowCountService.mergeRowCounts(srcCounts, dstCounts, dialect, false));
-		
-		connectionSettings.getParameterHistory().put("connection2", fbo.getConnection2());
-		connectionSettings.getParameterHistory().put("catalog2", fbo.getCatalog2());
-		connectionSettings.getParameterHistory().put("schema2", fbo.getSchema2());
+		final TaskCompareProgressMonitor c = taskProgressService.createCompareProgressMonitor();
+		try	{
+			final Map<QualifiedName, Object> srcCounts = rowCountService.countRows(connectionSettings.getLinkName(), tablesLeft, dialect, c.getSourceRows());
+			final Map<QualifiedName, Object> dstCounts = rowCountService.countRows(fbo.getConnection2(), tablesRight, dialect, c.getDestinationRows());
+			
+			model.put("rowCounts", rowCountService.mergeRowCounts(srcCounts, dstCounts, dialect, false));
+			
+			connectionSettings.getParameterHistory().put("connection2", fbo.getConnection2());
+			connectionSettings.getParameterHistory().put("catalog2", fbo.getCatalog2());
+			connectionSettings.getParameterHistory().put("schema2", fbo.getSchema2());
+			}
+		finally
+			{
+			taskProgressService.removeCompareProgressMonitor();
+			}
 		
 		return (model);
 		}

@@ -28,6 +28,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import de.tweerlei.common5.jdbc.model.QualifiedName;
 import de.tweerlei.dbgrazer.link.service.LinkService;
 import de.tweerlei.dbgrazer.web.exception.AccessDeniedException;
+import de.tweerlei.dbgrazer.web.model.TaskCompareProgressMonitor;
+import de.tweerlei.dbgrazer.web.service.TaskProgressService;
 import de.tweerlei.dbgrazer.web.service.UserSettingsManager;
 import de.tweerlei.dbgrazer.web.service.jdbc.DesignManagerService;
 import de.tweerlei.dbgrazer.web.service.jdbc.RowCountService;
@@ -80,6 +82,7 @@ public class DesignRowCountController
 	
 	private final LinkService linkService;
 	private final RowCountService rowCountService;
+	private final TaskProgressService taskProgressService;
 	private final UserSettingsManager userSettingsManager;
 	private final DesignManagerService designManagerService;
 	private final UserSettings userSettings;
@@ -89,6 +92,7 @@ public class DesignRowCountController
 	 * Constructor
 	 * @param linkService LinkService
 	 * @param rowCountService RowCountService
+	 * @param taskProgressService TaskProgressService
 	 * @param userSettingsManager UserSettingsManager
 	 * @param designManagerService DesignManagerService
 	 * @param userSettings UserSettings
@@ -96,11 +100,12 @@ public class DesignRowCountController
 	 */
 	@Autowired
 	public DesignRowCountController(LinkService linkService, DesignManagerService designManagerService,
-			RowCountService rowCountService, UserSettingsManager userSettingsManager,
+			TaskProgressService taskProgressService, RowCountService rowCountService, UserSettingsManager userSettingsManager,
 			UserSettings userSettings, ConnectionSettings connectionSettings)
 		{
 		this.linkService = linkService;
 		this.rowCountService = rowCountService;
+		this.taskProgressService = taskProgressService;
 		this.userSettingsManager = userSettingsManager;
 		this.designManagerService = designManagerService;
 		this.userSettings = userSettings;
@@ -172,12 +177,19 @@ public class DesignRowCountController
 		final Set<QualifiedName> tables = design.getTableNames();
 		
 		final SQLDialect dialect = getSQLDialect();
-		final Map<QualifiedName, Object> srcCounts = rowCountService.countRows(connectionSettings.getLinkName(), tables, dialect);
-		final Map<QualifiedName, Object> dstCounts = rowCountService.countRows(fbo.getConnection2(), tables, dialect);
-		
-		model.put("rowCounts", rowCountService.mergeRowCounts(srcCounts, dstCounts, dialect, true));
-		
-		connectionSettings.getParameterHistory().put("connection2", fbo.getConnection2());
+		final TaskCompareProgressMonitor c = taskProgressService.createCompareProgressMonitor();
+		try	{
+			final Map<QualifiedName, Object> srcCounts = rowCountService.countRows(connectionSettings.getLinkName(), tables, dialect, c.getSourceRows());
+			final Map<QualifiedName, Object> dstCounts = rowCountService.countRows(fbo.getConnection2(), tables, dialect, c.getDestinationRows());
+			
+			model.put("rowCounts", rowCountService.mergeRowCounts(srcCounts, dstCounts, dialect, true));
+			
+			connectionSettings.getParameterHistory().put("connection2", fbo.getConnection2());
+			}
+		finally
+			{
+			taskProgressService.removeCompareProgressMonitor();
+			}
 		
 		return (model);
 		}

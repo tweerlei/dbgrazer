@@ -80,6 +80,8 @@
 			></c:choose
 			><c:set var="key" value="${name}${st.index}"
 			/><c:set var="content" value="${r.value.payload}"
+			/><c:set var="params" value="${r.value.params}"
+			/><c:set var="paramString" value="${r.value.paramString}"
 			/><ui:panel title="${label}" collapsed="${r.key == '$emptyTab'}"><jsp:doBody/></ui:panel
 			></c:forEach>
 		</div>
@@ -129,6 +131,8 @@
 			></c:choose
 			><c:set var="key" value="${name}${st.index}"
 			/><c:set var="content" value="${r.value.payload}"
+			/><c:set var="params" value="${r.value.params}"
+			/><c:set var="paramString" value="${r.value.paramString}"
 			/><ui:panel title="${label}" collapsed="${r.key == '$emptyTab'}"><jsp:doBody/></ui:panel
 			></c:forEach>
 		</div>
