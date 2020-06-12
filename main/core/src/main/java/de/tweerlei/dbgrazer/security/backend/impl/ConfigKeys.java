@@ -48,6 +48,9 @@ public final class ConfigKeys
 	/** File: Create user definitions for unknown users (with only ROLE_LOGIN defined) */
 	public static final ConfigKey<Boolean> FILE_CREATE_USERS = ConfigKey.create(PACKAGE_NAME, "file.create", Boolean.class, Boolean.FALSE);
 	
+	/** File: Additional roles to grant for users created based on file.create */
+	public static final ConfigKey<String> FILE_DEFAULT_ROLES = ConfigKey.create(PACKAGE_NAME, "file.defaultRoles", String.class, "");
+	
 	
 	private ConfigKeys()
 		{

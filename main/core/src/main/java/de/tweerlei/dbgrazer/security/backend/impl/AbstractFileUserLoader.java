@@ -39,6 +39,7 @@ import de.tweerlei.dbgrazer.common.file.FileAccess;
 import de.tweerlei.dbgrazer.common.file.HistoryEntry;
 import de.tweerlei.dbgrazer.common.file.ObjectPersister;
 import de.tweerlei.dbgrazer.common.service.ConfigFileStore;
+import de.tweerlei.dbgrazer.common.service.KeywordService;
 import de.tweerlei.dbgrazer.security.backend.UserAuthenticator;
 import de.tweerlei.dbgrazer.security.backend.UserLoader;
 import de.tweerlei.dbgrazer.security.backend.UserPersister;
@@ -156,6 +157,7 @@ public abstract class AbstractFileUserLoader implements UserLoader, UserAuthenti
 	
 	private final ConfigFileStore store;
 	private final ConfigAccessor configService;
+	private final KeywordService keywordService;
 	private final UserPersister persister;
 	private final FileAccess fileAccess;
 	private final Logger logger;
@@ -164,14 +166,16 @@ public abstract class AbstractFileUserLoader implements UserLoader, UserAuthenti
 	 * Constructor
 	 * @param store ConfigFileStore
 	 * @param configService ConfigAccessor
+	 * @param keywordService KeywordService
 	 * @param persister UserPersister
 	 * @param fileAccess FileAccess
 	 */
 	protected AbstractFileUserLoader(ConfigFileStore store, ConfigAccessor configService,
-			UserPersister persister, FileAccess fileAccess)
+			KeywordService keywordService, UserPersister persister, FileAccess fileAccess)
 		{
 		this.store = store;
 		this.configService = configService;
+		this.keywordService = keywordService;
 		this.persister = persister;
 		this.fileAccess = fileAccess;
 		this.logger = Logger.getLogger(getClass().getCanonicalName());
@@ -199,7 +203,9 @@ public abstract class AbstractFileUserLoader implements UserLoader, UserAuthenti
 			if (!configService.get(ConfigKeys.FILE_CREATE_USERS))
 				return (null);
 			
-			u = new UserImpl(username, username, "", EnumSet.of(Authority.ROLE_LOGIN), Collections.<String, Set<Authority>>emptyMap(), Collections.<String, String>emptyMap());
+			final Set<Authority> authorities = getDefaultAuthorities();
+			
+			u = new UserImpl(username, username, "", authorities, Collections.<String, Set<Authority>>emptyMap(), Collections.<String, String>emptyMap());
 			try	{
 				createUser(username, username, u);
 				}
@@ -212,7 +218,22 @@ public abstract class AbstractFileUserLoader implements UserLoader, UserAuthenti
 		
 		return (u);
 		}
-
+	
+	private Set<Authority> getDefaultAuthorities()
+		{
+		final Set<Authority> ret = EnumSet.of(Authority.ROLE_LOGIN);
+		
+		final List<String> roleNames = keywordService.extractValues(configService.get(ConfigKeys.FILE_DEFAULT_ROLES));
+		for (String roleName : roleNames)
+			{
+			final Authority auth = Authority.forShortName(roleName);
+			if (auth != null)
+				ret.add(auth);
+			}
+		
+		return (ret);
+		}
+	
 	@Override
 	public SortedSet<String> listUsers()
 		{
