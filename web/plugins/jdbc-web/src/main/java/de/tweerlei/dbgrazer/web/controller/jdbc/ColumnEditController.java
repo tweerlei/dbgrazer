@@ -349,7 +349,7 @@ public class ColumnEditController
 		final ColumnDescription cd = new ColumnDescription(fbo.getName(), fbo.getComment(), 0, fbo.getTypeName(), fbo.getLength(), fbo.getDecimals(), fbo.isNullable(), fbo.isDefaultPresent() ? fbo.getDefaultValue() : null);
 		
 		final Query q = queryGeneratorService.createAddColumnQuery(info, getSQLDialect(), cd);
-		final QueryParameters query = querySettingsManager.prepareParameters(q, Collections.emptyMap());
+		final QueryParameters query = querySettingsManager.prepareParameters(q, Collections.<Integer, String>emptyMap());
 		
 		try	{
 			final Result r = runner.performQuery(connectionSettings.getLinkName(), query);
@@ -418,7 +418,7 @@ public class ColumnEditController
 		final ColumnDescription cdNew = new ColumnDescription(fbo.getNewName(), fbo.getComment(), 0, fbo.getTypeName(), fbo.getLength(), fbo.getDecimals(), fbo.isNullable(), fbo.isDefaultPresent() ? fbo.getDefaultValue() : null);
 		
 		final Query q = queryGeneratorService.createAlterColumnQuery(info, getSQLDialect(), cd, cdNew);
-		final QueryParameters query = querySettingsManager.prepareParameters(q, Collections.emptyMap());
+		final QueryParameters query = querySettingsManager.prepareParameters(q, Collections.<Integer, String>emptyMap());
 		
 		try	{
 			final Result r = runner.performQuery(connectionSettings.getLinkName(), query);
@@ -484,7 +484,7 @@ public class ColumnEditController
 		final ColumnDescription cd = info.getColumn(fbo.getName());
 		
 		final Query q = queryGeneratorService.createDropColumnQuery(info, getSQLDialect(), cd);
-		final QueryParameters query = querySettingsManager.prepareParameters(q, Collections.emptyMap());
+		final QueryParameters query = querySettingsManager.prepareParameters(q, Collections.<Integer, String>emptyMap());
 		
 		try	{
 			final Result r = runner.performQuery(connectionSettings.getLinkName(), query);

@@ -380,7 +380,7 @@ public class TableEditController
 		final TableDescription info = new TableDescription(fbo.getCatalog(), fbo.getSchema(), fbo.getObject(), fbo.getObjectComment(), TableDescription.TABLE, pk, Collections.singleton(cd), null, null, null, null);
 		
 		final Query q = queryGeneratorService.createCreateTableQuery(info, getSQLDialect());
-		final QueryParameters query = querySettingsManager.prepareParameters(q, Collections.emptyMap());
+		final QueryParameters query = querySettingsManager.prepareParameters(q, Collections.<Integer, String>emptyMap());
 		
 		try	{
 			final Result r = runner.performQuery(connectionSettings.getLinkName(), query);
@@ -440,7 +440,7 @@ public class TableEditController
 		final TableDescription t = new TableDescription(fbo.getCatalog(), fbo.getSchema(), fbo.getNewName(), fbo.getComment(), info.getType(), info.getPrimaryKey(), info.getColumns(), info.getIndices(), info.getReferencedKeys(), info.getReferencingKeys(), info.getPrivileges());
 		
 		final Query q = queryGeneratorService.createAlterTableQuery(info, getSQLDialect(), t);
-		final QueryParameters query = querySettingsManager.prepareParameters(q, Collections.emptyMap());
+		final QueryParameters query = querySettingsManager.prepareParameters(q, Collections.<Integer, String>emptyMap());
 		
 		try	{
 			final Result r = runner.performQuery(connectionSettings.getLinkName(), query);
@@ -496,7 +496,7 @@ public class TableEditController
 		final TableDescription info = metadataService.getTableInfo(connectionSettings.getLinkName(), qname, ColumnMode.ALL);
 		
 		final Query q = queryGeneratorService.createDropTableQuery(info, getSQLDialect());
-		final QueryParameters query = querySettingsManager.prepareParameters(q, Collections.emptyMap());
+		final QueryParameters query = querySettingsManager.prepareParameters(q, Collections.<Integer, String>emptyMap());
 		
 		try	{
 			final Result r = runner.performQuery(connectionSettings.getLinkName(), query);

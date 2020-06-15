@@ -247,7 +247,7 @@ public class PrivilegeEditController
 		final PrivilegeDescription pd = new PrivilegeDescription(fbo.getGrantee(), fbo.getGrantee(), fbo.getPrivilege(), fbo.isGrantable());
 		
 		final Query q = queryGeneratorService.createGrantQuery(info, getSQLDialect(), pd);
-		final QueryParameters query = querySettingsManager.prepareParameters(q, Collections.emptyMap());
+		final QueryParameters query = querySettingsManager.prepareParameters(q, Collections.<Integer, String>emptyMap());
 		
 		try	{
 			final Result r = runner.performQuery(connectionSettings.getLinkName(), query);
@@ -307,7 +307,7 @@ public class PrivilegeEditController
 		final PrivilegeDescription pd = findPrivilege(info, fbo.getPrivilege(), fbo.getGrantee());
 		
 		final Query q = queryGeneratorService.createRevokeQuery(info, getSQLDialect(), pd);
-		final QueryParameters query = querySettingsManager.prepareParameters(q, Collections.emptyMap());
+		final QueryParameters query = querySettingsManager.prepareParameters(q, Collections.<Integer, String>emptyMap());
 		
 		try	{
 			final Result r = runner.performQuery(connectionSettings.getLinkName(), query);

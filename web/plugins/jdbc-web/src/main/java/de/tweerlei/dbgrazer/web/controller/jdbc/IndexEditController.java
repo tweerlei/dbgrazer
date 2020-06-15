@@ -275,7 +275,7 @@ public class IndexEditController
 		final IndexDescription id = new IndexDescription(fbo.getName(), fbo.isUnique(), fbo.getColumnNames());
 		
 		final Query q = queryGeneratorService.createAddIndexQuery(info, getSQLDialect(), id);
-		final QueryParameters query = querySettingsManager.prepareParameters(q, Collections.emptyMap());
+		final QueryParameters query = querySettingsManager.prepareParameters(q, Collections.<Integer, String>emptyMap());
 		
 		try	{
 			final Result r = runner.performQuery(connectionSettings.getLinkName(), query);
@@ -338,7 +338,7 @@ public class IndexEditController
 		final IndexDescription id = info.getIndex(fbo.getName());
 		
 		final Query q = queryGeneratorService.createDropIndexQuery(info, getSQLDialect(), id);
-		final QueryParameters query = querySettingsManager.prepareParameters(q, Collections.emptyMap());
+		final QueryParameters query = querySettingsManager.prepareParameters(q, Collections.<Integer, String>emptyMap());
 		
 		try	{
 			final Result r = runner.performQuery(connectionSettings.getLinkName(), query);
@@ -398,7 +398,7 @@ public class IndexEditController
 		final PrimaryKeyDescription pk = new PrimaryKeyDescription(fbo.getName(), fbo.getColumnNames());
 		
 		final Query q = queryGeneratorService.createAddPrimaryKeyQuery(info, getSQLDialect(), pk);
-		final QueryParameters query = querySettingsManager.prepareParameters(q, Collections.emptyMap());
+		final QueryParameters query = querySettingsManager.prepareParameters(q, Collections.<Integer, String>emptyMap());
 		
 		try	{
 			final Result r = runner.performQuery(connectionSettings.getLinkName(), query);
@@ -461,7 +461,7 @@ public class IndexEditController
 		final PrimaryKeyDescription pk = info.getPrimaryKey();
 		
 		final Query q = queryGeneratorService.createDropPrimaryKeyQuery(info, getSQLDialect(), pk);
-		final QueryParameters query = querySettingsManager.prepareParameters(q, Collections.emptyMap());
+		final QueryParameters query = querySettingsManager.prepareParameters(q, Collections.<Integer, String>emptyMap());
 		
 		try	{
 			final Result r = runner.performQuery(connectionSettings.getLinkName(), query);

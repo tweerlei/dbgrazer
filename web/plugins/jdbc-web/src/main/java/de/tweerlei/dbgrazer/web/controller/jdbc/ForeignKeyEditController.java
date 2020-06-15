@@ -327,7 +327,7 @@ public class ForeignKeyEditController
 		final ForeignKeyDescription fd = new ForeignKeyDescription(fbo.getName(), fbo.getCatalog2(), fbo.getSchema2(), fbo.getObject2(), fbo.getColumnMappings());
 		
 		final Query q = queryGeneratorService.createAddForeignKeyQuery(info, getSQLDialect(), fd);
-		final QueryParameters query = querySettingsManager.prepareParameters(q, Collections.emptyMap());
+		final QueryParameters query = querySettingsManager.prepareParameters(q, Collections.<Integer, String>emptyMap());
 		
 		try	{
 			final Result r = runner.performQuery(connectionSettings.getLinkName(), query);
@@ -395,7 +395,7 @@ public class ForeignKeyEditController
 		final ForeignKeyDescription fd = info.getReferencedKey(fbo.getName());
 		
 		final Query q = queryGeneratorService.createDropForeignKeyQuery(info, getSQLDialect(), fd);
-		final QueryParameters query = querySettingsManager.prepareParameters(q, Collections.emptyMap());
+		final QueryParameters query = querySettingsManager.prepareParameters(q, Collections.<Integer, String>emptyMap());
 		
 		try	{
 			final Result r = runner.performQuery(connectionSettings.getLinkName(), query);
