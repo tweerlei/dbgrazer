@@ -149,7 +149,7 @@ public class DirectMetadataLoader implements MetadataLoader
 		}
 	
 	@Override
-	public SortedSet<String> getSchemas(String catalog)
+	public SortedSet<String> getSchemas(final String catalog)
 		{
 		final SortedSet<String> ret = new TreeSet<String>(StringComparators.CASE_INSENSITIVE);
 		
