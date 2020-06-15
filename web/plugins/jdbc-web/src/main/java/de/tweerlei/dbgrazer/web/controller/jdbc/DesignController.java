@@ -248,7 +248,7 @@ public class DesignController
 		if (browserSettingsManager.getCatalog() != null)
 			{
 			model.put("catalog", browserSettingsManager.getCatalog());
-			model.put("schemas", metadataService.getSchemas(connectionSettings.getLinkName()));
+			model.put("schemas", metadataService.getSchemas(connectionSettings.getLinkName(), browserSettingsManager.getCatalog()));
 			if (browserSettingsManager.getSchema() != null)
 				{
 				model.put("schema", browserSettingsManager.getSchema());
@@ -303,7 +303,7 @@ public class DesignController
 		if (browserSettingsManager.getCatalog() != null)
 			{
 			model.put("catalog", browserSettingsManager.getCatalog());
-			model.put("schemas", metadataService.getSchemas(connectionSettings.getLinkName()));
+			model.put("schemas", metadataService.getSchemas(connectionSettings.getLinkName(), browserSettingsManager.getCatalog()));
 			if (browserSettingsManager.getSchema() != null)
 				model.put("schema", browserSettingsManager.getSchema());
 			}

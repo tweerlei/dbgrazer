@@ -100,6 +100,51 @@ public class TableDescription
 			}
 		return (null);
 		}
+
+	/**
+	 * Get an index by name
+	 * @param n Index name
+	 * @return IndexDescription
+	 */
+	public IndexDescription getIndex(String n)
+		{
+		for (IndexDescription c : indices)
+			{
+			if (c.getName().equals(n))
+				return (c);
+			}
+		return (null);
+		}
+
+	/**
+	 * Get a referenced key by name
+	 * @param n Key name
+	 * @return ForeignKeyDescription
+	 */
+	public ForeignKeyDescription getReferencedKey(String n)
+		{
+		for (ForeignKeyDescription c : referencedKeys)
+			{
+			if (c.getName().equals(n))
+				return (c);
+			}
+		return (null);
+		}
+
+	/**
+	 * Get a refrencing key by name
+	 * @param n Key name
+	 * @return ForeignKeyDescription
+	 */
+	public ForeignKeyDescription getReferencingKey(String n)
+		{
+		for (ForeignKeyDescription c : referencingKeys)
+			{
+			if (c.getName().equals(n))
+				return (c);
+			}
+		return (null);
+		}
 	
 	/**
 	 * Get the numbers of the columns that are part of the PK.

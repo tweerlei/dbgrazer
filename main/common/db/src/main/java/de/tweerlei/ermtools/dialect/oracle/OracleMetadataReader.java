@@ -109,7 +109,7 @@ public class OracleMetadataReader implements MetadataReader
 		return Collections.singletonList(DUMMY_CATALOG_NAME);
 		}
 
-	public List<String> getSchemaNames() throws SQLException
+	public List<String> getSchemaNames(String catalog) throws SQLException
 		{
 		final List<String> ret = new ArrayList<String>();
 		executor.executeQuery("SELECT u.username"

@@ -121,10 +121,11 @@ public interface KafkaApiService
 	 * @param partition Partition number (null to fetch from all partitions)
 	 * @param startOffset Record offset (null to fetch from current offset)
 	 * @param endOffset Max. Record offset (null to fetch from current offset)
-	 * @param key Optional key to match
+	 * @param key Optional key regex to match
+	 * @param value Optional body regex to match
 	 * @return ConsumerRecord or null
 	 */
-	public List<ConsumerRecord<String, String>> fetchRecords(String c, String topic, Integer partition, Long startOffset, Long endOffset, String key);
+	public List<ConsumerRecord<String, String>> fetchRecords(String c, String topic, Integer partition, Long startOffset, Long endOffset, String key, String value);
 	
 	/**
 	 * Send a record

@@ -14,7 +14,7 @@
  * limitations under the License.
 --%><%@
 	include file="../../include/include.jspf"
-%><spring:form id="f1" action="db/${currentConnection.linkName}/delete-simple.html" method="post" modelAttribute="model" onsubmit="return submitDML(this);" onreset="return closeDialog();">
+%><spring:form id="f1" action="db/${currentConnection.linkName}/dml-delete.html" method="post" modelAttribute="model" onsubmit="return submitDML(this);" onreset="return closeDialog();">
 	<spring:hidden path="catalog"/>
 	<spring:hidden path="schema"/>
 	<spring:hidden path="object"/>

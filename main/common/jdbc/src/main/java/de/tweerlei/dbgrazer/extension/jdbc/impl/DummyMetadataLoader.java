@@ -73,7 +73,7 @@ public class DummyMetadataLoader implements MetadataLoader
 		}
 	
 	@Override
-	public SortedSet<String> getSchemas()
+	public SortedSet<String> getSchemas(String catalog)
 		{
 		return (EMPTY_SORTED_SET);
 		}

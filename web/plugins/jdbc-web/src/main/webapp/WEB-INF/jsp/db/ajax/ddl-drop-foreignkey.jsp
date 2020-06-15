@@ -14,16 +14,15 @@
  * limitations under the License.
 --%><%@
 	include file="../../include/include.jspf"
-%><spring:form id="f1" action="db/${currentConnection.linkName}/update-simple.html" method="post" modelAttribute="model" onsubmit="return submitDML(this);" onreset="return closeDialog();">
+%><spring:form id="f1" action="db/${currentConnection.linkName}/ddl-drop-foreignkey.html" method="post" modelAttribute="model" onsubmit="return submitDML(this);" onreset="return closeDialog();">
 	<spring:hidden path="catalog"/>
 	<spring:hidden path="schema"/>
 	<spring:hidden path="object"/>
-	<ui:hidden items="${model.ids}" name="ids"/>
-	<spring:hidden path="backTo"/>
-	<div id="dmlerror"><c:if test="${not empty exceptionText}"><p class="error">${fn:escapeXml(exceptionText)}</p></c:if></div>
+	<spring:hidden path="name"/>
+	<p><fmt:message key="confirmDelete"/></p>
+	<div id="dmlerror"></div>
 	<dl>
-<ui:params items="${parameters}" fkTables="${fkTables}" path="params" nulls="${model.nulls}" nullPath="nulls"
-/>		<dt>&nbsp;</dt>
-		<dd><input id="f1-submit" type="submit" value="<fmt:message key="updateRow"/>"/> <input id="f1-reset" type="reset" value="<fmt:message key="cancel"/>"/></dd>
+		<dt>&nbsp;</dt>
+		<dd><input id="f1-submit" type="submit" value="<fmt:message key="deleteRow"/>"/> <input id="f1-reset" type="reset" value="<fmt:message key="cancel"/>"/></dd>
 	</dl><hr/>
 </spring:form>

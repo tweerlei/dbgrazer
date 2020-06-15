@@ -94,14 +94,18 @@ public class JdbcMetadataReader implements MetadataReader
 		return (ret);
 		}
 	
-	public List<String> getSchemaNames() throws SQLException
+	public List<String> getSchemaNames(String catalog) throws SQLException
 		{
 		final List<String> ret = new LinkedList<String>();
 		
 		final ResultSet rs = md.getSchemas();
 		try	{
 			while (rs.next())
-				ret.add(rs.getString(1));
+				{
+				final String c = rs.getString(2);
+				if ((c == null) || c.equals(catalog))
+					ret.add(rs.getString(1));
+				}
 			}
 		finally
 			{

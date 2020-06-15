@@ -132,6 +132,14 @@ public interface SQLDialect
 	public String createTable(TableDescription t);
 	
 	/**
+	 * Modify a table (name/comment only)
+	 * @param old Old TableDescription
+	 * @param t New TableDescription
+	 * @return Statement
+	 */
+	public String modifyTable(TableDescription old, TableDescription t);
+	
+	/**
 	 * Drop a table
 	 * @param t TableDescription
 	 * @return Statement

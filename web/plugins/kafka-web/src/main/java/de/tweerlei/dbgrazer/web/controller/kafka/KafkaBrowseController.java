@@ -521,6 +521,7 @@ public class KafkaBrowseController
 	 * @param partition Partition number
 	 * @param offset Message offset
 	 * @param key Key to match
+	 * @param value Value search term
 	 * @param compact Compact messages
 	 * @return Model
 	 */
@@ -530,10 +531,11 @@ public class KafkaBrowseController
 			@RequestParam(value = "partition", required = false) Integer partition,
 			@RequestParam(value = "offset", required = false) Long offset,
 			@RequestParam(value = "key", required = false) String key,
+			@RequestParam(value = "value", required = false) String value,
 			@RequestParam(value = "compact", required = false) Boolean compact
 			)
 		{
-		return (showMessagesInternal(topic, partition, offset, key, compact));
+		return (showMessagesInternal(topic, partition, offset, key, value, compact));
 		}
 	
 	/**
@@ -542,6 +544,7 @@ public class KafkaBrowseController
 	 * @param partition Partition number
 	 * @param offset Message offset
 	 * @param key Key to match
+	 * @param value Value search term
 	 * @param compact Compact messages
 	 * @return Model
 	 */
@@ -551,10 +554,11 @@ public class KafkaBrowseController
 			@RequestParam(value = "partition", required = false) Integer partition,
 			@RequestParam(value = "offset", required = false) Long offset,
 			@RequestParam(value = "key", required = false) String key,
+			@RequestParam(value = "value", required = false) String value,
 			@RequestParam(value = "compact", required = false) Boolean compact
 			)
 		{
-		return (showMessagesInternal(topic, partition, offset, key, compact));
+		return (showMessagesInternal(topic, partition, offset, key, value, compact));
 		}
 	
 	private Map<String, Object> showMessagesInternal(
@@ -562,6 +566,7 @@ public class KafkaBrowseController
 			Integer partition,
 			Long offset,
 			String key,
+			String value,
 			Boolean compact
 			)
 		{
@@ -573,6 +578,7 @@ public class KafkaBrowseController
 		model.put("topic", topic);
 		model.put("partition", partition);
 		model.put("key", key);
+		model.put("value", value);
 		model.put("compact", compact);
 		
 		final OffsetInfo offsets = kafkaClientService.getOffsetInfo(connectionSettings.getLinkName(), topic, partition);
@@ -587,7 +593,7 @@ public class KafkaBrowseController
 			effectiveOffset = offset;
 		model.put("offset", effectiveOffset);
 		
-		final List<ConsumerRecord<String, String>> records = kafkaClientService.fetchRecords(connectionSettings.getLinkName(), topic, partition, effectiveOffset, null, StringUtils.nullIfEmpty(key));
+		final List<ConsumerRecord<String, String>> records = kafkaClientService.fetchRecords(connectionSettings.getLinkName(), topic, partition, effectiveOffset, null, StringUtils.nullIfEmpty(key), StringUtils.nullIfEmpty(value));
 		
 		final List<ConsumerRecordBean> l;
 		Long minOffset = null;

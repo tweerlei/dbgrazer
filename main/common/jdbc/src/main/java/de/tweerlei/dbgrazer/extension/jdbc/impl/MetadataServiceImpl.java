@@ -172,9 +172,9 @@ public class MetadataServiceImpl implements MetadataService, ConfigListener, Lin
 		}
 	
 	@Override
-	public SortedSet<String> getSchemas(String link)
+	public SortedSet<String> getSchemas(String link, String catalog)
 		{
-		return (getMetadataLoader(link).getSchemas());
+		return (getMetadataLoader(link).getSchemas(catalog));
 		}
 	
 	@Override

@@ -257,7 +257,7 @@ public class SchemaRowCountController
 			{
 			model.put("catalogs", metadataService.getCatalogs(fbo.getConnection2()));
 			if (fbo.getCatalog2() != null)
-				model.put("schemas", metadataService.getSchemas(fbo.getConnection2()));
+				model.put("schemas", metadataService.getSchemas(fbo.getConnection2(), fbo.getCatalog2()));
 			}
 		
 		model.put("extensionJS", JdbcMessageKeys.EXTENSION_JS);

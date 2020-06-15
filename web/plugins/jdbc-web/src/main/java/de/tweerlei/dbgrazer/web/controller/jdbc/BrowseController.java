@@ -24,6 +24,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.logging.Level;
@@ -34,6 +35,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.ModelAndViewDefiningException;
 
 import de.tweerlei.common.util.StringUtils;
 import de.tweerlei.common5.collections.StringComparators;
@@ -315,14 +318,19 @@ public class BrowseController
 	 * Show schemas
 	 * @param catalog Catalog
 	 * @return Model
+	 * @throws ModelAndViewDefiningException if the catalog does not exist
 	 */
 	@RequestMapping(value = "/db/*/dbschemas.html", method = RequestMethod.GET)
 	public Map<String, Object> showSchemas(
 			@RequestParam("catalog") String catalog
-			)
+			) throws ModelAndViewDefiningException
 		{
 		if (!connectionSettings.isBrowserEnabled())
 			throw new AccessDeniedException();
+		
+		final SortedSet<String> catalogs = metadataService.getCatalogs(connectionSettings.getLinkName());
+		if (!catalogs.contains(catalog))
+			throw new ModelAndViewDefiningException(new ModelAndView("redirect:dbcatalogs.html"));
 		
 		final Map<String, Object> model = new HashMap<String, Object>();
 		
@@ -332,7 +340,7 @@ public class BrowseController
 		levels.add(new SubQueryDefImpl(JdbcMessageKeys.CATALOG_LEVEL, null));
 		final Query query = new ViewImpl(JdbcMessageKeys.SCHEMA_LEVEL, null, null, null, null, levels, null);
 		
-		final RowSet cats = buildRowSet(query, metadataService.getSchemas(connectionSettings.getLinkName()), true);
+		final RowSet cats = buildRowSet(query, metadataService.getSchemas(connectionSettings.getLinkName(), catalog), true);
 		
 		final Map<String, TabItem<RowSet>> tabs = new LinkedHashMap<String, TabItem<RowSet>>();
 		tabs.put(JdbcMessageKeys.SCHEMA_TAB, new TabItem<RowSet>(cats, cats.getRows().size()));
@@ -382,7 +390,7 @@ public class BrowseController
 		final Map<String, Object> model = new HashMap<String, Object>();
 		
 		model.put("catalog", catalog);
-		model.put("schemas", metadataService.getSchemas(conn));
+		model.put("schemas", metadataService.getSchemas(conn, catalog));
 		
 		return (model);
 		}
@@ -414,6 +422,35 @@ public class BrowseController
 		}
 	
 	/**
+	 * Show schemas
+	 * @param conn Connection name
+	 * @param catalog Catalog
+	 * @param schema Schema
+	 * @param object Object name
+	 * @return Model
+	 */
+	@RequestMapping(value = "/db/*/ajax/dbcolumns.html", method = RequestMethod.GET)
+	public Map<String, Object> showColumns(
+			@RequestParam("c") String conn,
+			@RequestParam("catalog") String catalog,
+			@RequestParam("schema") String schema,
+			@RequestParam("object") String object
+			)
+		{
+		if (!connectionSettings.isBrowserEnabled())
+			throw new AccessDeniedException();
+		
+		final Map<String, Object> model = new HashMap<String, Object>();
+		
+		final QualifiedName qname = new QualifiedName(catalog, schema, object);
+		final TableDescription info = metadataService.getTableInfo(conn, qname, ColumnMode.ALL);
+		
+		model.put("columns", info.getColumns());
+		
+		return (model);
+		}
+	
+	/**
 	 * Show the schema selection dialog
 	 * @param catalog Selected catalog
 	 * @param schema Selected schema
@@ -438,7 +475,7 @@ public class BrowseController
 		if (catalog != null)
 			{
 			model.put("catalog", catalog);
-			model.put("schemas", metadataService.getSchemas(connectionSettings.getLinkName()));
+			model.put("schemas", metadataService.getSchemas(connectionSettings.getLinkName(), catalog));
 			if (schema != null)
 				model.put("schema", schema);
 			}
@@ -473,7 +510,7 @@ public class BrowseController
 		if (catalog != null)
 			{
 			model.put("catalog", catalog);
-			model.put("schemas", metadataService.getSchemas(connectionSettings.getLinkName()));
+			model.put("schemas", metadataService.getSchemas(connectionSettings.getLinkName(), catalog));
 			if (schema != null)
 				{
 				model.put("schema", schema);
@@ -490,15 +527,23 @@ public class BrowseController
 	 * @param catalog Catalog
 	 * @param schema Schema
 	 * @return Model
+	 * @throws ModelAndViewDefiningException if the catalog or schema does not exist
 	 */
 	@RequestMapping(value = "/db/*/dbobjects.html", method = RequestMethod.GET)
 	public Map<String, Object> showObjects(
 			@RequestParam("catalog") String catalog,
 			@RequestParam("schema") String schema
-			)
+			) throws ModelAndViewDefiningException
 		{
 		if (!connectionSettings.isBrowserEnabled())
 			throw new AccessDeniedException();
+		
+		final SortedSet<String> catalogs = metadataService.getCatalogs(connectionSettings.getLinkName());
+		if (!catalogs.contains(catalog))
+			throw new ModelAndViewDefiningException(new ModelAndView("redirect:dbcatalogs.html"));
+		final SortedSet<String> schemas = metadataService.getSchemas(connectionSettings.getLinkName(), catalog);
+		if (!schemas.contains(schema))
+			throw new ModelAndViewDefiningException(new ModelAndView("redirect:dbschemas.html?catalog="+catalog));
 		
 		browserSettingsManager.setCatalog(catalog);
 		browserSettingsManager.setSchema(schema);

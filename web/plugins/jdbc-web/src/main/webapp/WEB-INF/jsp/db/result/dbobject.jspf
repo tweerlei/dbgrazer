@@ -28,18 +28,31 @@
 			<fmt:message key="dbObject" var="title"/><ui:panel title="${title}" zoomable="true">
 				<dl class="result">
 					<dt><fmt:message key="name"/>:</dt>
-					<dd>${object}</dd>
+					<dd>${object}<c:if test="${currentConnection.writable && currentConnection.editorActive}"
+						> <span class="action" title="<fmt:message key="updateRow"/>" onclick="return showAlterTableDialog(event, '${catalog}', '${schema}', '${object}');"><fmt:message key="editIcon"
+						/></span></c:if></dd>
 					<dt><fmt:message key="dbObjectType"/>:</dt>
 					<dd>${info.type}</dd>
 					<dt><fmt:message key="comment"/>:</dt>
 					<dd>${fn:escapeXml(info.comment)}</dd>
+					<dt><fmt:message key="primaryKey"/>:</dt>
+					<dd><c:choose><c:when test="${info.primaryKey == null}"
+							><fmt:message key="empty"/><c:if test="${currentConnection.writable && currentConnection.editorActive}"
+							> <span class="action" title="<fmt:message key="insertRow"/>" onclick="return showAddPrimaryKeyDialog(event, '${catalog}', '${schema}', '${object}');"><fmt:message key="addIcon"/></span></c:if
+						></c:when><c:otherwise
+							><c:forEach items="${info.primaryKey.columns}" var="c" varStatus="st"><c:if test="${!st.first}"><br/></c:if>${c}</c:forEach><c:if test="${currentConnection.writable && currentConnection.editorActive}"
+							> <span class="action" title="<fmt:message key="deleteRow"/>" onclick="return showDropPrimaryKeyDialog(event, '${catalog}', '${schema}', '${object}', '${c.name}');"><fmt:message key="removeIcon"/></span></c:if
+						></c:otherwise></c:choose></dd>
 				</dl><hr/>
 			</ui:panel>
 			<fmt:message key="columnsTab" var="title"><fmt:param value="${fn:length(info.columns)}"/></fmt:message><ui:panel title="${title}" zoomable="true">
 				<table class="multiple columns table-autosort">
 					<thead>
 						<tr>
-							<th class="table-sortable table-sortable:numeric"><fmt:message key="position"/></th>
+<c:if test="${currentConnection.writable && currentConnection.editorActive}"
+>							<th class="actions">&nbsp;</th>
+</c:if
+>							<th class="table-sortable table-sortable:numeric"><fmt:message key="position"/></th>
 							<th class="table-sortable table-sortable:ignorecase"><fmt:message key="name"/></th>
 							<th class="table-sortable table-sortable:numeric"><fmt:message key="primaryKeyIndex"/></th>
 							<th class="table-sortable table-sortable:ignorecase"><fmt:message key="nullable"/></th>
@@ -53,7 +66,12 @@
 					<tbody>
 <c:forEach items="${info.columns}" var="c" varStatus="st"
 >						<tr>
-							<td>${st.index + 1}</td>
+<c:if test="${currentConnection.writable && currentConnection.editorActive}"
+>							<td class="actions"><span class="action" title="<fmt:message key="updateRow"/>" onclick="return showAlterColumnDialog(event, '${catalog}', '${schema}', '${object}', '${c.name}');"><fmt:message key="editIcon"
+								/></span>&nbsp;<span class="action" title="<fmt:message key="deleteRow"/>" onclick="return showDropColumnDialog(event, '${catalog}', '${schema}', '${object}', '${c.name}');"><fmt:message key="removeIcon"
+								/></span></td>
+</c:if
+>							<td>${st.index + 1}</td>
 							<td>${c.name}</td>
 							<td>${pkIndices[st.index]}</td>
 							<td><fmt:message key="${c.nullable}"/></td>
@@ -64,6 +82,20 @@
 							<td>${fn:escapeXml(c.comment)}</td>
 						</tr>
 </c:forEach
+><c:if test="${currentConnection.writable && currentConnection.editorActive}"
+>						<tr>
+							<td class="actions"><span class="action" title="<fmt:message key="insertRow"/>" onclick="return showAddColumnDialog(event, '${catalog}', '${schema}', '${object}');"><fmt:message key="addIcon"/></span></td>
+							<td>&nbsp;</td>
+							<td>&nbsp;</td>
+							<td>&nbsp;</td>
+							<td>&nbsp;</td>
+							<td>&nbsp;</td>
+							<td>&nbsp;</td>
+							<td>&nbsp;</td>
+							<td>&nbsp;</td>
+							<td>&nbsp;</td>
+						</tr>
+</c:if
 >					</tbody>
 				</table>
 			</ui:panel>
@@ -72,7 +104,10 @@
 				<table class="multiple table-autosort">
 					<thead>
 						<tr>
-							<th class="table-sortable table-sortable:ignorecase"><fmt:message key="action"/></th>
+<c:if test="${currentConnection.writable && currentConnection.editorActive}"
+>							<th class="actions">&nbsp;</th>
+</c:if
+>							<th class="table-sortable table-sortable:ignorecase"><fmt:message key="action"/></th>
 							<th class="table-sortable table-sortable:ignorecase"><fmt:message key="grantee"/></th>
 							<th class="table-sortable table-sortable:ignorecase"><fmt:message key="grantor"/></th>
 							<th class="table-sortable table-sortable:ignorecase"><fmt:message key="grantable"/></th>
@@ -81,12 +116,25 @@
 					<tbody>
 <c:forEach items="${privs}" var="priv"
 >						<tr>
-							<td>${priv.privilege}</td>
+<c:if test="${currentConnection.writable && currentConnection.editorActive}"
+>							<td class="actions"><span class="action" title="<fmt:message key="deleteRow"/>" onclick="return showRevokeDialog(event, '${catalog}', '${schema}', '${object}', '${priv.privilege}', '${priv.grantee}');"><fmt:message key="removeIcon"
+								/></span></td>
+</c:if
+>							<td>${priv.privilege}</td>
 							<td>${priv.grantee}</td>
 							<td>${priv.grantor}</td>
 							<td><fmt:message key="${priv.grantable}"/></td>
 						</tr>
 </c:forEach
+><c:if test="${currentConnection.writable && currentConnection.editorActive}"
+>						<tr>
+							<td class="actions"><span class="action" title="<fmt:message key="insertRow"/>" onclick="return showGrantDialog(event, '${catalog}', '${schema}', '${object}');"><fmt:message key="addIcon"/></span></td>
+							<td>&nbsp;</td>
+							<td>&nbsp;</td>
+							<td>&nbsp;</td>
+							<td>&nbsp;</td>
+						</tr>
+</c:if
 >					</tbody>
 				</table>
 			</ui:panel>
@@ -99,7 +147,10 @@
 				<table class="multiple table-autosort">
 					<thead>
 						<tr>
-							<th class="table-sortable table-sortable:ignorecase"><fmt:message key="name"/></th>
+<c:if test="${currentConnection.writable && currentConnection.editorActive}"
+>							<th class="actions">&nbsp;</th>
+</c:if
+>							<th class="table-sortable table-sortable:ignorecase"><fmt:message key="name"/></th>
 							<th class="table-sortable table-sortable:ignorecase"><fmt:message key="unique"/></th>
 							<th class="table-sortable table-sortable:ignorecase"><fmt:message key="columns"/></th>
 						</tr>
@@ -107,11 +158,23 @@
 					<tbody>
 <c:forEach items="${info.indices}" var="ix"
 >						<tr>
-							<td>${ix.name}</td>
+<c:if test="${currentConnection.writable && currentConnection.editorActive}"
+>							<td class="actions"><span class="action" title="<fmt:message key="deleteRow"/>" onclick="return showDropIndexDialog(event, '${catalog}', '${schema}', '${object}', '${ix.name}');"><fmt:message key="removeIcon"
+								/></span></td>
+</c:if
+>							<td>${ix.name}</td>
 							<td><fmt:message key="${ix.unique}"/></td>
 							<td><c:forEach items="${ix.columns}" var="c" varStatus="st"><c:if test="${!st.first}"><br/></c:if>${c}</c:forEach></td>
 						</tr>
 </c:forEach
+><c:if test="${currentConnection.writable && currentConnection.editorActive}"
+>						<tr>
+							<td class="actions"><span class="action" title="<fmt:message key="insertRow"/>" onclick="return showAddIndexDialog(event, '${catalog}', '${schema}', '${object}');"><fmt:message key="addIcon"/></span></td>
+							<td>&nbsp;</td>
+							<td>&nbsp;</td>
+							<td>&nbsp;</td>
+						</tr>
+</c:if
 >					</tbody>
 				</table>
 			</ui:panel>
@@ -120,7 +183,10 @@
 				<table class="multiple table-autosort">
 					<thead>
 						<tr>
-							<th class="table-sortable table-sortable:ignorecase"><fmt:message key="dbObject"/></th>
+<c:if test="${currentConnection.writable && currentConnection.editorActive}"
+>							<th class="actions">&nbsp;</th>
+</c:if
+>							<th class="table-sortable table-sortable:ignorecase"><fmt:message key="dbObject"/></th>
 							<th class="table-sortable table-sortable:ignorecase"><fmt:message key="viaFK"/></th>
 							<th class="table-sortable table-sortable:ignorecase"><fmt:message key="sourceColumns"/></th>
 							<th class="table-sortable table-sortable:ignorecase"><fmt:message key="destinationColumns"/></th>
@@ -129,7 +195,11 @@
 					<tbody>
 <c:forEach items="${info.referencedKeys}" var="fk"
 >						<tr>
-							<td><a href="db/${currentConnection.linkName}/dbobject.html?catalog=${fk.tableName.catalogName}&amp;schema=${fk.tableName.schemaName}&amp;object=${fk.tableName.objectName}"<c:if test="${not empty targetElement}"
+<c:if test="${currentConnection.writable && currentConnection.editorActive}"
+>							<td class="actions"><span class="action" title="<fmt:message key="deleteRow"/>" onclick="return showDropForeignKeyDialog(event, '${catalog}', '${schema}', '${object}', '${fk.name}');"><fmt:message key="removeIcon"
+								/></span></td>
+</c:if
+>							<td><a href="db/${currentConnection.linkName}/dbobject.html?catalog=${fk.tableName.catalogName}&amp;schema=${fk.tableName.schemaName}&amp;object=${fk.tableName.objectName}"<c:if test="${not empty targetElement}"
 								> onclick="return showDBObject(event, '${fk.tableName.catalogName}', '${fk.tableName.schemaName}', '${fk.tableName.objectName}');"</c:if
 								>>${fk.tableName.objectName}</a></td>
 							<td>${fk.name}</td>
@@ -137,6 +207,15 @@
 							<td><c:forEach items="${fk.columns}" var="c" varStatus="st"><c:if test="${!st.first}"><br/></c:if>${c.value}</c:forEach></td>
 						</tr>
 </c:forEach
+><c:if test="${currentConnection.writable && currentConnection.editorActive}"
+>						<tr>
+							<td class="actions"><span class="action" title="<fmt:message key="insertRow"/>" onclick="return showAddForeignKeyDialog(event, '${catalog}', '${schema}', '${object}');"><fmt:message key="copyIcon"/></span></td>
+							<td>&nbsp;</td>
+							<td>&nbsp;</td>
+							<td>&nbsp;</td>
+							<td>&nbsp;</td>
+						</tr>
+</c:if
 >					</tbody>
 				</table>
 			</ui:panel>

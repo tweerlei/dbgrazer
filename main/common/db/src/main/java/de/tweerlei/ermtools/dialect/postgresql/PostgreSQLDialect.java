@@ -137,7 +137,12 @@ public class PostgreSQLDialect extends CommonSQLDialect
 		
 		return (sb.toString());
 		}
-
+	
+	public String modifyTable(TableDescription old, TableDescription t)
+		{
+		return ("ALTER TABLE " + getQualifiedTableName(old.getName()) + " RENAME TO " + getQualifiedTableName(t.getName()));
+		}
+	
 	public String addColumn(TableDescription t, ColumnDescription c)
 		{
 		final StringBuffer sb = new StringBuffer();

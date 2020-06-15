@@ -14,15 +14,15 @@
  * limitations under the License.
 --%><%@
 	include file="../../include/include.jspf"
-%><spring:form id="f1" action="db/${currentConnection.linkName}/insert-simple.html" method="post" modelAttribute="model" onsubmit="return submitDML(this);" onreset="return closeDialog();">
+%><spring:form id="f1" action="db/${currentConnection.linkName}/ddl-drop-column.html" method="post" modelAttribute="model" onsubmit="return submitDML(this);" onreset="return closeDialog();">
 	<spring:hidden path="catalog"/>
 	<spring:hidden path="schema"/>
 	<spring:hidden path="object"/>
-	<spring:hidden path="backTo"/>
+	<spring:hidden path="name"/>
+	<p><fmt:message key="confirmDelete"/></p>
 	<div id="dmlerror"></div>
 	<dl>
-<ui:params items="${parameters}" fkTables="${fkTables}" path="params" nulls="${model.nulls}" nullPath="nulls"
-/>		<dt>&nbsp;</dt>
-		<dd><input id="f1-submit" type="submit" value="<fmt:message key="insertRow"/>"/> <input id="f1-reset" type="reset" value="<fmt:message key="cancel"/>"/></dd>
+		<dt>&nbsp;</dt>
+		<dd><input id="f1-submit" type="submit" value="<fmt:message key="deleteRow"/>"/> <input id="f1-reset" type="reset" value="<fmt:message key="cancel"/>"/></dd>
 	</dl><hr/>
 </spring:form>

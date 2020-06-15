@@ -230,7 +230,7 @@ public class DataEditController
 	 * @param fbo FormBackingObject
 	 * @return Model
 	 */
-	@RequestMapping(value = "/db/*/ajax/insert-simple.html", method = RequestMethod.GET)
+	@RequestMapping(value = "/db/*/ajax/dml-insert.html", method = RequestMethod.GET)
 	public Map<String, Object> showInsertDialog(@ModelAttribute("model") FormBackingObject fbo)
 		{
 		if (!connectionSettings.isBrowserEnabled())
@@ -265,7 +265,7 @@ public class DataEditController
 	 * @param fbo FormBackingObject
 	 * @return Model
 	 */
-	@RequestMapping(value = "/db/*/insert-simple.html", method = RequestMethod.POST)
+	@RequestMapping(value = "/db/*/dml-insert.html", method = RequestMethod.POST)
 	public Map<String, Object> performInsertQuery(@ModelAttribute("model") FormBackingObject fbo)
 		{
 		if (!connectionSettings.isBrowserEnabled())
@@ -313,7 +313,7 @@ public class DataEditController
 	 * @param fbo FormBackingObject
 	 * @return Model
 	 */
-	@RequestMapping(value = "/db/*/ajax/update-simple.html", method = RequestMethod.GET)
+	@RequestMapping(value = "/db/*/ajax/dml-update.html", method = RequestMethod.GET)
 	public Map<String, Object> showUpdateDialog(@ModelAttribute("model") FormBackingObject fbo)
 		{
 		if (!connectionSettings.isBrowserEnabled())
@@ -374,7 +374,7 @@ public class DataEditController
 	 * @param fbo FormBackingObject
 	 * @return Model
 	 */
-	@RequestMapping(value = "/db/*/update-simple.html", method = RequestMethod.POST)
+	@RequestMapping(value = "/db/*/dml-update.html", method = RequestMethod.POST)
 	public Map<String, Object> performUpdateQuery(@ModelAttribute("model") FormBackingObject fbo)
 		{
 		if (!connectionSettings.isBrowserEnabled())
@@ -424,7 +424,7 @@ public class DataEditController
 	 * @param fbo FormBackingObject
 	 * @return Model
 	 */
-	@RequestMapping(value = "/db/*/ajax/copy-simple.html", method = RequestMethod.GET)
+	@RequestMapping(value = "/db/*/ajax/dml-copy.html", method = RequestMethod.GET)
 	public Map<String, Object> showCopyDialog(@ModelAttribute("model") FormBackingObject fbo)
 		{
 		if (!connectionSettings.isBrowserEnabled())
@@ -519,7 +519,7 @@ public class DataEditController
 	 * @param fbo FormBackingObject
 	 * @return Model
 	 */
-	@RequestMapping(value = "/db/*/ajax/delete-simple.html", method = RequestMethod.GET)
+	@RequestMapping(value = "/db/*/ajax/dml-delete.html", method = RequestMethod.GET)
 	public Map<String, Object> showDeleteDialog(@ModelAttribute("model") FormBackingObject fbo)
 		{
 		if (!connectionSettings.isBrowserEnabled())
@@ -546,7 +546,7 @@ public class DataEditController
 	 * @param fbo FormBackingObject
 	 * @return Model
 	 */
-	@RequestMapping(value = "/db/*/delete-simple.html", method = RequestMethod.POST)
+	@RequestMapping(value = "/db/*/dml-delete.html", method = RequestMethod.POST)
 	public Map<String, Object> performDeleteQuery(@ModelAttribute("model") FormBackingObject fbo)
 		{
 		if (!connectionSettings.isBrowserEnabled())

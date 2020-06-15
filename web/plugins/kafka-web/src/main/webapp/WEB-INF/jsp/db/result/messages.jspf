@@ -20,23 +20,25 @@
 			<form class="filter" action="db/${currentConnection.linkName}/messages.html" method="get"<c:if test="${not empty targetElement}"> onsubmit="return showPartition(event, $F('f2-topic'), $F('f2-partition'), $F('f2-offset'), $F('f2-key'), $F('f2-compact'));"</c:if>>
 				<input type="hidden" id="f2-topic" name="topic" value="${topic}"/>
 				<input type="hidden" id="f2-partition" name="partition" value="${partition}"/>
-				<div class="filter"><fmt:message key="topicIDRange"><fmt:param value="${startOffset}"/><fmt:param value="${endOffset}"/></fmt:message></div>
-				<div class="filter"><fmt:message key="topicPosition"><fmt:param value="${currentOffset}"/></fmt:message></div>
+				<p><fmt:message key="topicIDRange"><fmt:param value="${startOffset}"/><fmt:param value="${endOffset}"/></fmt:message>, <fmt:message key="topicPosition"><fmt:param value="${currentOffset}"/></fmt:message></p>
 <c:choose><c:when test="${minOffset != null}"
-><c:if test="${prevOffset != null}"
->				<div class="filter"><input type="button" value="<fmt:message key="previous"/>" onclick="$('f2-offset').value = ${prevOffset}; Forms.submit(form);"/></div>
+>				<p>
+<c:if test="${prevOffset != null}"
+>					<input type="button" value="<fmt:message key="previous"/>" onclick="$('f2-offset').value = ${prevOffset}; Forms.submit(form);"/>
 </c:if
->				<div class="filter"><fmt:message key="fetchedIDRange"><fmt:param value="${minOffset}"/><fmt:param value="${maxOffset}"/></fmt:message></div>
+>					<fmt:message key="fetchedIDRange"><fmt:param value="${minOffset}"/><fmt:param value="${maxOffset}"/></fmt:message>
 <c:if test="${nextOffset != null}"
->				<div class="filter"><input type="button" value="<fmt:message key="next"/>" onclick="$('f2-offset').value = ${nextOffset}; Forms.submit(form);"/></div>
+>					<input type="button" value="<fmt:message key="next"/>" onclick="$('f2-offset').value = ${nextOffset}; Forms.submit(form);"/>
 </c:if
-></c:when><c:otherwise
->				<div class="filter"><fmt:message key="noData"/></div>
+>				</p>
+</c:when><c:otherwise
+>				<p><fmt:message key="noData"/></p>
 </c:otherwise></c:choose
->				<div class="filter"><label for="f2-offset"><fmt:message key="seek"/>:</label> <input type="text" id="f2-offset" name="offset" value="${offset}" size="10"/></div>
-				<div class="filter"><label for="f2-key"><fmt:message key="key"/>:</label> <input type="text" id="f2-key" name="key" value="${key}" size="10"/></div>
-				<div class="filter"><input type="checkbox" id="f2-compact" name="compact" value="true"<c:if test="${compact}"> checked="checked"</c:if>/> <label for="f2-compact"><fmt:message key="compact"/></label></div>
-				<div class="filter"><input type="submit" value="<fmt:message key="apply"/>"/></div>
+>				<p><label for="f2-offset"><fmt:message key="seek"/>:</label> <input type="text" id="f2-offset" name="offset" value="${offset}" size="10"/></p>
+				<p><label for="f2-key"><fmt:message key="key"/>:</label> <input type="text" id="f2-key" name="key" value="${fn:escapeXml(key)}" size="10"/>
+					<input type="checkbox" id="f2-compact" name="compact" value="true"<c:if test="${compact}"> checked="checked"</c:if>/> <label for="f2-compact"><fmt:message key="compact"/></label></p>
+				<p><label for="f2-value"><fmt:message key="searchTerm"/>:</label> <input type="text" id="f2-value" name="value" value="${fn:escapeXml(value)}" size="10"/></p>
+				<p><input type="submit" value="<fmt:message key="apply"/>"/></p>
 				<ui:filter id="filter-table-${label}" target="table-${label}"/>
 			</form>
 			<hr/>

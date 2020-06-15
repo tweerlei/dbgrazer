@@ -204,7 +204,31 @@ public class MSSQLDialect extends CommonSQLDialect
 		
 		return (sb.toString());
 		}
-
+	
+	public String modifyTable(TableDescription old, TableDescription t)
+		{
+		final StringBuilder sb = new StringBuilder();
+		
+		// Move between schemas
+		if (!old.getName().getSchemaName().equals(t.getName().getSchemaName()))
+			{
+			sb.append("ALTER SCHEMA ").append(t.getName().getSchemaName());
+			sb.append(" TRANSFER ").append(getQualifiedTableName(old.getName()));
+			}
+		
+		// Rename object
+		if (!old.getName().getObjectName().equals(t.getName().getObjectName()))
+			{
+			if (sb.length() > 0)
+				sb.append("; ");
+			
+			sb.append("EXEC sp_rename '").append(getQualifiedTableName(old.getName())).append("'");
+			sb.append(", '").append(t.getName().getObjectName()).append("'");
+			}
+		
+		return (sb.toString());
+		}
+	
 	public String addColumn(TableDescription t, ColumnDescription c)
 		{
 		final StringBuffer sb = new StringBuffer();

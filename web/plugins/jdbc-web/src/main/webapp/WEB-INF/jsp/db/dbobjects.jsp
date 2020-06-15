@@ -61,7 +61,11 @@
 		<div class="menuitem"><a href="db/${currentConnection.linkName}/dbcompare.html?catalog=${catalog}&amp;schema=${schema}" target="_blank"><fmt:message key="structureCompare"/></a></div>
 		<div class="menuitem"><a href="db/${currentConnection.linkName}/dbcount.html?catalog=${catalog}&amp;schema=${schema}" target="_blank"><fmt:message key="countCompare"/></a></div>
 		<div class="menuitem"><a href="db/${currentConnection.linkName}/srccompare.html?catalog=${catalog}&amp;schema=${schema}" target="_blank"><fmt:message key="ddlCompare"/></a></div>
-		<hr class="menuseparator"/>
+<c:if test="${currentConnection.writable}"
+>		<hr class="menuseparator"/>
+		<div class="menuitem"><a href="#" onclick="return showCreateTableDialog(event, '${catalog}', '${schema}');"><fmt:message key="createTable"/></a></div>
+</c:if
+>		<hr class="menuseparator"/>
 		<div class="menuitem"><a href="#" onclick="return clearDbCache();"><fmt:message key="clearCache"/></a></div>
 	</div></div>
 	</jsp:body></ui:headline1>

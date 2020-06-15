@@ -52,10 +52,11 @@ public interface MetadataReader
 	
 	/**
 	 * Get available schema names
+	 * @param catalog Catalog name
 	 * @return Schema names
 	 * @throws SQLException on error
 	 */
-	public List<String> getSchemaNames() throws SQLException;
+	public List<String> getSchemaNames(String catalog) throws SQLException;
 	
 	/**
 	 * Get table names

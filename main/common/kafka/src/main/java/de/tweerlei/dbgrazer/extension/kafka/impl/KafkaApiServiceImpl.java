@@ -26,6 +26,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import org.apache.kafka.clients.admin.Config;
 import org.apache.kafka.clients.admin.ConsumerGroupDescription;
@@ -262,8 +264,31 @@ public class KafkaApiServiceImpl implements KafkaApiService
 		}
 	
 	@Override
-	public List<ConsumerRecord<String, String>> fetchRecords(String c, String topic, Integer partition, Long startOffset, Long endOffset, String key)
+	public List<ConsumerRecord<String, String>> fetchRecords(String c, String topic, Integer partition, Long startOffset, Long endOffset, String key, String value)
 		{
+		Pattern keyPattern = null;
+		if (key != null)
+			{
+			try	{
+				keyPattern = Pattern.compile(key);
+				}
+			catch (PatternSyntaxException e)
+				{
+				// ignore
+				}
+			}
+		Pattern valuePattern = null;
+		if (value != null)
+			{
+			try	{
+				valuePattern = Pattern.compile(value);
+				}
+			catch (PatternSyntaxException e)
+				{
+				// ignore
+				}
+			}
+		
 		final Consumer<String, String> consumer = clientService.getConsumer(c);
 		
 		if (partition != null)
@@ -302,7 +327,9 @@ public class KafkaApiServiceImpl implements KafkaApiService
 					{
 					if (((startOffset == null) || (rec.offset() >= startOffset))
 							&& ((endOffset == null) || (rec.offset() <= endOffset))
-							&& ((key == null) || key.equals(rec.key())))
+							&& ((keyPattern == null) || (rec.key() != null && keyPattern.matcher(rec.key()).matches()))
+							&& ((valuePattern == null) || (rec.value() != null && valuePattern.matcher(rec.value()).matches()))
+							)
 						{
 						ret.add(rec);
 						n++;

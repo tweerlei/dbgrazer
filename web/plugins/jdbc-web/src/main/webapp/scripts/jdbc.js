@@ -61,6 +61,28 @@ function selectSchema(el) {
 	return false;
 }
 
+function selectObject(el) {
+	var obj = $F(el);
+	if (obj == '.') {
+		//$('f1-object').disabled = true;
+	} else {
+		var c = $F('f1-connection');
+		var cat = $F('f1-catalog');
+		var sch = $F('f1-schema');
+		if ((c == '.') || (cat == '.') || (sch == '.')) {
+			//$('f1-object').disabled = true;
+		} else {
+			var txt = WSApi.getDBAsync('dbcolumns', { c: c, catalog: cat, schema: sch, object: obj }, function(txt) {
+				$$('select.dbcolumn').each(function(e)
+					{
+					e.innerHTML = txt;
+					});
+			});
+		}
+	}
+	return selectObjComplete(el);
+}
+
 function selectObjComplete(el) {
 	var s = $F(el);
 	if (s == '.') {

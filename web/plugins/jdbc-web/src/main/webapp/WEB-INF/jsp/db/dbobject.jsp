@@ -82,7 +82,10 @@
 		<div class="menuitem"><a href="db/${currentConnection.linkName}/dml.html?catalog=${catalog}&amp;schema=${schema}&amp;object=${object}" target="_blank"><fmt:message key="fullCompare"/></a></div>
 		<hr class="menuseparator"/>
 		<div class="menuitem"><a href="db/${currentConnection.linkName}/dbobject-upload.html?catalog=${catalog}&amp;schema=${schema}&amp;object=${object}" target="_blank"><fmt:message key="uploadData"/></a></div>
-		<hr class="menuseparator"/>
+<c:if test="${currentConnection.writable}"
+>		<div class="menuitem"><a href="#" onclick="return showDropTableDialog(event, '${catalog}', '${schema}', '${object}');"><fmt:message key="dropTable"/></a></div>
+</c:if
+>		<hr class="menuseparator"/>
 		<div class="menuitem"><a href="#" onclick="return clearDbCache();"><fmt:message key="clearCache"/></a></div>
 	</div></div>
 	</jsp:body></ui:headline1>

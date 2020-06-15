@@ -59,9 +59,10 @@ public interface MetadataLoader
 	
 	/**
 	 * Get all schemas
+	 * @param catalog Catalog name
 	 * @return Schemas
 	 */
-	public SortedSet<String> getSchemas();
+	public SortedSet<String> getSchemas(String catalog);
 	
 	/**
 	 * Get tables

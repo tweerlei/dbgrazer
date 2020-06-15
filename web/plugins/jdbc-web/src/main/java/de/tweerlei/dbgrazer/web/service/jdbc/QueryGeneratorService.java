@@ -17,6 +17,11 @@ package de.tweerlei.dbgrazer.web.service.jdbc;
 
 import java.util.Map;
 
+import de.tweerlei.common5.jdbc.model.ColumnDescription;
+import de.tweerlei.common5.jdbc.model.ForeignKeyDescription;
+import de.tweerlei.common5.jdbc.model.IndexDescription;
+import de.tweerlei.common5.jdbc.model.PrimaryKeyDescription;
+import de.tweerlei.common5.jdbc.model.PrivilegeDescription;
 import de.tweerlei.common5.jdbc.model.TableDescription;
 import de.tweerlei.dbgrazer.query.model.Query;
 import de.tweerlei.dbgrazer.web.formatter.DataFormatter;
@@ -67,4 +72,129 @@ public interface QueryGeneratorService
 	 * @return Query
 	 */
 	public Query createDeleteQuery(TableDescription t, SQLDialect dialect, DataFormatter fmt);
+	
+	/**
+	 * Create an ALTER query for a TableDescription
+	 * @param t TableDescription
+	 * @param dialect SQLDialect
+	 * @param c ColumnDescription
+	 * @return Query
+	 */
+	public Query createAddColumnQuery(TableDescription t, SQLDialect dialect, ColumnDescription c);
+	
+	/**
+	 * Create an ALTER query for a TableDescription
+	 * @param t TableDescription
+	 * @param dialect SQLDialect
+	 * @param prev Current ColumnDescription
+	 * @param c New ColumnDescription
+	 * @return Query
+	 */
+	public Query createAlterColumnQuery(TableDescription t, SQLDialect dialect, ColumnDescription prev, ColumnDescription c);
+	
+	/**
+	 * Create an ALTER query for a TableDescription
+	 * @param t TableDescription
+	 * @param dialect SQLDialect
+	 * @param c ColumnDescription
+	 * @return Query
+	 */
+	public Query createDropColumnQuery(TableDescription t, SQLDialect dialect, ColumnDescription c);
+	
+	/**
+	 * Create an ALTER query for a TableDescription
+	 * @param t TableDescription
+	 * @param dialect SQLDialect
+	 * @param i IndexDescription
+	 * @return Query
+	 */
+	public Query createAddIndexQuery(TableDescription t, SQLDialect dialect, IndexDescription i);
+	
+	/**
+	 * Create an ALTER query for a TableDescription
+	 * @param t TableDescription
+	 * @param dialect SQLDialect
+	 * @param i IndexDescription
+	 * @return Query
+	 */
+	public Query createDropIndexQuery(TableDescription t, SQLDialect dialect, IndexDescription i);
+	
+	/**
+	 * Create an ALTER query for a TableDescription
+	 * @param t TableDescription
+	 * @param dialect SQLDialect
+	 * @param i PrimaryKeyDescription
+	 * @return Query
+	 */
+	public Query createAddPrimaryKeyQuery(TableDescription t, SQLDialect dialect, PrimaryKeyDescription i);
+	
+	/**
+	 * Create an ALTER query for a TableDescription
+	 * @param t TableDescription
+	 * @param dialect SQLDialect
+	 * @param i PrimaryKeyDescription
+	 * @return Query
+	 */
+	public Query createDropPrimaryKeyQuery(TableDescription t, SQLDialect dialect, PrimaryKeyDescription i);
+	
+	/**
+	 * Create an ALTER query for a TableDescription
+	 * @param t TableDescription
+	 * @param dialect SQLDialect
+	 * @param f ForeignKeyDescription
+	 * @return Query
+	 */
+	public Query createAddForeignKeyQuery(TableDescription t, SQLDialect dialect, ForeignKeyDescription f);
+	
+	/**
+	 * Create an ALTER query for a TableDescription
+	 * @param t TableDescription
+	 * @param dialect SQLDialect
+	 * @param f ForeignKeyDescription
+	 * @return Query
+	 */
+	public Query createDropForeignKeyQuery(TableDescription t, SQLDialect dialect, ForeignKeyDescription f);
+	
+	/**
+	 * Create an ALTER query for a TableDescription
+	 * @param t TableDescription
+	 * @param dialect SQLDialect
+	 * @param p PrivilegeDescription
+	 * @return Query
+	 */
+	public Query createGrantQuery(TableDescription t, SQLDialect dialect, PrivilegeDescription p);
+	
+	/**
+	 * Create an ALTER query for a TableDescription
+	 * @param t TableDescription
+	 * @param dialect SQLDialect
+	 * @param p PrivilegeDescription
+	 * @return Query
+	 */
+	public Query createRevokeQuery(TableDescription t, SQLDialect dialect, PrivilegeDescription p);
+	
+	/**
+	 * Create a CREATE query for a TableDescription
+	 * @param t TableDescription
+	 * @param dialect SQLDialect
+	 * @return Query
+	 */
+	public Query createCreateTableQuery(TableDescription t, SQLDialect dialect);
+	
+	/**
+	 * Create an ALTER query for a TableDescription
+	 * @param prev Current TableDescription
+	 * @param dialect SQLDialect
+	 * @param t New TableDescription
+	 * @return Query
+	 */
+	public Query createAlterTableQuery(TableDescription prev, SQLDialect dialect, TableDescription t);
+	
+	/**
+	 * Create a DROP query for a TableDescription
+	 * @param t TableDescription
+	 * @param dialect SQLDialect
+	 * @return Query
+	 */
+	public Query createDropTableQuery(TableDescription t, SQLDialect dialect);
 	}

@@ -1129,6 +1129,15 @@ function runQuery(ev, query, param, target) {
 	return false;
 }
 
+function clearDetails(msg) {
+	var el = $('explorer-right');
+	if (el) {
+		el.innerHTML = '<p class="center">'+msg+'</p>';
+		return true;
+	}
+	return false;
+}
+
 function restoreQuery() {
 	var d = HashMonitor.get('detail');
 	var p = HashMonitor.get('params');

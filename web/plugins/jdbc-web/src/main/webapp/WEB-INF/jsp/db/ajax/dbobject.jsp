@@ -48,7 +48,10 @@
 		<div class="menuitem"><a href="db/${currentConnection.linkName}/dml.html?catalog=${catalog}&amp;schema=${schema}&amp;object=${object}" target="_blank"><fmt:message key="fullCompare"/></a></div>
 		<hr class="menuseparator"/>
 		<div class="menuitem"><a href="db/${currentConnection.linkName}/dbobject-upload.html?catalog=${catalog}&amp;schema=${schema}&amp;object=${object}" target="_blank"><fmt:message key="uploadData"/></a></div>
-	</div></div>
+<c:if test="${currentConnection.writable}"
+>		<div class="menuitem"><a href="#" onclick="return showDropTableDialog(event, '${catalog}', '${schema}', '${object}');"><fmt:message key="dropTable"/></a></div>
+</c:if
+>	</div></div>
 	</ui:headline2>
 	
 	<ui:tabs items="${tabs}" var="ix" varKey="label" varLink="detailLink" varParams="detailParams" varParamString="detailParamString" name="result"><%@

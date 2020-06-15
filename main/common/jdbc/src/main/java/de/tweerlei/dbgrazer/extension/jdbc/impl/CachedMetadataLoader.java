@@ -113,12 +113,12 @@ public class CachedMetadataLoader implements MetadataLoader
 		}
 	
 	@Override
-	public SortedSet<String> getSchemas()
+	public SortedSet<String> getSchemas(String catalog)
 		{
 		if (schemas == null)
 			{
-			logger.log(Level.INFO, "Fetching schemas for " + delegate.getLink());
-			schemas = delegate.getSchemas();
+			logger.log(Level.INFO, "Fetching schemas in " + catalog + " for " + delegate.getLink());
+			schemas = delegate.getSchemas(catalog);
 			}
 		return (new TreeSet<String>(schemas));
 		}

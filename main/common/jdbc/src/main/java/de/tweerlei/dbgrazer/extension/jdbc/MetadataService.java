@@ -73,9 +73,10 @@ public interface MetadataService
 	/**
 	 * Get all schemas
 	 * @param link Link name
+	 * @param catalog Catalog name
 	 * @return Schemas
 	 */
-	public SortedSet<String> getSchemas(String link);
+	public SortedSet<String> getSchemas(String link, String catalog);
 	
 	/**
 	 * Get tables

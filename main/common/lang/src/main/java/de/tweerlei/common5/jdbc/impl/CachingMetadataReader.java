@@ -37,7 +37,7 @@ public class CachingMetadataReader implements MetadataReader
 	private String defaultCatalog;
 	private String defaultSchema;
 	private List<String> catalogs;
-	private List<String> schemas;
+	private final Map<String, List<String>> schemas;
 	private final Map<String, Map<String, String>> tables;
 	private final Map<String, Map<String, String>> procedures;
 	private final Map<String, Map<String, Integer>> types;
@@ -51,6 +51,7 @@ public class CachingMetadataReader implements MetadataReader
 	public CachingMetadataReader(MetadataReader target)
 		{
 		this.target = target;
+		schemas = new ConcurrentHashMap<String, List<String>>();
 		tables = new ConcurrentHashMap<String, Map<String, String>>();
 		procedures = new ConcurrentHashMap<String, Map<String, String>>();
 		types = new ConcurrentHashMap<String, Map<String, Integer>>();
@@ -66,7 +67,7 @@ public class CachingMetadataReader implements MetadataReader
 		defaultCatalog = null;
 		defaultSchema = null;
 		catalogs = null;
-		schemas = null;
+		schemas.clear();
 		tables.clear();
 		procedures.clear();
 		types.clear();
@@ -99,13 +100,13 @@ public class CachingMetadataReader implements MetadataReader
 		return (new ArrayList<String>(ret));
 		}
 	
-	public List<String> getSchemaNames() throws SQLException
+	public List<String> getSchemaNames(String catalog) throws SQLException
 		{
-		List<String> ret = schemas;
+		List<String> ret = schemas.get(catalog);
 		if (ret == null)
 			{
-			ret = target.getSchemaNames();
-			schemas = ret;
+			ret = target.getSchemaNames(catalog);
+			schemas.put(catalog, ret);
 			}
 		return (new ArrayList<String>(ret));
 		}

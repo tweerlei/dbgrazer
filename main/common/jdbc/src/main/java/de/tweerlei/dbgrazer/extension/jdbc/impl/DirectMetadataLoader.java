@@ -149,7 +149,7 @@ public class DirectMetadataLoader implements MetadataLoader
 		}
 	
 	@Override
-	public SortedSet<String> getSchemas()
+	public SortedSet<String> getSchemas(String catalog)
 		{
 		final SortedSet<String> ret = new TreeSet<String>(StringComparators.CASE_INSENSITIVE);
 		
@@ -164,7 +164,7 @@ public class DirectMetadataLoader implements MetadataLoader
 			public Object doInConnection(Connection con) throws SQLException, DataAccessException
 				{
 				final MetadataReader r = dialect.getMetadataReader(con);
-				ret.addAll(r.getSchemaNames());
+				ret.addAll(r.getSchemaNames(catalog));
 				return (null);
 				}
 			});
