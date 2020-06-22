@@ -94,7 +94,7 @@ public class GenericDialect extends CommonSQLDialect
 	
 	public String modifyTable(TableDescription old, TableDescription t)
 		{
-		return ("ALTER TABLE " + getQualifiedTableName(old.getName()) + " RENAME TO " + getQualifiedTableName(t.getName()));
+		return ("ALTER TABLE " + getQualifiedTableName(old.getName()) + "\n\tRENAME TO " + getQualifiedTableName(t.getName()));
 		}
 	
 	public String addColumn(TableDescription t, ColumnDescription c)

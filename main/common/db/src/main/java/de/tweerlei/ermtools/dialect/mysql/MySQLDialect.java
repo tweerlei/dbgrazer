@@ -86,7 +86,7 @@ public class MySQLDialect extends CommonSQLDialect
 		{
 		final StringBuffer sb = new StringBuffer();
 		sb.append("CREATE TABLE ");
-		sb.append(t.getName().getObjectName());
+		sb.append(getQualifiedTableName(t.getName()));
 		sb.append(" (\n\t");
 		
 		boolean first = true;
@@ -141,7 +141,7 @@ public class MySQLDialect extends CommonSQLDialect
 		{
 		final StringBuffer sb = new StringBuffer();
 		sb.append("ALTER TABLE ");
-		sb.append(t.getName().getObjectName());
+		sb.append(getQualifiedTableName(t.getName()));
 		sb.append("\n\tADD ");
 		sb.append(c.getName());
 		sb.append(" ");
@@ -160,7 +160,7 @@ public class MySQLDialect extends CommonSQLDialect
 		{
 		final StringBuffer sb = new StringBuffer();
 		sb.append("ALTER TABLE ");
-		sb.append(t.getName().getObjectName());
+		sb.append(getQualifiedTableName(t.getName()));
 		sb.append("\n\tMODIFY COLUMN ");
 		sb.append(c.getName());
 		sb.append(" ");
@@ -179,7 +179,7 @@ public class MySQLDialect extends CommonSQLDialect
 		{
 		final StringBuffer sb = new StringBuffer();
 		sb.append("ALTER TABLE ");
-		sb.append(t.getName().getObjectName());
+		sb.append(getQualifiedTableName(t.getName()));
 		sb.append("\n\tDROP COLUMN ");
 		sb.append(c.getName());
 		return (sb.toString());
@@ -189,7 +189,7 @@ public class MySQLDialect extends CommonSQLDialect
 		{
 		final StringBuffer sb = new StringBuffer();
 		sb.append("ALTER TABLE ");
-		sb.append(t.getName().getObjectName());
+		sb.append(getQualifiedTableName(t.getName()));
 		if (ix.isUnique())
 			sb.append("\n\tADD UNIQUE KEY ");
 		else
@@ -215,7 +215,7 @@ public class MySQLDialect extends CommonSQLDialect
 		{
 		final StringBuffer sb = new StringBuffer();
 		sb.append("ALTER TABLE ");
-		sb.append(t.getName().getObjectName());
+		sb.append(getQualifiedTableName(t.getName()));
 		sb.append("\n\tDROP INDEX ");
 		sb.append(ix.getName());
 		return (sb.toString());
@@ -225,7 +225,7 @@ public class MySQLDialect extends CommonSQLDialect
 		{
 		final StringBuffer sb = new StringBuffer();
 		sb.append("ALTER TABLE ");
-		sb.append(t.getName().getObjectName());
+		sb.append(getQualifiedTableName(t.getName()));
 		sb.append("\n\tADD PRIMARY KEY (");
 		
 		boolean first = true;
@@ -246,7 +246,7 @@ public class MySQLDialect extends CommonSQLDialect
 		{
 		final StringBuffer sb = new StringBuffer();
 		sb.append("ALTER TABLE ");
-		sb.append(t.getName().getObjectName());
+		sb.append(getQualifiedTableName(t.getName()));
 		sb.append("\n\tDROP PRIMARY KEY");
 		return (sb.toString());
 		}
@@ -255,7 +255,7 @@ public class MySQLDialect extends CommonSQLDialect
 		{
 		final StringBuffer sb = new StringBuffer();
 		sb.append("ALTER TABLE ");
-		sb.append(t.getName().getObjectName());
+		sb.append(getQualifiedTableName(t.getName()));
 		sb.append("\n\tADD CONSTRAINT ");
 		sb.append(fk.getName());
 		sb.append("\n\tFOREIGN KEY (");
@@ -271,7 +271,7 @@ public class MySQLDialect extends CommonSQLDialect
 			}
 		
 		sb.append(")\n\tREFERENCES ");
-		sb.append(fk.getTableName().getObjectName());
+		sb.append(getQualifiedTableName(fk.getTableName()));
 		sb.append(" (");
 		
 		first = true;
@@ -292,7 +292,7 @@ public class MySQLDialect extends CommonSQLDialect
 		{
 		final StringBuffer sb = new StringBuffer();
 		sb.append("ALTER TABLE ");
-		sb.append(t.getName().getObjectName());
+		sb.append(getQualifiedTableName(t.getName()));
 		sb.append("\n\tDROP FOREIGN KEY ");
 		sb.append(fk.getName());
 		return (sb.toString());

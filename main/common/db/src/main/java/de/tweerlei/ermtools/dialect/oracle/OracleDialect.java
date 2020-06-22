@@ -28,6 +28,7 @@ import de.tweerlei.common5.jdbc.model.ForeignKeyDescription;
 import de.tweerlei.common5.jdbc.model.IndexDescription;
 import de.tweerlei.common5.jdbc.model.PrimaryKeyDescription;
 import de.tweerlei.common5.jdbc.model.PrivilegeDescription;
+import de.tweerlei.common5.jdbc.model.QualifiedName;
 import de.tweerlei.common5.jdbc.model.TableDescription;
 import de.tweerlei.ermtools.dialect.SQLDataType;
 import de.tweerlei.ermtools.dialect.SQLScriptOutputReader;
@@ -100,7 +101,7 @@ public class OracleDialect extends CommonSQLDialect
 		{
 		final StringBuffer sb = new StringBuffer();
 		sb.append("CREATE TABLE ");
-		sb.append(t.getName().getObjectName());
+		sb.append(getQualifiedTableName(t.getName()));
 		sb.append(" (\n\t");
 		
 		boolean first = true;
@@ -149,14 +150,14 @@ public class OracleDialect extends CommonSQLDialect
 	
 	public String modifyTable(TableDescription old, TableDescription t)
 		{
-		return ("ALTER TABLE " + getQualifiedTableName(old.getName()) + " RENAME TO " + getQualifiedTableName(t.getName()));
+		return ("ALTER TABLE " + getQualifiedTableName(old.getName()) + "\n\tRENAME TO " + getQualifiedTableName(t.getName()));
 		}
 	
 	public String addColumn(TableDescription t, ColumnDescription c)
 		{
 		final StringBuffer sb = new StringBuffer();
 		sb.append("ALTER TABLE ");
-		sb.append(t.getName().getObjectName());
+		sb.append(getQualifiedTableName(t.getName()));
 		sb.append("\n\tADD ");
 		sb.append(c.getName());
 		sb.append(" ");
@@ -174,7 +175,7 @@ public class OracleDialect extends CommonSQLDialect
 		{
 		final StringBuffer sb = new StringBuffer();
 		sb.append("ALTER TABLE ");
-		sb.append(t.getName().getObjectName());
+		sb.append(getQualifiedTableName(t.getName()));
 		sb.append("\n\tMODIFY ");
 		sb.append(c.getName());
 		sb.append(" ");
@@ -193,7 +194,7 @@ public class OracleDialect extends CommonSQLDialect
 		{
 		final StringBuffer sb = new StringBuffer();
 		sb.append("ALTER TABLE ");
-		sb.append(t.getName().getObjectName());
+		sb.append(getQualifiedTableName(t.getName()));
 		sb.append("\n\tDROP COLUMN ");
 		sb.append(c.getName());
 		return (sb.toString());
@@ -217,7 +218,7 @@ public class OracleDialect extends CommonSQLDialect
 			sb.append("INDEX ");
 		sb.append(ix.getName());
 		sb.append("\n\tON ");
-		sb.append(t.getName().getObjectName());
+		sb.append(getQualifiedTableName(t.getName()));
 		sb.append(" (");
 		
 		boolean first = true;
@@ -236,9 +237,11 @@ public class OracleDialect extends CommonSQLDialect
 
 	public String dropIndex(TableDescription t, IndexDescription ix)
 		{
+		final QualifiedName qname = new QualifiedName(t.getName().getCatalogName(), t.getName().getSchemaName(), ix.getName());
+		
 		final StringBuffer sb = new StringBuffer();
 		sb.append("DROP INDEX ");
-		sb.append(ix.getName());
+		sb.append(getQualifiedTableName(qname));
 		return (sb.toString());
 		}
 
@@ -246,7 +249,7 @@ public class OracleDialect extends CommonSQLDialect
 		{
 		final StringBuffer sb = new StringBuffer();
 		sb.append("ALTER TABLE ");
-		sb.append(t.getName().getObjectName());
+		sb.append(getQualifiedTableName(t.getName()));
 		sb.append("\n\tADD CONSTRAINT ");
 		sb.append(k.getName());
 		sb.append(" PRIMARY KEY (");
@@ -269,7 +272,7 @@ public class OracleDialect extends CommonSQLDialect
 		{
 		final StringBuffer sb = new StringBuffer();
 		sb.append("ALTER TABLE ");
-		sb.append(t.getName().getObjectName());
+		sb.append(getQualifiedTableName(t.getName()));
 		sb.append("\n\tDROP CONSTRAINT ");
 		sb.append(k.getName());
 		return (sb.toString());
@@ -279,7 +282,7 @@ public class OracleDialect extends CommonSQLDialect
 		{
 		final StringBuffer sb = new StringBuffer();
 		sb.append("ALTER TABLE ");
-		sb.append(t.getName().getObjectName());
+		sb.append(getQualifiedTableName(t.getName()));
 		sb.append("\n\tADD CONSTRAINT ");
 		sb.append(fk.getName());
 		sb.append("\n\tFOREIGN KEY (");
@@ -301,7 +304,7 @@ public class OracleDialect extends CommonSQLDialect
 			sb.append(fk.getTableName().getSchemaName());
 			sb.append(".");
 			}
-		sb.append(fk.getTableName().getObjectName());
+		sb.append(getQualifiedTableName(fk.getTableName()));
 		sb.append(" (");
 		
 		first = true;
@@ -322,7 +325,7 @@ public class OracleDialect extends CommonSQLDialect
 		{
 		final StringBuffer sb = new StringBuffer();
 		sb.append("ALTER TABLE ");
-		sb.append(t.getName().getObjectName());
+		sb.append(getQualifiedTableName(t.getName()));
 		sb.append("\n\tDROP CONSTRAINT ");
 		sb.append(fk.getName());
 		return (sb.toString());
@@ -335,7 +338,7 @@ public class OracleDialect extends CommonSQLDialect
 		sb.append("GRANT ");
 		sb.append(p.getPrivilege());
 		sb.append(" ON ");
-		sb.append(t.getName().getObjectName());
+		sb.append(getQualifiedTableName(t.getName()));
 		sb.append(" TO ");
 		sb.append(p.getGrantee());
 		if (p.isGrantable())

@@ -27,6 +27,7 @@ import de.tweerlei.common5.jdbc.model.ColumnDescription;
 import de.tweerlei.common5.jdbc.model.ForeignKeyDescription;
 import de.tweerlei.common5.jdbc.model.IndexDescription;
 import de.tweerlei.common5.jdbc.model.PrimaryKeyDescription;
+import de.tweerlei.common5.jdbc.model.QualifiedName;
 import de.tweerlei.common5.jdbc.model.TableDescription;
 import de.tweerlei.ermtools.dialect.SQLDataType;
 import de.tweerlei.ermtools.dialect.SQLStatementAnalyzer;
@@ -92,7 +93,7 @@ public class PostgreSQLDialect extends CommonSQLDialect
 		{
 		final StringBuffer sb = new StringBuffer();
 		sb.append("CREATE TABLE ");
-		sb.append(t.getName().getObjectName());
+		sb.append(getQualifiedTableName(t.getName()));
 		sb.append(" (\n\t");
 		
 		boolean first = true;
@@ -140,14 +141,36 @@ public class PostgreSQLDialect extends CommonSQLDialect
 	
 	public String modifyTable(TableDescription old, TableDescription t)
 		{
-		return ("ALTER TABLE " + getQualifiedTableName(old.getName()) + " RENAME TO " + getQualifiedTableName(t.getName()));
+		final StringBuilder sb = new StringBuilder();
+		QualifiedName tempName = old.getName();
+		
+		// Rename object
+		if (!old.getName().getObjectName().equals(t.getName().getObjectName()))
+			{
+			sb.append("ALTER TABLE ").append(getQualifiedTableName(old.getName()));
+			sb.append("\n\tRENAME TO ").append(t.getName().getObjectName());
+			
+			tempName = new QualifiedName(old.getName().getCatalogName(), old.getName().getSchemaName(), t.getName().getObjectName());
+			}
+		
+		// Move between schemas
+		if (!old.getName().getSchemaName().equals(t.getName().getSchemaName()))
+			{
+			if (sb.length() > 0)
+				sb.append(";\n");
+		
+			sb.append("ALTER TABLE ").append(getQualifiedTableName(tempName));
+			sb.append("\n\tSET SCHEMA ").append(t.getName().getSchemaName());
+			}
+		
+		return (sb.toString());
 		}
 	
 	public String addColumn(TableDescription t, ColumnDescription c)
 		{
 		final StringBuffer sb = new StringBuffer();
 		sb.append("ALTER TABLE ");
-		sb.append(t.getName().getObjectName());
+		sb.append(getQualifiedTableName(t.getName()));
 		sb.append("\n\tADD ");
 		sb.append(c.getName());
 		sb.append(" ");
@@ -161,31 +184,90 @@ public class PostgreSQLDialect extends CommonSQLDialect
 			}
 		return (sb.toString());
 		}
-
+	
 	public String modifyColumn(TableDescription t, ColumnDescription c, ColumnDescription old)
 		{
 		final StringBuffer sb = new StringBuffer();
 		sb.append("ALTER TABLE ");
-		sb.append(t.getName().getObjectName());
-		sb.append("\n\tMODIFY COLUMN ");
-		sb.append(c.getName());
-		sb.append(" ");
-		sb.append(dataTypeToString(c.getType()));
-		sb.append(c.isNullable() ? " NULL" : " NOT NULL");
-		if (c.getDefaultValue() != null)
+		sb.append(getQualifiedTableName(t.getName()));
+		boolean sep = false;
+		
+		if (c.isNullable() && !old.isNullable())
 			{
-			sb.append(" DEFAULT '");
+			if (sep)
+				sb.append(",");
+			else
+				sep = true;
+			sb.append("\n\tALTER COLUMN ");
+			sb.append(old.getName());
+			sb.append(" DROP NOT NULL");
+			}
+		else if (!c.isNullable() && old.isNullable())
+			{
+			if (sep)
+				sb.append(",");
+			else
+				sep = true;
+			sb.append("\n\tALTER COLUMN ");
+			sb.append(old.getName());
+			sb.append(" SET NOT NULL");
+			}
+	
+		if ((c.getDefaultValue() == null) && (old.getDefaultValue() != null))
+			{
+			if (sep)
+				sb.append(",");
+			else
+				sep = true;
+			sb.append("\n\tALTER COLUMN ");
+			sb.append(old.getName());
+			sb.append(" DROP DEFAULT");
+			}
+		else if ((c.getDefaultValue() != null)  && !c.getDefaultValue().equals(old.getDefaultValue()))
+			{
+			if (sep)
+				sb.append(",");
+			else
+				sep = true;
+			sb.append("\n\tALTER COLUMN ");
+			sb.append(old.getName());
+			sb.append(" SET DEFAULT '");
 			sb.append(c.getDefaultValue());
 			sb.append("'");
 			}
+		
+		final String oldType = dataTypeToString(old.getType());
+		final String newType = dataTypeToString(c.getType());
+		if (!sep || !newType.equalsIgnoreCase(oldType))
+			{
+			if (sep)
+				sb.append(",");
+			else
+				sep = true;
+			sb.append("\n\tALTER COLUMN ");
+			sb.append(c.getName());
+			sb.append(" TYPE ");
+			sb.append(newType);
+			}
+		
+		if (!old.getName().equals(c.getName()))
+			{
+			sb.append(";\nALTER TABLE ");
+			sb.append(getQualifiedTableName(t.getName()));
+			sb.append("\n\tRENAME COLUMN ");
+			sb.append(old.getName());
+			sb.append(" TO ");
+			sb.append(c.getName());
+			}
+		
 		return (sb.toString());
 		}
-
+	
 	public String removeColumn(TableDescription t, ColumnDescription c)
 		{
 		final StringBuffer sb = new StringBuffer();
 		sb.append("ALTER TABLE ");
-		sb.append(t.getName().getObjectName());
+		sb.append(getQualifiedTableName(t.getName()));
 		sb.append("\n\tDROP COLUMN ");
 		sb.append(c.getName());
 		return (sb.toString());
@@ -193,14 +275,23 @@ public class PostgreSQLDialect extends CommonSQLDialect
 
 	public String createIndex(TableDescription t, IndexDescription ix)
 		{
+		final PrimaryKeyDescription pk = t.getPrimaryKey();
+		if (pk != null)
+			{
+			// Suppress index creation for PK (in most cases, PostgreSQL does this itself)
+			if (ix.getColumns().equals(pk.getColumns()))
+				return ("NULL;");
+			}
+		
 		final StringBuffer sb = new StringBuffer();
-		sb.append("ALTER TABLE ");
-		sb.append(t.getName().getObjectName());
+		sb.append("CREATE ");
 		if (ix.isUnique())
-			sb.append("\n\tADD UNIQUE KEY ");
+			sb.append("UNIQUE INDEX ");
 		else
-			sb.append("\n\tADD KEY ");
+			sb.append("INDEX ");
 		sb.append(ix.getName());
+		sb.append("\n\tON ");
+		sb.append(getQualifiedTableName(t.getName()));
 		sb.append(" (");
 		
 		boolean first = true;
@@ -219,11 +310,11 @@ public class PostgreSQLDialect extends CommonSQLDialect
 
 	public String dropIndex(TableDescription t, IndexDescription ix)
 		{
+		final QualifiedName qname = new QualifiedName(t.getName().getCatalogName(), t.getName().getSchemaName(), ix.getName());
+		
 		final StringBuffer sb = new StringBuffer();
-		sb.append("ALTER TABLE ");
-		sb.append(t.getName().getObjectName());
-		sb.append("\n\tDROP INDEX ");
-		sb.append(ix.getName());
+		sb.append("DROP INDEX ");
+		sb.append(getQualifiedTableName(qname));
 		return (sb.toString());
 		}
 
@@ -231,7 +322,7 @@ public class PostgreSQLDialect extends CommonSQLDialect
 		{
 		final StringBuffer sb = new StringBuffer();
 		sb.append("ALTER TABLE ");
-		sb.append(t.getName().getObjectName());
+		sb.append(getQualifiedTableName(t.getName()));
 		sb.append("\n\tADD PRIMARY KEY (");
 		
 		boolean first = true;
@@ -252,7 +343,7 @@ public class PostgreSQLDialect extends CommonSQLDialect
 		{
 		final StringBuffer sb = new StringBuffer();
 		sb.append("ALTER TABLE ");
-		sb.append(t.getName().getObjectName());
+		sb.append(getQualifiedTableName(t.getName()));
 		sb.append("\n\tDROP PRIMARY KEY");
 		return (sb.toString());
 		}
@@ -261,7 +352,7 @@ public class PostgreSQLDialect extends CommonSQLDialect
 		{
 		final StringBuffer sb = new StringBuffer();
 		sb.append("ALTER TABLE ");
-		sb.append(t.getName().getObjectName());
+		sb.append(getQualifiedTableName(t.getName()));
 		sb.append("\n\tADD CONSTRAINT ");
 		sb.append(fk.getName());
 		sb.append("\n\tFOREIGN KEY (");
@@ -277,7 +368,7 @@ public class PostgreSQLDialect extends CommonSQLDialect
 			}
 		
 		sb.append(")\n\tREFERENCES ");
-		sb.append(fk.getTableName().getObjectName());
+		sb.append(getQualifiedTableName(fk.getTableName()));
 		sb.append(" (");
 		
 		first = true;
@@ -298,7 +389,7 @@ public class PostgreSQLDialect extends CommonSQLDialect
 		{
 		final StringBuffer sb = new StringBuffer();
 		sb.append("ALTER TABLE ");
-		sb.append(t.getName().getObjectName());
+		sb.append(getQualifiedTableName(t.getName()));
 		sb.append("\n\tDROP FOREIGN KEY ");
 		sb.append(fk.getName());
 		return (sb.toString());

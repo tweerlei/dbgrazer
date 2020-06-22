@@ -27,6 +27,7 @@ import de.tweerlei.common5.jdbc.model.ColumnDescription;
 import de.tweerlei.common5.jdbc.model.ForeignKeyDescription;
 import de.tweerlei.common5.jdbc.model.IndexDescription;
 import de.tweerlei.common5.jdbc.model.PrimaryKeyDescription;
+import de.tweerlei.common5.jdbc.model.QualifiedName;
 import de.tweerlei.common5.jdbc.model.TableDescription;
 import de.tweerlei.ermtools.dialect.SQLDataType;
 import de.tweerlei.ermtools.dialect.SQLStatementAnalyzer;
@@ -157,7 +158,7 @@ public class MSSQLDialect extends CommonSQLDialect
 		{
 		final StringBuffer sb = new StringBuffer();
 		sb.append("CREATE TABLE ");
-		sb.append(t.getName().getObjectName());
+		sb.append(getQualifiedTableName(t.getName()));
 		sb.append(" (\n\t");
 		
 		boolean first = true;
@@ -208,22 +209,25 @@ public class MSSQLDialect extends CommonSQLDialect
 	public String modifyTable(TableDescription old, TableDescription t)
 		{
 		final StringBuilder sb = new StringBuilder();
-		
-		// Move between schemas
-		if (!old.getName().getSchemaName().equals(t.getName().getSchemaName()))
-			{
-			sb.append("ALTER SCHEMA ").append(t.getName().getSchemaName());
-			sb.append(" TRANSFER ").append(getQualifiedTableName(old.getName()));
-			}
+		QualifiedName tempName = old.getName();
 		
 		// Rename object
 		if (!old.getName().getObjectName().equals(t.getName().getObjectName()))
 			{
-			if (sb.length() > 0)
-				sb.append("; ");
-			
 			sb.append("EXEC sp_rename '").append(getQualifiedTableName(old.getName())).append("'");
 			sb.append(", '").append(t.getName().getObjectName()).append("'");
+			
+			tempName = new QualifiedName(old.getName().getCatalogName(), old.getName().getSchemaName(), t.getName().getObjectName());
+			}
+		
+		// Move between schemas
+		if (!old.getName().getSchemaName().equals(t.getName().getSchemaName()))
+			{
+			if (sb.length() > 0)
+				sb.append(";\n");
+			
+			sb.append("ALTER SCHEMA ").append(t.getName().getSchemaName());
+			sb.append("\n\tTRANSFER ").append(getQualifiedTableName(tempName));
 			}
 		
 		return (sb.toString());
@@ -233,7 +237,7 @@ public class MSSQLDialect extends CommonSQLDialect
 		{
 		final StringBuffer sb = new StringBuffer();
 		sb.append("ALTER TABLE ");
-		sb.append(t.getName().getObjectName());
+		sb.append(getQualifiedTableName(t.getName()));
 		sb.append("\n\tADD ");
 		sb.append(c.getName());
 		sb.append(" ");
@@ -251,7 +255,7 @@ public class MSSQLDialect extends CommonSQLDialect
 		{
 		final StringBuffer sb = new StringBuffer();
 		sb.append("ALTER TABLE ");
-		sb.append(t.getName().getObjectName());
+		sb.append(getQualifiedTableName(t.getName()));
 		sb.append("\n\tALTER COLUMN ");
 		sb.append(c.getName());
 		sb.append(" ");
@@ -271,7 +275,7 @@ public class MSSQLDialect extends CommonSQLDialect
 		{
 		final StringBuffer sb = new StringBuffer();
 		sb.append("ALTER TABLE ");
-		sb.append(t.getName().getObjectName());
+		sb.append(getQualifiedTableName(t.getName()));
 		sb.append("\n\tDROP COLUMN ");
 		sb.append(c.getName());
 		return (sb.toString());
@@ -286,7 +290,7 @@ public class MSSQLDialect extends CommonSQLDialect
 			sb.append("CREATE INDEX ");
 		sb.append(ix.getName());
 		sb.append("\n\tON ");
-		sb.append(t.getName().getObjectName());
+		sb.append(getQualifiedTableName(t.getName()));
 		sb.append(" (");
 		
 		boolean first = true;
@@ -309,7 +313,7 @@ public class MSSQLDialect extends CommonSQLDialect
 		sb.append("DROP INDEX ");
 		sb.append(ix.getName());
 		sb.append(" ON ");
-		sb.append(t.getName().getObjectName());
+		sb.append(getQualifiedTableName(t.getName()));
 		return (sb.toString());
 		}
 
@@ -317,7 +321,7 @@ public class MSSQLDialect extends CommonSQLDialect
 		{
 		final StringBuffer sb = new StringBuffer();
 		sb.append("ALTER TABLE ");
-		sb.append(t.getName().getObjectName());
+		sb.append(getQualifiedTableName(t.getName()));
 		sb.append("\n\tADD CONSTRAINT ");
 		sb.append(k.getName());
 		sb.append(" PRIMARY KEY (");
@@ -340,7 +344,7 @@ public class MSSQLDialect extends CommonSQLDialect
 		{
 		final StringBuffer sb = new StringBuffer();
 		sb.append("ALTER TABLE ");
-		sb.append(t.getName().getObjectName());
+		sb.append(getQualifiedTableName(t.getName()));
 		sb.append("\n\tDROP CONSTRAINT ");
 		sb.append(k.getName());
 		return (sb.toString());
@@ -350,7 +354,7 @@ public class MSSQLDialect extends CommonSQLDialect
 		{
 		final StringBuffer sb = new StringBuffer();
 		sb.append("ALTER TABLE ");
-		sb.append(t.getName().getObjectName());
+		sb.append(getQualifiedTableName(t.getName()));
 		sb.append("\n\tADD CONSTRAINT ");
 		sb.append(fk.getName());
 		sb.append("\n\tFOREIGN KEY (");
@@ -366,7 +370,7 @@ public class MSSQLDialect extends CommonSQLDialect
 			}
 		
 		sb.append(")\n\tREFERENCES ");
-		sb.append(fk.getTableName().getObjectName());
+		sb.append(getQualifiedTableName(fk.getTableName()));
 		sb.append(" (");
 		
 		first = true;
@@ -387,7 +391,7 @@ public class MSSQLDialect extends CommonSQLDialect
 		{
 		final StringBuffer sb = new StringBuffer();
 		sb.append("ALTER TABLE ");
-		sb.append(t.getName().getObjectName());
+		sb.append(getQualifiedTableName(t.getName()));
 		sb.append("\n\tDROP CONSTRAINT ");
 		sb.append(fk.getName());
 		return (sb.toString());
