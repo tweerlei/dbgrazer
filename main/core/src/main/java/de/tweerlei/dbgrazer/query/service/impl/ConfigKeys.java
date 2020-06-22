@@ -33,6 +33,9 @@ public final class ConfigKeys
 	/** Module prefix for the query loader impl. */
 	public static final ConfigKey<String> QUERY_LOADER = ConfigKey.create(PACKAGE_NAME, "queryLoader", String.class, "file");
 	
+	/** Log all queries */
+	public static final ConfigKey<Boolean> LOG_QUERIES = ConfigKey.create(PACKAGE_NAME, "logQueries", Boolean.class, Boolean.FALSE);
+	
 	
 	private ConfigKeys()
 		{

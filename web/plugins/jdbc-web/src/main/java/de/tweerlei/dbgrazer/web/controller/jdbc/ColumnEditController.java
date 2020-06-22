@@ -41,6 +41,7 @@ import de.tweerlei.dbgrazer.web.service.QueryPerformerService;
 import de.tweerlei.dbgrazer.web.service.QuerySettingsManager;
 import de.tweerlei.dbgrazer.web.service.jdbc.QueryGeneratorService;
 import de.tweerlei.dbgrazer.web.session.ConnectionSettings;
+import de.tweerlei.ermtools.dialect.SQLDataType;
 import de.tweerlei.ermtools.dialect.SQLDialect;
 import de.tweerlei.ermtools.dialect.impl.SQLDialectFactory;
 
@@ -390,8 +391,17 @@ public class ColumnEditController
 		fbo.setDefaultValue(cd.getDefaultValue());
 		fbo.setNullable(cd.isNullable());
 		fbo.setTypeName(cd.getType().getName());
-		fbo.setLength(cd.getType().getLength());
-		fbo.setDecimals(cd.getType().getDecimals());
+		
+		// Suppress length and decimals if the DBMS does not support them in type specifications
+		final SQLDataType dt = getSQLDialect().getSQLDataType(cd.getType().getType());
+		if ((dt == null) || dt.hasLength())
+			fbo.setLength(cd.getType().getLength());
+		else
+			fbo.setLength(0);
+		if ((dt == null) || dt.hasDecimals())
+			fbo.setDecimals(cd.getType().getDecimals());
+		else
+			fbo.setDecimals(0);
 		
 		return (model);
 		}
@@ -458,8 +468,17 @@ public class ColumnEditController
 		fbo.setDefaultValue(cd.getDefaultValue());
 		fbo.setNullable(cd.isNullable());
 		fbo.setTypeName(cd.getType().getName());
-		fbo.setLength(cd.getType().getLength());
-		fbo.setDecimals(cd.getType().getDecimals());
+		
+		// Suppress length and decimals if the DBMS does not support them in type specifications
+		final SQLDataType dt = getSQLDialect().getSQLDataType(cd.getType().getType());
+		if ((dt == null) || dt.hasLength())
+			fbo.setLength(cd.getType().getLength());
+		else
+			fbo.setLength(0);
+		if ((dt == null) || dt.hasDecimals())
+			fbo.setDecimals(cd.getType().getDecimals());
+		else
+			fbo.setDecimals(0);
 		
 		return (model);
 		}

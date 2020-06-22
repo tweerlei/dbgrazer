@@ -22,9 +22,13 @@ import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import de.tweerlei.dbgrazer.common.service.ConfigListener;
+import de.tweerlei.dbgrazer.common.service.ConfigService;
 import de.tweerlei.dbgrazer.common.util.impl.NamedSet;
 import de.tweerlei.dbgrazer.query.backend.QueryRunner;
 import de.tweerlei.dbgrazer.query.exception.PerformQueryException;
@@ -50,18 +54,22 @@ import de.tweerlei.dbgrazer.query.service.QueryRunnerService;
  * @author Robert Wruck
  */
 @Service
-public class QueryRunnerServiceImpl implements QueryRunnerService
+public class QueryRunnerServiceImpl implements QueryRunnerService, ConfigListener
 	{
+	private final ConfigService configService;
 	private final Logger logger;
 	private final Set<QueryRunner> runners;
+	private boolean logQueries;
 	
 	/**
 	 * Constructor
+	 * @param configService ConfigService
 	 * @param runners Available QueryRunners
 	 */
 	@Autowired(required = false)
-	public QueryRunnerServiceImpl(List<QueryRunner> runners)
+	public QueryRunnerServiceImpl(ConfigService configService, List<QueryRunner> runners)
 		{
+		this.configService = configService;
 		this.logger = Logger.getLogger(getClass().getCanonicalName());
 		this.runners = Collections.unmodifiableSet(new NamedSet<QueryRunner>(runners));
 		
@@ -70,10 +78,28 @@ public class QueryRunnerServiceImpl implements QueryRunnerService
 	
 	/**
 	 * Constructor
+	 * @param configService ConfigService
 	 */
-	public QueryRunnerServiceImpl()
+	@Autowired(required = false)
+	public QueryRunnerServiceImpl(ConfigService configService)
 		{
-		this(Collections.<QueryRunner>emptyList());
+		this(configService, Collections.<QueryRunner>emptyList());
+		}
+	
+	/**
+	 * Register for config changes
+	 */
+	@PostConstruct
+	public void init()
+		{
+		configService.addListener(this);
+		configChanged();
+		}
+	
+	@Override
+	public void configChanged()
+		{
+		logQueries = configService.get(ConfigKeys.LOG_QUERIES);
 		}
 	
 	@Override
@@ -86,7 +112,11 @@ public class QueryRunnerServiceImpl implements QueryRunnerService
 			res = new ResultImpl(query);
 		else
 			{
+			if (logQueries)
+				logger.log(Level.INFO, query.getStatement());
 			res = r.performQuery(link, query, subQueryIndex, params, timeZone, limit, monitor);
+			if (logQueries)
+				logger.log(Level.INFO, String.valueOf(res.getFirstRowSet().getFirstValue()));
 			}
 		
 		prepareResult(res);
@@ -103,7 +133,12 @@ public class QueryRunnerServiceImpl implements QueryRunnerService
 				return (0);
 			else
 				{
-				return (r.performStreamedQuery(link, query, params, timeZone, limit, handler));
+				if (logQueries)
+					logger.log(Level.INFO, query.getStatement());
+				final int result = r.performStreamedQuery(link, query, params, timeZone, limit, handler);
+				if (logQueries)
+					logger.log(Level.INFO, String.valueOf(result));
+				return (result);
 				}
 			}
 		catch (PerformQueryException e)
