@@ -1189,7 +1189,7 @@ public class DataDiffController
 		if (runMode == RunMode.BATCH)
 			{
 			h3.comment("Preview not supported for BATCH mode");
-			tempResult = new DiffResult(null, Collections.emptySortedMap(), 0, false);
+			tempResult = new DiffResult(null, Collections.<String, TaskProgress>emptySortedMap(), 0, false);
 			}
 		else
 			tempResult = compareByPK(srcDesc, dstDesc, conn2, dialect, filter, runMode, flags, order, h3, JdbcConstants.QUERYTYPE_TOLERANT_SCRIPT, c, null, false);
