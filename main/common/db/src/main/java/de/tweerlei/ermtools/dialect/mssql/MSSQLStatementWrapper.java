@@ -13,18 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.tweerlei.dbgrazer.query.model;
+package de.tweerlei.ermtools.dialect.mssql;
+
+import de.tweerlei.ermtools.dialect.SQLStatementWrapper;
 
 /**
- * Produce ResultRows and pass them to a RowHandler
+ * Add required terminator to MERGE
  * 
  * @author Robert Wruck
  */
-public interface RowProducer
+public class MSSQLStatementWrapper implements SQLStatementWrapper
 	{
-	/**
-	 * Produce ResultRows and pass them to a RowHandler
-	 * @param h RowHandler
-	 */
-	public void produceRows(RowHandler h);
+	/** The instance */
+	public static final SQLStatementWrapper INSTANCE = new MSSQLStatementWrapper();
+	
+	private MSSQLStatementWrapper()
+		{
+		}
+	
+	public String wrapStatement(String statement)
+		{
+		if (statement.length() >= 5)
+			{
+			final String start = statement.substring(0, 5);
+			if (start.equalsIgnoreCase("MERGE"))
+				{
+				return (statement + ";");
+				}
+			}
+		
+		return (statement);
+		}
 	}

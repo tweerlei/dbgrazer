@@ -56,10 +56,10 @@ public class QueryRowProducer implements RowProducer
 		}
 	
 	@Override
-	public int produceRows(RowHandler h)
+	public void produceRows(RowHandler h)
 		{
 		try	{
-			return (runner.performStreamedQuery(link, query, params, timeZone, Integer.MAX_VALUE, h));
+			runner.performStreamedQuery(link, query, params, timeZone, Integer.MAX_VALUE, h);
 			}
 		catch (PerformQueryException e)
 			{

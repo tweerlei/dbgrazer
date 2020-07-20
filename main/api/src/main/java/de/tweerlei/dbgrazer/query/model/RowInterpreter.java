@@ -73,11 +73,9 @@ public interface RowInterpreter
 	
 	/**
 	 * Transfer data rows from a RowIterator to a StatementHandler
-	 * @param rows RowIterator
 	 * @param handlers RowHandler for all statements returned by getStatements
-	 * @return Transfer result, e.g. statistics
 	 */
-	public Object transfer(RowIterator rows, List<RowHandler> handlers);
+	public void produceRows(List<RowHandler> handlers);
 	
 	/**
 	 * Get the statements to prepare for invoking the transfer method

@@ -39,6 +39,7 @@ public class DBUnitRowHandler implements RowHandler
 	private final DataFormatter fmt;
 	private List<ColumnDef> cols;
 	private Map<String, String> attrs;
+	private int count;
 	
 	/**
 	 * Constructor
@@ -52,6 +53,16 @@ public class DBUnitRowHandler implements RowHandler
 		this.tableName = tableName;
 		this.fmt = fmt;
 		this.attrs = null;
+		this.count = 0;
+		}
+	
+	/**
+	 * Get the number of rows handled
+	 * @return Count
+	 */
+	public int getCount()
+		{
+		return (count);
 		}
 	
 	@Override
@@ -81,6 +92,8 @@ public class DBUnitRowHandler implements RowHandler
 			{
 			throw new RuntimeException(e);
 			}
+		
+		count++;
 		
 		return (true);
 		}

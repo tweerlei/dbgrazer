@@ -16,6 +16,7 @@
 package de.tweerlei.dbgrazer.web.service.jdbc;
 
 import de.tweerlei.common5.jdbc.model.TableDescription;
+import de.tweerlei.dbgrazer.extension.jdbc.SQLGeneratorService.OrderBy;
 import de.tweerlei.dbgrazer.query.model.RowHandler;
 import de.tweerlei.dbgrazer.query.model.RowIterator;
 import de.tweerlei.dbgrazer.query.model.RowSet;
@@ -31,6 +32,36 @@ import de.tweerlei.ermtools.dialect.SQLDialect;
 public interface ResultCompareService
 	{
 	/**
+	 * Control which types of statements to generate
+	 */
+	public static final class CompareFlags
+		{
+		/** Use INSERT */
+		public final boolean useInsert;
+		/** Use UPDATE */
+		public final boolean useUpdate;
+		/** Use DELETE */
+		public final boolean useDelete;
+		/** Use MERGE instead of INSERT or UPDATE */
+		public final boolean useMerge;
+		
+		/**
+		 * Constructor
+		 * @param useInsert Use INSERT
+		 * @param useUpdate Use UPDATE
+		 * @param useDelete Use DELETE
+		 * @param useMerge Use MERGE instead of INSERT or UPDATE
+		 */
+		public CompareFlags(boolean useInsert, boolean useUpdate, boolean useDelete, boolean useMerge)
+			{
+			this.useInsert = useInsert;
+			this.useUpdate = useUpdate;
+			this.useDelete = useDelete;
+			this.useMerge = useMerge;
+			}
+		}
+	
+	/**
 	 * Compare two ResultSets, returning SQL statements to transform l to r
 	 * @param l LHS
 	 * @param r RHS
@@ -38,9 +69,9 @@ public interface ResultCompareService
 	 * @param monitor CompareProgressMonitor
 	 * @param tableDesc TableDescription
 	 * @param dialect SQLDialect
-	 * @param merge Use MERGE if possible
+	 * @param flags Control which types of statements to generate
 	 */
-	public void compareResults(RowSet l, RowSet r, StatementHandler h, CompareProgressMonitor monitor, TableDescription tableDesc, SQLDialect dialect, boolean merge);
+	public void compareResults(RowSet l, RowSet r, StatementHandler h, CompareProgressMonitor monitor, TableDescription tableDesc, SQLDialect dialect, CompareFlags flags);
 	
 	/**
 	 * Compare two ResultSets, returning differing rows.
@@ -62,23 +93,13 @@ public interface ResultCompareService
 	 * @param monitor CompareProgressMonitor
 	 * @param tableDesc TableDescription
 	 * @param dialect SQLDialect
-	 * @param merge Use MERGE if possible
+	 * @param order Compare mode
+	 * @param flags Control which types of statements to generate
 	 */
-	public void compareResultsByPK(RowIterator l, RowIterator r, StatementHandler h, CompareProgressMonitor monitor, TableDescription tableDesc, SQLDialect dialect, boolean merge);
+	public void compareResultsByPK(RowIterator l, RowIterator r, StatementHandler h, CompareProgressMonitor monitor, TableDescription tableDesc, SQLDialect dialect, OrderBy order, CompareFlags flags);
 	
 	/**
-	 * Compare two ResultSets matching rows by all columns NOT in the PK and returning SQL statements to transform l to r
-	 * @param l LHS
-	 * @param r RHS
-	 * @param h StatementHandler for generated DML statements
-	 * @param monitor CompareProgressMonitor
-	 * @param tableDesc TableDescription
-	 * @param dialect SQLDialect
-	 */
-	public void compareResultsIgnoringPK(RowIterator l, RowIterator r, StatementHandler h, CompareProgressMonitor monitor, TableDescription tableDesc, SQLDialect dialect);
-	
-	/**
-	 * Compare two ResultSets matching rows by PK and returning SQL statements to transform l to r
+	 * Compare two ResultSets matching rows by PK passing differing rows to the appropriate RowHandler
 	 * @param l LHS
 	 * @param r RHS
 	 * @param insert RowHandler for inserting

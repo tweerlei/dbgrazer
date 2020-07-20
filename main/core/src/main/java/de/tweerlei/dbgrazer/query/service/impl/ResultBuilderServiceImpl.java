@@ -15,7 +15,6 @@
  */
 package de.tweerlei.dbgrazer.query.service.impl;
 
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -24,17 +23,13 @@ import java.util.Set;
 
 import org.springframework.stereotype.Service;
 
-import de.tweerlei.common.util.StringUtils;
 import de.tweerlei.dbgrazer.query.model.ColumnDef;
 import de.tweerlei.dbgrazer.query.model.ColumnType;
 import de.tweerlei.dbgrazer.query.model.Query;
-import de.tweerlei.dbgrazer.query.model.StatementHandler;
-import de.tweerlei.dbgrazer.query.model.StatementProducer;
 import de.tweerlei.dbgrazer.query.model.impl.ColumnDefImpl;
 import de.tweerlei.dbgrazer.query.model.impl.DefaultResultRow;
 import de.tweerlei.dbgrazer.query.model.impl.ResultImpl;
 import de.tweerlei.dbgrazer.query.model.impl.RowSetImpl;
-import de.tweerlei.dbgrazer.query.model.impl.StatementWriter;
 import de.tweerlei.dbgrazer.query.service.ResultBuilderService;
 
 /**
@@ -131,17 +126,5 @@ public class ResultBuilderServiceImpl implements ResultBuilderService
 		rs.getRows().add(row);
 		
 		return (rs);
-		}
-	
-	@Override
-	public String writeScript(StatementProducer producer, String header, String separator)
-		{
-		final StringWriter sw = new StringWriter();
-		final StatementHandler h = new StatementWriter(sw, separator);
-		if (!StringUtils.empty(header))
-			h.comment(header);
-		producer.produceStatements(h);
-		
-		return (sw.toString());
 		}
 	}

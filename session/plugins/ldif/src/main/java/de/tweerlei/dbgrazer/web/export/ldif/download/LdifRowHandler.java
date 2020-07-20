@@ -45,6 +45,7 @@ public class LdifRowHandler implements RowHandler
 	private String[] names;
 	private int dnIndex;
 	private int rdnIndex;
+	private int count;
 	
 	/**
 	 * Constructor
@@ -60,6 +61,16 @@ public class LdifRowHandler implements RowHandler
 		this.names = null;
 		this.dnIndex = -1;
 		this.rdnIndex = -1;
+		this.count = 0;
+		}
+	
+	/**
+	 * Get the number of rows handled
+	 * @return Count
+	 */
+	public int getCount()
+		{
+		return (count);
 		}
 	
 	@Override
@@ -122,6 +133,8 @@ public class LdifRowHandler implements RowHandler
 			{
 			throw new RuntimeException(e);
 			}
+		
+		count++;
 		
 		return (true);
 		}

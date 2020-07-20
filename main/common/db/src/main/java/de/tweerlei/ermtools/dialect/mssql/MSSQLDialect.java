@@ -31,6 +31,7 @@ import de.tweerlei.common5.jdbc.model.QualifiedName;
 import de.tweerlei.common5.jdbc.model.TableDescription;
 import de.tweerlei.ermtools.dialect.SQLDataType;
 import de.tweerlei.ermtools.dialect.SQLStatementAnalyzer;
+import de.tweerlei.ermtools.dialect.SQLStatementWrapper;
 import de.tweerlei.ermtools.dialect.impl.CommonSQLDialect;
 
 /**
@@ -114,12 +115,6 @@ public class MSSQLDialect extends CommonSQLDialect
 	
 	@Override
 	public boolean supportsMerge()
-		{
-		return (true);
-		}
-	
-	@Override
-	public boolean dmlRequiresTerminator()
 		{
 		return (true);
 		}
@@ -395,6 +390,12 @@ public class MSSQLDialect extends CommonSQLDialect
 		sb.append("\n\tDROP CONSTRAINT ");
 		sb.append(fk.getName());
 		return (sb.toString());
+		}
+	
+	@Override
+	public SQLStatementWrapper getStatementWrapper()
+		{
+		return (MSSQLStatementWrapper.INSTANCE);
 		}
 	
 	@Override

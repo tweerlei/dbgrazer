@@ -15,6 +15,10 @@
  */
 package de.tweerlei.spring.config;
 
+import java.util.List;
+import java.util.Set;
+import java.util.SortedSet;
+
 /**
  * Typed configuration key
  * @param <T> Value type
@@ -24,6 +28,7 @@ package de.tweerlei.spring.config;
 public class ConfigKey<T>
 	{
 	private final Class<T> type;
+	private final Class<?> elementType;
 	private final String key;
 	private final T defaultValue;
 	
@@ -31,12 +36,14 @@ public class ConfigKey<T>
 	 * Constructor
 	 * @param key Key
 	 * @param type Value type
+	 * @param elementType Element type when type refers to a collection
 	 * @param defaultValue Default value
 	 */
-	private ConfigKey(String key, Class<T> type, T defaultValue)
+	private ConfigKey(String key, Class<T> type, Class<?> elementType, T defaultValue)
 		{
 		this.key = key;
 		this.type = type;
+		this.elementType = elementType;
 		this.defaultValue = defaultValue;
 		}
 	
@@ -47,6 +54,15 @@ public class ConfigKey<T>
 	public Class<T> getType()
 		{
 		return type;
+		}
+	
+	/**
+	 * Get the element type
+	 * @return the element type
+	 */
+	public Class<?> getElementType()
+		{
+		return elementType;
 		}
 	
 	/**
@@ -77,7 +93,7 @@ public class ConfigKey<T>
 	 */
 	public static <T> ConfigKey<T> create(String key, Class<T> type, T defaultValue)
 		{
-		return (new ConfigKey<T>(key, type, defaultValue));
+		return (new ConfigKey<T>(key, type, null, defaultValue));
 		}
 	
 	/**
@@ -91,7 +107,91 @@ public class ConfigKey<T>
 	 */
 	public static <T> ConfigKey<T> create(String pkg, String key, Class<T> type, T defaultValue)
 		{
-		return (new ConfigKey<T>(pkg + "." + key, type, defaultValue));
+		return (create(pkg + "." + key, type, defaultValue));
+		}
+	
+	/**
+	 * Create a ConfigKey instance for a list of elements
+	 * @param <T> Value type
+	 * @param key Key name
+	 * @param elementType Value type
+	 * @param defaultValue Default value
+	 * @return The created ConfigKey
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> ConfigKey<List<T>> createList(String key, Class<T> elementType, List<T> defaultValue)
+		{
+		return (new ConfigKey<List<T>>(key, (Class<List<T>>) (Class<?>) List.class, elementType, defaultValue));
+		}
+	
+	/**
+	 * Create a ConfigKey instance for a list of elements
+	 * @param <T> Value type
+	 * @param pkg Key package
+	 * @param key Key name
+	 * @param type Value type
+	 * @param defaultValue Default value
+	 * @return The created ConfigKey
+	 */
+	public static <T> ConfigKey<List<T>> createList(String pkg, String key, Class<T> type, List<T> defaultValue)
+		{
+		return (createList(pkg + "." + key, type, defaultValue));
+		}
+	
+	/**
+	 * Create a ConfigKey instance for a set of elements
+	 * @param <T> Value type
+	 * @param key Key name
+	 * @param elementType Value type
+	 * @param defaultValue Default value
+	 * @return The created ConfigKey
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> ConfigKey<Set<T>> createSet(String key, Class<T> elementType, Set<T> defaultValue)
+		{
+		return (new ConfigKey<Set<T>>(key, (Class<Set<T>>) (Class<?>) Set.class, elementType, defaultValue));
+		}
+	
+	/**
+	 * Create a ConfigKey instance for a set of elements
+	 * @param <T> Value type
+	 * @param pkg Key package
+	 * @param key Key name
+	 * @param type Value type
+	 * @param defaultValue Default value
+	 * @return The created ConfigKey
+	 */
+	public static <T> ConfigKey<Set<T>> createSet(String pkg, String key, Class<T> type, Set<T> defaultValue)
+		{
+		return (createSet(pkg + "." + key, type, defaultValue));
+		}
+	
+	/**
+	 * Create a ConfigKey instance for a sorted set of elements
+	 * @param <T> Value type
+	 * @param key Key name
+	 * @param elementType Value type
+	 * @param defaultValue Default value
+	 * @return The created ConfigKey
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> ConfigKey<SortedSet<T>> createSortedSet(String key, Class<T> elementType, SortedSet<T> defaultValue)
+		{
+		return (new ConfigKey<SortedSet<T>>(key, (Class<SortedSet<T>>) (Class<?>) SortedSet.class, elementType, defaultValue));
+		}
+	
+	/**
+	 * Create a ConfigKey instance for a sorted set of elements
+	 * @param <T> Value type
+	 * @param pkg Key package
+	 * @param key Key name
+	 * @param type Value type
+	 * @param defaultValue Default value
+	 * @return The created ConfigKey
+	 */
+	public static <T> ConfigKey<SortedSet<T>> createSortedSet(String pkg, String key, Class<T> type, SortedSet<T> defaultValue)
+		{
+		return (createSortedSet(pkg + "." + key, type, defaultValue));
 		}
 	
 	@Override

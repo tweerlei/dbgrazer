@@ -15,6 +15,8 @@
  */
 package de.tweerlei.spring.config.impl;
 
+import java.util.Collection;
+
 import de.tweerlei.spring.config.ConfigKey;
 import de.tweerlei.spring.config.ConfigProvider;
 import de.tweerlei.spring.config.ConfigProviderHolder;
@@ -41,11 +43,15 @@ public class ConfigProviderAccessor extends AbstractConfigAccessor implements Co
 		this.factory = factory;
 		}
 	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public <T> T getRaw(ConfigKey<T> key)
 		{
 		final String value = provider.get(key.getKey());
 		if (value == null)
 			return (null);
+		
+		if (key.getElementType() != null)
+			return ((T) factory.decode((Class<Collection>) key.getType(), key.getElementType(), value));
 		
 		final T ret = factory.decode(key.getType(), value);
 		return (ret);

@@ -45,6 +45,15 @@ public class StatementCollection implements StatementHandler, Iterable<String>, 
 		this.cleanup = cleanup;
 		}
 	
+	/**
+	 * Get the number of statements
+	 * @return Number of statements
+	 */
+	public int getStatementCount()
+		{
+		return (queue.size());
+		}
+	
 	/*
 	 * Producer side
 	 */
@@ -109,19 +118,12 @@ public class StatementCollection implements StatementHandler, Iterable<String>, 
 		}
 	
 	@Override
-	public int produceStatements(StatementHandler h)
+	public void produceStatements(StatementHandler h)
 		{
 		if (lastError != null)
 			throw lastError;
 		
-		int i = 0;
-		
 		for (String stmt : queue)
-			{
 			h.statement(stmt);
-			i++;
-			}
-		
-		return (i);
 		}
 	}

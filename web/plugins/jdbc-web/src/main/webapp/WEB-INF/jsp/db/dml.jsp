@@ -69,20 +69,27 @@
 >					</spring:select></dd>
 				<dt><spring:label path="filter"><fmt:message key="WHERE"/></spring:label></dt>
 				<dd><spring:input path="filter"/></dd>
+				<dt><spring:label path="runMode"><fmt:message key="runMode"/></spring:label></dt>
+				<dd><spring:select path="runMode">
+<c:forEach items="${runModes}" var="t"
+>					<spring:option value="${t}"><fmt:message key="run_${t}"/></spring:option>
+</c:forEach
+>					</spring:select></dd>
+				<dt>&nbsp;</dt>
+				<dd><fmt:message key="useInsert" var="lbl"/><spring:checkbox path="useInsert" value="true" label=" ${lbl}"/><br/>
+					<fmt:message key="useUpdate" var="lbl"/><spring:checkbox path="useUpdate" value="true" label=" ${lbl}"/><br/>
+					<fmt:message key="useDelete" var="lbl"/><spring:checkbox path="useDelete" value="true" label=" ${lbl}"/><br/>
+					<fmt:message key="useMerge" var="lbl"/><spring:checkbox path="useMerge" value="true" label=" ${lbl}"/></dd>
+				</dd>
 				<dt><spring:label path="order"><fmt:message key="compareMode"/></spring:label></dt>
 				<dd><spring:select path="order">
 <c:forEach items="${orders}" var="o"
 >					<spring:option value="${o}"><fmt:message key="order_${o}"/></spring:option>
 </c:forEach
 >				</spring:select></dd>
-				<dt>&nbsp;</dt>
-				<dd><fmt:message key="stmtInsert" var="lbl"/><spring:radiobutton path="stmtMode" value="INSERT" label=" ${lbl}"/><br/>
-					<fmt:message key="stmtMerge" var="lbl"/><spring:radiobutton path="stmtMode" value="MERGE" label=" ${lbl}"/><br/>
-					<fmt:message key="stmtInsertBatch" var="lbl"/><spring:radiobutton path="stmtMode" value="BATCH" label=" ${lbl}"/></dd>
 <c:if test="${currentConnection.writable}"
 >				<dt><spring:label path="execMode"><fmt:message key="executeAs"/></spring:label></dt>
 				<dd><spring:select path="execMode">
-					<spring:option value=""><fmt:message key="preview"/></spring:option>
 <c:forEach items="${resultTypes}" var="t"
 >					<spring:option value="${t}"><fmt:message key="execute_${t}"/></spring:option>
 </c:forEach

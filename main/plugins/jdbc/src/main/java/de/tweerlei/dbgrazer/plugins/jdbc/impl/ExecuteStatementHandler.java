@@ -24,6 +24,7 @@ import org.springframework.jdbc.BadSqlGrammarException;
 import de.tweerlei.dbgrazer.query.exception.CancelledByUserException;
 import de.tweerlei.dbgrazer.query.model.DMLProgressMonitor;
 import de.tweerlei.dbgrazer.query.model.StatementHandler;
+import de.tweerlei.ermtools.dialect.SQLStatementWrapper;
 
 /**
  * StatementHandler that executes passed statements
@@ -33,7 +34,7 @@ import de.tweerlei.dbgrazer.query.model.StatementHandler;
 public class ExecuteStatementHandler implements StatementHandler
 	{
 	private final Statement ps;
-	private final String eol;
+	private final SQLStatementWrapper wrapper;
 	private final int commitSize;
 	private final DMLProgressMonitor monitor;
 	private final boolean rollback;
@@ -46,16 +47,16 @@ public class ExecuteStatementHandler implements StatementHandler
 	/**
 	 * Constructor
 	 * @param ps Statement
-	 * @param eol Statement terminator
+	 * @param wrapper SQLStatementWrapper
 	 * @param commitSize Perform a COMMIT after this number of rows (0 = never)
 	 * @param monitor DMLProgressMonitor
 	 * @param rollback Perform a ROLLBACK instead of COMMIT
 	 * @param ignoreErrors Catch any SQLException and save its message
 	 */
-	public ExecuteStatementHandler(Statement ps, String eol, int commitSize, DMLProgressMonitor monitor, boolean rollback, boolean ignoreErrors)
+	public ExecuteStatementHandler(Statement ps, SQLStatementWrapper wrapper, int commitSize, DMLProgressMonitor monitor, boolean rollback, boolean ignoreErrors)
 		{
 		this.ps = ps;
-		this.eol = eol;
+		this.wrapper = wrapper;
 		this.commitSize = commitSize;
 		this.monitor = monitor;
 		this.rollback = rollback;
@@ -76,11 +77,7 @@ public class ExecuteStatementHandler implements StatementHandler
 			if ((monitor != null) && !monitor.getTotalStatements().progress(1))
 				throw new CancelledByUserException();
 			
-			final int rows;
-			if (eol != null)
-				rows = ps.executeUpdate(stmt + eol);
-			else
-				rows = ps.executeUpdate(stmt);
+			final int rows = ps.executeUpdate(wrapper.wrapStatement(stmt));
 			if (monitor != null)
 				monitor.getTotalRows().progress(rows);
 			rowCount += rows;

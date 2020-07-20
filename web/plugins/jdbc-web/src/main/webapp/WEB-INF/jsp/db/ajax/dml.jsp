@@ -30,7 +30,11 @@
 			<input type="hidden" name="schema2" value="${model.schema}"/>
 			<input type="hidden" name="filter" value="${model.filter}"/>
 			<input type="hidden" name="order" value="${model.order}"/>
-			<input type="hidden" name="stmtMode" value="${model.stmtMode}"/>
+			<input type="hidden" name="runMode" value="${model.runMode}"/>
+			<input type="hidden" name="useInsert" value="${model.useInsert}"/>
+			<input type="hidden" name="useUpdate" value="${model.useUpdate}"/>
+			<input type="hidden" name="useDelete" value="${model.useDelete}"/>
+			<input type="hidden" name="useMerge" value="${model.useMerge}"/>
 			<input type="hidden" name="execMode" value="${model.execMode}"/>
 			<input type="submit" value="<fmt:message key="reverse"/>"/>
 		</form>

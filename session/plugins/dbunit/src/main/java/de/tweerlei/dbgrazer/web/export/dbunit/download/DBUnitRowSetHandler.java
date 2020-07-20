@@ -39,6 +39,7 @@ public class DBUnitRowSetHandler implements RowSetHandler
 	private final XMLWriter writer;
 	private final DataFormatter fmt;
 	private final SQLDialect dialect;
+	private int count;
 	
 	/**
 	 * Constructor
@@ -51,6 +52,16 @@ public class DBUnitRowSetHandler implements RowSetHandler
 		this.writer = w;
 		this.fmt = fmt;
 		this.dialect = dialect;
+		this.count = 0;
+		}
+	
+	/**
+	 * Get the number of rows handled
+	 * @return Count
+	 */
+	public int getCount()
+		{
+		return (count);
 		}
 	
 	@Override
@@ -74,6 +85,8 @@ public class DBUnitRowSetHandler implements RowSetHandler
 				writer.writeText("\n\t");
 				writer.writeElement(tableName, attrs);
 				}
+			
+			count++;
 			}
 		catch (IOException e)
 			{

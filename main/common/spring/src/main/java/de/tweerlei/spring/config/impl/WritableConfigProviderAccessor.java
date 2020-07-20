@@ -15,6 +15,8 @@
  */
 package de.tweerlei.spring.config.impl;
 
+import java.util.Collection;
+
 import de.tweerlei.spring.config.ConfigKey;
 import de.tweerlei.spring.config.WritableConfigProvider;
 import de.tweerlei.spring.config.WritableConfigProviderHolder;
@@ -41,27 +43,37 @@ public class WritableConfigProviderAccessor extends AbstractWritableConfigAccess
 		this.factory = factory;
 		}
 	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public <T> T getRaw(ConfigKey<T> key)
 		{
 		final String value = provider.get(key.getKey());
 		if (value == null)
 			return (null);
 		
+		if (key.getElementType() != null)
+			return ((T) factory.decode((Class<Collection>) key.getType(), key.getElementType(), value));
+		
 		final T ret = factory.decode(key.getType(), value);
 		return (ret);
 		}
 	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public <T> T putRaw(ConfigKey<T> key, T value)
 		{
 		String s;
 		if (value == null)
 			s = null;
+		else if (key.getElementType() != null)
+			s = factory.encode((Class<Collection>) key.getType(), key.getElementType(), (Collection) value);
 		else
 			s = factory.encode(key.getType(), value);
 		
 		s = provider.put(key.getKey(), s);
 		if (s == null)
 			return (null);
+		
+		if (key.getElementType() != null)
+			return ((T) factory.decode((Class<Collection>) key.getType(), key.getElementType(), s));
 		
 		final T ret = factory.decode(key.getType(), s);
 		return (ret);

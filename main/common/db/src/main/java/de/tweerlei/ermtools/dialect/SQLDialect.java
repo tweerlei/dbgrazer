@@ -57,12 +57,6 @@ public interface SQLDialect
 	public String getQualifiedTableName(QualifiedName qn);
 	
 	/**
-	 * Get the statement terminator string
-	 * @return Statement terminator
-	 */
-	public String getStatementTerminator();
-	
-	/**
 	 * Get a SimpleDateFormat format String to use for creatig DATE literals
 	 * @return Format String
 	 */
@@ -97,12 +91,6 @@ public interface SQLDialect
 	 * @return Merge support
 	 */
 	public boolean supportsMerge();
-	
-	/**
-	 * Check whether DML statements require the statement terminator
-	 * @return true if required
-	 */
-	public boolean dmlRequiresTerminator();
 	
 	/**
 	 * Get the table name for usage in SELECT statements that don't need a source table
@@ -234,6 +222,18 @@ public interface SQLDialect
 	 * @return Statement
 	 */
 	public String removeForeignKey(TableDescription t, ForeignKeyDescription fk);
+	
+	/**
+	 * Get the SQLStatementWrapper to use for submitting single statements via JDBC calls
+	 * @return SQLStatementWrapper
+	 */
+	public SQLStatementWrapper getStatementWrapper();
+	
+	/**
+	 * Get the SQLStatementWrapper to use for generating script files
+	 * @return SQLStatementWrapper
+	 */
+	public SQLStatementWrapper getScriptStatementWrapper();
 	
 	/**
 	 * Get a MetadataReader for a JDBC connection

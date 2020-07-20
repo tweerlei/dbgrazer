@@ -32,6 +32,7 @@ import de.tweerlei.ermtools.dialect.SQLDialect;
 import de.tweerlei.ermtools.dialect.SQLObjectDDLWriter;
 import de.tweerlei.ermtools.dialect.SQLScriptOutputReader;
 import de.tweerlei.ermtools.dialect.SQLStatementAnalyzer;
+import de.tweerlei.ermtools.dialect.SQLStatementWrapper;
 
 /**
  * DDL statements common to all known DBMS
@@ -40,7 +41,6 @@ import de.tweerlei.ermtools.dialect.SQLStatementAnalyzer;
  */
 public abstract class CommonSQLDialect implements SQLDialect
 	{
-	private static final String EOL = ";\n";
 	private static final String DATE_FORMAT = "'DATE'''yyyy-MM-dd''";
 	private static final String TIME_FORMAT = "'TIME'''HH:mm:ss''";
 	private static final String DATETIME_FORMAT = "'TIMESTAMP'''yyyy-MM-dd HH:mm:ss''";
@@ -110,11 +110,6 @@ public abstract class CommonSQLDialect implements SQLDialect
 		return (sb.toString());
 		}
 	
-	public String getStatementTerminator()
-		{
-		return (EOL);
-		}
-	
 	public String getDateFormat()
 		{
 		return (DATE_FORMAT);
@@ -145,11 +140,6 @@ public abstract class CommonSQLDialect implements SQLDialect
 		return (false);
 		}
 	
-	public boolean dmlRequiresTerminator()
-		{
-		return (false);
-		}
-	
 	public String getDefaultTableName()
 		{
 		return (null);
@@ -169,7 +159,7 @@ public abstract class CommonSQLDialect implements SQLDialect
 		{
 		final StringBuffer sb = new StringBuffer();
 		sb.append("DROP TABLE ");
-		sb.append(t.getName().getObjectName());
+		sb.append(getQualifiedTableName(t.getName()));
 		
 		return (sb.toString());
 		}
@@ -180,7 +170,7 @@ public abstract class CommonSQLDialect implements SQLDialect
 		sb.append("GRANT ");
 		sb.append(p.getPrivilege());
 		sb.append(" ON ");
-		sb.append(t.getName().getObjectName());
+		sb.append(getQualifiedTableName(t.getName()));
 		sb.append(" TO ");
 		sb.append(p.getGrantee());
 		
@@ -193,11 +183,21 @@ public abstract class CommonSQLDialect implements SQLDialect
 		sb.append("REVOKE ");
 		sb.append(p.getPrivilege());
 		sb.append(" ON ");
-		sb.append(t.getName().getObjectName());
+		sb.append(getQualifiedTableName(t.getName()));
 		sb.append(" FROM ");
 		sb.append(p.getGrantee());
 		
 		return (sb.toString());
+		}
+	
+	public SQLStatementWrapper getStatementWrapper()
+		{
+		return (IdentitySQLStatementWrapper.INSTANCE);
+		}
+	
+	public SQLStatementWrapper getScriptStatementWrapper()
+		{
+		return (SimpleSQLStatementWrapper.SEMICOLON_NL);
 		}
 	
 	public MetadataReader getMetadataReader(Connection c) throws SQLException

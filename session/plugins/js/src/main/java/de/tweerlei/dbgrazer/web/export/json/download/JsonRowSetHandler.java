@@ -36,6 +36,7 @@ public class JsonRowSetHandler implements RowSetHandler
 	{
 	private final JSONWriter writer;
 	private final SQLDialect dialect;
+	private int count;
 	
 	/**
 	 * Constructor
@@ -46,6 +47,16 @@ public class JsonRowSetHandler implements RowSetHandler
 		{
 		this.writer = w;
 		this.dialect = dialect;
+		this.count = 0;
+		}
+	
+	/**
+	 * Get the number of rows handled
+	 * @return Count
+	 */
+	public int getCount()
+		{
+		return (count);
 		}
 	
 	@Override
@@ -79,6 +90,8 @@ public class JsonRowSetHandler implements RowSetHandler
 				}
 			
 			writer.endArray();
+			
+			count++;
 			}
 		catch (IOException e)
 			{

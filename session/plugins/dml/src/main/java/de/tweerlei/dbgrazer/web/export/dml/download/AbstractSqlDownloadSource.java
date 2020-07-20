@@ -21,8 +21,8 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 
 import de.tweerlei.common.io.ByteOrderMarkWriter;
-import de.tweerlei.dbgrazer.query.model.impl.StatementWriter;
 import de.tweerlei.dbgrazer.web.formatter.SQLWriter;
+import de.tweerlei.dbgrazer.web.model.StatementWriter;
 import de.tweerlei.dbgrazer.web.service.DataFormatterFactory;
 import de.tweerlei.ermtools.dialect.SQLDialect;
 import de.tweerlei.spring.web.view.AbstractDownloadSource;
@@ -72,7 +72,7 @@ public abstract class AbstractSqlDownloadSource extends AbstractDownloadSource
 		{
 		final Writer osw = new ByteOrderMarkWriter(new OutputStreamWriter(stream, CHARSET));
 		try	{
-			final SQLWriter sw = dataFormatterFactory.getSQLWriter(new StatementWriter(osw, dialect.getStatementTerminator()), dialect, pretty);
+			final SQLWriter sw = dataFormatterFactory.getSQLWriter(new StatementWriter(osw, dialect.getScriptStatementWrapper()), dialect, pretty);
 			
 			writeSql(sw);
 			}

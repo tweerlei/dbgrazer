@@ -15,6 +15,10 @@
  */
 package de.tweerlei.dbgrazer.security.backend.impl;
 
+import java.util.EnumSet;
+import java.util.Set;
+
+import de.tweerlei.dbgrazer.security.model.Authority;
 import de.tweerlei.spring.config.ConfigKey;
 
 /**
@@ -49,7 +53,7 @@ public final class ConfigKeys
 	public static final ConfigKey<Boolean> FILE_CREATE_USERS = ConfigKey.create(PACKAGE_NAME, "file.create", Boolean.class, Boolean.FALSE);
 	
 	/** File: Additional roles to grant for users created based on file.create */
-	public static final ConfigKey<String> FILE_DEFAULT_ROLES = ConfigKey.create(PACKAGE_NAME, "file.defaultRoles", String.class, "");
+	public static final ConfigKey<Set<Authority>> FILE_DEFAULT_ROLES = ConfigKey.createSet(PACKAGE_NAME, "file.defaultRoles", Authority.class, EnumSet.noneOf(Authority.class));
 	
 	
 	private ConfigKeys()

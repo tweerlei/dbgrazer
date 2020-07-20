@@ -36,6 +36,7 @@ public class CsvRowHandler implements RowHandler
 	private final DataFormatter fmt;
 	private ColumnType[] cols;
 	private String[] data;
+	private int count;
 	
 	/**
 	 * Constructor
@@ -47,6 +48,16 @@ public class CsvRowHandler implements RowHandler
 		this.writer = w;
 		this.fmt = fmt;
 		this.data = null;
+		this.count = 0;
+		}
+	
+	/**
+	 * Get the number of rows handled
+	 * @return Count
+	 */
+	public int getCount()
+		{
+		return (count);
 		}
 	
 	@Override
@@ -89,6 +100,8 @@ public class CsvRowHandler implements RowHandler
 			{
 			throw new RuntimeException(e);
 			}
+		
+		count++;
 		
 		return (true);
 		}

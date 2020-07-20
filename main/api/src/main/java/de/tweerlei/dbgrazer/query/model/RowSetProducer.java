@@ -25,7 +25,6 @@ public interface RowSetProducer
 	/**
 	 * Produce RowSets and pass them to a RowSetHandler
 	 * @param h RowSetHandler
-	 * @return Number of rows produced
 	 */
-	public int produceRowSets(RowSetHandler h);
+	public void produceRowSets(RowSetHandler h);
 	}

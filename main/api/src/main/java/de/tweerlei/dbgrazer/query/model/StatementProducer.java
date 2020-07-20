@@ -25,9 +25,8 @@ public interface StatementProducer
 	/**
 	 * Produce statements and pass them to a StatementHandler
 	 * @param h StatementHandler
-	 * @return Number of rows produced
 	 */
-	public int produceStatements(StatementHandler h);
+	public void produceStatements(StatementHandler h);
 	
 	/**
 	 * Get the prepare statement that will be executed prior to all statements returned from the iterator

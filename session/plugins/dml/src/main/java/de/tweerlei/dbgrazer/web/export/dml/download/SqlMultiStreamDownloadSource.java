@@ -66,8 +66,8 @@ public class SqlMultiStreamDownloadSource extends AbstractSqlDownloadSource
 		
 		try	{
 			sw.writeComment(header);
-			
-			if (producer.produceRowSets(handler) == 0)
+			producer.produceRowSets(handler);
+			if (handler.getCount() == 0)
 				sw.writeComment(noDataFound);
 			}
 		catch (RuntimeException e)

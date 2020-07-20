@@ -167,10 +167,10 @@ public class DesignExportController
 			}
 		
 		@Override
-		public int produceRowSets(RowSetHandler h)
+		public void produceRowSets(RowSetHandler h)
 			{
 			try	{
-				return (schemaExportService.export(connection, dialect, infos, startTable, where, mode, h));
+				schemaExportService.export(connection, dialect, infos, startTable, where, mode, h);
 				}
 			catch (PerformQueryException e)
 				{

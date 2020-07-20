@@ -15,6 +15,8 @@
  */
 package de.tweerlei.spring.service;
 
+import java.util.Collection;
+
 import de.tweerlei.spring.serializer.Serializer;
 
 /**
@@ -33,6 +35,16 @@ public interface SerializerFactory
 	public <T> Serializer<T> getSerializer(Class<T> clazz);
 	
 	/**
+	 * Get a serializer for a specific container and element type
+	 * @param <T> Collection type
+	 * @param <V> Element type
+	 * @param clazz Type instance
+	 * @param elementClazz Element type instance
+	 * @return Serializer or null if no matching Serializer was found
+	 */
+	public <V, T extends Collection<V>> Serializer<T> getSerializer(Class<T> clazz, Class<V> elementClazz);
+	
+	/**
 	 * Decode a string into an object
 	 * @param <T> Type
 	 * @param clazz Type instance
@@ -43,6 +55,18 @@ public interface SerializerFactory
 	public <T> T decode(Class<T> clazz, String value) throws IllegalArgumentException;
 	
 	/**
+	 * Decode a string into an object
+	 * @param <T> Type
+	 * @param <V> Element type
+	 * @param clazz Type instance
+	 * @param elementClazz Element type instance
+	 * @param value String
+	 * @return Object or null if the passed value was null
+	 * @throws IllegalArgumentException if the String could not be parsed
+	 */
+	public <V, T extends Collection<V>> T decode(Class<T> clazz, Class<V> elementClazz, String value) throws IllegalArgumentException;
+	
+	/**
 	 * Encode an object into a string
 	 * @param <T> Type
 	 * @param clazz Type instance
@@ -51,4 +75,16 @@ public interface SerializerFactory
 	 * @throws IllegalArgumentException if the String could not be encoded
 	 */
 	public <T> String encode(Class<T> clazz, T value) throws IllegalArgumentException;
+	
+	/**
+	 * Encode an object into a string
+	 * @param <T> Type
+	 * @param <V> Element type
+	 * @param clazz Type instance
+	 * @param elementClazz Element type instance
+	 * @param value Object
+	 * @return String or null if the passed value was null
+	 * @throws IllegalArgumentException if the String could not be encoded
+	 */
+	public <V, T extends Collection<V>> String encode(Class<T> clazz, Class<V> elementClazz, T value) throws IllegalArgumentException;
 	}

@@ -13,18 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.tweerlei.dbgrazer.query.model;
+package de.tweerlei.dbgrazer.web.service;
+
+import de.tweerlei.dbgrazer.query.model.StatementProducer;
+import de.tweerlei.ermtools.dialect.SQLStatementWrapper;
 
 /**
- * Produce ResultRows and pass them to a RowHandler
+ * Write SQL scripts
  * 
  * @author Robert Wruck
  */
-public interface RowProducer
+public interface ScriptWriterService
 	{
 	/**
-	 * Produce ResultRows and pass them to a RowHandler
-	 * @param h RowHandler
+	 * Collect all statements from a StatementProducer and return a single script
+	 * @param producer StatementProducer
+	 * @param header Header comment
+	 * @param wrapper SQLStatementWrapper
+	 * @return Script
 	 */
-	public void produceRows(RowHandler h);
+	public String writeScript(StatementProducer producer, String header, SQLStatementWrapper wrapper);
 	}

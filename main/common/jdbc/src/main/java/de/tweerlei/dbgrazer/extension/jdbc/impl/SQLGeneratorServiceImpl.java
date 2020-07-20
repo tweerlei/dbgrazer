@@ -649,7 +649,7 @@ public class SQLGeneratorServiceImpl implements SQLGeneratorService
 	public List<String> parseScript(String script, SQLDialect dialect)
 		{
 		try	{
-			return (sqlFormat.parseScript(script, dialect.dmlRequiresTerminator()));
+			return (sqlFormat.parseScript(script, false));
 			}
 		catch (RuntimeException e)
 			{

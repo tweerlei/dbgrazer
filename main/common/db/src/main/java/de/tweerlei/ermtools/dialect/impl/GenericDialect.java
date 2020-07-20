@@ -44,7 +44,7 @@ public class GenericDialect extends CommonSQLDialect
 		{
 		final StringBuffer sb = new StringBuffer();
 		sb.append("CREATE TABLE ");
-		sb.append(t.getName().getObjectName());
+		sb.append(getQualifiedTableName(t.getName()));
 		sb.append(" (\n\t");
 		
 		boolean first = true;
@@ -101,7 +101,7 @@ public class GenericDialect extends CommonSQLDialect
 		{
 		final StringBuffer sb = new StringBuffer();
 		sb.append("ALTER TABLE ");
-		sb.append(t.getName().getObjectName());
+		sb.append(getQualifiedTableName(t.getName()));
 		sb.append("\n\tADD COLUMN ");
 		sb.append(c.getName());
 		sb.append(" ");
@@ -120,7 +120,7 @@ public class GenericDialect extends CommonSQLDialect
 		{
 		final StringBuffer sb = new StringBuffer();
 		sb.append("ALTER TABLE ");
-		sb.append(t.getName().getObjectName());
+		sb.append(getQualifiedTableName(t.getName()));
 		sb.append("\n\tMODIFY COLUMN ");
 		sb.append(c.getName());
 		sb.append(" ");
@@ -139,7 +139,7 @@ public class GenericDialect extends CommonSQLDialect
 		{
 		final StringBuffer sb = new StringBuffer();
 		sb.append("ALTER TABLE ");
-		sb.append(t.getName().getObjectName());
+		sb.append(getQualifiedTableName(t.getName()));
 		sb.append("\n\tDROP COLUMN ");
 		sb.append(c.getName());
 		return (sb.toString());
@@ -149,7 +149,7 @@ public class GenericDialect extends CommonSQLDialect
 		{
 		final StringBuffer sb = new StringBuffer();
 		sb.append("ALTER TABLE ");
-		sb.append(t.getName().getObjectName());
+		sb.append(getQualifiedTableName(t.getName()));
 		if (ix.isUnique())
 			sb.append("\n\tADD UNIQUE INDEX ");
 		else
@@ -175,7 +175,7 @@ public class GenericDialect extends CommonSQLDialect
 		{
 		final StringBuffer sb = new StringBuffer();
 		sb.append("ALTER TABLE ");
-		sb.append(t.getName().getObjectName());
+		sb.append(getQualifiedTableName(t.getName()));
 		sb.append("\n\tDROP INDEX ");
 		sb.append(ix.getName());
 		return (sb.toString());
@@ -185,7 +185,7 @@ public class GenericDialect extends CommonSQLDialect
 		{
 		final StringBuffer sb = new StringBuffer();
 		sb.append("ALTER TABLE ");
-		sb.append(t.getName().getObjectName());
+		sb.append(getQualifiedTableName(t.getName()));
 		sb.append("\n\tADD CONSTRAINT ");
 		sb.append(k.getName());
 		sb.append(" PRIMARY KEY (");
@@ -208,7 +208,7 @@ public class GenericDialect extends CommonSQLDialect
 		{
 		final StringBuffer sb = new StringBuffer();
 		sb.append("ALTER TABLE ");
-		sb.append(t.getName().getObjectName());
+		sb.append(getQualifiedTableName(t.getName()));
 		sb.append("\n\tDROP CONSTRAINT ");
 		sb.append(k.getName());
 		return (sb.toString());
@@ -218,7 +218,7 @@ public class GenericDialect extends CommonSQLDialect
 		{
 		final StringBuffer sb = new StringBuffer();
 		sb.append("ALTER TABLE ");
-		sb.append(t.getName().getObjectName());
+		sb.append(getQualifiedTableName(t.getName()));
 		sb.append("\n\tADD CONSTRAINT ");
 		sb.append(fk.getName());
 		sb.append("\n\tFOREIGN KEY (");
@@ -234,7 +234,7 @@ public class GenericDialect extends CommonSQLDialect
 			}
 		
 		sb.append(")\n\tREFERENCES ");
-		sb.append(fk.getTableName().getObjectName());
+		sb.append(getQualifiedTableName(fk.getTableName()));
 		sb.append(" (");
 		
 		first = true;
@@ -255,7 +255,7 @@ public class GenericDialect extends CommonSQLDialect
 		{
 		final StringBuffer sb = new StringBuffer();
 		sb.append("ALTER TABLE ");
-		sb.append(t.getName().getObjectName());
+		sb.append(getQualifiedTableName(t.getName()));
 		sb.append("\n\tDROP CONSTRAINT ");
 		sb.append(fk.getName());
 		return (sb.toString());

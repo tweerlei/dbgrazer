@@ -43,6 +43,7 @@ public class LdifRowSetHandler implements RowSetHandler
 	private final LDIFWriter writer;
 	private final DataFormatter fmt;
 	private final SQLDialect dialect;
+	private int count;
 	
 	/**
 	 * Constructor
@@ -55,6 +56,16 @@ public class LdifRowSetHandler implements RowSetHandler
 		this.writer = w;
 		this.fmt = fmt;
 		this.dialect = dialect;
+		this.count = 0;
+		}
+	
+	/**
+	 * Get the number of rows handled
+	 * @return Count
+	 */
+	public int getCount()
+		{
+		return (count);
 		}
 	
 	@Override
@@ -115,6 +126,8 @@ public class LdifRowSetHandler implements RowSetHandler
 				
 				writer.write(String.valueOf(dn), data);
 				}
+			
+			count++;
 			}
 		catch (IOException e)
 			{

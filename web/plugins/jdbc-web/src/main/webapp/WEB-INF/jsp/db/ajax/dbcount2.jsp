@@ -59,17 +59,17 @@
 >				<tr>
 					<td>${c.key}</td>
 <c:choose><c:when test="${c.value.srcName != null}"
->					<td><a href="db/${currentConnection.linkName}/dbobject.html?catalog=${c.value.srcName.catalogName}&amp;schema=${c.value.srcName.schemaName}&amp;object=${c.value.srcName.objectName}">${c.value.srcCount}</a></td>
+>					<td><a href="db/${currentConnection.linkName}/dbobject.html?catalog=${c.value.srcName.catalogName}&amp;schema=${c.value.srcName.schemaName}&amp;object=${c.value.srcName.objectName}" target="_blank">${c.value.srcCount}</a></td>
 </c:when><c:otherwise
 >					<td>&nbsp;</td>
 </c:otherwise></c:choose
 ><c:if test="${not empty model.connection2}"><c:choose><c:when test="${c.value.dstName != null}"
->					<td<c:choose><c:when test="${c.value.srcCount < c.value.dstCount}"> class="diff-add"</c:when><c:when test="${c.value.srcCount > c.value.dstCount}"> class="diff-del"</c:when></c:choose>><a href="db/${model.connection2}/dbobject.html?catalog=${c.value.dstName.catalogName}&amp;schema=${c.value.dstName.schemaName}&amp;object=${c.value.dstName.objectName}">${c.value.dstCount}</a></td>
+>					<td<c:choose><c:when test="${c.value.srcCount < c.value.dstCount}"> class="diff-add"</c:when><c:when test="${c.value.srcCount > c.value.dstCount}"> class="diff-del"</c:when></c:choose>><a href="db/${model.connection2}/dbobject.html?catalog=${c.value.dstName.catalogName}&amp;schema=${c.value.dstName.schemaName}&amp;object=${c.value.dstName.objectName}" target="_blank">${c.value.dstCount}</a></td>
 </c:when><c:otherwise
 >					<td>&nbsp;</td>
 </c:otherwise></c:choose
 ><c:choose><c:when test="${c.value.srcName != null && c.value.dstName != null}"
->					<td><a href="db/${currentConnection.linkName}/dml.html?catalog=${c.value.srcName.catalogName}&amp;schema=${c.value.srcName.schemaName}&amp;object=${c.value.srcName.objectName}&amp;connection2=${model.connection2}&amp;catalog2=${c.value.dstName.catalogName}&amp;schema2=${c.value.dstName.schemaName}"><fmt:message key="fullCompare"/></a></td>
+>					<td><a href="db/${currentConnection.linkName}/dml.html?catalog=${c.value.srcName.catalogName}&amp;schema=${c.value.srcName.schemaName}&amp;object=${c.value.srcName.objectName}&amp;connection2=${model.connection2}&amp;catalog2=${c.value.dstName.catalogName}&amp;schema2=${c.value.dstName.schemaName}" target="_blank"><fmt:message key="fullCompare"/></a></td>
 </c:when><c:otherwise
 >					<td>&nbsp;</td>
 </c:otherwise></c:choose

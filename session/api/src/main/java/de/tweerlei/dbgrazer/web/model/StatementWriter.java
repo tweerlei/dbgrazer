@@ -13,12 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.tweerlei.dbgrazer.query.model.impl;
+package de.tweerlei.dbgrazer.web.model;
 
 import java.io.IOException;
 import java.io.Writer;
 
 import de.tweerlei.dbgrazer.query.model.StatementHandler;
+import de.tweerlei.ermtools.dialect.SQLStatementWrapper;
+import de.tweerlei.ermtools.dialect.impl.IdentitySQLStatementWrapper;
 
 /**
  * Write to a StringBuilder
@@ -28,17 +30,17 @@ import de.tweerlei.dbgrazer.query.model.StatementHandler;
 public class StatementWriter implements StatementHandler
 	{
 	private final Writer w;
-	private final String eol;
+	private final SQLStatementWrapper wrapper;
 	
 	/**
 	 * Constructor
 	 * @param w Writer
-	 * @param eol Statement terminator
+	 * @param wrapper SQLStatementWrapper
 	 */
-	public StatementWriter(Writer w, String eol)
+	public StatementWriter(Writer w, SQLStatementWrapper wrapper)
 		{
 		this.w = w;
-		this.eol = eol;
+		this.wrapper = wrapper;
 		}
 	
 	/**
@@ -47,7 +49,7 @@ public class StatementWriter implements StatementHandler
 	 */
 	public StatementWriter(Writer w)
 		{
-		this(w, "");
+		this(w, IdentitySQLStatementWrapper.INSTANCE);
 		}
 	
 	@Override
@@ -59,8 +61,7 @@ public class StatementWriter implements StatementHandler
 	public void statement(String stmt)
 		{
 		try	{
-			w.write(stmt);
-			w.write(eol);
+			w.write(wrapper.wrapStatement(stmt));
 			}
 		catch (IOException e)
 			{

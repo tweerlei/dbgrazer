@@ -37,6 +37,7 @@ public class MergeRowHandler implements RowHandler
 	private final Set<Integer> pk;
 	private final int blockSize;
 	private final List<ResultRow> rows;
+	private int count;
 	
 	/**
 	 * Constructor
@@ -52,6 +53,16 @@ public class MergeRowHandler implements RowHandler
 		this.pk = pk;
 		this.blockSize = blockSize;
 		this.rows = new ArrayList<ResultRow>(blockSize);
+		this.count = 0;
+		}
+	
+	/**
+	 * Get the number of rows handled
+	 * @return Count
+	 */
+	public int getCount()
+		{
+		return (count);
 		}
 	
 	@Override
@@ -66,6 +77,8 @@ public class MergeRowHandler implements RowHandler
 		rows.add(row.clone());
 		if (rows.size() >= blockSize)
 			endRows();
+		
+		count++;
 		
 		return (true);
 		}

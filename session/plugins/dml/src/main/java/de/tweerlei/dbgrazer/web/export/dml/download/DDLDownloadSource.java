@@ -21,8 +21,8 @@ import java.util.Set;
 
 import de.tweerlei.common5.jdbc.model.TableDescription;
 import de.tweerlei.dbgrazer.query.model.StatementProducer;
-import de.tweerlei.dbgrazer.query.service.ResultBuilderService;
 import de.tweerlei.dbgrazer.web.service.SchemaTransformerService;
+import de.tweerlei.dbgrazer.web.service.ScriptWriterService;
 import de.tweerlei.ermtools.dialect.SQLDialect;
 import de.tweerlei.ermtools.model.SQLSchema;
 
@@ -34,7 +34,7 @@ import de.tweerlei.ermtools.model.SQLSchema;
 public class DDLDownloadSource extends AbstractDDLDownloadSource
 	{
 	private final SchemaTransformerService schemaTransformerService;
-	private final ResultBuilderService resultBuilder;
+	private final ScriptWriterService resultBuilder;
 	private final Set<TableDescription> tables;
 	private final String comment;
 	
@@ -45,10 +45,10 @@ public class DDLDownloadSource extends AbstractDDLDownloadSource
 	 * @param dialect SQLDialect
 	 * @param comment Comment
 	 * @param schemaTransformerService SchemaTransformerService
-	 * @param resultBuilder ResultBuilderService
+	 * @param resultBuilder ScriptWriterService
 	 */
 	public DDLDownloadSource(String name, Set<TableDescription> tables, SQLDialect dialect, String comment,
-			SchemaTransformerService schemaTransformerService, ResultBuilderService resultBuilder)
+			SchemaTransformerService schemaTransformerService, ScriptWriterService resultBuilder)
 		{
 		super(name, dialect);
 		this.schemaTransformerService = schemaTransformerService;
@@ -61,6 +61,6 @@ public class DDLDownloadSource extends AbstractDDLDownloadSource
 	protected void writeDDL(Writer sw, SQLDialect d) throws IOException
 		{
 		final StatementProducer p = schemaTransformerService.buildDDL(new SQLSchema(null, null, tables), d);
-		sw.write(resultBuilder.writeScript(p, comment, d.getStatementTerminator()));
+		sw.write(resultBuilder.writeScript(p, comment, d.getScriptStatementWrapper()));
 		}
 	}

@@ -13,18 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.tweerlei.dbgrazer.query.model;
+package de.tweerlei.ermtools.dialect;
 
 /**
- * Produce ResultRows and pass them to a RowHandler
+ * Wrap an SQL statement for execution, e.g. by appending a terminator
  * 
  * @author Robert Wruck
  */
-public interface RowProducer
+public interface SQLStatementWrapper
 	{
 	/**
-	 * Produce ResultRows and pass them to a RowHandler
-	 * @param h RowHandler
+	 * Wrap an SQL statement for execution, e.g. by appending a terminator
+	 * @param statement SQL statement to wrap
+	 * @return Wrapped statement
 	 */
-	public void produceRows(RowHandler h);
+	public String wrapStatement(String statement);
 	}

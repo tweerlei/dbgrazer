@@ -27,7 +27,6 @@ import org.springframework.validation.Errors;
 
 import de.tweerlei.dbgrazer.common.service.KeywordService;
 import de.tweerlei.dbgrazer.link.backend.LinkPersister;
-import de.tweerlei.dbgrazer.link.backend.impl.LinkPersisterImpl;
 import de.tweerlei.dbgrazer.link.model.LinkDef;
 import de.tweerlei.dbgrazer.link.model.LinkType;
 import de.tweerlei.dbgrazer.link.model.SchemaDef;

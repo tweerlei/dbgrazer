@@ -37,6 +37,7 @@ public class CsvRowSetHandler implements RowSetHandler
 	private final CSVWriter writer;
 	private final DataFormatter fmt;
 	private final SQLDialect dialect;
+	private int count;
 	
 	/**
 	 * Constructor
@@ -49,6 +50,16 @@ public class CsvRowSetHandler implements RowSetHandler
 		this.writer = w;
 		this.fmt = fmt;
 		this.dialect = dialect;
+		this.count = 0;
+		}
+	
+	/**
+	 * Get the number of rows handled
+	 * @return Count
+	 */
+	public int getCount()
+		{
+		return (count);
 		}
 	
 	@Override
@@ -81,6 +92,8 @@ public class CsvRowSetHandler implements RowSetHandler
 				
 				writer.writeData(data);
 				}
+			
+			count++;
 			}
 		catch (IOException e)
 			{

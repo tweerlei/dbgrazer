@@ -67,7 +67,8 @@ public class DBUnitStreamDownloadSource extends AbstractXmlDownloadSource
 		
 		final DBUnitRowHandler handler = new DBUnitRowHandler(xw, tableName, fmt);
 		try	{
-			if (producer.produceRows(handler) == 0)
+			producer.produceRows(handler);
+			if (handler.getCount() == 0)
 				{
 				xw.writeText("\n\t");
 				xw.writeComment(noDataFound);

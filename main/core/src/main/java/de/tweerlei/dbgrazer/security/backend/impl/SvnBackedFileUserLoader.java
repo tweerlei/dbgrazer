@@ -21,7 +21,6 @@ import org.springframework.stereotype.Service;
 
 import de.tweerlei.dbgrazer.common.file.FileAccess;
 import de.tweerlei.dbgrazer.common.service.ConfigFileStore;
-import de.tweerlei.dbgrazer.common.service.KeywordService;
 import de.tweerlei.dbgrazer.security.backend.UserPersister;
 import de.tweerlei.spring.config.ConfigAccessor;
 
@@ -37,15 +36,14 @@ public class SvnBackedFileUserLoader extends AbstractFileUserLoader
 	 * Constructor
 	 * @param store ConfigFileStore
 	 * @param configService ConfigAccessor
-	 * @param keywordService KeywordService
 	 * @param persister UserPersister
 	 * @param fileAccess FileAccess
 	 */
 	@Autowired
 	public SvnBackedFileUserLoader(ConfigFileStore store, ConfigAccessor configService,
-			KeywordService keywordService, UserPersister persister,
+			UserPersister persister,
 			@Qualifier("svnFileAccess") FileAccess fileAccess)
 		{
-		super(store, configService, keywordService, persister, fileAccess);
+		super(store, configService, persister, fileAccess);
 		}
 	}

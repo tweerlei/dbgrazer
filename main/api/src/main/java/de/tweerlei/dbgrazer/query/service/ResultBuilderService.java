@@ -19,7 +19,6 @@ import java.util.Collection;
 import java.util.Map;
 
 import de.tweerlei.dbgrazer.query.model.Query;
-import de.tweerlei.dbgrazer.query.model.StatementProducer;
 import de.tweerlei.dbgrazer.query.model.impl.ResultImpl;
 import de.tweerlei.dbgrazer.query.model.impl.RowSetImpl;
 
@@ -96,13 +95,4 @@ public interface ResultBuilderService
 	 * @return RowSet
 	 */
 	public RowSetImpl createMapRowSet(Query query, int subQueryIndex, Map<String, Object> values, long time);
-	
-	/**
-	 * Collect all statements from a StatementProducer and return a single script
-	 * @param producer StatementProducer
-	 * @param header Header comment
-	 * @param separator Statement separator
-	 * @return Script
-	 */
-	public String writeScript(StatementProducer producer, String header, String separator);
 	}

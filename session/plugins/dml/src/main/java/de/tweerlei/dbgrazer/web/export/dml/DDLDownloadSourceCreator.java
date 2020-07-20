@@ -24,13 +24,13 @@ import org.springframework.stereotype.Service;
 
 import de.tweerlei.common5.jdbc.model.TableDescription;
 import de.tweerlei.dbgrazer.common.util.impl.NamedBase;
-import de.tweerlei.dbgrazer.query.service.ResultBuilderService;
 import de.tweerlei.dbgrazer.web.backend.MetadataDownloadSourceCreator;
 import de.tweerlei.dbgrazer.web.backend.SchemaDownloadSourceCreator;
 import de.tweerlei.dbgrazer.web.constant.MessageKeys;
 import de.tweerlei.dbgrazer.web.export.dml.download.DDLDownloadSource;
 import de.tweerlei.dbgrazer.web.service.DataFormatterFactory;
 import de.tweerlei.dbgrazer.web.service.SchemaTransformerService;
+import de.tweerlei.dbgrazer.web.service.ScriptWriterService;
 import de.tweerlei.ermtools.dialect.SQLDialect;
 import de.tweerlei.spring.web.view.DownloadSource;
 
@@ -43,17 +43,17 @@ import de.tweerlei.spring.web.view.DownloadSource;
 public class DDLDownloadSourceCreator extends NamedBase implements MetadataDownloadSourceCreator, SchemaDownloadSourceCreator
 	{
 	private final SchemaTransformerService schemaTransformerService;
-	private final ResultBuilderService resultBuilder;
+	private final ScriptWriterService resultBuilder;
 	private final DataFormatterFactory factory;
 	
 	/**
 	 * Constructor
 	 * @param schemaTransformerService SchemaTransformerService
-	 * @param resultBuilder ResultBuilderService
+	 * @param resultBuilder ScriptWriterService
 	 * @param factory DataFormatterFactory
 	 */
 	@Autowired
-	public DDLDownloadSourceCreator(SchemaTransformerService schemaTransformerService, ResultBuilderService resultBuilder,
+	public DDLDownloadSourceCreator(SchemaTransformerService schemaTransformerService, ScriptWriterService resultBuilder,
 			DataFormatterFactory factory)
 		{
 		super("DDL");

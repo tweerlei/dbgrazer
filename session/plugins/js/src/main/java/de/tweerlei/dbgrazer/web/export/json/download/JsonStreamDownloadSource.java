@@ -56,8 +56,8 @@ public class JsonStreamDownloadSource extends AbstractJsonDownloadSource
 		
 		try	{
 			cw.writeComment(header);
-			
-			if (producer.produceRows(handler) == 0)
+			producer.produceRows(handler);
+			if (handler.getCount() == 0)
 				cw.writeComment(noDataFound);
 			}
 		catch (RuntimeException e)

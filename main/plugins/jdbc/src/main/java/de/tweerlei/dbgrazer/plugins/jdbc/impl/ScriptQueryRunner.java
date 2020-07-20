@@ -17,7 +17,6 @@ package de.tweerlei.dbgrazer.plugins.jdbc.impl;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
 import java.sql.Statement;
@@ -58,13 +57,14 @@ import de.tweerlei.dbgrazer.query.model.RowHandler;
 import de.tweerlei.dbgrazer.query.model.RowInterpreter;
 import de.tweerlei.dbgrazer.query.model.RowInterpreter.RowHandlerDef;
 import de.tweerlei.dbgrazer.query.model.RowSet;
-import de.tweerlei.dbgrazer.query.model.RowTransferer;
 import de.tweerlei.dbgrazer.query.model.StatementProducer;
 import de.tweerlei.dbgrazer.query.model.impl.ResultImpl;
 import de.tweerlei.dbgrazer.query.model.impl.RowSetImpl;
+import de.tweerlei.dbgrazer.query.model.impl.StatementCollection;
 import de.tweerlei.dbgrazer.query.service.ResultBuilderService;
 import de.tweerlei.ermtools.dialect.SQLDialect;
 import de.tweerlei.ermtools.dialect.SQLScriptOutputReader;
+import de.tweerlei.ermtools.dialect.SQLStatementWrapper;
 import de.tweerlei.spring.service.TimeService;
 
 /**
@@ -148,6 +148,7 @@ public class ScriptQueryRunner extends BaseQueryRunner
 		@Override
 		public Object doInStatement(Statement stmt) throws SQLException, DataAccessException
 			{
+			final SQLStatementWrapper wrapper = dialect.getStatementWrapper();
 			final SQLScriptOutputReader reader = dialect.getScriptOutputReader(stmt.getConnection());
 			
 			SQLException caught = null;
@@ -159,12 +160,12 @@ public class ScriptQueryRunner extends BaseQueryRunner
 				
 				for (String sql : statements)
 					{
-					currentStatement = sql;
+					currentStatement = wrapper.wrapStatement(sql);
 					
 					final long start = timeService.getCurrentTime();
 					int count = 0;
 					try	{
-						count = stmt.executeUpdate(sql);
+						count = stmt.executeUpdate(currentStatement);
 						}
 					catch (SQLException e)
 						{
@@ -261,10 +262,19 @@ public class ScriptQueryRunner extends BaseQueryRunner
 			}
 		}
 	
-	private static final class DMLRunnerCallback implements StatementCallback, SqlProvider
+	private static interface DMLRunnerCallback extends StatementCallback, SqlProvider
+		{
+		public int getTotalRowCount();
+		
+		public String getErrors();
+		
+		public int getRowCount();
+		}
+	
+	private static final class ExecuteDMLRunnerCallback implements DMLRunnerCallback
 		{
 		private final StatementProducer statements;
-		private final String eol;
+		private final SQLDialect dialect;
 		private final int commitSize;
 		private final DMLProgressMonitor monitor;
 		private final boolean rollback;
@@ -276,10 +286,10 @@ public class ScriptQueryRunner extends BaseQueryRunner
 		private int totalRowCount;
 		private int rowCount;
 		
-		public DMLRunnerCallback(StatementProducer statements, String eol, int commitSize, DMLProgressMonitor monitor, boolean rollback, boolean ignoreErrors, String preDMLStatement, String postDMLStatement)
+		public ExecuteDMLRunnerCallback(StatementProducer statements, SQLDialect dialect, int commitSize, DMLProgressMonitor monitor, boolean rollback, boolean ignoreErrors, String preDMLStatement, String postDMLStatement)
 			{
 			this.statements = statements;
-			this.eol = eol;
+			this.dialect = dialect;
 			this.commitSize = commitSize;
 			this.monitor = monitor;
 			this.rollback = rollback;
@@ -289,16 +299,19 @@ public class ScriptQueryRunner extends BaseQueryRunner
 			this.errors = new StringBuilder();
 			}
 		
+		@Override
 		public int getTotalRowCount()
 			{
 			return (totalRowCount);
 			}
 		
+		@Override
 		public String getErrors()
 			{
 			return (errors.toString());
 			}
 		
+		@Override
 		public int getRowCount()
 			{
 			return (rowCount);
@@ -307,12 +320,18 @@ public class ScriptQueryRunner extends BaseQueryRunner
 		@Override
 		public Object doInStatement(Statement stmt) throws SQLException, DataAccessException
 			{
-			final ExecuteStatementHandler esh = new ExecuteStatementHandler(stmt, eol, commitSize, monitor, rollback, ignoreErrors);
+			final ExecuteStatementHandler esh = new ExecuteStatementHandler(stmt, dialect.getStatementWrapper(), commitSize, monitor, rollback, ignoreErrors);
 			
 			if (!StringUtils.empty(preDMLStatement))
+				{
+				currentStatement = preDMLStatement;
 				esh.statement(preDMLStatement);
+				}
 			if (!StringUtils.empty(statements.getPrepareStatement()))
+				{
+				currentStatement = statements.getPrepareStatement();
 				esh.statement(statements.getPrepareStatement());
+				}
 			
 			DataAccessException caught = null;
 			try	{
@@ -326,9 +345,15 @@ public class ScriptQueryRunner extends BaseQueryRunner
 				{
 				try	{
 					if (!StringUtils.empty(statements.getCleanupStatement()))
+						{
+						currentStatement = statements.getCleanupStatement();
 						esh.statement(statements.getCleanupStatement());
+						}
 					if (!StringUtils.empty(postDMLStatement))
+						{
+						currentStatement = postDMLStatement;
 						esh.statement(postDMLStatement);
+						}
 					}
 				catch (DataAccessException e)
 					{
@@ -357,58 +382,17 @@ public class ScriptQueryRunner extends BaseQueryRunner
 			}
 		}
 	
-	private static abstract class TransferRunnerCallback implements ConnectionCallback, SqlProvider 
+	private static final class NoExecuteDMLRunnerCallback implements DMLRunnerCallback
 		{
-		private final String sql;
-		
-		public TransferRunnerCallback(String sql)
-			{
-			this.sql = sql;
-			}
-		
-		public abstract int getTotalRowCount();
-		
-		public abstract String getErrors();
-		
-		public abstract int getRowCount();
-		
-		@Override
-		public final String getSql()
-			{
-			return (sql);
-			}
-		}
-	
-	private static final class ExecuteTransferRunnerCallback extends TransferRunnerCallback
-		{
-		private final SQLGeneratorService sqlGenerator;
-		private final SQLDialect dialect;
-		private final TimeZone timeZone;
-		private final RowTransferer trans;
-		private final String eol;
-		private final int commitSize;
-		private final DMLProgressMonitor monitor;
-		private final boolean rollback;
-		private final boolean ignoreErrors;
+		private final StatementProducer statements;
 		private final String preDMLStatement;
 		private final String postDMLStatement;
 		private final StringBuilder errors;
 		private int totalRowCount;
-		private int rowCount;
 		
-		public ExecuteTransferRunnerCallback(String sql, SQLGeneratorService sqlGenerator, SQLDialect dialect, TimeZone timeZone,
-				RowTransferer trans, String eol, int commitSize, DMLProgressMonitor monitor, boolean rollback, boolean ignoreErrors, String preDMLStatement, String postDMLStatement)
+		public NoExecuteDMLRunnerCallback(StatementProducer statements, String preDMLStatement, String postDMLStatement)
 			{
-			super(sql);
-			this.sqlGenerator = sqlGenerator;
-			this.dialect = dialect;
-			this.timeZone = timeZone;
-			this.trans = trans;
-			this.eol = eol;
-			this.commitSize = commitSize;
-			this.monitor = monitor;
-			this.rollback = rollback;
-			this.ignoreErrors = ignoreErrors;
+			this.statements = statements;
 			this.preDMLStatement = preDMLStatement;
 			this.postDMLStatement = postDMLStatement;
 			this.errors = new StringBuilder();
@@ -429,165 +413,69 @@ public class ScriptQueryRunner extends BaseQueryRunner
 		@Override
 		public int getRowCount()
 			{
-			return (rowCount);
+			return (0);
 			}
 		
 		@Override
-		public Object doInConnection(Connection c) throws SQLException, DataAccessException
+		public Object doInStatement(Statement stmt) throws SQLException, DataAccessException
 			{
-			final Statement dstStmt = c.createStatement();
+			final StatementCollection esh = new StatementCollection(preDMLStatement, postDMLStatement);
+			
+			if (!StringUtils.empty(statements.getPrepareStatement()))
+				esh.statement(statements.getPrepareStatement());
+			
+			DataAccessException caught = null;
 			try	{
-				final ExecuteStatementHandler esh = new ExecuteStatementHandler(dstStmt, eol, commitSize, monitor, rollback, ignoreErrors);
-				
-				// The prepareStatement must be executed BEFORE executeQuery ist called,
-				// since it might alter session properties
-				if (!StringUtils.empty(preDMLStatement))
-					esh.statement(preDMLStatement);
-				if (!StringUtils.empty(trans.getPrepareStatement()))
-					esh.statement(trans.getPrepareStatement());
-				
-				RuntimeException caught = null;
+				statements.produceStatements(esh);
+				}
+			catch (DataAccessException e)
+				{
+				caught = e;
+				}
+			finally
+				{
 				try	{
-					doWithHandler(c, esh);
-					}
-				catch (TransactionException e)
-					{
-					caught = e;
+					if (!StringUtils.empty(statements.getCleanupStatement()))
+						esh.statement(statements.getCleanupStatement());
 					}
 				catch (DataAccessException e)
 					{
-					caught = e;
-					}
-				finally
-					{
-					try	{
-						if (!StringUtils.empty(trans.getCleanupStatement()))
-							esh.statement(trans.getCleanupStatement());
-						if (!StringUtils.empty(postDMLStatement))
-							esh.statement(postDMLStatement);
-						}
-					catch (TransactionException e)
-						{
-						// Report the inner exception if caught
-						if (caught == null)
-							throw e;
-						}
-					catch (DataAccessException e)
-						{
-						// Report the inner exception if caught
-						if (caught == null)
-							throw e;
-						}
-					
-					errors.append(esh.getTotalRowCount()).append(" rows\n");
-					errors.append(esh.getErrors());
-					
-					if (caught != null)
-						throw caught;
+					// Report the inner exception if caught
+					if (caught == null)
+						throw e;
 					}
 				
-				totalRowCount += esh.getTotalRowCount();
-				rowCount = esh.getUncommittedRowCount();
+				errors.append(esh.getStatementCount()).append(" rows\n");
 				
-				return (errors.toString());
+				if (caught != null)
+					throw caught;
 				}
-			finally
-				{
-				dstStmt.close();
-				}
+			
+			totalRowCount += esh.getStatementCount();
+			
+			return (errors.toString());
 			}
 		
-		private void doWithHandler(Connection c, ExecuteStatementHandler esh) throws SQLException
+		@Override
+		public String getSql()
 			{
-			final PreparedStatement srcStmt = c.prepareStatement(getSql());
-			try	{
-				final ResultSet rs = srcStmt.executeQuery();
-				try	{
-					final ResultSetIterator rsi = new ResultSetIterator(rs, new ResultSetAccessor(sqlGenerator, dialect, timeZone));
-					
-					trans.transfer(rsi, esh);
-					}
-				finally
-					{
-					rs.close();
-					}
-				}
-			finally
-				{
-				srcStmt.close();
-				}
+			return (null);
 			}
 		}
 	
-	private static final class NoExecuteTransferRunnerCallback extends TransferRunnerCallback
+	private static interface TransferRunnerCallback extends ConnectionCallback, SqlProvider 
 		{
-		private final SQLGeneratorService sqlGenerator;
-		private final SQLDialect dialect;
-		private final TimeZone timeZone;
-		private final RowTransferer trans;
-		private int totalRowCount;
- 		
-		public NoExecuteTransferRunnerCallback(String sql, SQLGeneratorService sqlGenerator, SQLDialect dialect, TimeZone timeZone, RowTransferer trans)
-			{
-			super(sql);
-			this.sqlGenerator = sqlGenerator;
-			this.dialect = dialect;
-			this.timeZone = timeZone;
-			this.trans = trans;
-			}
+		public int getTotalRowCount();
 		
- 		@Override
-		public int getTotalRowCount()
- 			{
-			return (totalRowCount);
- 			}
+		public String getErrors();
 		
-		@Override
-		public String getErrors()
-			{
-			return ("");
-			}
-		
-		@Override
-		public int getRowCount()
-			{
-			return (totalRowCount);
-			}
-		
-		@Override
-		public Object doInConnection(Connection c) throws SQLException, DataAccessException
-			{
-			final PreparedStatement srcStmt = c.prepareStatement(getSql());
-			try	{
-				final ResultSet rs = srcStmt.executeQuery();
-				try	{
-					final ResultSetIterator rsi = new ResultSetIterator(rs, new ResultSetAccessor(sqlGenerator, dialect, timeZone));
-					
-					trans.transfer(rsi, null);
-					
-					totalRowCount = rsi.getRowCount();
-					}
-				finally
-					{
-					rs.close();
-					}
-				}
-			finally
-				{
-				srcStmt.close();
-				}
-			
-			return ("");
-			}
- 		}
- 	
-	private static final class PreparedStatementTransferRunnerCallback extends TransferRunnerCallback
+		public int getRowCount();
+		}
+	
+	private static final class PreparedStatementTransferRunnerCallback implements TransferRunnerCallback
 		{
-		private final SQLGeneratorService sqlGenerator;
 		private final SQLDialect dialect;
-		private final TimeZone timeZone;
 		private final RowInterpreter trans;
-		private final String eol;
 		private final int commitSize;
 		private final DMLProgressMonitor monitor;
 		private final boolean rollback;
@@ -595,18 +483,15 @@ public class ScriptQueryRunner extends BaseQueryRunner
 		private final String preDMLStatement;
 		private final String postDMLStatement;
 		private final StringBuilder errors;
+		private String currentStatement;
 		private int totalRowCount;
 		private int rowCount;
 		
-		public PreparedStatementTransferRunnerCallback(String sql, SQLGeneratorService sqlGenerator, SQLDialect dialect, TimeZone timeZone,
-				RowInterpreter trans, String eol, int commitSize, DMLProgressMonitor monitor, boolean rollback, boolean ignoreErrors, String preDMLStatement, String postDMLStatement)
+		public PreparedStatementTransferRunnerCallback(SQLDialect dialect, RowInterpreter trans, int commitSize,
+				DMLProgressMonitor monitor, boolean rollback, boolean ignoreErrors, String preDMLStatement, String postDMLStatement)
 			{
-			super(sql);
-			this.sqlGenerator = sqlGenerator;
 			this.dialect = dialect;
-			this.timeZone = timeZone;
 			this.trans = trans;
-			this.eol = eol;
 			this.commitSize = commitSize;
 			this.monitor = monitor;
 			this.rollback = rollback;
@@ -639,14 +524,20 @@ public class ScriptQueryRunner extends BaseQueryRunner
 			{
 			final Statement dstStmt = c.createStatement();
 			try	{
-				final ExecuteStatementHandler esh = new ExecuteStatementHandler(dstStmt, eol, commitSize, monitor, rollback, ignoreErrors);
+				final ExecuteStatementHandler esh = new ExecuteStatementHandler(dstStmt, dialect.getStatementWrapper(), commitSize, monitor, rollback, ignoreErrors);
 				
 				// The prepareStatement must be executed BEFORE executeQuery ist called,
 				// since it might alter session properties
 				if (!StringUtils.empty(preDMLStatement))
+					{
+					currentStatement = preDMLStatement;
 					esh.statement(preDMLStatement);
+					}
 				if (!StringUtils.empty(trans.getPrepareStatement()))
+					{
+					currentStatement = trans.getPrepareStatement();
 					esh.statement(trans.getPrepareStatement());
+					}
 				
 				RuntimeException caught = null;
 				try	{
@@ -664,9 +555,15 @@ public class ScriptQueryRunner extends BaseQueryRunner
 					{
 					try	{
 						if (!StringUtils.empty(trans.getCleanupStatement()))
+							{
+							currentStatement = trans.getCleanupStatement();
 							esh.statement(trans.getCleanupStatement());
+							}
 						if (!StringUtils.empty(postDMLStatement))
+							{
+							currentStatement = postDMLStatement;
 							esh.statement(postDMLStatement);
+							}
 						}
 					catch (TransactionException e)
 						{
@@ -727,23 +624,7 @@ public class ScriptQueryRunner extends BaseQueryRunner
 						}
 					}
 				
-				final PreparedStatement srcStmt = c.prepareStatement(getSql());
-				try	{
-					final ResultSet rs = srcStmt.executeQuery();
-					try	{
-						final ResultSetIterator rsi = new ResultSetIterator(rs, new ResultSetAccessor(sqlGenerator, dialect, timeZone));
-						
-						trans.transfer(rsi, handlers);
-						}
-					finally
-						{
-						rs.close();
-						}
-					}
-				finally
-					{
-					srcStmt.close();
-					}
+				trans.produceRows(handlers);
 				}
 			finally
 				{
@@ -762,6 +643,12 @@ public class ScriptQueryRunner extends BaseQueryRunner
 						}
 					}
 				}
+			}
+		
+		@Override
+		public String getSql()
+			{
+			return (currentStatement);
 			}
 		}
 	
@@ -869,9 +756,6 @@ public class ScriptQueryRunner extends BaseQueryRunner
 		if (supports(query.getType()))
 			{
 			final TransactionTemplate tx = getTransactionTemplate(link, query.getType());
-			if (tx.isReadOnly())
-				throw new PerformQueryException("getTransactionTemplate", new RuntimeException("Link is read-only"));
-			
 			final JdbcTemplate template = dataAccessService.getJdbcTemplate(link);
 			final SQLDialect dialect = dataAccessService.getSQLDialect(link);
 			final String preDMLStatement = dataAccessService.getPreDMLStatement(link);
@@ -898,10 +782,13 @@ public class ScriptQueryRunner extends BaseQueryRunner
 	private RowSet runScript(TransactionTemplate tx, JdbcTemplate template, SQLDialect dialect, Query query, StatementProducer statements,
 			int commitSize, DMLProgressMonitor monitor, String preDMLStatement, String postDMLStatement)
 		{
-		final String eol = getStatementTerminator(dialect);
 		final boolean rollback = isRollbackOnly(query.getType());
 		final boolean ignoreErrors = isIgnoreErrors(query.getType());
-		final DMLRunnerCallback runner = new DMLRunnerCallback(statements, eol, commitSize, monitor, rollback, ignoreErrors, preDMLStatement, postDMLStatement);
+		final DMLRunnerCallback runner;
+		if (tx.isReadOnly())
+			runner = new NoExecuteDMLRunnerCallback(statements, preDMLStatement, postDMLStatement);
+		else
+			runner = new ExecuteDMLRunnerCallback(statements, dialect, commitSize, monitor, rollback, ignoreErrors, preDMLStatement, postDMLStatement);
 		final TransactionCallback cb = new StatementTxCallback(template, runner);
 		
 		final long start = timeService.getCurrentTime();
@@ -918,78 +805,11 @@ public class ScriptQueryRunner extends BaseQueryRunner
 			{
 			ret = runner.getErrors() + e.getMessage() + "\n";
 			}
-		
-		if (monitor != null)
-			monitor.getCommittedRows().progress(runner.getRowCount());
-		
-		final long end = timeService.getCurrentTime();
-		
-		final RowSetImpl rs = resultBuilder.createSingletonRowSet(query, 0, RESULT_COLUMN_NAME, String.valueOf(ret), end - start);
-		rs.setAffectedRows(runner.getTotalRowCount());
-		return (rs);
-		}
-	
-	@Override
-	public Result transferRows(String link, Query query, TimeZone timeZone, RowTransferer transferer, int commitSize, DMLProgressMonitor monitor) throws PerformQueryException
-		{
-		final Result res = new ResultImpl(query);
-		
-		if (supports(query.getType()))
+		finally
 			{
-			final TransactionTemplate tx = getTransactionTemplate(link, query.getType());
-			final JdbcTemplate template = dataAccessService.getUnlimitedJdbcTemplate(link);
-			final SQLDialect dialect = dataAccessService.getSQLDialect(link);
-			final String preDMLStatement = dataAccessService.getPreDMLStatement(link);
-			final String postDMLStatement = dataAccessService.getPostDMLStatement(link);
-			if (template != null)
-				{
-				try	{
-					res.getRowSets().put(query.getName(), runScript(tx, template, dialect, query, timeZone, transferer, commitSize, monitor, preDMLStatement, postDMLStatement));
-					}
-				catch (TransactionException e)
-					{
-					throw new PerformQueryException("performQueries", e);
-					}
-				catch (DataAccessException e)
-					{
-					throw new PerformQueryException("performQueries", e);
-					}
-				}
+			if (monitor != null)
+				monitor.getCommittedRows().progress(runner.getRowCount());
 			}
-		
-		return (res);
-		}
-	
-	private RowSet runScript(TransactionTemplate tx, JdbcTemplate template, SQLDialect dialect, Query query, TimeZone timeZone, RowTransferer transferer,
-			int commitSize, DMLProgressMonitor monitor, String preDMLStatement, String postDMLStatement)
-		{
-		final String eol = getStatementTerminator(dialect);
-		final boolean rollback = isRollbackOnly(query.getType());
-		final boolean ignoreErrors = isIgnoreErrors(query.getType());
-		final TransferRunnerCallback runner;
-		if (tx.isReadOnly())
-			runner = new NoExecuteTransferRunnerCallback(query.getStatement(), sqlGenerator, dialect, timeZone, transferer);
-		else
-			runner = new ExecuteTransferRunnerCallback(query.getStatement(), sqlGenerator, dialect, timeZone, transferer, eol, commitSize, monitor, rollback, ignoreErrors, preDMLStatement, postDMLStatement);
-		final TransactionCallback cb = new ConnectionTxCallback(template, runner);
-		
-		final long start = timeService.getCurrentTime();
-		
-		Object ret = null;
-		try	{
-			ret = tx.execute(cb);
-			}
-		catch (TransactionException e)
-			{
-			ret = runner.getErrors() + e.getMessage() + "\n";
-			}
-		catch (DataAccessException e)
-			{
-			ret = runner.getErrors() + e.getMessage() + "\n";
-			}
-		
-		if (monitor != null)
-			monitor.getCommittedRows().progress(runner.getRowCount());
 		
 		final long end = timeService.getCurrentTime();
 		
@@ -1016,7 +836,7 @@ public class ScriptQueryRunner extends BaseQueryRunner
 			if (template != null)
 				{
 				try	{
-					res.getRowSets().put(query.getName(), runScript(tx, template, dialect, query, timeZone, interpreter, commitSize, monitor, preDMLStatement, postDMLStatement));
+					res.getRowSets().put(query.getName(), runScript(tx, template, dialect, query, interpreter, commitSize, monitor, preDMLStatement, postDMLStatement));
 					}
 				catch (TransactionException e)
 					{
@@ -1032,14 +852,13 @@ public class ScriptQueryRunner extends BaseQueryRunner
 		return (res);
 		}
 	
-	private RowSet runScript(TransactionTemplate tx, JdbcTemplate template, SQLDialect dialect, Query query, TimeZone timeZone, RowInterpreter interpreter,
+	private RowSet runScript(TransactionTemplate tx, JdbcTemplate template, SQLDialect dialect, Query query, RowInterpreter interpreter,
 			int commitSize, DMLProgressMonitor monitor, String preDMLStatement, String postDMLStatement)
 		{
-		final String eol = getStatementTerminator(dialect);
 		final boolean rollback = isRollbackOnly(query.getType());
 		final boolean ignoreErrors = isIgnoreErrors(query.getType());
 		
-		final TransferRunnerCallback runner = new PreparedStatementTransferRunnerCallback(query.getStatement(), sqlGenerator, dialect, timeZone, interpreter, eol, commitSize, monitor, rollback, ignoreErrors, preDMLStatement, postDMLStatement);
+		final TransferRunnerCallback runner = new PreparedStatementTransferRunnerCallback(dialect, interpreter, commitSize, monitor, rollback, ignoreErrors, preDMLStatement, postDMLStatement);
 		final TransactionCallback cb = new ConnectionTxCallback(template, runner);
 		
 		final long start = timeService.getCurrentTime();
@@ -1077,11 +896,6 @@ public class ScriptQueryRunner extends BaseQueryRunner
 	private boolean isIgnoreErrors(QueryType type)
 		{
 		return ((type instanceof FaultTolerantScriptQueryType) || (type instanceof TestScriptQueryType));
-		}
-	
-	private String getStatementTerminator(SQLDialect d)
-		{
-		return (d.dmlRequiresTerminator() ? d.getStatementTerminator() : null);
 		}
 	
 	private TransactionTemplate getTransactionTemplate(String link, QueryType type)

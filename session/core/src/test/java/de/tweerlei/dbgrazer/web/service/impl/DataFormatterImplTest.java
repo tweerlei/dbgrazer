@@ -43,6 +43,8 @@ public class DataFormatterImplTest extends TestCase
 		assertEquals(Long.valueOf(1), fmt.parse(ColumnType.INTEGER, "1"));
 		assertEquals(Long.valueOf(1), fmt.parse(ColumnType.INTEGER, " 1\n"));
 		assertEquals(Long.valueOf(1), fmt.parse(ColumnType.INTEGER, " 1\nsome text"));
+		assertEquals(Long.valueOf(0), fmt.parse(ColumnType.INTEGER, "0x"));
+		assertEquals(Long.valueOf(255), fmt.parse(ColumnType.INTEGER, "0xffx"));
 		assertNull(fmt.parse(ColumnType.INTEGER, " some text\n1"));
 		assertEquals(Double.valueOf(1.1), fmt.parse(ColumnType.INTEGER, "1,1"));
 		}
@@ -59,6 +61,8 @@ public class DataFormatterImplTest extends TestCase
 		assertEquals(Long.valueOf(1), fmt.parse(ColumnType.FLOAT, "1"));
 		assertEquals(Long.valueOf(1), fmt.parse(ColumnType.FLOAT, " 1\n"));
 		assertEquals(Long.valueOf(1), fmt.parse(ColumnType.FLOAT, " 1\nsome text"));
+		assertEquals(Long.valueOf(0), fmt.parse(ColumnType.INTEGER, "0x"));
+		assertEquals(Long.valueOf(255), fmt.parse(ColumnType.INTEGER, "0xffx"));
 		assertNull(fmt.parse(ColumnType.FLOAT, " some text\n1"));
 		assertEquals(Double.valueOf(1.1), fmt.parse(ColumnType.FLOAT, "1,1"));
 		assertEquals(Long.valueOf(1), fmt.parse(ColumnType.FLOAT, "1.1"));

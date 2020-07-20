@@ -36,6 +36,7 @@ public class SQLDataFormatterImpl extends AbstractDataFormatter
 	 * @param tsfmt Timestamp date format
 	 * @param ldfmt Long date format
 	 * @param sdfmt Short date format
+	 * @param hasBoolean Whether to use boolean literals
 	 * @param tz Time zone
 	 * @param sizeLimit Size limit (characters) for formatted output
 	 */

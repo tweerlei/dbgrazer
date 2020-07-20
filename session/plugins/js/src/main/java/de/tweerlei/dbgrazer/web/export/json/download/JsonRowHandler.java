@@ -35,6 +35,7 @@ public class JsonRowHandler implements RowHandler
 	private final JSONWriter writer;
 	private final Map<String, Object> data;
 	private String[] names;
+	private int count;
 	
 	/**
 	 * Constructor
@@ -45,6 +46,16 @@ public class JsonRowHandler implements RowHandler
 		this.writer = w;
 		this.data = new LinkedHashMap<String, Object>();
 		this.names = null;
+		this.count = 0;
+		}
+	
+	/**
+	 * Get the number of rows handled
+	 * @return Count
+	 */
+	public int getCount()
+		{
+		return (count);
 		}
 	
 	@Override
@@ -85,6 +96,8 @@ public class JsonRowHandler implements RowHandler
 			{
 			throw new RuntimeException(e);
 			}
+		
+		count++;
 		
 		return (true);
 		}

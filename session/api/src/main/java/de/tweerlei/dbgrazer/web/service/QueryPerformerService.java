@@ -17,6 +17,7 @@ package de.tweerlei.dbgrazer.web.service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 import de.tweerlei.dbgrazer.query.exception.PerformQueryException;
 import de.tweerlei.dbgrazer.query.model.CancelableProgressMonitor;
@@ -27,7 +28,6 @@ import de.tweerlei.dbgrazer.query.model.Result;
 import de.tweerlei.dbgrazer.query.model.RowHandler;
 import de.tweerlei.dbgrazer.query.model.RowInterpreter;
 import de.tweerlei.dbgrazer.query.model.RowProducer;
-import de.tweerlei.dbgrazer.query.model.RowTransferer;
 import de.tweerlei.dbgrazer.query.model.StatementHandler;
 import de.tweerlei.dbgrazer.query.model.StatementProducer;
 import de.tweerlei.dbgrazer.web.model.QueryParameters;
@@ -96,11 +96,11 @@ public interface QueryPerformerService
 	 * @param type Query type name
 	 * @param statement Statement text
 	 * @param label Query name
+	 * @param timeZone Time zone for temporal values
 	 * @param handler RowHandler
-	 * @return Processed row count
 	 * @throws PerformQueryException on error
 	 */
-	public int performCustomQuery(String link, String type, String statement, String label, RowHandler handler) throws PerformQueryException;
+	public void performCustomQuery(String link, String type, String statement, String label, TimeZone timeZone, RowHandler handler) throws PerformQueryException;
 	
 	/**
 	 * Perform a custom query, passing results to a RowHandler
@@ -114,30 +114,17 @@ public interface QueryPerformerService
 	public Result performCustomQueries(String link, StatementProducer statements, String type, DMLProgressMonitor monitor) throws PerformQueryException;
 	
 	/**
-	 * Perform modifications in a single transaction
+	 * Perform a custom query, passing results to a RowHandler
 	 * @param link Link name
-	 * @param query Source query statement
-	 * @param transferer RowTransferer
-	 * @param type DML query type
-	 * @param monitor DMLProgressMonitor
-	 * @return Result
-	 * @throws PerformQueryException on error
-	 */
-	public Result transferRows(String link, String query, RowTransferer transferer, String type, DMLProgressMonitor monitor) throws PerformQueryException;
-	
-	/**
-	 * Perform modifications in a single transaction
-	 * @param link Link name
-	 * @param query Source query statement
-	 * @param transferer RowTransferer
+	 * @param statements Statements
 	 * @param handler Destination StatementHandler
-	 * @param type DML query type
+	 * @param type Query type name
 	 * @param monitor DMLProgressMonitor
 	 * @param export Whether to return ALL result rows
-	 * @return Result
+	 * @return Processed row count
 	 * @throws PerformQueryException on error
 	 */
-	public Result transferRows(String link, String query, RowTransferer transferer, StatementHandler handler, String type, DMLProgressMonitor monitor, boolean export) throws PerformQueryException;
+	public Result performCustomQueries(String link, StatementProducer statements, StatementHandler handler, String type, DMLProgressMonitor monitor, boolean export) throws PerformQueryException;
 	
 	/**
 	 * Perform modifications in a single transaction

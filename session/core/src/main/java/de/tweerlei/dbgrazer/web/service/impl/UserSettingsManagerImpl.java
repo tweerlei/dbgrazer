@@ -22,14 +22,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TimeZone;
-import java.util.TreeSet;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.context.Theme;
 
 import de.tweerlei.common.math.Rational;
-import de.tweerlei.dbgrazer.common.service.KeywordService;
 import de.tweerlei.dbgrazer.link.model.LinkDef;
 import de.tweerlei.dbgrazer.security.model.Authority;
 import de.tweerlei.dbgrazer.security.model.User;
@@ -47,21 +45,18 @@ public class UserSettingsManagerImpl implements UserSettingsManager
 	{
 	private final LocalizationHelper localizationHelper;
 	private final ConfigAccessor configService;
-	private final KeywordService keywordService;
 	
 	/**
 	 * Constructor
 	 * @param localizationHelper LocalizationHelper
 	 * @param configService ConfigAccessor
-	 * @param keywordService KeywordService
 	 */
 	@Autowired
 	public UserSettingsManagerImpl(LocalizationHelper localizationHelper,
-			ConfigAccessor configService, KeywordService keywordService)
+			ConfigAccessor configService)
 		{
 		this.localizationHelper = localizationHelper;
 		this.configService = configService;
-		this.keywordService = keywordService;
 		}
 	
 	@Override
@@ -91,18 +86,7 @@ public class UserSettingsManagerImpl implements UserSettingsManager
 	@Override
 	public SortedSet<Integer> getAutorefreshIntervals()
 		{
-		final SortedSet<Integer> ret = new TreeSet<Integer>();
-		for (String s : keywordService.extractValues(configService.get(ConfigKeys.AUTOREFRESH_INTERVALS)))
-			{
-			try	{
-				ret.add(Integer.valueOf(s));
-				}
-			catch (NumberFormatException e)
-				{
-				// ignore value
-				}
-			}
-		return (ret);
+		return (configService.get(ConfigKeys.AUTOREFRESH_INTERVALS));
 		}
 	
 	@Override

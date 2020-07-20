@@ -13,18 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.tweerlei.dbgrazer.query.model;
+package de.tweerlei.ermtools.dialect.impl;
+
+import de.tweerlei.ermtools.dialect.SQLStatementWrapper;
 
 /**
- * Produce ResultRows and pass them to a RowHandler
+ * Trivial implementation
  * 
  * @author Robert Wruck
  */
-public interface RowProducer
+public class IdentitySQLStatementWrapper implements SQLStatementWrapper
 	{
-	/**
-	 * Produce ResultRows and pass them to a RowHandler
-	 * @param h RowHandler
-	 */
-	public void produceRows(RowHandler h);
+	/** The instance */
+	public static final SQLStatementWrapper INSTANCE = new IdentitySQLStatementWrapper();
+	
+	private IdentitySQLStatementWrapper()
+		{
+		}
+	
+	public String wrapStatement(String statement)
+		{
+		return (statement);
+		}
 	}

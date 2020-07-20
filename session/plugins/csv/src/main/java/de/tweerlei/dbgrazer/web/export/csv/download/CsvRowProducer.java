@@ -69,16 +69,14 @@ public class CsvRowProducer implements RowProducer
 		}
 	
 	@Override
-	public int produceRows(RowHandler h)
+	public void produceRows(RowHandler h)
 		{
 		try	{
 			final CSVReader r = new CSVReader(new LineNumberReader(new ByteOrderMarkReader(new InputStreamReader(input, CHARSET))),
 					params.getFieldSeparator(), params.getTextDelimiter(), 0, false);
 			
 			try	{
-				final int rows = exportCSV(r, h);
-				
-				return (rows);
+				exportCSV(r, h);
 				}
 			finally
 				{
@@ -95,9 +93,8 @@ public class CsvRowProducer implements RowProducer
 			}
 		}
 	
-	private int exportCSV(CSVReader r, RowHandler h) throws IOException
+	private void exportCSV(CSVReader r, RowHandler h) throws IOException
 		{
-		int rows = 0;
 		Map<Integer, ColumnDef> columnMap = null;
 		ResultRow row = null;
 		
@@ -132,7 +129,7 @@ public class CsvRowProducer implements RowProducer
 						}
 					
 					if (columnMap.isEmpty())
-						return (0);
+						return;
 					
 					h.startRows(columns);
 					}
@@ -147,11 +144,7 @@ public class CsvRowProducer implements RowProducer
 							row.getValues().add(fmt.parse(ent.getValue().getType(), data[ent.getKey()]));
 						}
 					if (!h.handleRow(row))
-						{
-						rows++;
 						break;
-						}
-					rows++;
 					}
 				}
 			catch (EOFException e)
@@ -160,7 +153,5 @@ public class CsvRowProducer implements RowProducer
 				break;
 				}
 			}
-		
-		return (rows);
 		}
 	}

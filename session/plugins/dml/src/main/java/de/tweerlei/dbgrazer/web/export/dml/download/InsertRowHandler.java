@@ -32,6 +32,7 @@ public class InsertRowHandler implements RowHandler
 	private final SQLWriter sqlWriter;
 	private final String tableName;
 	private List<ColumnDef> cols;
+	private int count;
 	
 	/**
 	 * Constructor
@@ -42,6 +43,16 @@ public class InsertRowHandler implements RowHandler
 		{
 		this.sqlWriter = sqlWriter;
 		this.tableName = tableName;
+		this.count = 0;
+		}
+	
+	/**
+	 * Get the number of rows handled
+	 * @return Count
+	 */
+	public int getCount()
+		{
+		return (count);
 		}
 	
 	@Override
@@ -54,6 +65,8 @@ public class InsertRowHandler implements RowHandler
 	public boolean handleRow(ResultRow row)
 		{
 		sqlWriter.writeInsert(tableName, cols, row);
+		
+		count++;
 		
 		return (true);
 		}

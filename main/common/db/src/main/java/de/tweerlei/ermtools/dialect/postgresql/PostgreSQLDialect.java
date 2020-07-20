@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import de.tweerlei.common.util.StringUtils;
 import de.tweerlei.common5.jdbc.MetadataReader;
 import de.tweerlei.common5.jdbc.model.ColumnDescription;
 import de.tweerlei.common5.jdbc.model.ForeignKeyDescription;
@@ -31,6 +32,7 @@ import de.tweerlei.common5.jdbc.model.QualifiedName;
 import de.tweerlei.common5.jdbc.model.TableDescription;
 import de.tweerlei.ermtools.dialect.SQLDataType;
 import de.tweerlei.ermtools.dialect.SQLStatementAnalyzer;
+import de.tweerlei.ermtools.dialect.SQLStatementWrapper;
 import de.tweerlei.ermtools.dialect.impl.CommonSQLDialect;
 
 /**
@@ -119,7 +121,10 @@ public class PostgreSQLDialect extends CommonSQLDialect
 		final PrimaryKeyDescription pk = t.getPrimaryKey();
 		if (pk != null)
 			{
-			sb.append(",\n\tPRIMARY KEY (");
+			sb.append(",\n\t");
+			if (!StringUtils.empty(pk.getName()))
+				sb.append("CONSTRAINT ").append(pk.getName()).append(" ");
+			sb.append("PRIMARY KEY (");
 			
 			first = true;
 			for (Iterator<String> i = pk.getColumns().iterator(); i.hasNext(); )
@@ -280,7 +285,7 @@ public class PostgreSQLDialect extends CommonSQLDialect
 			{
 			// Suppress index creation for PK (in most cases, PostgreSQL does this itself)
 			if (ix.getColumns().equals(pk.getColumns()))
-				return ("NULL;");
+				return ("NULL");
 			}
 		
 		final StringBuffer sb = new StringBuffer();
@@ -393,6 +398,12 @@ public class PostgreSQLDialect extends CommonSQLDialect
 		sb.append("\n\tDROP FOREIGN KEY ");
 		sb.append(fk.getName());
 		return (sb.toString());
+		}
+	
+	@Override
+	public SQLStatementWrapper getStatementWrapper()
+		{
+		return (PostgreSQLStatementWrapper.INSTANCE);
 		}
 	
 	@Override

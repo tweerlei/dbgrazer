@@ -42,12 +42,12 @@ import de.tweerlei.dbgrazer.query.model.QueryType;
 import de.tweerlei.dbgrazer.query.model.Result;
 import de.tweerlei.dbgrazer.query.model.StatementProducer;
 import de.tweerlei.dbgrazer.query.service.QueryService;
-import de.tweerlei.dbgrazer.query.service.ResultBuilderService;
 import de.tweerlei.dbgrazer.web.exception.AccessDeniedException;
 import de.tweerlei.dbgrazer.web.model.TaskDMLProgressMonitor;
 import de.tweerlei.dbgrazer.web.service.DataFormatterFactory;
 import de.tweerlei.dbgrazer.web.service.QueryPerformerService;
 import de.tweerlei.dbgrazer.web.service.SchemaTransformerService;
+import de.tweerlei.dbgrazer.web.service.ScriptWriterService;
 import de.tweerlei.dbgrazer.web.service.TaskProgressService;
 import de.tweerlei.dbgrazer.web.service.UserSettingsManager;
 import de.tweerlei.dbgrazer.web.session.ConnectionSettings;
@@ -236,7 +236,7 @@ public class ObjectDiffController
 	private final QueryService queryService;
 	private final QueryPerformerService runner;
 	private final SchemaTransformerService schemaTransformer;
-	private final ResultBuilderService resultBuilder;
+	private final ScriptWriterService resultBuilder;
 	private final DataFormatterFactory dataFormatterFactory;
 	private final UserSettingsManager userSettingsManager;
 	private final TaskProgressService taskProgressService;
@@ -252,7 +252,7 @@ public class ObjectDiffController
 	 * @param runner QueryPerformerService
 	 * @param userSettingsManager UserSettingsManager
 	 * @param schemaTransformer SchemaTransformerService
-	 * @param resultBuilder ResultBuilderService
+	 * @param resultBuilder ScriptWriterService
 	 * @param dataFormatterFactory DataFormatterFactory
 	 * @param taskProgressService TaskProgressService
 	 * @param userSettings UserSettings
@@ -261,7 +261,7 @@ public class ObjectDiffController
 	@Autowired
 	public ObjectDiffController(MetadataService metadataService, LinkService linkService,
 			QueryService queryService, QueryPerformerService runner, SchemaTransformerService schemaTransformer,
-			UserSettingsManager userSettingsManager, ResultBuilderService resultBuilder,
+			UserSettingsManager userSettingsManager, ScriptWriterService resultBuilder,
 			DataFormatterFactory dataFormatterFactory, TaskProgressService taskProgressService,
 			UserSettings userSettings, ConnectionSettings connectionSettings)
 		{
@@ -432,7 +432,7 @@ public class ObjectDiffController
 			else
 				{
 				final String header = getHeader(connectionSettings.getLinkName(), rightLabel);
-				model.put("result", resultBuilder.writeScript(p, header, dialect.getStatementTerminator()));
+				model.put("result", resultBuilder.writeScript(p, header, dialect.getScriptStatementWrapper()));
 				}
 			}
 		catch (PerformQueryException e)

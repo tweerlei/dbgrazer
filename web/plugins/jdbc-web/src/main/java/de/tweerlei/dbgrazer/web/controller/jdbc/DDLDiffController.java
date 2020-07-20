@@ -21,6 +21,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -46,15 +47,15 @@ import de.tweerlei.dbgrazer.query.model.ResultRow;
 import de.tweerlei.dbgrazer.query.model.RowHandler;
 import de.tweerlei.dbgrazer.query.model.RowIterator;
 import de.tweerlei.dbgrazer.query.model.RowSet;
-import de.tweerlei.dbgrazer.query.model.RowTransferer;
 import de.tweerlei.dbgrazer.query.model.StatementHandler;
+import de.tweerlei.dbgrazer.query.model.StatementProducer;
 import de.tweerlei.dbgrazer.query.model.impl.AsyncRowIterator;
 import de.tweerlei.dbgrazer.query.model.impl.MonitoringStatementHandler;
-import de.tweerlei.dbgrazer.query.model.impl.StatementWriter;
 import de.tweerlei.dbgrazer.query.service.QueryService;
 import de.tweerlei.dbgrazer.web.constant.MessageKeys;
 import de.tweerlei.dbgrazer.web.exception.AccessDeniedException;
 import de.tweerlei.dbgrazer.web.model.CompareProgressMonitor;
+import de.tweerlei.dbgrazer.web.model.StatementWriter;
 import de.tweerlei.dbgrazer.web.model.TaskCompareProgressMonitor;
 import de.tweerlei.dbgrazer.web.model.TaskDMLProgressMonitor;
 import de.tweerlei.dbgrazer.web.model.TaskProgress;
@@ -331,14 +332,16 @@ public class DDLDiffController
 		private final String connection;
 		private final String statement;
 		private final String label;
+		private final TimeZone timeZone;
 		private final RowHandler handler;
 		
-		public RowProducer(QueryPerformerService runner, String connection, String statement, String label, RowHandler handler)
+		public RowProducer(QueryPerformerService runner, String connection, String statement, String label, TimeZone timeZone, RowHandler handler)
 			{
 			this.runner = runner;
 			this.connection = connection;
 			this.statement = statement;
 			this.label = label;
+			this.timeZone = timeZone;
 			this.handler = handler;
 			}
 		
@@ -346,7 +349,7 @@ public class DDLDiffController
 		public void run()
 			{
 			try	{
-				runner.performCustomQuery(connection, JdbcConstants.QUERYTYPE_MULTIPLE, statement, label, handler);
+				runner.performCustomQuery(connection, JdbcConstants.QUERYTYPE_MULTIPLE, statement, label, timeZone, handler);
 				}
 			catch (PerformQueryException e)
 				{
@@ -399,26 +402,27 @@ public class DDLDiffController
 			}
 		}
 */	
-	private static final class DiffRowTransferer implements RowTransferer
+	private static final class DiffRowTransferer implements StatementProducer
 		{
 		private final ResultCompareService transformer;
+		private final RowIterator src;
 		private final RowIterator dst;
 		private final CompareProgressMonitor monitor;
 		private final SQLDialect dialect;
 		
-		public DiffRowTransferer(ResultCompareService transformer, RowIterator dst, CompareProgressMonitor monitor, SQLDialect dialect)
+		public DiffRowTransferer(ResultCompareService transformer, RowIterator src, RowIterator dst, CompareProgressMonitor monitor, SQLDialect dialect)
 			{
 			this.transformer = transformer;
+			this.src = src;
 			this.dst = dst;
 			this.monitor = monitor;
 			this.dialect = dialect;
 			}
 		
 		@Override
-		public Object transfer(RowIterator rows, StatementHandler handler)
+		public void produceStatements(StatementHandler handler)
 			{
-			transformer.compareDDLSource(rows, dst, handler, monitor, dialect);
-			return null;
+			transformer.compareDDLSource(src, dst, handler, monitor, dialect);
 			}
 		
 		@Override
@@ -434,26 +438,27 @@ public class DDLDiffController
 			}
 		}
 	
-	private static final class PrivRowTransferer implements RowTransferer
+	private static final class PrivRowTransferer implements StatementProducer
 		{
 		private final ResultCompareService transformer;
+		private final RowIterator src;
 		private final RowIterator dst;
 		private final CompareProgressMonitor monitor;
 		private final SQLDialect dialect;
 		
-		public PrivRowTransferer(ResultCompareService transformer, RowIterator dst, CompareProgressMonitor monitor, SQLDialect dialect)
+		public PrivRowTransferer(ResultCompareService transformer, RowIterator src, RowIterator dst, CompareProgressMonitor monitor, SQLDialect dialect)
 			{
 			this.transformer = transformer;
+			this.src = src;
 			this.dst = dst;
 			this.monitor = monitor;
 			this.dialect = dialect;
 			}
 		
 		@Override
-		public Object transfer(RowIterator rows, StatementHandler handler)
+		public void produceStatements(StatementHandler handler)
 			{
-			transformer.compareDDLPrivileges(rows, dst, handler, monitor, dialect);
-			return null;
+			transformer.compareDDLPrivileges(src, dst, handler, monitor, dialect);
 			}
 		
 		@Override
@@ -734,7 +739,7 @@ public class DDLDiffController
 		final SQLDialect dialect = getSQLDialect();
 		
 		final StringWriter sw = new StringWriter();
-		final StatementHandler h3 = new MonitoringStatementHandler(new StatementWriter(sw, dialect.getStatementTerminator()), p.getTotalStatements());
+		final StatementHandler h3 = new MonitoringStatementHandler(new StatementWriter(sw, dialect.getScriptStatementWrapper()), p.getTotalStatements());
 		
 		h3.comment(getHeader(connectionSettings.getLinkName(), conn2));
 		
@@ -848,20 +853,36 @@ public class DDLDiffController
 		if (dstStmt == null)
 			throw new UnsupportedOperationException("Operation not supported by dialect " + connectionSettings.getDialectName());
 		
+		final AsyncRowIterator h1 = new AsyncRowIterator();
+		final RowProducer p1 = new RowProducer(runner, connectionSettings.getLinkName(), srcStmt, "diff", dataFormatterFactory.getTimeZone(), h1);
+		final Thread src = new Thread(p1);
+		
 		final AsyncRowIterator h2 = new AsyncRowIterator();
-		final RowProducer p2 = new RowProducer(runner, conn2, dstStmt, "diff", h2);
+		final RowProducer p2 = new RowProducer(runner, conn2, dstStmt, "diff", dataFormatterFactory.getTimeZone(), h2);
 		final Thread dst = new Thread(p2);
 		
+		src.start();
 		dst.start();
 		
 		final Result res;
 		try	{
 			final CompareProgressMonitor c = new TaskCompareProgressMonitor();
-			final DiffRowTransferer transferer = new DiffRowTransferer(transformer, h2, c, dialect);
-			res = runner.transferRows(connectionSettings.getLinkName(), srcStmt, transferer, h3, mode, p, export);
+			final DiffRowTransferer transferer = new DiffRowTransferer(transformer, h1, h2, c, dialect);
+			res = runner.performCustomQueries(connectionSettings.getLinkName(), transferer, h3, mode, p, export);
 			}
 		finally
 			{
+ 			try	{
+				h1.abort();
+				src.interrupt();
+				src.join();
+				}
+			catch (InterruptedException e)
+				{
+				logger.log(Level.SEVERE, "Error joining RowProducer for " + connectionSettings.getLinkName(), e);
+	//			throw new RuntimeException(e);
+				}
+			
 			try	{
 				h2.abort();
 				dst.interrupt();
@@ -900,19 +921,35 @@ public class DDLDiffController
 		if (dstStmt == null)
 			throw new UnsupportedOperationException("Operation not supported by dialect " + connectionSettings.getDialectName());
 		
+		final AsyncRowIterator h1 = new AsyncRowIterator();
+		final RowProducer p1 = new RowProducer(runner, connectionSettings.getLinkName(), srcStmt, "diff", dataFormatterFactory.getTimeZone(), h1);
+		final Thread src = new Thread(p1);
+		
 		final AsyncRowIterator h2 = new AsyncRowIterator();
-		final RowProducer p2 = new RowProducer(runner, conn2, dstStmt, "diff", h2);
+		final RowProducer p2 = new RowProducer(runner, conn2, dstStmt, "diff", dataFormatterFactory.getTimeZone(), h2);
 		final Thread dst = new Thread(p2);
 		
+		src.start();
 		dst.start();
 		
 		final Result res;
 		try	{
-			final PrivRowTransferer transferer = new PrivRowTransferer(transformer, h2, c, dialect);
-			res = runner.transferRows(connectionSettings.getLinkName(), srcStmt, transferer, h3, mode, p, export);
+			final PrivRowTransferer transferer = new PrivRowTransferer(transformer, h1, h2, c, dialect);
+			res = runner.performCustomQueries(connectionSettings.getLinkName(), transferer, h3, mode, p, export);
 			}
 		finally
 			{
+ 			try	{
+				h1.abort();
+				src.interrupt();
+				src.join();
+				}
+			catch (InterruptedException e)
+				{
+				logger.log(Level.SEVERE, "Error joining RowProducer for " + connectionSettings.getLinkName(), e);
+	//			throw new RuntimeException(e);
+				}
+			
 			try	{
 				h2.abort();
 				dst.interrupt();

@@ -41,7 +41,6 @@ import de.tweerlei.dbgrazer.query.model.ResultVisitor;
 import de.tweerlei.dbgrazer.query.model.RowHandler;
 import de.tweerlei.dbgrazer.query.model.RowInterpreter;
 import de.tweerlei.dbgrazer.query.model.RowSet;
-import de.tweerlei.dbgrazer.query.model.RowTransferer;
 import de.tweerlei.dbgrazer.query.model.StatementProducer;
 import de.tweerlei.dbgrazer.query.model.impl.QueryImpl;
 import de.tweerlei.dbgrazer.query.model.impl.ResultImpl;
@@ -115,7 +114,7 @@ public class QueryRunnerServiceImpl implements QueryRunnerService, ConfigListene
 			if (logQueries)
 				logger.log(Level.INFO, query.getStatement());
 			res = r.performQuery(link, query, subQueryIndex, params, timeZone, limit, monitor);
-			if (logQueries)
+			if (logQueries && !res.getRowSets().isEmpty())
 				logger.log(Level.INFO, String.valueOf(res.getFirstRowSet().getFirstValue()));
 			}
 		
@@ -125,21 +124,16 @@ public class QueryRunnerServiceImpl implements QueryRunnerService, ConfigListene
 		}
 	
 	@Override
-	public int performStreamedQuery(String link, Query query, List<Object> params, TimeZone timeZone, int limit, RowHandler handler) throws PerformQueryException
+	public void performStreamedQuery(String link, Query query, List<Object> params, TimeZone timeZone, int limit, RowHandler handler) throws PerformQueryException
 		{
 		try	{
 			final QueryRunner r = findRunner(query.getType());
 			if (r == null)
-				return (0);
-			else
-				{
-				if (logQueries)
-					logger.log(Level.INFO, query.getStatement());
-				final int result = r.performStreamedQuery(link, query, params, timeZone, limit, handler);
-				if (logQueries)
-					logger.log(Level.INFO, String.valueOf(result));
-				return (result);
-				}
+				return;
+			
+			if (logQueries)
+				logger.log(Level.INFO, query.getStatement());
+			r.performStreamedQuery(link, query, params, timeZone, limit, handler);
 			}
 		catch (PerformQueryException e)
 			{
@@ -165,26 +159,6 @@ public class QueryRunnerServiceImpl implements QueryRunnerService, ConfigListene
 		else
 			{
 			res = r.performQueries(link, q, statements, timeZone, commitSize, monitor);
-			}
-		
-		prepareResult(res);
-		
-		return (res);
-		}
-	
-	@Override
-	public Result transferRows(String link, String query, TimeZone timeZone, RowTransferer transferer, QueryType type, int commitSize, DMLProgressMonitor monitor) throws PerformQueryException
-		{
-		final Result res;
-		
-		final Query q = new QueryImpl(type.getName(), null, null, query, type, null, null, null);
-		
-		final QueryRunner r = findRunner(type);
-		if (r == null)
-			res = new ResultImpl(q);
-		else
-			{
-			res = r.transferRows(link, q, timeZone, transferer, commitSize, monitor);
 			}
 		
 		prepareResult(res);

@@ -56,7 +56,8 @@ public class CsvStreamDownloadSource extends AbstractCsvDownloadSource
 		{
 		final CsvRowHandler handler = new CsvRowHandler(cw, fmt);
 		try	{
-			if (producer.produceRows(handler) == 0)
+			producer.produceRows(handler);
+			if (handler.getCount() == 0)
 				cw.writeData(new String[] { noDataFound });
 			}
 		catch (RuntimeException e)

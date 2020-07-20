@@ -64,8 +64,8 @@ public class LdifMultiStreamDownloadSource extends AbstractLdifDownloadSource
 		
 		try	{
 			cw.writeComment(header);
-			
-			if (producer.produceRowSets(handler) == 0)
+			producer.produceRowSets(handler);
+			if (handler.getCount() == 0)
 				cw.writeComment(noDataFound);
 			}
 		catch (RuntimeException e)

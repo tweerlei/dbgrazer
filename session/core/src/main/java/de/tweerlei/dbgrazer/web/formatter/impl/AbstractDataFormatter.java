@@ -47,6 +47,7 @@ import de.tweerlei.dbgrazer.web.formatter.DataFormatter;
  */
 public abstract class AbstractDataFormatter implements DataFormatter
 	{
+	private static final Pattern HEX_NUMBER_PATTERN = Pattern.compile("0x([0-9A-Fa-f]+).*");
 	private static final Pattern NUMBER_PATTERN = Pattern.compile("([0-9]+).*");
 	
 	private final Calendar calendar;
@@ -340,6 +341,15 @@ public abstract class AbstractDataFormatter implements DataFormatter
 	
 	private Object parseNumber(String v)
 		{
+		try	{
+			final Matcher m = HEX_NUMBER_PATTERN.matcher(v);
+			if (m.matches())
+				return Long.parseLong(m.group(1), 16);
+			}
+		catch (NumberFormatException e)
+			{
+			}
+		
 		try	{
 			return (floatFormat.parse(v));
 			}

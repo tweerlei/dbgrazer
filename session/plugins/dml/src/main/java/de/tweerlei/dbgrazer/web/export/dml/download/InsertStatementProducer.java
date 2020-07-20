@@ -57,12 +57,12 @@ public class InsertStatementProducer implements StatementProducer
 		}
 	
 	@Override
-	public int produceStatements(StatementHandler h)
+	public void produceStatements(StatementHandler h)
 		{
 		final SQLWriter sw = factory.getSQLWriter(h, dialect, false);
 		final RowHandler handler = new InsertRowHandler(tableName, sw);
 		
-		return (producer.produceRows(handler));
+		producer.produceRows(handler);
 		}
 	
 	@Override

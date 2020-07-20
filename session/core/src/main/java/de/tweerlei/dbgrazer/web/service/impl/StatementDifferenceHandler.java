@@ -200,75 +200,50 @@ public class StatementDifferenceHandler implements DifferenceHandler, StatementP
 		}
 	
 	@Override
-	public int produceStatements(StatementHandler h)
+	public void produceStatements(StatementHandler h)
 		{
-		int n = 0;
-		
 		if (!del_relationships.isEmpty())
 			{
 			h.comment("Drop obsolete relationships");
 			for (String s : del_relationships)
-				{
 				h.statement(s);
-				n++;
-				}
 			}
 		if (!del_indexes.isEmpty())
 			{
 			h.comment("Drop obsolete indexes");
 			for (String s : del_indexes)
-				{
 				h.statement(s);
-				n++;
-				}
 			}
 		if (!tables.isEmpty())
 			{
 			h.comment("Add / remove tables");
 			for (String s : tables)
-				{
 				h.statement(s);
-				n++;
-				}
 			}
 		if (!privs.isEmpty())
 			{
 			h.comment("Add / remove privileges");
 			for (String s : privs)
-				{
 				h.statement(s);
-				n++;
-				}
 			}
 		if (!structures.isEmpty())
 			{
 			h.comment("Update table structures");
 			for (String s : structures)
-				{
 				h.statement(s);
-				n++;
-				}
 			}
 		if (!add_indexes.isEmpty())
 			{
 			h.comment("Create indexes");
 			for (String s : add_indexes)
-				{
 				h.statement(s);
-				n++;
-				}
 			}
 		if (!add_relationships.isEmpty())
 			{
 			h.comment("Create relationships");
 			for (String s : add_relationships)
-				{
 				h.statement(s);
-				n++;
-				}
 			}
-		
-		return (n);
 		}
 	
 	@Override

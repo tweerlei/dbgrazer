@@ -19,7 +19,6 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import de.tweerlei.dbgrazer.query.model.RowHandler;
 import de.tweerlei.dbgrazer.query.model.RowProducer;
 import de.tweerlei.dbgrazer.web.formatter.SQLWriter;
 import de.tweerlei.dbgrazer.web.service.DataFormatterFactory;
@@ -68,16 +67,38 @@ public class SqlStreamDownloadSource extends AbstractSqlDownloadSource
 	@Override
 	protected void writeSql(SQLWriter sw)
 		{
-		final RowHandler handler;
 		if ((pk != null) && !pk.isEmpty() && (blockSize > 0))
-			handler = new MergeRowHandler(tableName, pk, blockSize, sw);
+			writeMerge(sw);
 		else
-			handler = new InsertRowHandler(tableName, sw);
+			writeInsert(sw);
+		}
+	
+	private void writeMerge(SQLWriter sw)
+		{
+		final MergeRowHandler handler = new MergeRowHandler(tableName, pk, blockSize, sw);
 		
 		try	{
 			sw.writeComment(header);
-			
-			if (producer.produceRows(handler) == 0)
+			producer.produceRows(handler);
+			if (handler.getCount() == 0)
+				sw.writeComment(noDataFound);
+			}
+		catch (RuntimeException e)
+			{
+			Logger.getLogger(getClass().getCanonicalName()).log(Level.SEVERE, "writeSql", e);
+			if (e.getMessage() != null)
+				sw.writeComment(e.getMessage());
+			}
+		}
+	
+	private void writeInsert(SQLWriter sw)
+		{
+		final InsertRowHandler handler = new InsertRowHandler(tableName, sw);
+		
+		try	{
+			sw.writeComment(header);
+			producer.produceRows(handler);
+			if (handler.getCount() == 0)
 				sw.writeComment(noDataFound);
 			}
 		catch (RuntimeException e)

@@ -39,7 +39,6 @@ import de.tweerlei.dbgrazer.common.file.FileAccess;
 import de.tweerlei.dbgrazer.common.file.HistoryEntry;
 import de.tweerlei.dbgrazer.common.file.ObjectPersister;
 import de.tweerlei.dbgrazer.common.service.ConfigFileStore;
-import de.tweerlei.dbgrazer.common.service.KeywordService;
 import de.tweerlei.dbgrazer.security.backend.UserAuthenticator;
 import de.tweerlei.dbgrazer.security.backend.UserLoader;
 import de.tweerlei.dbgrazer.security.backend.UserPersister;
@@ -157,7 +156,6 @@ public abstract class AbstractFileUserLoader implements UserLoader, UserAuthenti
 	
 	private final ConfigFileStore store;
 	private final ConfigAccessor configService;
-	private final KeywordService keywordService;
 	private final UserPersister persister;
 	private final FileAccess fileAccess;
 	private final Logger logger;
@@ -166,16 +164,14 @@ public abstract class AbstractFileUserLoader implements UserLoader, UserAuthenti
 	 * Constructor
 	 * @param store ConfigFileStore
 	 * @param configService ConfigAccessor
-	 * @param keywordService KeywordService
 	 * @param persister UserPersister
 	 * @param fileAccess FileAccess
 	 */
 	protected AbstractFileUserLoader(ConfigFileStore store, ConfigAccessor configService,
-			KeywordService keywordService, UserPersister persister, FileAccess fileAccess)
+			UserPersister persister, FileAccess fileAccess)
 		{
 		this.store = store;
 		this.configService = configService;
-		this.keywordService = keywordService;
 		this.persister = persister;
 		this.fileAccess = fileAccess;
 		this.logger = Logger.getLogger(getClass().getCanonicalName());
@@ -223,13 +219,7 @@ public abstract class AbstractFileUserLoader implements UserLoader, UserAuthenti
 		{
 		final Set<Authority> ret = EnumSet.of(Authority.ROLE_LOGIN);
 		
-		final List<String> roleNames = keywordService.extractValues(configService.get(ConfigKeys.FILE_DEFAULT_ROLES));
-		for (String roleName : roleNames)
-			{
-			final Authority auth = Authority.forShortName(roleName);
-			if (auth != null)
-				ret.add(auth);
-			}
+		ret.addAll(configService.get(ConfigKeys.FILE_DEFAULT_ROLES));
 		
 		return (ret);
 		}

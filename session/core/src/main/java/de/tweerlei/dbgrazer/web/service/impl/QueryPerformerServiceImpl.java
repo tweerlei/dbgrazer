@@ -36,9 +36,7 @@ import de.tweerlei.dbgrazer.query.model.Result;
 import de.tweerlei.dbgrazer.query.model.ResultType;
 import de.tweerlei.dbgrazer.query.model.RowHandler;
 import de.tweerlei.dbgrazer.query.model.RowInterpreter;
-import de.tweerlei.dbgrazer.query.model.RowIterator;
 import de.tweerlei.dbgrazer.query.model.RowProducer;
-import de.tweerlei.dbgrazer.query.model.RowTransferer;
 import de.tweerlei.dbgrazer.query.model.StatementHandler;
 import de.tweerlei.dbgrazer.query.model.StatementProducer;
 import de.tweerlei.dbgrazer.query.model.TargetDef;
@@ -114,13 +112,13 @@ public class QueryPerformerServiceImpl implements QueryPerformerService
 			}
 		}
 	
-	private static final class LimitingRowTransferer implements RowTransferer
+	private static final class LimitingStatementProducer implements StatementProducer
 		{
-		private final RowTransferer t;
+		private final StatementProducer t;
 		private final StatementHandler h;
 		private final int limit;
 		
-		public LimitingRowTransferer(RowTransferer t, StatementHandler h, int limit)
+		public LimitingStatementProducer(StatementProducer t, StatementHandler h, int limit)
 			{
 			this.t = t;
 			this.h = h;
@@ -128,10 +126,10 @@ public class QueryPerformerServiceImpl implements QueryPerformerService
 			}
 		
 		@Override
-		public Object transfer(RowIterator rows, StatementHandler handler)
+		public void produceStatements(StatementHandler handler)
 			{
 			final LimitingStatementHandler lh = new LimitingStatementHandler((h == null) ? handler : h, limit);
-			return (t.transfer(rows, lh));
+			t.produceStatements(lh);
 			}
 		
 		@Override
@@ -337,14 +335,12 @@ public class QueryPerformerServiceImpl implements QueryPerformerService
 		}
 	
 	@Override
-	public int performCustomQuery(String link, String type, String statement, String label, RowHandler handler) throws PerformQueryException
+	public void performCustomQuery(String link, String type, String statement, String label, TimeZone timeZone, RowHandler handler) throws PerformQueryException
 		{
 		try	{
-			final TimeZone timeZone = factory.getTimeZone();
 			final Query q = createCustomQuery(type, statement, null, label);
 			
-			final int r = runner.performStreamedQuery(link, q, Collections.emptyList(), timeZone, Integer.MAX_VALUE, handler);
-			return (r);
+			runner.performStreamedQuery(link, q, Collections.emptyList(), timeZone, Integer.MAX_VALUE, handler);
 			}
 		finally
 			{
@@ -364,27 +360,16 @@ public class QueryPerformerServiceImpl implements QueryPerformerService
 		}
 	
 	@Override
-	public Result transferRows(String link, String query, RowTransferer transferer, String type, DMLProgressMonitor monitor) throws PerformQueryException
+	public Result performCustomQueries(String link, StatementProducer statements, StatementHandler handler, String type, DMLProgressMonitor monitor, boolean export) throws PerformQueryException
 		{
 		final TimeZone timeZone = factory.getTimeZone();
 		final QueryType t = queryService.findQueryType(type);
 		if (t == null)
 			throw new IllegalArgumentException("Unknown query type: " + type);
 		
-		return (runner.transferRows(link, query, timeZone, transferer, t, configService.get(ConfigKeys.COMMIT_ROWS), monitor));
-		}
-	
-	@Override
-	public Result transferRows(String link, String query, RowTransferer transferer, StatementHandler handler, String type, DMLProgressMonitor monitor, boolean export) throws PerformQueryException
-		{
-		final TimeZone timeZone = factory.getTimeZone();
-		final QueryType t = queryService.findQueryType(type);
-		if (t == null)
-			throw new IllegalArgumentException("Unknown query type: " + type);
+		final StatementProducer lrt = new LimitingStatementProducer(statements, handler, export ? Integer.MAX_VALUE : configService.get(ConfigKeys.BROWSER_ROWS));
 		
-		final RowTransferer lrt = new LimitingRowTransferer(transferer, handler, export ? Integer.MAX_VALUE : configService.get(ConfigKeys.BROWSER_ROWS));
-		
-		return (runner.transferRows(link, query, timeZone, lrt, t, configService.get(ConfigKeys.COMMIT_ROWS), monitor));
+		return (runner.performQueries(link, lrt, timeZone, t, configService.get(ConfigKeys.COMMIT_ROWS), monitor));
 		}
 	
 	@Override

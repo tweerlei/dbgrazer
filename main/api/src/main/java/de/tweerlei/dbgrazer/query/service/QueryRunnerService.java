@@ -26,7 +26,6 @@ import de.tweerlei.dbgrazer.query.model.QueryType;
 import de.tweerlei.dbgrazer.query.model.Result;
 import de.tweerlei.dbgrazer.query.model.RowHandler;
 import de.tweerlei.dbgrazer.query.model.RowInterpreter;
-import de.tweerlei.dbgrazer.query.model.RowTransferer;
 import de.tweerlei.dbgrazer.query.model.StatementProducer;
 
 /**
@@ -58,10 +57,9 @@ public interface QueryRunnerService
 	 * @param timeZone TimeZone to use for temporal results
 	 * @param limit Limit the number of rows to fetch per result RowSet
 	 * @param handler RowHandler
-	 * @return Processed row count
 	 * @throws PerformQueryException on error
 	 */
-	public int performStreamedQuery(String link, Query query, List<Object> params, TimeZone timeZone, int limit, RowHandler handler) throws PerformQueryException;
+	public void performStreamedQuery(String link, Query query, List<Object> params, TimeZone timeZone, int limit, RowHandler handler) throws PerformQueryException;
 	
 	/**
 	 * Perform DML queries in a single transaction
@@ -75,20 +73,6 @@ public interface QueryRunnerService
 	 * @throws PerformQueryException on error
 	 */
 	public Result performQueries(String link, StatementProducer statements, TimeZone timeZone, QueryType type, int commitSize, DMLProgressMonitor monitor) throws PerformQueryException;
-	
-	/**
-	 * Perform DML queries in a single transaction
-	 * @param link Link name
-	 * @param query Source query statement
-	 * @param timeZone TimeZone to use for temporal results
-	 * @param transferer RowTransferer
-	 * @param type DML query type
-	 * @param commitSize Perform a COMMIT after this number of rows
-	 * @param monitor DMLProgressMonitor
-	 * @return Result
-	 * @throws PerformQueryException on error
-	 */
-	public Result transferRows(String link, String query, TimeZone timeZone, RowTransferer transferer, QueryType type, int commitSize, DMLProgressMonitor monitor) throws PerformQueryException;
 	
 	/**
 	 * Perform DML queries in a single transaction

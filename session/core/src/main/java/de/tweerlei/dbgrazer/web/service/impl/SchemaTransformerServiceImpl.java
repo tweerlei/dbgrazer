@@ -92,7 +92,7 @@ public class SchemaTransformerServiceImpl implements SchemaTransformerService
 			}
 		
 		@Override
-		public int produceStatements(StatementHandler h)
+		public void produceStatements(StatementHandler h)
 			{
 			final String tableName = dialect.getQualifiedTableName(t.getName());
 			final List<ColumnDef> columns = new ArrayList<ColumnDef>(t.getColumns().size());
@@ -105,7 +105,6 @@ public class SchemaTransformerServiceImpl implements SchemaTransformerService
 			sqlWriter.writeUpdate(tableName, columns, null, null, pk);
 			sqlWriter.writeMerge(tableName, columns, Collections.<ResultRow>singletonList(null), pk);
 			sqlWriter.writeDelete(tableName, columns, null, pk);
-			return (4);
 			}
 		
 		@Override
@@ -184,15 +183,32 @@ public class SchemaTransformerServiceImpl implements SchemaTransformerService
 					sb.append("P" + (pkIndex + 1));
 				}
 			
-			// Occurrence in indices
+			// Occurrence in unique indices
+			int ukIndex = -1;
+			for (IndexDescription ix : info.getIndices())
+				{
+				if (ix.isUnique())
+					{
+					final int i = ix.getColumns().indexOf(c.getName());
+					if ((i >= 0) && ((ukIndex < 0) || (i < ukIndex)))
+						ukIndex = i;
+					}
+				}
+			if ((ukIndex >= 0) && (pkIndex < 0))
+				sb.append("U" + (ukIndex + 1));
+			
+			// Occurrence in other indices
 			int secIndex = -1;
 			for (IndexDescription ix : info.getIndices())
 				{
-				final int i = ix.getColumns().indexOf(c.getName());
-				if ((i >= 0) && ((secIndex < 0) || (i < secIndex)))
-					secIndex = i;
+				if (!ix.isUnique())
+					{
+					final int i = ix.getColumns().indexOf(c.getName());
+					if ((i >= 0) && ((secIndex < 0) || (i < secIndex)))
+						secIndex = i;
+					}
 				}
-			if ((secIndex >= 0) && ((pkIndex < 0) || (secIndex < pkIndex)))
+			if ((secIndex >= 0) && (pkIndex < 0) && (ukIndex < 0))
 				sb.append("I" + (secIndex + 1));
 			
 			// Occurrence in foreign keys (position is not relevant)

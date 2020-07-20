@@ -26,6 +26,7 @@ import de.tweerlei.common5.jdbc.model.PrimaryKeyDescription;
 import de.tweerlei.common5.jdbc.model.PrivilegeDescription;
 import de.tweerlei.common5.jdbc.model.TableDescription;
 import de.tweerlei.ermtools.dialect.SQLDialect;
+import de.tweerlei.ermtools.dialect.SQLStatementWrapper;
 import de.tweerlei.ermtools.schema.DifferenceHandler;
 
 /**
@@ -210,75 +211,56 @@ public class SQLDifferenceHandler implements DifferenceHandler
 	@Override
 	public String toString()
 		{
+		final SQLStatementWrapper w = dialect.getStatementWrapper();
+		
 		final StringBuffer sb = new StringBuffer();
 		if (!del_relationships.isEmpty())
 			{
 			sb.append("-- Drop obsolete relationships\n");
 			for (Iterator<String> i = del_relationships.iterator(); i.hasNext(); )
-				{
-				sb.append(i.next());
-				sb.append(dialect.getStatementTerminator());
-				}
+				sb.append(w.wrapStatement(i.next()));
 			sb.append("\n");
 			}
 		if (!del_indexes.isEmpty())
 			{
 			sb.append("-- Drop obsolete indexes\n");
 			for (Iterator<String> i = del_indexes.iterator(); i.hasNext(); )
-				{
-				sb.append(i.next());
-				sb.append(dialect.getStatementTerminator());
-				}
+				sb.append(w.wrapStatement(i.next()));
 			sb.append("\n");
 			}
 		if (!tables.isEmpty())
 			{
 			sb.append("-- Add / remove tables\n");
 			for (Iterator<String> i = tables.iterator(); i.hasNext(); )
-				{
-				sb.append(i.next());
-				sb.append(dialect.getStatementTerminator());
-				}
+				sb.append(w.wrapStatement(i.next()));
 			sb.append("\n");
 			}
 		if (!privs.isEmpty())
 			{
 			sb.append("-- Add / remove privileges\n");
 			for (Iterator<String> i = privs.iterator(); i.hasNext(); )
-				{
-				sb.append(i.next());
-				sb.append(dialect.getStatementTerminator());
-				}
+				sb.append(w.wrapStatement(i.next()));
 			sb.append("\n");
 			}
 		if (!structures.isEmpty())
 			{
 			sb.append("-- Update table structures\n");
 			for (Iterator<String> i = structures.iterator(); i.hasNext(); )
-				{
-				sb.append(i.next());
-				sb.append(dialect.getStatementTerminator());
-				}
+				sb.append(w.wrapStatement(i.next()));
 			sb.append("\n");
 			}
 		if (!add_indexes.isEmpty())
 			{
 			sb.append("-- Create indexes\n");
 			for (Iterator<String> i = add_indexes.iterator(); i.hasNext(); )
-				{
-				sb.append(i.next());
-				sb.append(dialect.getStatementTerminator());
-				}
+				sb.append(w.wrapStatement(i.next()));
 			sb.append("\n");
 			}
 		if (!add_relationships.isEmpty())
 			{
 			sb.append("-- Create relationships\n");
 			for (Iterator<String> i = add_relationships.iterator(); i.hasNext(); )
-				{
-				sb.append(i.next());
-				sb.append(dialect.getStatementTerminator());
-				}
+				sb.append(w.wrapStatement(i.next()));
 			sb.append("\n");
 			}
 		return (sb.toString());

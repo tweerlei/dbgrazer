@@ -32,6 +32,7 @@ public class SqlRowSetHandler implements RowSetHandler
 	private final SQLWriter sqlWriter;
 	private final SQLDialect dialect;
 	private final int blockSize;
+	private int count;
 	
 	/**
 	 * Constructor
@@ -44,6 +45,16 @@ public class SqlRowSetHandler implements RowSetHandler
 		this.sqlWriter = sqlWriter;
 		this.dialect = dialect;
 		this.blockSize = blockSize;
+		this.count = 0;
+		}
+	
+	/**
+	 * Get the number of rows handled
+	 * @return Count
+	 */
+	public int getCount()
+		{
+		return (count);
 		}
 	
 	@Override
@@ -62,5 +73,7 @@ public class SqlRowSetHandler implements RowSetHandler
 			for (ResultRow row : rs.getRows())
 				sqlWriter.writeInsert(tableName, rs.getColumns(), row);
 			}
+		
+		count++;
 		}
 	}

@@ -39,7 +39,6 @@ import de.tweerlei.dbgrazer.query.model.QueryType;
 import de.tweerlei.dbgrazer.query.model.Result;
 import de.tweerlei.dbgrazer.query.model.StatementProducer;
 import de.tweerlei.dbgrazer.query.service.QueryService;
-import de.tweerlei.dbgrazer.query.service.ResultBuilderService;
 import de.tweerlei.dbgrazer.web.exception.AccessDeniedException;
 import de.tweerlei.dbgrazer.web.model.TaskCompareProgressMonitor;
 import de.tweerlei.dbgrazer.web.model.TaskDMLProgressMonitor;
@@ -47,6 +46,7 @@ import de.tweerlei.dbgrazer.web.model.TaskProgress;
 import de.tweerlei.dbgrazer.web.service.DataFormatterFactory;
 import de.tweerlei.dbgrazer.web.service.QueryPerformerService;
 import de.tweerlei.dbgrazer.web.service.SchemaTransformerService;
+import de.tweerlei.dbgrazer.web.service.ScriptWriterService;
 import de.tweerlei.dbgrazer.web.service.TaskProgressService;
 import de.tweerlei.dbgrazer.web.service.UserSettingsManager;
 import de.tweerlei.dbgrazer.web.service.jdbc.DesignManagerService;
@@ -122,7 +122,7 @@ public class DesignDiffController
 	private final QueryService queryService;
 	private final QueryPerformerService runner;
 	private final SchemaTransformerService schemaTransformer;
-	private final ResultBuilderService resultBuilder;
+	private final ScriptWriterService resultBuilder;
 	private final DataFormatterFactory dataFormatterFactory;
 	private final UserSettingsManager userSettingsManager;
 	private final TaskProgressService taskProgressService;
@@ -139,7 +139,7 @@ public class DesignDiffController
 	 * @param runner QueryPerformerService
 	 * @param userSettingsManager UserSettingsManager
 	 * @param schemaTransformer SchemaTransformerService
-	 * @param resultBuilder ResultBuilderService
+	 * @param resultBuilder ScriptWriterService
 	 * @param dataFormatterFactory DataFormatterFactory
 	 * @param taskProgressService TaskProgressService
 	 * @param designManagerService DesignManagerService
@@ -149,7 +149,7 @@ public class DesignDiffController
 	@Autowired
 	public DesignDiffController(MetadataService metadataService, LinkService linkService,
 			QueryService queryService, QueryPerformerService runner, SchemaTransformerService schemaTransformer,
-			UserSettingsManager userSettingsManager, ResultBuilderService resultBuilder,
+			UserSettingsManager userSettingsManager, ScriptWriterService resultBuilder,
 			DataFormatterFactory dataFormatterFactory, TaskProgressService taskProgressService,
 			DesignManagerService designManagerService,
 			UserSettings userSettings, ConnectionSettings connectionSettings)
@@ -281,7 +281,7 @@ public class DesignDiffController
 			else
 				{
 				final String header = getHeader(connectionSettings.getLinkName(), fbo.getConnection2());
-				model.put("result", resultBuilder.writeScript(p, header, dialect.getStatementTerminator()));
+				model.put("result", resultBuilder.writeScript(p, header, dialect.getScriptStatementWrapper()));
 				}
 			
 			connectionSettings.getParameterHistory().put("connection2", fbo.getConnection2());

@@ -72,6 +72,7 @@ import de.tweerlei.dbgrazer.web.service.MetadataExportService;
 import de.tweerlei.dbgrazer.web.service.QuerySettingsManager;
 import de.tweerlei.dbgrazer.web.service.SchemaTransformerService;
 import de.tweerlei.dbgrazer.web.service.SchemaTransformerService.GraphMode;
+import de.tweerlei.dbgrazer.web.service.ScriptWriterService;
 import de.tweerlei.dbgrazer.web.service.TextTransformerService;
 import de.tweerlei.dbgrazer.web.service.VisualizationService;
 import de.tweerlei.dbgrazer.web.service.jdbc.BrowserSettingsManagerService;
@@ -79,6 +80,7 @@ import de.tweerlei.dbgrazer.web.service.jdbc.impl.TableFilterEntry;
 import de.tweerlei.dbgrazer.web.session.ConnectionSettings;
 import de.tweerlei.dbgrazer.web.session.ResultCache;
 import de.tweerlei.ermtools.dialect.SQLDialect;
+import de.tweerlei.ermtools.dialect.SQLStatementWrapper;
 import de.tweerlei.ermtools.dialect.impl.SQLDialectFactory;
 import de.tweerlei.ermtools.model.SQLSchema;
 import de.tweerlei.spring.config.ConfigAccessor;
@@ -226,10 +228,27 @@ public class BrowseController
 			}
 		}
 	
+	private static class BlankLineSQLStatementWrapper implements SQLStatementWrapper
+		{
+		private final SQLStatementWrapper delegate;
+		
+		public BlankLineSQLStatementWrapper(SQLStatementWrapper delegate)
+			{
+			this.delegate = delegate;
+			}
+		
+		@Override
+		public String wrapStatement(String statement)
+			{
+			return (delegate.wrapStatement(statement) + "\n");
+			}
+		}
+	
 	private final MetadataService metadataService;
 	private final ConfigAccessor configService;
 	private final SQLGeneratorService sqlGenerator;
 	private final ResultBuilderService resultBuilder;
+	private final ScriptWriterService scriptWriter;
 	private final DataFormatterFactory dataFormatterFactory;
 	private final MetadataExportService exportService;
 	private final VisualizationService visualizationService;
@@ -248,6 +267,7 @@ public class BrowseController
 	 * @param configService ConfigAccessor
 	 * @param sqlGenerator SQLGeneratorService
 	 * @param resultBuilder ResultBuilderService
+	 * @param scriptWriter ScriptWriterService
 	 * @param dataFormatterFactory DataFormatterFactory
 	 * @param exportService MetadataExportService
 	 * @param visualizationService VisualizationService
@@ -262,7 +282,7 @@ public class BrowseController
 	@Autowired
 	public BrowseController(MetadataService metadataService, ConfigAccessor configService,
 			SQLGeneratorService sqlGenerator, DataFormatterFactory dataFormatterFactory,
-			ResultBuilderService resultBuilder, MetadataExportService exportService,
+			ResultBuilderService resultBuilder, ScriptWriterService scriptWriter, MetadataExportService exportService,
 			VisualizationService visualizationService, SchemaTransformerService schemaTransformer,
 			TextTransformerService textFormatterService, BrowserSettingsManagerService browserSettingsManager,
 			FrontendHelperService frontendHelper, QuerySettingsManager querySettingsManager,
@@ -272,6 +292,7 @@ public class BrowseController
 		this.configService = configService;
 		this.sqlGenerator = sqlGenerator;
 		this.resultBuilder = resultBuilder;
+		this.scriptWriter = scriptWriter;
 		this.dataFormatterFactory = dataFormatterFactory;
 		this.exportService = exportService;
 		this.visualizationService = visualizationService;
@@ -788,21 +809,21 @@ public class BrowseController
 		{
 		final StatementProducer p = schemaTransformer.buildDDL(new SQLSchema(null, null, Collections.singleton(t)), dialect);
 		
-		return (resultBuilder.writeScript(p, null, dialect.getStatementTerminator() + "\n"));
+		return (scriptWriter.writeScript(p, null, new BlankLineSQLStatementWrapper(dialect.getScriptStatementWrapper())));
 		}
 	
 	private String generateDML(TableDescription t, SQLDialect dialect)
 		{
 		final StatementProducer p = schemaTransformer.buildDML(t, dialect);
 		
-		return (resultBuilder.writeScript(p, null, dialect.getStatementTerminator() + "\n"));
+		return (scriptWriter.writeScript(p, null, new BlankLineSQLStatementWrapper(dialect.getScriptStatementWrapper())));
 		}
 	
 	private String generateSELECT(TableDescription t, SQLDialect dialect)
 		{
 		final String stmt = sqlGenerator.generateSelect(t, Style.INDENTED, Joins.ALL, null, OrderBy.NONE, dialect);
 		
-		return (stmt + "\n");
+		return (new BlankLineSQLStatementWrapper(dialect.getScriptStatementWrapper()).wrapStatement(stmt));
 		}
 	
 	/**
