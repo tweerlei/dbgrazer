@@ -1,4 +1,4 @@
-function showPartition(ev, topic, partition, offset, key, compact) {
+function showPartition(ev, topic, partition, offset, key, value, compact) {
 	if (ev) {
 		Event.stop(ev);
 	}
@@ -11,6 +11,9 @@ function showPartition(ev, topic, partition, offset, key, compact) {
 		}
 		if (!Object.isUndefined(key)) {
 			params.key = key;
+		}
+		if (!Object.isUndefined(value)) {
+			params.value = value;
 		}
 		if (compact) {
 			params.compact = true;
@@ -72,6 +75,7 @@ function refreshTopic() {
 	var partition = HashMonitor.get('partition');
 	var offset = HashMonitor.get('offset');
 	var key = HashMonitor.get('key');
+	var value = HashMonitor.get('value');
 	var compact = HashMonitor.get('compact');
 	var format = HashMonitor.get('format');
 	var formatting = HashMonitor.get('formatting');
@@ -100,6 +104,9 @@ function refreshTopic() {
 				}
 				if (!Object.isUndefined(key)) {
 					params.key = key;
+				}
+				if (!Object.isUndefined(value)) {
+					params.value = value;
 				}
 				if (compact) {
 					params.compact = true;
@@ -139,6 +146,7 @@ function restoreTopic() {
 	var partition = HashMonitor.get('partition');
 	var offset = HashMonitor.get('offset');
 	var key = HashMonitor.get('key');
+	var value = HashMonitor.get('value');
 	var compact = HashMonitor.get('compact');
 	var format = HashMonitor.get('format');
 	var formatting = HashMonitor.get('formatting');
@@ -147,7 +155,7 @@ function restoreTopic() {
 	if (topic && partition && offset) {
 		showMessage(null, topic, partition, offset, format, formatting);
 	} else if (topic) {
-		showPartition(null, topic, partition, offset, key, compact);
+		showPartition(null, topic, partition, offset, key, value, compact);
 	} else if (group) {
 		showConsumerGroup(null, group);
 	}
