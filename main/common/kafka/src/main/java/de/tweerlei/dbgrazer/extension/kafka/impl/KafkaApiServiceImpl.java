@@ -327,8 +327,8 @@ public class KafkaApiServiceImpl implements KafkaApiService
 					{
 					if (((startOffset == null) || (rec.offset() >= startOffset))
 							&& ((endOffset == null) || (rec.offset() <= endOffset))
-							&& ((keyPattern == null) || (rec.key() != null && keyPattern.matcher(rec.key()).matches()))
-							&& ((valuePattern == null) || (rec.value() != null && valuePattern.matcher(rec.value()).matches()))
+							&& ((keyPattern == null) || (rec.key() != null && keyPattern.matcher(rec.key()).find()))
+							&& ((valuePattern == null) || (rec.value() != null && valuePattern.matcher(rec.value()).find()))
 							)
 						{
 						ret.add(rec);
