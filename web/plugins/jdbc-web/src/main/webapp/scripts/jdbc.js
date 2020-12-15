@@ -232,17 +232,17 @@ function setOrder(f, v) {
 
 function addOrderAsc(ev) {
 	var cell = Popup.parent;
-	setOrder(cell.innerText, 'ASC');
+	setOrder(cell.textContent, 'ASC');
 }
 
 function addOrderDesc(ev) {
 	var cell = Popup.parent;
-	setOrder(cell.innerText, 'DESC');
+	setOrder(cell.textContent, 'DESC');
 }
 
 function removeOrder(ev) {
 	var cell = Popup.parent;
-	setOrder(cell.innerText);
+	setOrder(cell.textContent);
 }
 
 function setWhere(f, v) {
@@ -265,27 +265,32 @@ function addWhere(ev) {
 	var cell = Popup.parent;
 	var n = cell.previousSiblings().length;
 	var hdr = cell.up('table').down('tr').childElements()[n];
-	if (cell.innerText === '\u2205')
-		setWhere(hdr.innerText, 'IS NULL');
+	if (cell.textContent === '\u2205')
+		setWhere(hdr.textContent, 'IS NULL');
 	else
-		setWhere(hdr.innerText, '= \'' + cell.innerText.replace(/'/g, "''") + '\'');
+		setWhere(hdr.textContent, '= \'' + cell.textContent.replace(/'/g, "''") + '\'');
 }
 
 function addWhereNot(ev) {
 	var cell = Popup.parent;
 	var n = cell.previousSiblings().length;
 	var hdr = cell.up('table').down('tr').childElements()[n];
-	if (cell.innerText === '\u2205')
-		setWhere(hdr.innerText, 'IS NOT NULL');
+	if (cell.textContent === '\u2205')
+		setWhere(hdr.textContent, 'IS NOT NULL');
 	else
-		setWhere(hdr.innerText, '<> \'' + cell.innerText.replace(/'/g, "''") + '\'');
+		setWhere(hdr.textContent, '<> \'' + cell.textContent.replace(/'/g, "''") + '\'');
 }
 
 function removeWhere(ev) {
 	var cell = Popup.parent;
 	var n = cell.previousSiblings().length;
 	var hdr = cell.up('table').down('tr').childElements()[n];
-	setWhere(hdr.innerText);
+	setWhere(hdr.textContent);
+}
+
+function formatContent(ev) {
+	var cell = Popup.parent;
+	showDialog(ev, 'db:formatlines', {statement: cell.textContent}, '', true);
 }
 
 HashMonitor.addListener(restoreDBObject);

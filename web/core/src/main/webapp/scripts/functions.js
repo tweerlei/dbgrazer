@@ -684,47 +684,57 @@ function showElementDialog(ev, title, id) {
 	return false;
 }
 
-function showTopDialog(ev, page, params, label) {
+function showTopDialog(ev, page, params, label, post) {
 	if (ev) {
 		Event.stop(ev);
 	}
 	AutoRefresh.stop();
 	Menu.hide();
 	Popup.hide();
-	WSApi.getAsync(page, params, function(txt) {
+	var fn = function(txt) {
 		if (txt) {
 			Dialog.show(label, txt);
 		}
-	});
-	return false;
-}
-
-function showDbDialog(ev, page, params, label) {
-	if (ev) {
-		Event.stop(ev);
-	}
-	AutoRefresh.stop();
-	Menu.hide();
-	Popup.hide();
-	WSApi.getDBAsync(page, params, function(txt) {
-		if (txt) {
-			Dialog.show(label, txt);
-		}
-	});
-	return false;
-}
-
-function showDialog(ev, page, params, label) {
-	if (page.substr(0, 3) == 'db:') {
-		return showDbDialog(ev, page.substr(3), params, label);
+	};
+	if (post) {
+		WSApi.postAsync(page, params, fn);
 	} else {
-		return showTopDialog(ev, page, params, label);
+		WSApi.getAsync(page, params, fn);
+	}
+	return false;
+}
+
+function showDbDialog(ev, page, params, label, post) {
+	if (ev) {
+		Event.stop(ev);
+	}
+	AutoRefresh.stop();
+	Menu.hide();
+	Popup.hide();
+	var fn = function(txt) {
+		if (txt) {
+			Dialog.show(label, txt);
+		}
+	};
+	if (post) {
+		WSApi.postDBAsync(page, params, fn);
+	} else {
+		WSApi.getDBAsync(page, params, fn);
+	}
+	return false;
+}
+
+function showDialog(ev, page, params, label, post) {
+	if (page.substr(0, 3) == 'db:') {
+		return showDbDialog(ev, page.substr(3), params, label, post);
+	} else {
+		return showTopDialog(ev, page, params, label, post);
 	}
 }
 
 function showFormDialog(ev, page, frm, label) {
 	var params = frm.serialize(true);
-	return showDialog(ev, page, params, label);
+	return showDialog(ev, page, params, label, frm.method === 'post');
 }
 
 /*

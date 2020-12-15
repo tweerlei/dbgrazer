@@ -71,7 +71,7 @@
 						/></span></td>
 </c:if
 ><c:forEach items="${row.values}" var="v" varStatus="st"
->					<td<c:if test="${fn:length(v) >= 100}"> class="zoomable"</c:if>><ui:dblink value="${v}" fk="${foreignKeys[st.index]}" targetElement="${targetElement}"/></td>
+>					<td><ui:dblink value="${v}" fk="${foreignKeys[st.index]}" targetElement="${targetElement}"/></td>
 </c:forEach
 >				</tr>
 </c:forEach
@@ -82,4 +82,5 @@
 			&nbsp;<span class="action" title="<fmt:message key="removeOrder"/>" onclick="removeOrder(event);"><fmt:message key="removeOrderIcon"/></span></div>
 		<div id="where-table-${label}" class="hidden"><span class="action" title="<fmt:message key="addWhere"/>" onclick="addWhere(event);"><fmt:message key="addWhereIcon"/></span>
 			&nbsp;<span class="action" title="<fmt:message key="addWhereNot"/>" onclick="addWhereNot(event);"><fmt:message key="addWhereNotIcon"/></span>
-			&nbsp;<span class="action" title="<fmt:message key="removeWhere"/>" onclick="removeWhere(event);"><fmt:message key="removeWhereIcon"/></span></div>
+			&nbsp;<span class="action" title="<fmt:message key="removeWhere"/>" onclick="removeWhere(event);"><fmt:message key="removeWhereIcon"/></span>
+			&nbsp;<span class="action" title="<fmt:message key="maximize"/>" onclick="formatContent(event);"><fmt:message key="maximizeIcon"/></span></div>

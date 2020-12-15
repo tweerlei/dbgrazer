@@ -14,7 +14,7 @@
  * limitations under the License.
 --%><%@
 	include file="../../include/include.jspf"
-%><div class="tab-header"><form class="filter" action="db/${currentConnection.linkName}/ajax/formatlines.html" method="post" onsubmit="return getFormInto(this, this.parentNode.parentNode);">
+%><div class="tab-header"><form class="filter" action="db/${currentConnection.linkName}/ajax/formatlines.html" method="post" onsubmit="return showFormDialog(event, 'db:formatlines', this, '');">
 	<input id="f1-statement" type="hidden" name="statement" value="${fn:escapeXml(statement)}"/>
 	<div class="filter"><select id="f1-format" name="format" onchange="Forms.submit(form);">
 			<option value=""><fmt:message key="default"/></option>

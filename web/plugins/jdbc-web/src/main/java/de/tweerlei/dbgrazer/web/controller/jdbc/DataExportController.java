@@ -40,9 +40,11 @@ import de.tweerlei.dbgrazer.extension.jdbc.SQLGeneratorService;
 import de.tweerlei.dbgrazer.extension.jdbc.SQLGeneratorService.Style;
 import de.tweerlei.dbgrazer.query.exception.PerformQueryException;
 import de.tweerlei.dbgrazer.query.model.ColumnDef;
+import de.tweerlei.dbgrazer.query.model.ColumnType;
 import de.tweerlei.dbgrazer.query.model.Query;
 import de.tweerlei.dbgrazer.query.model.Result;
 import de.tweerlei.dbgrazer.query.model.RowSet;
+import de.tweerlei.dbgrazer.query.model.impl.ColumnDefImpl;
 import de.tweerlei.dbgrazer.web.exception.AccessDeniedException;
 import de.tweerlei.dbgrazer.web.formatter.DataFormatter;
 import de.tweerlei.dbgrazer.web.model.QueryParameters;
@@ -293,15 +295,18 @@ public class DataExportController
 			final TableDescription desc = metadataService.getTableInfo(connectionSettings.getLinkName(), qname, ColumnMode.ALL);
 			final String statement;
 			final String type;
+			final boolean editable;
 			if (VIEW_COUNT.equals(fbo.getView()))
 				{
 				statement = sqlGenerator.generateSelectCount(desc.getName(), Style.INDENTED, fbo.getWhere(), dialect);
 				type = JdbcConstants.QUERYTYPE_MULTIPLE;
+				editable = false;
 				}
 			else if (VIEW_STATS.equals(fbo.getView()))
 				{
 				statement = sqlGenerator.generateSelectStats(desc, Style.INDENTED, fbo.getWhere(), dialect);
 				type = JdbcConstants.QUERYTYPE_MULTIPLE;
+				editable = false;
 				}
 			else if (VIEW_DELETE.equals(fbo.getView()))
 				{
@@ -310,6 +315,7 @@ public class DataExportController
 				
 				statement = sqlGenerator.generateDelete(desc.getName(), Style.INDENTED, fbo.getWhere(), dialect);
 				type = JdbcConstants.QUERYTYPE_DML;
+				editable = false;
 				}
 			else if (VIEW_TRUNCATE.equals(fbo.getView()))
 				{
@@ -318,11 +324,17 @@ public class DataExportController
 				
 				statement = sqlGenerator.generateTruncate(desc.getName(), Style.INDENTED, dialect);
 				type = JdbcConstants.QUERYTYPE_DML;
+				editable = false;
 				}
 			else
 				{
 				if (connectionSettings.isWritable() && !desc.getPKColumns().isEmpty())
+					{
 					model.put("pkColumns", new ArrayList<Integer>(desc.getPKColumns()));
+					editable = true;
+					}
+				else
+					editable = false;
 				
 				statement = sqlGenerator.generateSelect(desc, Style.INDENTED, fbo.getWhere(), fbo.getOrder(), dialect);
 				type = JdbcConstants.QUERYTYPE_MULTIPLE;
@@ -340,7 +352,15 @@ public class DataExportController
 			model.put("rs", rs);
 			
 			final List<List<ColumnDef>> tableColumns = new ArrayList<List<ColumnDef>>(1);
-			tableColumns.add(rs.getColumns());
+			if (editable)
+				{
+				final List<ColumnDef> tmp = new ArrayList<ColumnDef>(rs.getColumns().size() + 1);
+				tmp.add(new ColumnDefImpl("", ColumnType.STRING, null, null, null, null));
+				tmp.addAll(rs.getColumns());
+				tableColumns.add(tmp);
+				}
+			else
+				tableColumns.add(rs.getColumns());
 			model.put("tableColumns", tableColumns);
 			
 			model.put("targetElement", target);
