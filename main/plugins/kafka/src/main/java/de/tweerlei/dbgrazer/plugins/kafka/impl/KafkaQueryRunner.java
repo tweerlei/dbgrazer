@@ -17,6 +17,8 @@ package de.tweerlei.dbgrazer.plugins.kafka.impl;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -71,6 +73,25 @@ public class KafkaQueryRunner extends BaseQueryRunner
 	private static final String KEY_HEADER = "Key";
 	private static final String TIMESTAMP_HEADER = "Timestamp";
 	private static final String SIZE_HEADER = "Size";
+	
+	private static final class RecordComparator implements Comparator<ConsumerRecord<?, ?>>
+		{
+		public RecordComparator()
+			{
+			}
+		
+		@Override
+		public int compare(ConsumerRecord<?, ?> a, ConsumerRecord<?, ?> b)
+			{
+			if (a.timestamp() < b.timestamp())
+				return (1);
+			if (a.timestamp() > b.timestamp())
+				return (-1);
+			return (0);
+			}
+		}
+	
+	private static final RecordComparator TIMESTAMP_DESCENDING = new RecordComparator();
 	
 	private final TimeService timeService;
 	private final KafkaApiService kafkaClient;
@@ -266,6 +287,8 @@ public class KafkaQueryRunner extends BaseQueryRunner
 			columns.add(new ColumnDefImpl(KEY_HEADER, ColumnType.STRING, null, query.getTargetQueries().get(1), null, null));
 			columns.add(new ColumnDefImpl(TIMESTAMP_HEADER, ColumnType.DATE, null, query.getTargetQueries().get(2), null, null));
 			columns.add(new ColumnDefImpl(SIZE_HEADER, ColumnType.INTEGER, null, query.getTargetQueries().get(3), null, null));
+			
+			Collections.sort(recs, TIMESTAMP_DESCENDING);
 			
 			rs = new RowSetImpl(query, subQueryIndex, columns);
 			int count = 0;
