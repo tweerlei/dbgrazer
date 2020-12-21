@@ -163,6 +163,11 @@ public class KafkaQueryRunner extends BaseQueryRunner
 			final String q = buildQuery(query, params);
 			final KafkaQueryParser p = new KafkaQueryParser(q);
 			
+			if (p.getPartition() == null)
+				throw new RuntimeException("No partition specified");
+			if (p.getStartOffset() == null)
+				throw new RuntimeException("No offset specified");
+			
 			final long start = timeService.getCurrentTime();
 			final ConsumerRecord<String, String> rec = kafkaClient.fetchRecord(link, p.getTopic(), p.getPartition(), p.getStartOffset());
 			final long end = timeService.getCurrentTime();

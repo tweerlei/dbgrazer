@@ -53,7 +53,7 @@ public class KafkaQueryParser
 			}
 		else if (fields.length > 1)
 			{
-			partition = 0;
+			partition = null;
 			final String[] offsets = fields[1].split("-");
 			startOffset = parseLong(offsets[0]);
 			if (offsets.length > 1)
@@ -64,7 +64,7 @@ public class KafkaQueryParser
 			}
 		else
 			{
-			partition = 0;
+			partition = null;
 			startOffset = null;
 			endOffset = null;
 			key = null;

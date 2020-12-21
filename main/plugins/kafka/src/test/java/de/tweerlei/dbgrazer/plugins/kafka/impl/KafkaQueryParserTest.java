@@ -31,7 +31,7 @@ public class KafkaQueryParserTest extends TestCase
 		{
 		final KafkaQueryParser p = new KafkaQueryParser("");
 		assertEquals("", p.getTopic());
-		assertEquals(0, p.getPartition().intValue());
+		assertEquals(null, p.getPartition());
 		assertEquals(null, p.getStartOffset());
 		assertEquals(null, p.getEndOffset());
 		assertEquals(null, p.getKey());
@@ -44,7 +44,7 @@ public class KafkaQueryParserTest extends TestCase
 		{
 		final KafkaQueryParser p = new KafkaQueryParser("Topic");
 		assertEquals("Topic", p.getTopic());
-		assertEquals(0, p.getPartition().intValue());
+		assertEquals(null, p.getPartition());
 		assertEquals(null, p.getStartOffset());
 		assertEquals(null, p.getEndOffset());
 		assertEquals(null, p.getKey());
@@ -57,7 +57,7 @@ public class KafkaQueryParserTest extends TestCase
 		{
 		final KafkaQueryParser p = new KafkaQueryParser("Topic:42");
 		assertEquals("Topic", p.getTopic());
-		assertEquals(0, p.getPartition().intValue());
+		assertEquals(null, p.getPartition());
 		assertEquals(42L, p.getStartOffset().longValue());
 		assertEquals(null, p.getEndOffset());
 		assertEquals(null, p.getKey());
@@ -70,7 +70,7 @@ public class KafkaQueryParserTest extends TestCase
 		{
 		final KafkaQueryParser p = new KafkaQueryParser("Topic:42-43");
 		assertEquals("Topic", p.getTopic());
-		assertEquals(0, p.getPartition().intValue());
+		assertEquals(null, p.getPartition());
 		assertEquals(42L, p.getStartOffset().longValue());
 		assertEquals(43L, p.getEndOffset().longValue());
 		assertEquals(null, p.getKey());
