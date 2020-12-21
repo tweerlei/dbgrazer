@@ -353,6 +353,10 @@ span.button {
 	margin: 1em;
 }
 
+#dialog .tab-body {
+	height: 75vh;
+} 
+
 #dialog input[type="text"], #dialog input[type="password"], #dialog select {
 	width: 20em;
 }

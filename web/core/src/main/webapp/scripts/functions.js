@@ -376,6 +376,9 @@ function tw_windowOnResize() {
 	var yf = Elements.getHeight(f);
 	
 	$$('.tab-body').each(function(e) {
+		if (e.up('#dialog')) {
+			return;
+		}
 		var y = Elements.getY(e);
 		// subtract margin 3 times: 1x margin between content and footer, 2x content padding
 		Elements.resizeTo(e, undefined, h - y - 3 * ym - yf);
