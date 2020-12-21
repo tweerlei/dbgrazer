@@ -14,7 +14,7 @@
  * limitations under the License.
 --%><%@
 	include file="../../include/include.jspf"
-%><div class="tab-header"><form class="filter" action="db/${currentConnection.linkName}/ajax/formatlines.html" method="post" onsubmit="return showFormDialog(event, 'db:formatlines', this, '');">
+%><div class="tab-header"><form class="filter" action="db/${currentConnection.linkName}/ajax/formatlines.html" method="post" onsubmit="Dialog.close(); return showFormDialog(event, 'db:formatlines', this, '');">
 	<input id="f1-statement" type="hidden" name="statement" value="${fn:escapeXml(statement)}"/>
 	<div class="filter"><select id="f1-format" name="format" onchange="Forms.submit(form);">
 			<option value=""><fmt:message key="default"/></option>
@@ -23,7 +23,6 @@
 </c:forEach
 >	</select></div>
 	<div class="filter"><input id="f1-formatting" type="checkbox" name="formatting" value="true"<c:if test="${formatting}"> checked="checked"</c:if> onchange="Forms.submit(form);"/> <label for="f1-formatting"><fmt:message key="formatter"/></label></div>
-	<div class="filter"><span class="action" title="<fmt:message key="maximize"/>" onclick="return unzoomForm();"><fmt:message key="maximizeIcon"/></span></div>
 </form><hr/></div><div class="tab-body">
 	<pre class="code">${result}</pre>
 </div>

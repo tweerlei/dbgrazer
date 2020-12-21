@@ -345,8 +345,8 @@ span.button {
 
 #dialog pre {
 	width: 60em;
-	max-height: 30em;
-	overflow: auto;
+/*	max-height: 30em;
+	overflow: auto;*/
 }
 
 #dialog form {

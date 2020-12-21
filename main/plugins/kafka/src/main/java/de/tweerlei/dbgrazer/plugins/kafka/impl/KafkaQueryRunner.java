@@ -257,7 +257,7 @@ public class KafkaQueryRunner extends BaseQueryRunner
 		else
 			{
 			final List<ColumnDef> columns = new ArrayList<ColumnDef>();
-			columns.add(new ColumnDefImpl(ID_HEADER, ColumnType.INTEGER, null, query.getTargetQueries().get(0), null, null));
+			columns.add(new ColumnDefImpl(ID_HEADER, ColumnType.STRING, null, query.getTargetQueries().get(0), null, null));
 			columns.add(new ColumnDefImpl(KEY_HEADER, ColumnType.STRING, null, query.getTargetQueries().get(1), null, null));
 			columns.add(new ColumnDefImpl(TIMESTAMP_HEADER, ColumnType.DATE, null, query.getTargetQueries().get(2), null, null));
 			columns.add(new ColumnDefImpl(SIZE_HEADER, ColumnType.INTEGER, null, query.getTargetQueries().get(3), null, null));
@@ -273,7 +273,7 @@ public class KafkaQueryRunner extends BaseQueryRunner
 					}
 				
 				final ResultRow row = new DefaultResultRow(columns.size());
-				row.getValues().add(rec.offset());
+				row.getValues().add(rec.partition() + "  " + rec.offset());
 				row.getValues().add(rec.key());
 				row.getValues().add(new Date(rec.timestamp()));
 				row.getValues().add(rec.serializedValueSize());
@@ -294,7 +294,7 @@ public class KafkaQueryRunner extends BaseQueryRunner
 		final RowSetImpl rs = new RowSetImpl(query, subQueryIndex, columns);
 		
 		final ResultRow row = new DefaultResultRow(columns.size());
-		row.getValues().add(rm.topic() + "  " + rm.partition() + "  " + rm.offset());
+		row.getValues().add(rm.partition() + "  " + rm.offset());
 		rs.getRows().add(row);
 		
 		rs.setQueryTime(time);
