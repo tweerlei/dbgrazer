@@ -45,6 +45,9 @@ public class MessageQueryType extends AbstractSingleQueryType
 		{
 		super(NAME, linkType, MapBuilder.<String, Class<?>>ordered()
 				.put(QueryTypeAttributes.ATTR_FORMATTER, TextFormatter.class)
+				.put(QueryTypeAttributes.ATTR_FORMATTING, Boolean.class)
+				.put(QueryTypeAttributes.ATTR_SYNTAX_COLORING, Boolean.class)
+				.put(QueryTypeAttributes.ATTR_LINE_NUMBERS, Boolean.class)
 				.build());
 		}
 	}
