@@ -24,7 +24,7 @@
 	<dl>
 <ui:params items="${parameters}" fkTables="${fkTables}" path="params" nulls="${model.nulls}" nullPath="nulls"
 />		<dt>&nbsp;</dt>
-		<dd><spring:checkbox path="move"/> <spring:label path="move"><fmt:message key="move"/></spring:label></dd>
+		<dd><fmt:message key="move" var="lbl"/><spring:checkbox path="move" label=" ${lbl}"/></dd>
 		<dt>&nbsp;</dt>
 		<dd><input id="f1-submit" type="submit" value="<fmt:message key="copyRow"/>"/> <input id="f1-reset" type="reset" value="<fmt:message key="cancel"/>"/></dd>
 	</dl><hr/>

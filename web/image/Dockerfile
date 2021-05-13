@@ -28,9 +28,9 @@ RUN apk add --no-cache graphviz msttcorefonts-installer
 RUN update-ms-fonts && fc-cache -f
 
 # Enable SSL and copy certificate
-COPY examples/conf/server.xml /usr/local/tomcat/conf/server.xml
-COPY examples/conf/server.jks /usr/local/tomcat/conf/server.jks
-COPY examples/conf/trust.jks /usr/local/tomcat/conf/trust.jks
+COPY root/usr/local/tomcat/conf/* /usr/local/tomcat/conf/
+COPY root/usr/local/bin/* /usr/local/bin/
+RUN chmod +x /usr/local/bin/*
 
 # Add required libraries
 COPY target/*.jar /usr/local/tomcat/lib/
@@ -38,21 +38,19 @@ COPY target/*.jar /usr/local/tomcat/lib/
 # Autodeploy webapp
 COPY target/dbgrazer-web-*.war /usr/local/tomcat/webapps/dbgrazer.war
 
-# Setup config directory
-COPY examples/startup.sh /root/
-COPY examples/*.properties /root/.dbgrazer/
-COPY examples/bin/*.sh /root/.dbgrazer/bin/
-COPY examples/themes/*.properties /root/.dbgrazer/themes/
+# Fix file permissions for running as unprivileged user
+RUN chmod -R og+rX /usr/local/tomcat && \
+	chmod -R og+w /usr/local/tomcat/logs && \
+	chmod -R og+w /usr/local/tomcat/temp && \
+	chmod -R og+w /usr/local/tomcat/webapps && \
+	chmod -R og+w /usr/local/tomcat/work
 
-# Add static resources
-COPY examples/static/*.css /root/.dbgrazer/static/
-COPY examples/static/*.png /root/.dbgrazer/static/
-
-# Set permissions
-RUN chmod +x /root/startup.sh /root/.dbgrazer/bin/*.sh
+# Add config directory
+COPY examples /opt/dbgrazer
+RUN chmod +x /opt/dbgrazer/bin/*
 
 # Set Tomcat options
-ENV CATALINA_OPTS -Xmx512m -XX:-OmitStackTraceInFastThrow -Duser.language=de -Duser.country=DE -Duser.timezone=Europe/Berlin
+ENV CATALINA_OPTS -Xmx512m -XX:-OmitStackTraceInFastThrow -Ddbgrazer.configPath=/opt/dbgrazer -Duser.language=de -Duser.country=DE -Duser.timezone=Europe/Berlin
 
-# Possibly run /root/init.sh and launch Tomcat afterwards
-CMD [ "/root/startup.sh" ]
+# Possibly run init.sh and launch Tomcat afterwards
+CMD [ "/usr/local/bin/startup.sh" ]
