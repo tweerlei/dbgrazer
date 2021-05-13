@@ -41,6 +41,8 @@ import de.tweerlei.ermtools.dialect.SQLStatementWrapper;
  */
 public abstract class CommonSQLDialect implements SQLDialect
 	{
+	private static final String NAME_SEPARATOR = ".";
+	
 	private static final String DATE_FORMAT = "'DATE'''yyyy-MM-dd''";
 	private static final String TIME_FORMAT = "'TIME'''HH:mm:ss''";
 	private static final String DATETIME_FORMAT = "'TIMESTAMP'''yyyy-MM-dd HH:mm:ss''";
@@ -95,17 +97,22 @@ public abstract class CommonSQLDialect implements SQLDialect
 		return (typeMap.get(type));
 		}
 	
+	public String quoteIdentifier(String c)
+		{
+		return (c);
+		}
+	
 	public String getQualifiedTableName(QualifiedName qn)
 		{
 		final StringBuilder sb = new StringBuilder();
 		
 		// Apply only one prefix, prefer schema over catalog
 		if (!StringUtils.empty(qn.getSchemaName()))
-			sb.append(qn.getSchemaName()).append(".");
+			sb.append(quoteIdentifier(qn.getSchemaName())).append(NAME_SEPARATOR);
 		else if (!StringUtils.empty(qn.getCatalogName()))
-			sb.append(qn.getCatalogName()).append(".");
+			sb.append(quoteIdentifier(qn.getCatalogName())).append(NAME_SEPARATOR);
 		
-		sb.append(qn.getObjectName());
+		sb.append(quoteIdentifier(qn.getObjectName()));
 		
 		return (sb.toString());
 		}

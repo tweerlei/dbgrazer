@@ -420,7 +420,6 @@ public class DataExportController
 		
 		final SQLDialect dialect = getSQLDialect();
 		final QualifiedName qname = new QualifiedName(fbo.getCatalog(), fbo.getSchema(), fbo.getObject());
-		final String tableName = dialect.getQualifiedTableName(qname);
 		final TableDescription desc = metadataService.getTableInfo(connectionSettings.getLinkName(), qname, ColumnMode.ALL);
 		final String statement = sqlGenerator.generateSelect(desc, Style.INDENTED, fbo.getWhere(), fbo.getOrder(), dialect);
 		
@@ -431,14 +430,14 @@ public class DataExportController
 				{
 				final Query query = runner.createCustomQuery(JdbcConstants.QUERYTYPE_MULTIPLE, statement, null, fbo.getObject());
 				
-				model.put(GenericDownloadView.SOURCE_ATTRIBUTE, downloadService.getStreamDownloadSource(connectionSettings.getLinkName(), new QueryParameters(query), tableName, desc.getPKColumns(), dialect, fbo.getFormat()));
+				model.put(GenericDownloadView.SOURCE_ATTRIBUTE, downloadService.getStreamDownloadSource(connectionSettings.getLinkName(), new QueryParameters(query), qname, desc.getPKColumns(), dialect, fbo.getFormat()));
 				}
 			else
 				{
 				final Result r = runner.performCustomQuery(connectionSettings.getLinkName(), JdbcConstants.QUERYTYPE_MULTIPLE, statement, null, null, fbo.getObject(), false, null);
 				final RowSet rs = r.getFirstRowSet();
 				
-				model.put(GenericDownloadView.SOURCE_ATTRIBUTE, downloadService.getDownloadSource(connectionSettings.getLinkName(), rs, tableName, desc.getPKColumns(), dialect, fbo.getFormat()));
+				model.put(GenericDownloadView.SOURCE_ATTRIBUTE, downloadService.getDownloadSource(connectionSettings.getLinkName(), rs, qname, desc.getPKColumns(), dialect, fbo.getFormat()));
 				}
 			}
 		catch (PerformQueryException e)
@@ -515,13 +514,12 @@ public class DataExportController
 		
 		final SQLDialect dialect = getSQLDialect();
 		final QualifiedName qname = new QualifiedName(fbo.getCatalog(), fbo.getSchema(), fbo.getObject());
-		final String tableName = dialect.getQualifiedTableName(qname);
 		final TableDescription desc = metadataService.getTableInfo(connectionSettings.getLinkName(), qname, ColumnMode.ALL);
 		final String statement = sqlGenerator.generateSelect(desc, Style.INDENTED, fbo.getWhere(), fbo.getOrder(), dialect);
 		
 		final Query query = runner.createCustomQuery(JdbcConstants.QUERYTYPE_MULTIPLE, statement, null, fbo.getObject());
 		
-		model.put(GenericDownloadView.SOURCE_ATTRIBUTE, downloadService.getStreamDownloadSource(connectionSettings.getLinkName(), new QueryParameters(query), tableName, null, dialect, fbo.getFormat()));
+		model.put(GenericDownloadView.SOURCE_ATTRIBUTE, downloadService.getStreamDownloadSource(connectionSettings.getLinkName(), new QueryParameters(query), qname, null, dialect, fbo.getFormat()));
 		
 		return (model);
 		}

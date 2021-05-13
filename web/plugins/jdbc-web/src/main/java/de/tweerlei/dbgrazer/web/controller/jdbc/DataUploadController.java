@@ -336,7 +336,7 @@ public class DataUploadController
 			final RowProducer p = uploadService.createRowProducer(info, fbo.getFile().getInputStream(), fbo.getFileFormat());
 			
 			if (StringUtils.empty(fbo.getMode()))
-				model.put(GenericDownloadView.SOURCE_ATTRIBUTE, downloadService.getStreamDownloadSource(connectionSettings.getLinkName(), p, fbo.getFile().getOriginalFilename(), fbo.getObject(), dialect.getQualifiedTableName(qname), info.getPKColumns(), dialect, fbo.getFormat()));
+				model.put(GenericDownloadView.SOURCE_ATTRIBUTE, downloadService.getStreamDownloadSource(connectionSettings.getLinkName(), p, fbo.getFile().getOriginalFilename(), fbo.getObject(), qname, info.getPKColumns(), dialect, fbo.getFormat()));
 			else
 				{
 				final Result r = insertRows(p, info, fbo.getStatementFormat(), fbo.getMode(), pr);

@@ -20,6 +20,7 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import de.tweerlei.common5.jdbc.model.QualifiedName;
 import de.tweerlei.common5.jdbc.model.TableDescription;
 import de.tweerlei.dbgrazer.common.util.impl.NamedBase;
 import de.tweerlei.dbgrazer.query.model.RowProducer;
@@ -64,7 +65,7 @@ public class SqlMergeFileDownloader extends NamedBase implements FileDownloader,
 		}
 	
 	@Override
-	public DownloadSource getDownloadSource(String link, RowSet rs, String srcName, String tableName, Set<Integer> pk, SQLDialect dialect)
+	public DownloadSource getDownloadSource(String link, RowSet rs, String srcName, QualifiedName tableName, Set<Integer> pk, SQLDialect dialect)
 		{
 		final int blockSize = dialect.supportsMerge() ? configService.get(ConfigKeys.MERGE_ROWS) : 0;
 		
@@ -74,7 +75,7 @@ public class SqlMergeFileDownloader extends NamedBase implements FileDownloader,
 		}
 	
 	@Override
-	public DownloadSource getStreamDownloadSource(String link, RowProducer p, String srcName, String fileName, String tableName, Set<Integer> pk, SQLDialect dialect)
+	public DownloadSource getStreamDownloadSource(String link, RowProducer p, String srcName, String fileName, QualifiedName tableName, Set<Integer> pk, SQLDialect dialect)
 		{
 		final int blockSize = dialect.supportsMerge() ? configService.get(ConfigKeys.MERGE_ROWS) : 0;
 		
@@ -100,9 +101,9 @@ public class SqlMergeFileDownloader extends NamedBase implements FileDownloader,
 		final Set<Integer> pk = info.getPKColumns();
 		
 		if (!pk.isEmpty() && (blockSize > 0))
-			return (new MergeStatementProducer(factory, p, dialect.getQualifiedTableName(info.getName()), pk, blockSize, dialect, dialect.prepareInsert(info), dialect.finishInsert(info)));
+			return (new MergeStatementProducer(factory, p, info.getName(), pk, blockSize, dialect, dialect.prepareInsert(info), dialect.finishInsert(info)));
 		else
-			return (new InsertStatementProducer(factory, p, dialect.getQualifiedTableName(info.getName()), dialect, dialect.prepareInsert(info), dialect.finishInsert(info)));
+			return (new InsertStatementProducer(factory, p, info.getName(), dialect, dialect.prepareInsert(info), dialect.finishInsert(info)));
 		}
 	
 	private String getHeader(String link, String stmt)

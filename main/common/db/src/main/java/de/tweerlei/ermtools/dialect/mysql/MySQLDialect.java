@@ -82,6 +82,12 @@ public class MySQLDialect extends CommonSQLDialect
 		super(TYPE_MAP);
 		}
 	
+	@Override
+	public String quoteIdentifier(String c)
+		{
+		return ("`" + c + "`");
+		}
+	
 	public String createTable(TableDescription t)
 		{
 		final StringBuffer sb = new StringBuffer();
@@ -97,7 +103,7 @@ public class MySQLDialect extends CommonSQLDialect
 				first = false;
 			else
 				sb.append(",\n\t");
-			sb.append(c.getName());
+			sb.append(quoteIdentifier(c.getName()));
 			sb.append(" ");
 			sb.append(dataTypeToString(c.getType()));
 			sb.append(c.isNullable() ? " NULL" : " NOT NULL");
@@ -121,7 +127,7 @@ public class MySQLDialect extends CommonSQLDialect
 					first = false;
 				else
 					sb.append(", ");
-				sb.append(i.next());
+				sb.append(quoteIdentifier(i.next()));
 				}
 			
 			sb.append(")");
@@ -143,7 +149,7 @@ public class MySQLDialect extends CommonSQLDialect
 		sb.append("ALTER TABLE ");
 		sb.append(getQualifiedTableName(t.getName()));
 		sb.append("\n\tADD ");
-		sb.append(c.getName());
+		sb.append(quoteIdentifier(c.getName()));
 		sb.append(" ");
 		sb.append(dataTypeToString(c.getType()));
 		sb.append(c.isNullable() ? " NULL" : " NOT NULL");
@@ -161,8 +167,18 @@ public class MySQLDialect extends CommonSQLDialect
 		final StringBuffer sb = new StringBuffer();
 		sb.append("ALTER TABLE ");
 		sb.append(getQualifiedTableName(t.getName()));
-		sb.append("\n\tMODIFY COLUMN ");
-		sb.append(c.getName());
+		if (!old.getName().equals(c.getName()))
+			{
+			sb.append("\n\tCHANGE COLUMN ");
+			sb.append(quoteIdentifier(old.getName()));
+			sb.append(" ");
+			sb.append(quoteIdentifier(c.getName()));
+			}
+		else
+			{
+			sb.append("\n\tMODIFY COLUMN ");
+			sb.append(quoteIdentifier(c.getName()));
+			}
 		sb.append(" ");
 		sb.append(dataTypeToString(c.getType()));
 		sb.append(c.isNullable() ? " NULL" : " NOT NULL");
@@ -181,7 +197,7 @@ public class MySQLDialect extends CommonSQLDialect
 		sb.append("ALTER TABLE ");
 		sb.append(getQualifiedTableName(t.getName()));
 		sb.append("\n\tDROP COLUMN ");
-		sb.append(c.getName());
+		sb.append(quoteIdentifier(c.getName()));
 		return (sb.toString());
 		}
 
@@ -194,7 +210,7 @@ public class MySQLDialect extends CommonSQLDialect
 			sb.append("\n\tADD UNIQUE KEY ");
 		else
 			sb.append("\n\tADD KEY ");
-		sb.append(ix.getName());
+		sb.append(quoteIdentifier(ix.getName()));
 		sb.append(" (");
 		
 		boolean first = true;
@@ -204,7 +220,7 @@ public class MySQLDialect extends CommonSQLDialect
 				first = false;
 			else
 				sb.append(", ");
-			sb.append(i.next());
+			sb.append(quoteIdentifier(i.next()));
 			}
 		
 		sb.append(")");
@@ -217,7 +233,7 @@ public class MySQLDialect extends CommonSQLDialect
 		sb.append("ALTER TABLE ");
 		sb.append(getQualifiedTableName(t.getName()));
 		sb.append("\n\tDROP INDEX ");
-		sb.append(ix.getName());
+		sb.append(quoteIdentifier(ix.getName()));
 		return (sb.toString());
 		}
 
@@ -235,7 +251,7 @@ public class MySQLDialect extends CommonSQLDialect
 				first = false;
 			else
 				sb.append(", ");
-			sb.append(i.next());
+			sb.append(quoteIdentifier(i.next()));
 			}
 		
 		sb.append(")");
@@ -267,7 +283,7 @@ public class MySQLDialect extends CommonSQLDialect
 				first = false;
 			else
 				sb.append(", ");
-			sb.append(i.next());
+			sb.append(quoteIdentifier(i.next()));
 			}
 		
 		sb.append(")\n\tREFERENCES ");
@@ -281,7 +297,7 @@ public class MySQLDialect extends CommonSQLDialect
 				first = false;
 			else
 				sb.append(", ");
-			sb.append(i.next());
+			sb.append(quoteIdentifier(i.next()));
 			}
 		
 		sb.append(")");

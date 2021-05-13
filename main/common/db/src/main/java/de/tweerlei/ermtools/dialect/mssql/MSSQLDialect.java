@@ -90,6 +90,12 @@ public class MSSQLDialect extends CommonSQLDialect
 		}
 	
 	@Override
+	public String quoteIdentifier(String c)
+		{
+		return ("[" + c + "]");
+		}
+	
+	@Override
 	public String getDateFormat()
 		{
 		return (DATE_FORMAT);
@@ -164,7 +170,7 @@ public class MSSQLDialect extends CommonSQLDialect
 				first = false;
 			else
 				sb.append(",\n\t");
-			sb.append(c.getName());
+			sb.append(quoteIdentifier(c.getName()));
 			sb.append(" ");
 			sb.append(dataTypeToString(c.getType()));
 			sb.append(c.isNullable() ? " NULL" : " NOT NULL");
@@ -190,7 +196,7 @@ public class MSSQLDialect extends CommonSQLDialect
 					first = false;
 				else
 					sb.append(", ");
-				sb.append(i.next());
+				sb.append(quoteIdentifier(i.next()));
 				}
 			
 			sb.append(")");
@@ -234,7 +240,7 @@ public class MSSQLDialect extends CommonSQLDialect
 		sb.append("ALTER TABLE ");
 		sb.append(getQualifiedTableName(t.getName()));
 		sb.append("\n\tADD ");
-		sb.append(c.getName());
+		sb.append(quoteIdentifier(c.getName()));
 		sb.append(" ");
 		sb.append(dataTypeToString(c.getType()));
 		sb.append(c.isNullable() ? " NULL" : " NOT NULL");
@@ -252,7 +258,7 @@ public class MSSQLDialect extends CommonSQLDialect
 		sb.append("ALTER TABLE ");
 		sb.append(getQualifiedTableName(t.getName()));
 		sb.append("\n\tALTER COLUMN ");
-		sb.append(c.getName());
+		sb.append(quoteIdentifier(c.getName()));
 		sb.append(" ");
 		sb.append(dataTypeToString(c.getType()));
 		sb.append(c.isNullable() ? " NULL" : " NOT NULL");
@@ -263,6 +269,16 @@ public class MSSQLDialect extends CommonSQLDialect
 			// FIXME: It's not possible to remove a DEFAULT from a column without knowing the constraint name -
 			//        but that is not returned from DatabaseMetadata
 			}
+		
+		if (!old.getName().equals(c.getName()))
+			{
+			sb.append(";\n");
+			
+			sb.append("EXEC sp_rename '").append(getQualifiedTableName(t.getName())).append(".").append(quoteIdentifier(old.getName())).append("'");
+			sb.append(", '").append(quoteIdentifier(c.getName())).append("'");
+			sb.append(", 'COLUMN'");
+			}
+		
 		return (sb.toString());
 		}
 
@@ -272,7 +288,7 @@ public class MSSQLDialect extends CommonSQLDialect
 		sb.append("ALTER TABLE ");
 		sb.append(getQualifiedTableName(t.getName()));
 		sb.append("\n\tDROP COLUMN ");
-		sb.append(c.getName());
+		sb.append(quoteIdentifier(c.getName()));
 		return (sb.toString());
 		}
 
@@ -283,7 +299,7 @@ public class MSSQLDialect extends CommonSQLDialect
 			sb.append("CREATE UNIQUE INDEX ");
 		else
 			sb.append("CREATE INDEX ");
-		sb.append(ix.getName());
+		sb.append(quoteIdentifier(ix.getName()));
 		sb.append("\n\tON ");
 		sb.append(getQualifiedTableName(t.getName()));
 		sb.append(" (");
@@ -295,7 +311,7 @@ public class MSSQLDialect extends CommonSQLDialect
 				first = false;
 			else
 				sb.append(", ");
-			sb.append(i.next());
+			sb.append(quoteIdentifier(i.next()));
 			}
 		
 		sb.append(")");
@@ -306,7 +322,7 @@ public class MSSQLDialect extends CommonSQLDialect
 		{
 		final StringBuffer sb = new StringBuffer();
 		sb.append("DROP INDEX ");
-		sb.append(ix.getName());
+		sb.append(quoteIdentifier(ix.getName()));
 		sb.append(" ON ");
 		sb.append(getQualifiedTableName(t.getName()));
 		return (sb.toString());
@@ -328,7 +344,7 @@ public class MSSQLDialect extends CommonSQLDialect
 				first = false;
 			else
 				sb.append(", ");
-			sb.append(i.next());
+			sb.append(quoteIdentifier(i.next()));
 			}
 		
 		sb.append(")");
@@ -361,7 +377,7 @@ public class MSSQLDialect extends CommonSQLDialect
 				first = false;
 			else
 				sb.append(", ");
-			sb.append(i.next());
+			sb.append(quoteIdentifier(i.next()));
 			}
 		
 		sb.append(")\n\tREFERENCES ");
@@ -375,7 +391,7 @@ public class MSSQLDialect extends CommonSQLDialect
 				first = false;
 			else
 				sb.append(", ");
-			sb.append(i.next());
+			sb.append(quoteIdentifier(i.next()));
 			}
 		
 		sb.append(")");

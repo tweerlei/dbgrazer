@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import de.tweerlei.common5.jdbc.model.QualifiedName;
 import de.tweerlei.dbgrazer.query.model.ColumnDef;
 import de.tweerlei.dbgrazer.query.model.ResultRow;
 import de.tweerlei.dbgrazer.query.model.RowHandler;
@@ -32,7 +33,7 @@ import de.tweerlei.dbgrazer.web.formatter.SQLWriter;
 public class MergeRowHandler implements RowHandler
 	{
 	private final SQLWriter sqlWriter;
-	private final String tableName;
+	private final QualifiedName tableName;
 	private List<ColumnDef> cols;
 	private final Set<Integer> pk;
 	private final int blockSize;
@@ -46,7 +47,7 @@ public class MergeRowHandler implements RowHandler
 	 * @param blockSize MERGE block size
 	 * @param sqlWriter SQLWriter
 	 */
-	public MergeRowHandler(String tableName, Set<Integer> pk, int blockSize, SQLWriter sqlWriter)
+	public MergeRowHandler(QualifiedName tableName, Set<Integer> pk, int blockSize, SQLWriter sqlWriter)
 		{
 		this.sqlWriter = sqlWriter;
 		this.tableName = tableName;

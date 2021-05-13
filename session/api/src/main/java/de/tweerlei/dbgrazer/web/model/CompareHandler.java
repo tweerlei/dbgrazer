@@ -18,6 +18,7 @@ package de.tweerlei.dbgrazer.web.model;
 import java.util.List;
 import java.util.Set;
 
+import de.tweerlei.common5.jdbc.model.QualifiedName;
 import de.tweerlei.dbgrazer.query.model.ColumnDef;
 import de.tweerlei.dbgrazer.query.model.ResultRow;
 
@@ -35,7 +36,7 @@ public interface CompareHandler
 	 * @param values Values
 	 * @param pk PK column indices
 	 */
-	public void rowAdded(String tableName, List<ColumnDef> columns, ResultRow values, Set<Integer> pk);
+	public void rowAdded(QualifiedName tableName, List<ColumnDef> columns, ResultRow values, Set<Integer> pk);
 	
 	/**
 	 * Row changed
@@ -46,7 +47,7 @@ public interface CompareHandler
 	 * @param pk PK column indices
 	 * @return true if an actual change was confirmed, false if oldValues matched newValues
 	 */
-	public boolean rowChanged(String tableName, List<ColumnDef> columns, ResultRow oldValues, ResultRow newValues, Set<Integer> pk);
+	public boolean rowChanged(QualifiedName tableName, List<ColumnDef> columns, ResultRow oldValues, ResultRow newValues, Set<Integer> pk);
 	
 	/**
 	 * Row removed
@@ -55,7 +56,7 @@ public interface CompareHandler
 	 * @param values Previous values
 	 * @param pk PK column indices
 	 */
-	public void rowRemoved(String tableName, List<ColumnDef> columns, ResultRow values, Set<Integer> pk);
+	public void rowRemoved(QualifiedName tableName, List<ColumnDef> columns, ResultRow values, Set<Integer> pk);
 	
 	/**
 	 * Flush results

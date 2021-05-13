@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import de.tweerlei.common5.collections.ObjectComparators;
+import de.tweerlei.common5.jdbc.model.QualifiedName;
 import de.tweerlei.common5.jdbc.model.TableDescription;
 import de.tweerlei.common5.util.ObjectUtils;
 import de.tweerlei.dbgrazer.extension.jdbc.ConfigKeys;
@@ -66,14 +67,14 @@ public class ResultCompareServiceImpl implements ResultCompareService
 			}
 		
 		@Override
-		public void rowAdded(String tableName, List<ColumnDef> columns, ResultRow values, Set<Integer> pk)
+		public void rowAdded(QualifiedName tableName, List<ColumnDef> columns, ResultRow values, Set<Integer> pk)
 			{
 			if (flags.useInsert)
 				other.rowAdded(tableName, columns, values, pk);
 			}
 		
 		@Override
-		public boolean rowChanged(String tableName, List<ColumnDef> columns, ResultRow oldValues, ResultRow newValues, Set<Integer> pk)
+		public boolean rowChanged(QualifiedName tableName, List<ColumnDef> columns, ResultRow oldValues, ResultRow newValues, Set<Integer> pk)
 			{
 			if (flags.useUpdate)
 				return (other.rowChanged(tableName, columns, oldValues, newValues, pk));
@@ -82,7 +83,7 @@ public class ResultCompareServiceImpl implements ResultCompareService
 			}
 		
 		@Override
-		public void rowRemoved(String tableName, List<ColumnDef> columns, ResultRow values, Set<Integer> pk)
+		public void rowRemoved(QualifiedName tableName, List<ColumnDef> columns, ResultRow values, Set<Integer> pk)
 			{
 			if (flags.useDelete)
 				other.rowRemoved(tableName, columns, values, pk);
@@ -97,7 +98,7 @@ public class ResultCompareServiceImpl implements ResultCompareService
 	
 	private static abstract class LoggingCompareHandler implements CompareHandler
 		{
-		private String lastTableName;
+		private QualifiedName lastTableName;
 		private List<ColumnDef> lastColumns;
 		private Set<Integer> lastPK;
 		private ResultRow firstRow;
@@ -107,7 +108,7 @@ public class ResultCompareServiceImpl implements ResultCompareService
 			{
 			}
 		
-		protected void logRow(String tableName, List<ColumnDef> columns, ResultRow values, Set<Integer> pk)
+		protected void logRow(QualifiedName tableName, List<ColumnDef> columns, ResultRow values, Set<Integer> pk)
 			{
 			lastTableName = tableName;
 			lastColumns = columns;
@@ -117,7 +118,7 @@ public class ResultCompareServiceImpl implements ResultCompareService
 			lastRow = values;
 			}
 		
-		protected String getLastTableName()
+		protected QualifiedName getLastTableName()
 			{
 			return lastTableName;
 			}
@@ -175,14 +176,14 @@ public class ResultCompareServiceImpl implements ResultCompareService
 			}
 		
 		@Override
-		public void rowAdded(String tableName, List<ColumnDef> columns, ResultRow values, Set<Integer> pk)
+		public void rowAdded(QualifiedName tableName, List<ColumnDef> columns, ResultRow values, Set<Integer> pk)
 			{
 			logRow(tableName, columns, values, pk);
 			sqlWriter.writeInsert(tableName, columns, values);
 			}
 		
 		@Override
-		public boolean rowChanged(String tableName, List<ColumnDef> columns, ResultRow oldValues, ResultRow newValues, Set<Integer> pk)
+		public boolean rowChanged(QualifiedName tableName, List<ColumnDef> columns, ResultRow oldValues, ResultRow newValues, Set<Integer> pk)
 			{
 			if (sqlWriter.writeUpdate(tableName, columns, oldValues, newValues, pk))
 				{
@@ -193,7 +194,7 @@ public class ResultCompareServiceImpl implements ResultCompareService
 			}
 		
 		@Override
-		public void rowRemoved(String tableName, List<ColumnDef> columns, ResultRow values, Set<Integer> pk)
+		public void rowRemoved(QualifiedName tableName, List<ColumnDef> columns, ResultRow values, Set<Integer> pk)
 			{
 			logRow(tableName, columns, values, pk);
 			sqlWriter.writeDelete(tableName, columns, values, pk);
@@ -239,14 +240,14 @@ public class ResultCompareServiceImpl implements ResultCompareService
 			}
 		
 		@Override
-		public void rowAdded(String tableName, List<ColumnDef> columns, ResultRow values, Set<Integer> pk)
+		public void rowAdded(QualifiedName tableName, List<ColumnDef> columns, ResultRow values, Set<Integer> pk)
 			{
 			logRow(tableName, columns, values, pk);
 			addRow(values);
 			}
 		
 		@Override
-		public boolean rowChanged(String tableName, List<ColumnDef> columns, ResultRow oldValues, ResultRow newValues, Set<Integer> pk)
+		public boolean rowChanged(QualifiedName tableName, List<ColumnDef> columns, ResultRow oldValues, ResultRow newValues, Set<Integer> pk)
 			{
 			if (sqlWriter.checkUpdate(oldValues, newValues, pk))
 				{
@@ -258,7 +259,7 @@ public class ResultCompareServiceImpl implements ResultCompareService
 			}
 		
 		@Override
-		public void rowRemoved(String tableName, List<ColumnDef> columns, ResultRow values, Set<Integer> pk)
+		public void rowRemoved(QualifiedName tableName, List<ColumnDef> columns, ResultRow values, Set<Integer> pk)
 			{
 			logRow(tableName, columns, values, pk);
 			sqlWriter.writeDelete(tableName, columns, values, pk);
@@ -289,14 +290,14 @@ public class ResultCompareServiceImpl implements ResultCompareService
 			}
 		
 		@Override
-		public void rowAdded(String tableName, List<ColumnDef> columns, ResultRow values, Set<Integer> pk)
+		public void rowAdded(QualifiedName tableName, List<ColumnDef> columns, ResultRow values, Set<Integer> pk)
 			{
 			if ((insert != null) && insert.handleRow(values))
 				logRow(tableName, columns, values, pk);
 			}
 		
 		@Override
-		public boolean rowChanged(String tableName, List<ColumnDef> columns, ResultRow oldValues, ResultRow newValues, Set<Integer> pk)
+		public boolean rowChanged(QualifiedName tableName, List<ColumnDef> columns, ResultRow oldValues, ResultRow newValues, Set<Integer> pk)
 			{
 			if (oldValues.getValues().equals(newValues.getValues()))
 				return (false);
@@ -310,7 +311,7 @@ public class ResultCompareServiceImpl implements ResultCompareService
 			}
 		
 		@Override
-		public void rowRemoved(String tableName, List<ColumnDef> columns, ResultRow values, Set<Integer> pk)
+		public void rowRemoved(QualifiedName tableName, List<ColumnDef> columns, ResultRow values, Set<Integer> pk)
 			{
 			if ((delete != null) && delete.handleRow(values))
 				logRow(tableName, columns, values, pk);
@@ -340,7 +341,7 @@ public class ResultCompareServiceImpl implements ResultCompareService
 			}
 		
 		@Override
-		public void rowAdded(String tableName, List<ColumnDef> columns, ResultRow values, Set<Integer> pk)
+		public void rowAdded(QualifiedName tableName, List<ColumnDef> columns, ResultRow values, Set<Integer> pk)
 			{
 			handler.statement(writer.createObject(
 					(String) values.getValues().get(SRC_CATALOG),
@@ -352,7 +353,7 @@ public class ResultCompareServiceImpl implements ResultCompareService
 			}
 		
 		@Override
-		public boolean rowChanged(String tableName, List<ColumnDef> columns, ResultRow oldValues, ResultRow newValues, Set<Integer> pk)
+		public boolean rowChanged(QualifiedName tableName, List<ColumnDef> columns, ResultRow oldValues, ResultRow newValues, Set<Integer> pk)
 			{
 			final String oldLine = (String) oldValues.getValues().get(SRC_LINE);
 			final String newLine = (String) newValues.getValues().get(SRC_LINE);
@@ -377,7 +378,7 @@ public class ResultCompareServiceImpl implements ResultCompareService
 			}
 		
 		@Override
-		public void rowRemoved(String tableName, List<ColumnDef> columns, ResultRow values, Set<Integer> pk)
+		public void rowRemoved(QualifiedName tableName, List<ColumnDef> columns, ResultRow values, Set<Integer> pk)
 			{
 			handler.statement(writer.dropObject(
 					(String) values.getValues().get(SRC_CATALOG),
@@ -413,7 +414,7 @@ public class ResultCompareServiceImpl implements ResultCompareService
 			}
 		
 		@Override
-		public void rowAdded(String tableName, List<ColumnDef> columns, ResultRow values, Set<Integer> pk)
+		public void rowAdded(QualifiedName tableName, List<ColumnDef> columns, ResultRow values, Set<Integer> pk)
 			{
 			handler.statement(writer.grantObjectPrivilege(
 					(String) values.getValues().get(SRC_CATALOG),
@@ -427,7 +428,7 @@ public class ResultCompareServiceImpl implements ResultCompareService
 			}
 		
 		@Override
-		public boolean rowChanged(String tableName, List<ColumnDef> columns, ResultRow oldValues, ResultRow newValues, Set<Integer> pk)
+		public boolean rowChanged(QualifiedName tableName, List<ColumnDef> columns, ResultRow oldValues, ResultRow newValues, Set<Integer> pk)
 			{
 			final String oldLine = (String) oldValues.getValues().get(SRC_IS_GRANTABLE);
 			final String newLine = (String) newValues.getValues().get(SRC_IS_GRANTABLE);
@@ -442,7 +443,7 @@ public class ResultCompareServiceImpl implements ResultCompareService
 			}
 		
 		@Override
-		public void rowRemoved(String tableName, List<ColumnDef> columns, ResultRow values, Set<Integer> pk)
+		public void rowRemoved(QualifiedName tableName, List<ColumnDef> columns, ResultRow values, Set<Integer> pk)
 			{
 			handler.statement(writer.revokeObjectPrivilege(
 					(String) values.getValues().get(SRC_CATALOG),
@@ -618,7 +619,7 @@ public class ResultCompareServiceImpl implements ResultCompareService
 		else
 			ch = new InsertCompareHandler(sqlWriter);
 		
-		resultDiffService.compareResults(l, r, new FilteredCompareHandler(ch, flags), monitor, dialect.getQualifiedTableName(tableDesc.getName()), tableDesc.getPKColumns());
+		resultDiffService.compareResults(l, r, new FilteredCompareHandler(ch, flags), monitor, tableDesc.getName(), tableDesc.getPKColumns());
 		}
 	
 	@Override
@@ -626,7 +627,7 @@ public class ResultCompareServiceImpl implements ResultCompareService
 		{
 		final DiffCompareHandler ch = new DiffCompareHandler(l.getRows().isEmpty() ? r : l);
 		
-		resultDiffService.compareResults(l, r, ch, monitor, dialect.getQualifiedTableName(tableDesc.getName()), tableDesc.getPKColumns());
+		resultDiffService.compareResults(l, r, ch, monitor, tableDesc.getName(), tableDesc.getPKColumns());
 		
 		return (ch.getRowSet());
 		}
@@ -641,13 +642,13 @@ public class ResultCompareServiceImpl implements ResultCompareService
 		else
 			ch = new InsertCompareHandler(sqlWriter);
 		
-		compareResults(new SimpleResultRowFetcher(l), new SimpleResultRowFetcher(r), new FilteredCompareHandler(ch, flags), monitor, dialect.getQualifiedTableName(tableDesc.getName()), tableDesc.getPKColumns(), order == OrderBy.PK);
+		compareResults(new SimpleResultRowFetcher(l), new SimpleResultRowFetcher(r), new FilteredCompareHandler(ch, flags), monitor, tableDesc.getName(), tableDesc.getPKColumns(), order == OrderBy.PK);
 		}
 	
 	@Override
 	public void compareResultsByPK(RowIterator l, RowIterator r, RowHandler insert, RowHandler update, RowHandler delete, CompareProgressMonitor monitor, TableDescription tableDesc, SQLDialect dialect)
 		{
-		compareResults(new SimpleResultRowFetcher(l), new SimpleResultRowFetcher(r), new DirectCompareHandler(insert, update, delete), monitor, dialect.getQualifiedTableName(tableDesc.getName()), tableDesc.getPKColumns(), true);
+		compareResults(new SimpleResultRowFetcher(l), new SimpleResultRowFetcher(r), new DirectCompareHandler(insert, update, delete), monitor, tableDesc.getName(), tableDesc.getPKColumns(), true);
 		}
 	
 	@Override
@@ -670,7 +671,7 @@ public class ResultCompareServiceImpl implements ResultCompareService
 		compareResults(new SimpleResultRowFetcher(l), new SimpleResultRowFetcher(r), new PrivilegeCompareHandler(h, w), monitor, null, pk, true);
 		}
 	
-	private void compareResults(ResultRowFetcher l, ResultRowFetcher r, CompareHandler h, CompareProgressMonitor monitor, String tableName, Set<Integer> pk, boolean compareByPK)
+	private void compareResults(ResultRowFetcher l, ResultRowFetcher r, CompareHandler h, CompareProgressMonitor monitor, QualifiedName tableName, Set<Integer> pk, boolean compareByPK)
 		{
 		ResultRow ll = l.fetch();
 		ResultRow rl = r.fetch();

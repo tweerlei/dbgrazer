@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import de.tweerlei.common5.jdbc.model.QualifiedName;
 import de.tweerlei.dbgrazer.common.util.impl.NamedMap;
 import de.tweerlei.dbgrazer.query.model.RowProducer;
 import de.tweerlei.dbgrazer.query.model.RowSet;
@@ -80,7 +81,7 @@ public class DownloadServiceImpl implements DownloadService
 		}
 	
 	@Override
-	public DownloadSource getDownloadSource(String link, RowSet rs, String tableName, Set<Integer> pk, SQLDialect dialect, String format)
+	public DownloadSource getDownloadSource(String link, RowSet rs, QualifiedName tableName, Set<Integer> pk, SQLDialect dialect, String format)
 		{
 		final FileDownloader c = getFileDownloader(format);
 		if (c != null)
@@ -90,7 +91,7 @@ public class DownloadServiceImpl implements DownloadService
 		}
 	
 	@Override
-	public DownloadSource getStreamDownloadSource(String link, QueryParameters query, String tableName, Set<Integer> pk, SQLDialect dialect, String format)
+	public DownloadSource getStreamDownloadSource(String link, QueryParameters query, QualifiedName tableName, Set<Integer> pk, SQLDialect dialect, String format)
 		{
 		final FileDownloader c = getFileDownloader(format);
 		if (c != null)
@@ -100,7 +101,7 @@ public class DownloadServiceImpl implements DownloadService
 		}
 	
 	@Override
-	public DownloadSource getStreamDownloadSource(String link, RowProducer p, String srcName, String fileName, String tableName, Set<Integer> pk, SQLDialect dialect, String format)
+	public DownloadSource getStreamDownloadSource(String link, RowProducer p, String srcName, String fileName, QualifiedName tableName, Set<Integer> pk, SQLDialect dialect, String format)
 		{
 		final FileDownloader c = getFileDownloader(format);
 		if (c != null)

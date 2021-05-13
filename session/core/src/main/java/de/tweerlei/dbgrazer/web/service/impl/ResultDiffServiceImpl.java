@@ -24,6 +24,7 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import de.tweerlei.common5.jdbc.model.QualifiedName;
 import de.tweerlei.common5.util.ObjectUtils;
 import de.tweerlei.dbgrazer.query.model.ColumnDef;
 import de.tweerlei.dbgrazer.query.model.ResultRow;
@@ -109,7 +110,7 @@ public class ResultDiffServiceImpl implements ResultDiffService
 		}
 	
 	@Override
-	public void compareResults(RowSet l, RowSet r, CompareHandler h, CompareProgressMonitor monitor, String tableName, Set<Integer> pk)
+	public void compareResults(RowSet l, RowSet r, CompareHandler h, CompareProgressMonitor monitor, QualifiedName tableName, Set<Integer> pk)
 		{
 		monitor.getSourceRows().progress(l.getRows().size());
 		monitor.getDestinationRows().progress(r.getRows().size());

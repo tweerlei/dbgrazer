@@ -86,6 +86,12 @@ public class PostgreSQLDialect extends CommonSQLDialect
 		}
 	
 	@Override
+	public String quoteIdentifier(String c)
+		{
+		return ("\"" + c + "\"");
+		}
+	
+	@Override
 	public boolean supportsBoolean()
 		{
 		return (true);
@@ -106,7 +112,7 @@ public class PostgreSQLDialect extends CommonSQLDialect
 				first = false;
 			else
 				sb.append(",\n\t");
-			sb.append(c.getName());
+			sb.append(quoteIdentifier(c.getName()));
 			sb.append(" ");
 			sb.append(dataTypeToString(c.getType()));
 			sb.append(c.isNullable() ? " NULL" : " NOT NULL");
@@ -133,7 +139,7 @@ public class PostgreSQLDialect extends CommonSQLDialect
 					first = false;
 				else
 					sb.append(", ");
-				sb.append(i.next());
+				sb.append(quoteIdentifier(i.next()));
 				}
 			
 			sb.append(")");
@@ -153,7 +159,7 @@ public class PostgreSQLDialect extends CommonSQLDialect
 		if (!old.getName().getObjectName().equals(t.getName().getObjectName()))
 			{
 			sb.append("ALTER TABLE ").append(getQualifiedTableName(old.getName()));
-			sb.append("\n\tRENAME TO ").append(t.getName().getObjectName());
+			sb.append("\n\tRENAME TO ").append(quoteIdentifier(t.getName().getObjectName()));
 			
 			tempName = new QualifiedName(old.getName().getCatalogName(), old.getName().getSchemaName(), t.getName().getObjectName());
 			}
@@ -165,7 +171,7 @@ public class PostgreSQLDialect extends CommonSQLDialect
 				sb.append(";\n");
 		
 			sb.append("ALTER TABLE ").append(getQualifiedTableName(tempName));
-			sb.append("\n\tSET SCHEMA ").append(t.getName().getSchemaName());
+			sb.append("\n\tSET SCHEMA ").append(quoteIdentifier(t.getName().getSchemaName()));
 			}
 		
 		return (sb.toString());
@@ -177,7 +183,7 @@ public class PostgreSQLDialect extends CommonSQLDialect
 		sb.append("ALTER TABLE ");
 		sb.append(getQualifiedTableName(t.getName()));
 		sb.append("\n\tADD ");
-		sb.append(c.getName());
+		sb.append(quoteIdentifier(c.getName()));
 		sb.append(" ");
 		sb.append(dataTypeToString(c.getType()));
 		sb.append(c.isNullable() ? " NULL" : " NOT NULL");
@@ -204,7 +210,7 @@ public class PostgreSQLDialect extends CommonSQLDialect
 			else
 				sep = true;
 			sb.append("\n\tALTER COLUMN ");
-			sb.append(old.getName());
+			sb.append(quoteIdentifier(old.getName()));
 			sb.append(" DROP NOT NULL");
 			}
 		else if (!c.isNullable() && old.isNullable())
@@ -214,7 +220,7 @@ public class PostgreSQLDialect extends CommonSQLDialect
 			else
 				sep = true;
 			sb.append("\n\tALTER COLUMN ");
-			sb.append(old.getName());
+			sb.append(quoteIdentifier(old.getName()));
 			sb.append(" SET NOT NULL");
 			}
 	
@@ -225,7 +231,7 @@ public class PostgreSQLDialect extends CommonSQLDialect
 			else
 				sep = true;
 			sb.append("\n\tALTER COLUMN ");
-			sb.append(old.getName());
+			sb.append(quoteIdentifier(old.getName()));
 			sb.append(" DROP DEFAULT");
 			}
 		else if ((c.getDefaultValue() != null)  && !c.getDefaultValue().equals(old.getDefaultValue()))
@@ -235,7 +241,7 @@ public class PostgreSQLDialect extends CommonSQLDialect
 			else
 				sep = true;
 			sb.append("\n\tALTER COLUMN ");
-			sb.append(old.getName());
+			sb.append(quoteIdentifier(old.getName()));
 			sb.append(" SET DEFAULT '");
 			sb.append(c.getDefaultValue());
 			sb.append("'");
@@ -250,7 +256,7 @@ public class PostgreSQLDialect extends CommonSQLDialect
 			else
 				sep = true;
 			sb.append("\n\tALTER COLUMN ");
-			sb.append(c.getName());
+			sb.append(quoteIdentifier(old.getName()));
 			sb.append(" TYPE ");
 			sb.append(newType);
 			}
@@ -260,9 +266,9 @@ public class PostgreSQLDialect extends CommonSQLDialect
 			sb.append(";\nALTER TABLE ");
 			sb.append(getQualifiedTableName(t.getName()));
 			sb.append("\n\tRENAME COLUMN ");
-			sb.append(old.getName());
+			sb.append(quoteIdentifier(old.getName()));
 			sb.append(" TO ");
-			sb.append(c.getName());
+			sb.append(quoteIdentifier(c.getName()));
 			}
 		
 		return (sb.toString());
@@ -274,7 +280,7 @@ public class PostgreSQLDialect extends CommonSQLDialect
 		sb.append("ALTER TABLE ");
 		sb.append(getQualifiedTableName(t.getName()));
 		sb.append("\n\tDROP COLUMN ");
-		sb.append(c.getName());
+		sb.append(quoteIdentifier(c.getName()));
 		return (sb.toString());
 		}
 
@@ -294,7 +300,7 @@ public class PostgreSQLDialect extends CommonSQLDialect
 			sb.append("UNIQUE INDEX ");
 		else
 			sb.append("INDEX ");
-		sb.append(ix.getName());
+		sb.append(quoteIdentifier(ix.getName()));
 		sb.append("\n\tON ");
 		sb.append(getQualifiedTableName(t.getName()));
 		sb.append(" (");
@@ -306,7 +312,7 @@ public class PostgreSQLDialect extends CommonSQLDialect
 				first = false;
 			else
 				sb.append(", ");
-			sb.append(i.next());
+			sb.append(quoteIdentifier(i.next()));
 			}
 		
 		sb.append(")");
@@ -328,7 +334,9 @@ public class PostgreSQLDialect extends CommonSQLDialect
 		final StringBuffer sb = new StringBuffer();
 		sb.append("ALTER TABLE ");
 		sb.append(getQualifiedTableName(t.getName()));
-		sb.append("\n\tADD PRIMARY KEY (");
+		sb.append("\n\tADD CONSTRAINT ");
+		sb.append(k.getName());
+		sb.append("\n\tPRIMARY KEY (");
 		
 		boolean first = true;
 		for (Iterator<String> i = k.getColumns().iterator(); i.hasNext(); )
@@ -337,7 +345,7 @@ public class PostgreSQLDialect extends CommonSQLDialect
 				first = false;
 			else
 				sb.append(", ");
-			sb.append(i.next());
+			sb.append(quoteIdentifier(i.next()));
 			}
 		
 		sb.append(")");
@@ -349,7 +357,8 @@ public class PostgreSQLDialect extends CommonSQLDialect
 		final StringBuffer sb = new StringBuffer();
 		sb.append("ALTER TABLE ");
 		sb.append(getQualifiedTableName(t.getName()));
-		sb.append("\n\tDROP PRIMARY KEY");
+		sb.append("\n\tDROP CONSTRAINT ");
+		sb.append(k.getName());
 		return (sb.toString());
 		}
 
@@ -369,7 +378,7 @@ public class PostgreSQLDialect extends CommonSQLDialect
 				first = false;
 			else
 				sb.append(", ");
-			sb.append(i.next());
+			sb.append(quoteIdentifier(i.next()));
 			}
 		
 		sb.append(")\n\tREFERENCES ");
@@ -383,7 +392,7 @@ public class PostgreSQLDialect extends CommonSQLDialect
 				first = false;
 			else
 				sb.append(", ");
-			sb.append(i.next());
+			sb.append(quoteIdentifier(i.next()));
 			}
 		
 		sb.append(")");
@@ -395,7 +404,7 @@ public class PostgreSQLDialect extends CommonSQLDialect
 		final StringBuffer sb = new StringBuffer();
 		sb.append("ALTER TABLE ");
 		sb.append(getQualifiedTableName(t.getName()));
-		sb.append("\n\tDROP FOREIGN KEY ");
+		sb.append("\n\tDROP CONSTRAINT ");
 		sb.append(fk.getName());
 		return (sb.toString());
 		}

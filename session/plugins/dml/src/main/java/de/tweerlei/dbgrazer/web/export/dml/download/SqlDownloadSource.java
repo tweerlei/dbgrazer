@@ -17,6 +17,7 @@ package de.tweerlei.dbgrazer.web.export.dml.download;
 
 import java.util.Set;
 
+import de.tweerlei.common5.jdbc.model.QualifiedName;
 import de.tweerlei.dbgrazer.query.model.ResultRow;
 import de.tweerlei.dbgrazer.query.model.RowSet;
 import de.tweerlei.dbgrazer.web.formatter.SQLWriter;
@@ -30,7 +31,7 @@ import de.tweerlei.ermtools.dialect.SQLDialect;
  */
 public class SqlDownloadSource extends AbstractSqlDownloadSource
 	{
-	private final String tableName;
+	private final QualifiedName tableName;
 	private final String header;
 	private final String noDataFound;
 	private final RowSet rs;
@@ -48,7 +49,7 @@ public class SqlDownloadSource extends AbstractSqlDownloadSource
 	 * @param dataFormatterFactory DataFormatterFactory
 	 * @param dialect SQLDialect
 	 */
-	public SqlDownloadSource(RowSet rs, String tableName, String header, String noDataFound, Set<Integer> pk, int blockSize,
+	public SqlDownloadSource(RowSet rs, QualifiedName tableName, String header, String noDataFound, Set<Integer> pk, int blockSize,
 			DataFormatterFactory dataFormatterFactory, SQLDialect dialect)
 		{
 		super(rs.getQuery().getName(), dataFormatterFactory, dialect, pk != null);

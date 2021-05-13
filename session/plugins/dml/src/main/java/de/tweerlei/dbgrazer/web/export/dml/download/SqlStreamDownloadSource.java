@@ -19,6 +19,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import de.tweerlei.common5.jdbc.model.QualifiedName;
 import de.tweerlei.dbgrazer.query.model.RowProducer;
 import de.tweerlei.dbgrazer.web.formatter.SQLWriter;
 import de.tweerlei.dbgrazer.web.service.DataFormatterFactory;
@@ -32,7 +33,7 @@ import de.tweerlei.ermtools.dialect.SQLDialect;
 public class SqlStreamDownloadSource extends AbstractSqlDownloadSource
 	{
 	private final RowProducer producer;
-	private final String tableName;
+	private final QualifiedName tableName;
 	private final String header;
 	private final String noDataFound;
 	private final Set<Integer> pk;
@@ -51,7 +52,7 @@ public class SqlStreamDownloadSource extends AbstractSqlDownloadSource
 	 * @param dialect SQLDialect
 	 */
 	public SqlStreamDownloadSource(RowProducer producer, String fileName,
-			String tableName, String header, String noDataFound, Set<Integer> pk, int blockSize,
+			QualifiedName tableName, String header, String noDataFound, Set<Integer> pk, int blockSize,
 			DataFormatterFactory dataFormatterFactory, SQLDialect dialect)
 		{
 		super(fileName, dataFormatterFactory, dialect, pk != null);

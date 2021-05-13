@@ -17,6 +17,7 @@ package de.tweerlei.dbgrazer.web.service;
 
 import java.util.Set;
 
+import de.tweerlei.common5.jdbc.model.QualifiedName;
 import de.tweerlei.dbgrazer.query.model.RowSet;
 import de.tweerlei.dbgrazer.web.formatter.DataFormatter;
 import de.tweerlei.dbgrazer.web.model.CompareHandler;
@@ -60,5 +61,5 @@ public interface ResultDiffService
 	 * @param tableName Table name to pass to the CompareHandler
 	 * @param pk PK to pass to the CompareHandler
 	 */
-	public void compareResults(RowSet l, RowSet r, CompareHandler h, CompareProgressMonitor monitor, String tableName, Set<Integer> pk);
+	public void compareResults(RowSet l, RowSet r, CompareHandler h, CompareProgressMonitor monitor, QualifiedName tableName, Set<Integer> pk);
 	}

@@ -34,7 +34,6 @@ public class SqlMultiStreamDownloadSource extends AbstractSqlDownloadSource
 	private final String header;
 	private final String noDataFound;
 	private final int blockSize;
-	private final SQLDialect dialect;
 	
 	/**
 	 * Constructor
@@ -56,13 +55,12 @@ public class SqlMultiStreamDownloadSource extends AbstractSqlDownloadSource
 		this.header = header;
 		this.noDataFound = noDataFound;
 		this.blockSize = blockSize;
-		this.dialect = dialect;
 		}
 	
 	@Override
 	protected void writeSql(SQLWriter sw)
 		{
-		final SqlRowSetHandler handler = new SqlRowSetHandler(blockSize, sw, dialect);
+		final SqlRowSetHandler handler = new SqlRowSetHandler(blockSize, sw);
 		
 		try	{
 			sw.writeComment(header);

@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import de.tweerlei.common.util.StringUtils;
 import de.tweerlei.common5.collections.CollectionUtils;
+import de.tweerlei.common5.jdbc.model.QualifiedName;
 import de.tweerlei.dbgrazer.extension.jdbc.JdbcConstants;
 import de.tweerlei.dbgrazer.extension.jdbc.MetadataService;
 import de.tweerlei.dbgrazer.query.exception.PerformQueryException;
@@ -582,11 +583,11 @@ public class SQLController
 				{
 				final Query q = runner.createCustomQuery(JdbcConstants.QUERYTYPE_CUSTOM, fbo.getStatement(), null, queryName);
 				
-				final String tableName;
+				final QualifiedName tableName;
 				if (!StringUtils.empty(fbo.getTableName()))
-					tableName = fbo.getTableName();
+					tableName = QualifiedName.valueOf(fbo.getTableName());
 				else
-					tableName = factory.getMessage(MessageKeys.DEFAULT_TABLE_NAME);
+					tableName = QualifiedName.valueOf(factory.getMessage(MessageKeys.DEFAULT_TABLE_NAME));
 				
 				final Map<Integer, String> params = new HashMap<Integer, String>();
 				for (Map.Entry<Integer, ParameterFBO> ent : fbo.getParams().entrySet())
@@ -601,13 +602,13 @@ public class SQLController
 				final Result r = runner.performCustomQuery(connectionSettings.getLinkName(), JdbcConstants.QUERYTYPE_CUSTOM, fbo.getStatement(), paramDefs, params, queryName, true, null);
 				final RowSet rs = r.getFirstRowSet();
 				
-				final String tableName;
+				final QualifiedName tableName;
 				if (!StringUtils.empty(fbo.getTableName()))
-					tableName = fbo.getTableName();
+					tableName = QualifiedName.valueOf(fbo.getTableName());
 				else if (!rs.getRows().isEmpty() && (rs.getColumns().get(0).getSourceObject() != null))
-					tableName = dialect.getQualifiedTableName(rs.getColumns().get(0).getSourceObject());
+					tableName = rs.getColumns().get(0).getSourceObject();
 				else
-					tableName = factory.getMessage(MessageKeys.DEFAULT_TABLE_NAME);
+					tableName = QualifiedName.valueOf(factory.getMessage(MessageKeys.DEFAULT_TABLE_NAME));
 				
 				model.put(GenericDownloadView.SOURCE_ATTRIBUTE, downloadService.getDownloadSource(connectionSettings.getLinkName(), rs, tableName, null, dialect, fbo.getFormat()));
 				}
@@ -638,7 +639,7 @@ public class SQLController
 		
 		try	{
 			final String queryName = factory.getMessage(MessageKeys.DEFAULT_CHART_TITLE);
-			final String tableName = factory.getMessage(MessageKeys.DEFAULT_TABLE_NAME);
+			final QualifiedName tableName = QualifiedName.valueOf(factory.getMessage(MessageKeys.DEFAULT_TABLE_NAME));
 			
 			final Query query = runner.createCustomQuery(JdbcConstants.QUERYTYPE_MULTIPLE, fbo.getQuery(), null, queryName);
 			

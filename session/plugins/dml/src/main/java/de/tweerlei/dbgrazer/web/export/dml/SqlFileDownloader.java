@@ -20,6 +20,7 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import de.tweerlei.common5.jdbc.model.QualifiedName;
 import de.tweerlei.common5.jdbc.model.TableDescription;
 import de.tweerlei.dbgrazer.common.util.impl.NamedBase;
 import de.tweerlei.dbgrazer.query.model.RowProducer;
@@ -59,7 +60,7 @@ public class SqlFileDownloader extends NamedBase implements FileDownloader, Stat
 		}
 	
 	@Override
-	public DownloadSource getDownloadSource(String link, RowSet rs, String srcName, String tableName, Set<Integer> pk, SQLDialect dialect)
+	public DownloadSource getDownloadSource(String link, RowSet rs, String srcName, QualifiedName tableName, Set<Integer> pk, SQLDialect dialect)
 		{
 		return (new SqlDownloadSource(rs, tableName, getHeader(link, srcName),
 				factory.getMessage(MessageKeys.NO_DATA_FOUND), null, 0,
@@ -67,7 +68,7 @@ public class SqlFileDownloader extends NamedBase implements FileDownloader, Stat
 		}
 	
 	@Override
-	public DownloadSource getStreamDownloadSource(String link, RowProducer p, String srcName, String fileName, String tableName, Set<Integer> pk, SQLDialect dialect)
+	public DownloadSource getStreamDownloadSource(String link, RowProducer p, String srcName, String fileName, QualifiedName tableName, Set<Integer> pk, SQLDialect dialect)
 		{
 		return (new SqlStreamDownloadSource(p, fileName, tableName, getHeader(link, srcName),
 				factory.getMessage(MessageKeys.NO_DATA_FOUND), null, 0,
@@ -85,7 +86,7 @@ public class SqlFileDownloader extends NamedBase implements FileDownloader, Stat
 	@Override
 	public StatementProducer getStatementProducer(RowProducer p, TableDescription info, SQLDialect dialect)
 		{
-		return (new InsertStatementProducer(factory, p, dialect.getQualifiedTableName(info.getName()), dialect, dialect.prepareInsert(info), dialect.finishInsert(info)));
+		return (new InsertStatementProducer(factory, p, info.getName(), dialect, dialect.prepareInsert(info), dialect.finishInsert(info)));
 		}
 	
 	private String getHeader(String link, String stmt)

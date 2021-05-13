@@ -114,8 +114,8 @@ public class DataFormatterFactoryImpl implements DataFormatterFactory
 	public SQLWriter getSQLWriter(StatementHandler h, SQLDialect dialect, boolean pretty)
 		{
 		return (new SQLWriterImpl(h,
+				dialect,
 				getSQLFormatter(dialect),
-				dialect.getDefaultTableName(),
 				pretty
 				));
 		}

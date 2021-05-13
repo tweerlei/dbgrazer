@@ -187,6 +187,19 @@ public class OracleDialect extends CommonSQLDialect
 			}
 		if (c.isNullable() != old.isNullable())
 			sb.append(c.isNullable() ? " NULL" : " NOT NULL");
+		
+		if (!old.getName().equals(c.getName()))
+			{
+			sb.append(";\n");
+			
+			sb.append("ALTER TABLE ");
+			sb.append(getQualifiedTableName(t.getName()));
+			sb.append("\n\tRENAME COLUMN ");
+			sb.append(old.getName());
+			sb.append(" TO ");
+			sb.append(c.getName());
+			}
+		
 		return (sb.toString());
 		}
 

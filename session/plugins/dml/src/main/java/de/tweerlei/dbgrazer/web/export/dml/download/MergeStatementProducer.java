@@ -17,6 +17,7 @@ package de.tweerlei.dbgrazer.web.export.dml.download;
 
 import java.util.Set;
 
+import de.tweerlei.common5.jdbc.model.QualifiedName;
 import de.tweerlei.dbgrazer.query.model.RowHandler;
 import de.tweerlei.dbgrazer.query.model.RowProducer;
 import de.tweerlei.dbgrazer.query.model.StatementHandler;
@@ -34,7 +35,7 @@ public class MergeStatementProducer implements StatementProducer
 	{
 	private final DataFormatterFactory factory;
 	private final RowProducer producer;
-	private final String tableName;
+	private final QualifiedName tableName;
 	private final Set<Integer> pk;
 	private final int blockSize;
 	private final SQLDialect dialect;
@@ -52,7 +53,7 @@ public class MergeStatementProducer implements StatementProducer
 	 * @param prepare Prepate statement
 	 * @param cleanup Cleanup statement
 	 */
-	public MergeStatementProducer(DataFormatterFactory factory, RowProducer producer, String tableName, Set<Integer> pk, int blockSize, SQLDialect dialect, String prepare, String cleanup)
+	public MergeStatementProducer(DataFormatterFactory factory, RowProducer producer, QualifiedName tableName, Set<Integer> pk, int blockSize, SQLDialect dialect, String prepare, String cleanup)
 		{
 		this.factory = factory;
 		this.producer = producer;

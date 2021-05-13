@@ -17,6 +17,7 @@ package de.tweerlei.dbgrazer.web.export.dml.download;
 
 import java.util.List;
 
+import de.tweerlei.common5.jdbc.model.QualifiedName;
 import de.tweerlei.dbgrazer.query.model.ColumnDef;
 import de.tweerlei.dbgrazer.query.model.ResultRow;
 import de.tweerlei.dbgrazer.query.model.RowHandler;
@@ -30,7 +31,7 @@ import de.tweerlei.dbgrazer.web.formatter.SQLWriter;
 public class InsertRowHandler implements RowHandler
 	{
 	private final SQLWriter sqlWriter;
-	private final String tableName;
+	private final QualifiedName tableName;
 	private List<ColumnDef> cols;
 	private int count;
 	
@@ -39,7 +40,7 @@ public class InsertRowHandler implements RowHandler
 	 * @param tableName Table name
 	 * @param sqlWriter SQLWriter
 	 */
-	public InsertRowHandler(String tableName, SQLWriter sqlWriter)
+	public InsertRowHandler(QualifiedName tableName, SQLWriter sqlWriter)
 		{
 		this.sqlWriter = sqlWriter;
 		this.tableName = tableName;

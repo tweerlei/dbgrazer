@@ -50,6 +50,13 @@ public interface SQLDialect
 	public SQLDataType getSQLDataType(int type);
 	
 	/**
+	 * Quote an identifier (schema/table/column name) for safe usage in SQL statements
+	 * @param c Identifier
+	 * @return Quoted identifier
+	 */
+	public String quoteIdentifier(String c);
+	
+	/**
 	 * Get the object name to use in SQL statements
 	 * @param qn QualifiedName
 	 * @return Formatted name

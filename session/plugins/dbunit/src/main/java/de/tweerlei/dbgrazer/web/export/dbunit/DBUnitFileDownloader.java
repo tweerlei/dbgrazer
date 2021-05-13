@@ -20,6 +20,7 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import de.tweerlei.common5.jdbc.model.QualifiedName;
 import de.tweerlei.dbgrazer.common.util.impl.NamedBase;
 import de.tweerlei.dbgrazer.query.model.RowProducer;
 import de.tweerlei.dbgrazer.query.model.RowSet;
@@ -55,15 +56,15 @@ public class DBUnitFileDownloader extends NamedBase implements FileDownloader
 		}
 	
 	@Override
-	public DownloadSource getDownloadSource(String link, RowSet rs, String srcName, String tableName, Set<Integer> pk, SQLDialect dialect)
+	public DownloadSource getDownloadSource(String link, RowSet rs, String srcName, QualifiedName tableName, Set<Integer> pk, SQLDialect dialect)
 		{
-		return (new DBUnitDownloadSource(rs, tableName, getHeader(link, srcName), factory.getMessage(MessageKeys.NO_DATA_FOUND), factory.getXMLFormatter()));
+		return (new DBUnitDownloadSource(rs, dialect.getQualifiedTableName(tableName), getHeader(link, srcName), factory.getMessage(MessageKeys.NO_DATA_FOUND), factory.getXMLFormatter()));
 		}
 	
 	@Override
-	public DownloadSource getStreamDownloadSource(String link, RowProducer p, String srcName, String fileName, String tableName, Set<Integer> pk, SQLDialect dialect)
+	public DownloadSource getStreamDownloadSource(String link, RowProducer p, String srcName, String fileName, QualifiedName tableName, Set<Integer> pk, SQLDialect dialect)
 		{
-		return (new DBUnitStreamDownloadSource(p, fileName, tableName, getHeader(link, srcName), factory.getMessage(MessageKeys.NO_DATA_FOUND), factory.getXMLFormatter()));
+		return (new DBUnitStreamDownloadSource(p, fileName, dialect.getQualifiedTableName(tableName), getHeader(link, srcName), factory.getMessage(MessageKeys.NO_DATA_FOUND), factory.getXMLFormatter()));
 		}
 	
 	@Override

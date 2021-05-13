@@ -20,7 +20,6 @@ import de.tweerlei.dbgrazer.query.model.ResultRow;
 import de.tweerlei.dbgrazer.query.model.RowSet;
 import de.tweerlei.dbgrazer.query.model.RowSetHandler;
 import de.tweerlei.dbgrazer.web.formatter.SQLWriter;
-import de.tweerlei.ermtools.dialect.SQLDialect;
 
 /**
  * Write MERGE statements for ResultRows
@@ -30,7 +29,6 @@ import de.tweerlei.ermtools.dialect.SQLDialect;
 public class SqlRowSetHandler implements RowSetHandler
 	{
 	private final SQLWriter sqlWriter;
-	private final SQLDialect dialect;
 	private final int blockSize;
 	private int count;
 	
@@ -38,12 +36,10 @@ public class SqlRowSetHandler implements RowSetHandler
 	 * Constructor
 	 * @param blockSize MERGE block size
 	 * @param sqlWriter SQLWriter
-	 * @param dialect SQLDialect
 	 */
-	public SqlRowSetHandler(int blockSize, SQLWriter sqlWriter, SQLDialect dialect)
+	public SqlRowSetHandler(int blockSize, SQLWriter sqlWriter)
 		{
 		this.sqlWriter = sqlWriter;
-		this.dialect = dialect;
 		this.blockSize = blockSize;
 		this.count = 0;
 		}
@@ -60,18 +56,16 @@ public class SqlRowSetHandler implements RowSetHandler
 	@Override
 	public void handleRowSet(TableDescription info, RowSet rs)
 		{
-		final String tableName = dialect.getQualifiedTableName(info.getName());
-		
 		if (!info.getPKColumns().isEmpty() && (blockSize > 0))
 			{
 			final int n = rs.getRows().size();
 			for (int i = 0; i < n; i += blockSize)
-				sqlWriter.writeMerge(tableName, rs.getColumns(), rs.getRows().subList(i, Math.min(i + blockSize, n)), info.getPKColumns());
+				sqlWriter.writeMerge(info.getName(), rs.getColumns(), rs.getRows().subList(i, Math.min(i + blockSize, n)), info.getPKColumns());
 			}
 		else
 			{
 			for (ResultRow row : rs.getRows())
-				sqlWriter.writeInsert(tableName, rs.getColumns(), row);
+				sqlWriter.writeInsert(info.getName(), rs.getColumns(), row);
 			}
 		
 		count++;

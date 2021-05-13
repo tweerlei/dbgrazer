@@ -19,12 +19,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import de.tweerlei.common5.jdbc.model.QualifiedName;
 import de.tweerlei.common5.util.ObjectUtils;
 import de.tweerlei.dbgrazer.query.model.ColumnDef;
 import de.tweerlei.dbgrazer.query.model.ResultRow;
 import de.tweerlei.dbgrazer.query.model.StatementHandler;
 import de.tweerlei.dbgrazer.web.formatter.DataFormatter;
 import de.tweerlei.dbgrazer.web.formatter.SQLWriter;
+import de.tweerlei.ermtools.dialect.SQLDialect;
 
 /**
  * Default impl.
@@ -36,32 +38,32 @@ public class SQLWriterImpl implements SQLWriter
 	private static final Object NO_VALUE = new Object();
 	
 	private final StatementHandler w;
+	private final SQLDialect dialect;
 	private final DataFormatter fmt;
-	private final String defaultTableName;
 	private final boolean pretty;
 	
 	/**
 	 * Constructor
 	 * @param w StatementHandler
+	 * @param d SQLDialect
 	 * @param fmt DataFormatter
-	 * @param defaultTableName Default table name for anonymous SELECTs
 	 * @param pretty Pretty print statements
 	 */
-	public SQLWriterImpl(StatementHandler w, DataFormatter fmt, String defaultTableName, boolean pretty)
+	public SQLWriterImpl(StatementHandler w, SQLDialect d, DataFormatter fmt, boolean pretty)
 		{
 		this.w = w;
+		this.dialect = d;
 		this.fmt = fmt;
-		this.defaultTableName = defaultTableName;
 		this.pretty = pretty;
 		}
 	
 	@Override
-	public void writeDelete(String tableName, List<ColumnDef> columns, ResultRow values, Set<Integer> pk)
+	public void writeDelete(QualifiedName tableName, List<ColumnDef> columns, ResultRow values, Set<Integer> pk)
 		{
 		final StringBuilder sb = new StringBuilder();
 		
 		sb.append("DELETE FROM ");
-		sb.append(tableName);
+		sb.append(dialect.getQualifiedTableName(tableName));
 		if (pretty)
 			sb.append("\nWHERE ");
 		else
@@ -91,12 +93,12 @@ public class SQLWriterImpl implements SQLWriter
 		}
 	
 	@Override
-	public boolean writeUpdate(String tableName, List<ColumnDef> columns, ResultRow oldValues, ResultRow newValues, Set<Integer> pk)
+	public boolean writeUpdate(QualifiedName tableName, List<ColumnDef> columns, ResultRow oldValues, ResultRow newValues, Set<Integer> pk)
 		{
 		final StringBuilder sb = new StringBuilder();
 		
 		sb.append("UPDATE ");
-		sb.append(tableName);
+		sb.append(dialect.getQualifiedTableName(tableName));
 		if (pretty)
 			sb.append("\n   SET ");
 		else
@@ -118,7 +120,7 @@ public class SQLWriterImpl implements SQLWriter
 					sb.append(",\n       ");
 				else
 					sb.append(", ");
-				sb.append((c.getSourceColumn() == null) ? c.getName() : c.getSourceColumn());
+				sb.append(dialect.quoteIdentifier((c.getSourceColumn() == null) ? c.getName() : c.getSourceColumn()));
 				sb.append(" = ");
 				if (n == NO_VALUE)
 					sb.append("?");
@@ -158,7 +160,7 @@ public class SQLWriterImpl implements SQLWriter
 //					w.write("\nAND ");
 				else
 					sb.append(" AND ");
-				sb.append((c.getSourceColumn() == null) ? c.getName() : c.getSourceColumn());
+				sb.append(dialect.quoteIdentifier((c.getSourceColumn() == null) ? c.getName() : c.getSourceColumn()));
 				if (values == null)
 					sb.append(" = ?");
 				else
@@ -186,7 +188,7 @@ public class SQLWriterImpl implements SQLWriter
 //					w.write("\nAND ");
 				else
 					sb.append(" AND ");
-				sb.append(c.getSourceColumn());
+				sb.append(dialect.quoteIdentifier(c.getSourceColumn()));
 				if (oi == null)
 					sb.append(" = ?");
 				else
@@ -205,18 +207,18 @@ public class SQLWriterImpl implements SQLWriter
 		}
 	
 	@Override
-	public void writeInsert(String tableName, List<ColumnDef> columns, ResultRow values)
+	public void writeInsert(QualifiedName tableName, List<ColumnDef> columns, ResultRow values)
 		{
 		writeInsert(tableName, columns, values, null, null);
 		}
 	
 	@Override
-	public void writeInsert(String tableName, List<ColumnDef> columns, ResultRow values, List<ColumnDef> pkColumns, List<Object> pkValues)
+	public void writeInsert(QualifiedName tableName, List<ColumnDef> columns, ResultRow values, List<ColumnDef> pkColumns, List<Object> pkValues)
 		{
 		final StringBuilder sb = new StringBuilder();
 		
 		sb.append("INSERT INTO ");
-		sb.append(tableName);
+		sb.append(dialect.getQualifiedTableName(tableName));
 		if (pretty)
 			sb.append("\n       (");
 		else
@@ -259,7 +261,7 @@ public class SQLWriterImpl implements SQLWriter
 		}
 	
 	@Override
-	public void writeMerge(String tableName, List<ColumnDef> columns, List<ResultRow> rows, Set<Integer> pk)
+	public void writeMerge(QualifiedName tableName, List<ColumnDef> columns, List<ResultRow> rows, Set<Integer> pk)
 		{
 		if (rows.isEmpty())
 			return;
@@ -267,7 +269,7 @@ public class SQLWriterImpl implements SQLWriter
 		final StringBuilder sb = new StringBuilder();
 		
 		sb.append("MERGE INTO ");
-		sb.append(tableName);
+		sb.append(dialect.getQualifiedTableName(tableName));
 		sb.append(" dst USING (");
 		
 		boolean first = true;
@@ -291,10 +293,10 @@ public class SQLWriterImpl implements SQLWriter
 			
 			writeValueList(sb, columns, (values == null) ? null : values.getValues(), true);
 			
-			if (defaultTableName != null)
+			if (dialect.getDefaultTableName() != null)
 				{
 				sb.append(" FROM ");
-				sb.append(defaultTableName);
+				sb.append(dialect.getDefaultTableName());
 				}
 			}
 		
@@ -314,9 +316,9 @@ public class SQLWriterImpl implements SQLWriter
 			else
 				sb.append(" AND ");
 			sb.append("dst.");
-			sb.append((c.getSourceColumn() == null) ? c.getName() : c.getSourceColumn());
+			sb.append(dialect.quoteIdentifier((c.getSourceColumn() == null) ? c.getName() : c.getSourceColumn()));
 			sb.append(" = src.");
-			sb.append((c.getSourceColumn() == null) ? c.getName() : c.getSourceColumn());
+			sb.append(dialect.quoteIdentifier((c.getSourceColumn() == null) ? c.getName() : c.getSourceColumn()));
 			}
 		
 		sb.append(")");
@@ -340,9 +342,9 @@ public class SQLWriterImpl implements SQLWriter
 						sb.append(", ");
 					
 //					w.write("dst.");
-					sb.append((c.getSourceColumn() == null) ? c.getName() : c.getSourceColumn());
+					sb.append(dialect.quoteIdentifier((c.getSourceColumn() == null) ? c.getName() : c.getSourceColumn()));
 					sb.append(" = src.");
-					sb.append((c.getSourceColumn() == null) ? c.getName() : c.getSourceColumn());
+					sb.append(dialect.quoteIdentifier((c.getSourceColumn() == null) ? c.getName() : c.getSourceColumn()));
 					}
 				i++;
 				}
@@ -390,7 +392,7 @@ public class SQLWriterImpl implements SQLWriter
 				if (label)
 					{
 					sb.append(" AS ");
-					sb.append((c.getSourceColumn() == null) ? c.getName() : c.getSourceColumn());
+					sb.append(dialect.quoteIdentifier((c.getSourceColumn() == null) ? c.getName() : c.getSourceColumn()));
 					}
 				}
 			}
@@ -410,7 +412,7 @@ public class SQLWriterImpl implements SQLWriter
 				else
 					sb.append(", ");
 				sb.append(prefix);
-				sb.append((c.getSourceColumn() == null) ? c.getName() : c.getSourceColumn());
+				sb.append(dialect.quoteIdentifier((c.getSourceColumn() == null) ? c.getName() : c.getSourceColumn()));
 				}
 			}
 		}

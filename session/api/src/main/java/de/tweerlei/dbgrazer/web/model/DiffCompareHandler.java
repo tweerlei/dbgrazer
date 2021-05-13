@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import de.tweerlei.common5.jdbc.model.QualifiedName;
 import de.tweerlei.dbgrazer.query.model.ColumnDef;
 import de.tweerlei.dbgrazer.query.model.ColumnType;
 import de.tweerlei.dbgrazer.query.model.ResultRow;
@@ -91,7 +92,7 @@ public class DiffCompareHandler implements CompareHandler
 		}
 	
 	@Override
-	public void rowAdded(String tableName, List<ColumnDef> columns, ResultRow values, Set<Integer> pk)
+	public void rowAdded(QualifiedName tableName, List<ColumnDef> columns, ResultRow values, Set<Integer> pk)
 		{
 		final ResultRow row = new DefaultResultRow(n);
 		row.getValues().add(ADDITION);
@@ -101,7 +102,7 @@ public class DiffCompareHandler implements CompareHandler
 		}
 	
 	@Override
-	public boolean rowChanged(String tableName, List<ColumnDef> columns, ResultRow oldValues, ResultRow newValues, Set<Integer> pk)
+	public boolean rowChanged(QualifiedName tableName, List<ColumnDef> columns, ResultRow oldValues, ResultRow newValues, Set<Integer> pk)
 		{
 		final ResultRow row = new DefaultResultRow(n);
 		row.getValues().add(CHANGE);
@@ -112,7 +113,7 @@ public class DiffCompareHandler implements CompareHandler
 		}
 	
 	@Override
-	public void rowRemoved(String tableName, List<ColumnDef> columns, ResultRow values, Set<Integer> pk)
+	public void rowRemoved(QualifiedName tableName, List<ColumnDef> columns, ResultRow values, Set<Integer> pk)
 		{
 		final ResultRow row = new DefaultResultRow(n);
 		row.getValues().add(DELETION);

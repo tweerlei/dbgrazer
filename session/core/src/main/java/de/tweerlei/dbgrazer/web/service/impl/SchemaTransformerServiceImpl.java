@@ -94,17 +94,16 @@ public class SchemaTransformerServiceImpl implements SchemaTransformerService
 		@Override
 		public void produceStatements(StatementHandler h)
 			{
-			final String tableName = dialect.getQualifiedTableName(t.getName());
 			final List<ColumnDef> columns = new ArrayList<ColumnDef>(t.getColumns().size());
 			final Set<Integer> pk = t.getPKColumns();
 			for (ColumnDescription c : t.getColumns())
 				columns.add(new ColumnDefImpl(c.getName(), ColumnType.forSQLType(c.getType()), dialect.dataTypeToString(c.getType()), null, t.getName(), c.getName()));
 			
 			final SQLWriter sqlWriter = dataFormatterFactory.getSQLWriter(h, dialect, true);
-			sqlWriter.writeInsert(tableName, columns, null);
-			sqlWriter.writeUpdate(tableName, columns, null, null, pk);
-			sqlWriter.writeMerge(tableName, columns, Collections.<ResultRow>singletonList(null), pk);
-			sqlWriter.writeDelete(tableName, columns, null, pk);
+			sqlWriter.writeInsert(t.getName(), columns, null);
+			sqlWriter.writeUpdate(t.getName(), columns, null, null, pk);
+			sqlWriter.writeMerge(t.getName(), columns, Collections.<ResultRow>singletonList(null), pk);
+			sqlWriter.writeDelete(t.getName(), columns, null, pk);
 			}
 		
 		@Override

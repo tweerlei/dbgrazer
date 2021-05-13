@@ -17,6 +17,7 @@ package de.tweerlei.dbgrazer.web.backend;
 
 import java.util.Set;
 
+import de.tweerlei.common5.jdbc.model.QualifiedName;
 import de.tweerlei.dbgrazer.common.util.Named;
 import de.tweerlei.dbgrazer.query.model.RowProducer;
 import de.tweerlei.dbgrazer.query.model.RowSet;
@@ -41,7 +42,7 @@ public interface FileDownloader extends Named
 	 * @param dialect SQLDialect
 	 * @return DownloadSource
 	 */
-	public DownloadSource getDownloadSource(String link, RowSet rs, String srcName, String tableName, Set<Integer> pk, SQLDialect dialect);
+	public DownloadSource getDownloadSource(String link, RowSet rs, String srcName, QualifiedName tableName, Set<Integer> pk, SQLDialect dialect);
 	
 	/**
 	 * Create a streamed DownloadSource for a RowProducer
@@ -54,7 +55,7 @@ public interface FileDownloader extends Named
 	 * @param dialect SQLDialect
 	 * @return DownloadSource
 	 */
-	public DownloadSource getStreamDownloadSource(String link, RowProducer p, String srcName, String fileName, String tableName, Set<Integer> pk, SQLDialect dialect);
+	public DownloadSource getStreamDownloadSource(String link, RowProducer p, String srcName, String fileName, QualifiedName tableName, Set<Integer> pk, SQLDialect dialect);
 	
 	/**
 	 * Create a streamed DownloadSource for a RowSetProducer

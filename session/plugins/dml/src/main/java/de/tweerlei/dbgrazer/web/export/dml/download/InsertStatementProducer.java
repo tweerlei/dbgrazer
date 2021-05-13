@@ -15,6 +15,7 @@
  */
 package de.tweerlei.dbgrazer.web.export.dml.download;
 
+import de.tweerlei.common5.jdbc.model.QualifiedName;
 import de.tweerlei.dbgrazer.query.model.RowHandler;
 import de.tweerlei.dbgrazer.query.model.RowProducer;
 import de.tweerlei.dbgrazer.query.model.StatementHandler;
@@ -32,7 +33,7 @@ public class InsertStatementProducer implements StatementProducer
 	{
 	private final DataFormatterFactory factory;
 	private final RowProducer producer;
-	private final String tableName;
+	private final QualifiedName tableName;
 	private final SQLDialect dialect;
 	private final String prepare;
 	private final String cleanup;
@@ -46,7 +47,7 @@ public class InsertStatementProducer implements StatementProducer
 	 * @param prepare Prepate statement
 	 * @param cleanup Cleanup statement
 	 */
-	public InsertStatementProducer(DataFormatterFactory factory, RowProducer producer, String tableName, SQLDialect dialect, String prepare, String cleanup)
+	public InsertStatementProducer(DataFormatterFactory factory, RowProducer producer, QualifiedName tableName, SQLDialect dialect, String prepare, String cleanup)
 		{
 		this.factory = factory;
 		this.producer = producer;

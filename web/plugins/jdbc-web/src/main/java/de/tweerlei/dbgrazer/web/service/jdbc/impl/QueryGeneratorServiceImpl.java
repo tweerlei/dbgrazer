@@ -89,7 +89,6 @@ public class QueryGeneratorServiceImpl implements QueryGeneratorService
 	@Override
 	public Query createInsertQuery(TableDescription t, SQLDialect dialect, DataFormatter fmt, String pkExpr, Map<Integer, String> values)
 		{
-		final String tableName = dialect.getQualifiedTableName(t.getName());
 		final List<ColumnDef> columns = new ArrayList<ColumnDef>(t.getColumns().size());
 		final List<ParameterDef> params = new ArrayList<ParameterDef>(t.getColumns().size());
 		final Set<Integer> pk = t.getPKColumns();
@@ -143,9 +142,9 @@ public class QueryGeneratorServiceImpl implements QueryGeneratorService
 		final SQLWriter sqlWriter = factory.getSQLWriter(new StatementWriter(sw), dialect, true);
 		
 		if (!pkColumns.isEmpty())
-			sqlWriter.writeInsert(tableName, columns, null, pkColumns, Collections.<Object>singletonList(pkExpr));
+			sqlWriter.writeInsert(t.getName(), columns, null, pkColumns, Collections.<Object>singletonList(pkExpr));
 		else
-			sqlWriter.writeInsert(tableName, columns, null);
+			sqlWriter.writeInsert(t.getName(), columns, null);
 		
 		final QueryType tp;
 		if (pk.isEmpty() || pkFilled)
@@ -159,7 +158,6 @@ public class QueryGeneratorServiceImpl implements QueryGeneratorService
 	@Override
 	public Query createUpdateQuery(TableDescription t, SQLDialect dialect, DataFormatter fmt, boolean includePK)
 		{
-		final String tableName = dialect.getQualifiedTableName(t.getName());
 		final List<ColumnDef> columns = new ArrayList<ColumnDef>(t.getColumns().size());
 		final List<ParameterDef> params = new ArrayList<ParameterDef>(t.getColumns().size());
 		final Set<Integer> pk = t.getPKColumns();
@@ -187,7 +185,7 @@ public class QueryGeneratorServiceImpl implements QueryGeneratorService
 		final StringWriter sw = new StringWriter();
 		final SQLWriter sqlWriter = factory.getSQLWriter(new StatementWriter(sw), dialect, true);
 		
-		sqlWriter.writeUpdate(tableName, columns, null, null, t.getPKColumns());
+		sqlWriter.writeUpdate(t.getName(), columns, null, null, t.getPKColumns());
 		
 		return (new QueryImpl("", null, null, sw.toString(), queryService.findQueryType(JdbcConstants.QUERYTYPE_DML), params, null, null));
 		}
@@ -195,7 +193,6 @@ public class QueryGeneratorServiceImpl implements QueryGeneratorService
 	@Override
 	public Query createDeleteQuery(TableDescription t, SQLDialect dialect, DataFormatter fmt)
 		{
-		final String tableName = dialect.getQualifiedTableName(t.getName());
 		final List<ColumnDef> columns = new ArrayList<ColumnDef>(t.getColumns().size());
 		for (ColumnDescription c : t.getColumns())
 			{
@@ -206,7 +203,7 @@ public class QueryGeneratorServiceImpl implements QueryGeneratorService
 		final StringWriter sw = new StringWriter();
 		final SQLWriter sqlWriter = factory.getSQLWriter(new StatementWriter(sw), dialect, true);
 		
-		sqlWriter.writeDelete(tableName, columns, null, t.getPKColumns());
+		sqlWriter.writeDelete(t.getName(), columns, null, t.getPKColumns());
 		
 		return (new QueryImpl("", null, null, sw.toString(), queryService.findQueryType(JdbcConstants.QUERYTYPE_DML), getPKParameters(t), null, null));
 		}

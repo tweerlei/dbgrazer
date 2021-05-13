@@ -1273,18 +1273,18 @@ public class DataDiffController
 				final StatementCollection sc = new StatementCollection(null, null);
 				final SQLWriter sw = dataFormatterFactory.getSQLWriter(sc, dialect, false);
 				if (flags.useInsert)
-					sw.writeInsert(dialect.getQualifiedTableName(srcDesc.getName()), columns, null);
+					sw.writeInsert(srcDesc.getName(), columns, null);
 				else
 					sc.statement(null);
 				if (flags.useUpdate)
 					{
-					if (!sw.writeUpdate(dialect.getQualifiedTableName(srcDesc.getName()), columns, null, null, srcDesc.getPKColumns()))
+					if (!sw.writeUpdate(srcDesc.getName(), columns, null, null, srcDesc.getPKColumns()))
 						sc.statement(null);
 					}
 				else
 					sc.statement(null);
 				if (flags.useDelete)
-					sw.writeDelete(dialect.getQualifiedTableName(srcDesc.getName()), columns, null, srcDesc.getPKColumns());
+					sw.writeDelete(srcDesc.getName(), columns, null, srcDesc.getPKColumns());
 				else
 					sc.statement(null);
 				final Iterator<String> it = sc.iterator();
