@@ -52,6 +52,7 @@ import de.tweerlei.dbgrazer.web.model.Visualization;
 import de.tweerlei.dbgrazer.web.service.DataFormatterFactory;
 import de.tweerlei.dbgrazer.web.service.SchemaTransformerService;
 import de.tweerlei.ermtools.dialect.SQLDialect;
+import de.tweerlei.ermtools.dialect.impl.SQLDialectFactory;
 import de.tweerlei.ermtools.model.SQLSchema;
 import de.tweerlei.ermtools.schema.CompareVisitor;
 import de.tweerlei.ermtools.schema.ObjectMatcher;
@@ -262,10 +263,12 @@ public class SchemaTransformerServiceImpl implements SchemaTransformerService
 		{
 		final Map<String, TableDescription> tables = new HashMap<String, TableDescription>();
 		
-		final String startName = (start == null) ? null : dialect.getQualifiedTableName(start);
+		// Use the generic dialect to output table names without quotes
+		final SQLDialect generic = SQLDialectFactory.getSQLDialect(null);
+		final String startName = (start == null) ? null : generic.getQualifiedTableName(start);
 		
 		for (TableDescription td : tableSet)
-			tables.put(dialect.getQualifiedTableName(td.getName()), td);
+			tables.put(generic.getQualifiedTableName(td.getName()), td);
 		
 		final Map<String, Integer> tableMap = new HashMap<String, Integer>();
 		final Map<String, FKTable> fkTableMap = new HashMap<String, FKTable>();
@@ -291,7 +294,7 @@ public class SchemaTransformerServiceImpl implements SchemaTransformerService
 			
 			for (ForeignKeyDescription fk : info.getReferencedKeys())
 				{
-				final String tname = dialect.getQualifiedTableName(fk.getTableName());
+				final String tname = generic.getQualifiedTableName(fk.getTableName());
 				Integer ix = tableMap.get(tname);
 				if (ix == null)
 					{
@@ -322,7 +325,7 @@ public class SchemaTransformerServiceImpl implements SchemaTransformerService
 			
 			for (ForeignKeyDescription fk : info.getReferencingKeys())
 				{
-				final String tname = dialect.getQualifiedTableName(fk.getTableName());
+				final String tname = generic.getQualifiedTableName(fk.getTableName());
 				Integer ix = tableMap.get(tname);
 				if (ix == null)
 					{

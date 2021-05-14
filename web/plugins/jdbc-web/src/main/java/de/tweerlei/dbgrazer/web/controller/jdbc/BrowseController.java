@@ -730,6 +730,9 @@ public class BrowseController
 		tabs.put(MessageKeys.DML_TAB, new TabItem<Integer>(INDEX_DML));
 		tabs.put(MessageKeys.DATA_TAB, new TabItem<Integer>(INDEX_DATA));
 		
+		// Use the generic dialect to output table names without quotes
+		final SQLDialect generic = SQLDialectFactory.getSQLDialect(null);
+		
 		model.put("browserSettings", browserSettingsManager);
 		model.put("depth", d);
 		model.put("tabs", tabs);
@@ -737,7 +740,7 @@ public class BrowseController
 		model.put("schema", schema);
 		model.put("object", object);
 		model.put("info", info);
-		model.put("infos", Collections.singletonMap(dialect.getQualifiedTableName(info.getName()), new RelationInfo(info, null)));
+		model.put("infos", Collections.singletonMap(generic.getQualifiedTableName(info.getName()), new RelationInfo(info, null)));
 		model.put("pkIndices", pkIndices);
 		model.put("privs", privs);
 		model.put("statement", generateSELECT(info, dialect));
@@ -961,16 +964,17 @@ public class BrowseController
 		
 		final QualifiedName qn = new QualifiedName(catalog, schema, object);
 		final Set<TableDescription> infos = metadataService.getTableInfoRecursive(connectionSettings.getLinkName(), qn, 1, true, ColumnMode.ALL, null);
-		final SQLDialect dialect = getSQLDialect();
-		final TableDescription info = schemaTransformer.findTable(infos, qn, dialect);
+		// Use the generic dialect to output table names without quotes
+		final SQLDialect generic = SQLDialectFactory.getSQLDialect(null);
+		final TableDescription info = schemaTransformer.findTable(infos, qn, generic);
 		
 		final Map<String, RelationInfo> tables = new TreeMap<String, RelationInfo>();
 		final List<ForeignKeyDescription> fks = dir ? info.getReferencedKeys() : info.getReferencingKeys();
 		for (ForeignKeyDescription fk : fks)
 			{
-			final TableDescription t = schemaTransformer.findTable(infos, fk.getTableName(), dialect);
+			final TableDescription t = schemaTransformer.findTable(infos, fk.getTableName(), generic);
 			if (t != null)
-				tables.put(dialect.getQualifiedTableName(fk.getTableName()), new RelationInfo(t, fk));
+				tables.put(generic.getQualifiedTableName(fk.getTableName()), new RelationInfo(t, fk));
 			}
 		
 		model.put("dir", dir);

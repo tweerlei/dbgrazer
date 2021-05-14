@@ -135,9 +135,9 @@ public class SQLGeneratorServiceImpl implements SQLGeneratorService
 					sb.appendOperator(",");
 				if (joins != Joins.NONE)
 					sb.appendName("t0").appendOperator(NAME_SEPARATOR);
-				sb.appendName(c.getName());
+				sb.appendName(dialect.quoteIdentifier(c.getName()));
 				if (joins != Joins.NONE)
-					sb.appendName("AS").appendName(c.getName());
+					sb.appendName("AS").appendName(dialect.quoteIdentifier(c.getName()));
 				}
 			i++;
 			}
@@ -184,7 +184,7 @@ public class SQLGeneratorServiceImpl implements SQLGeneratorService
 						first = false;
 					else
 						sb.appendName("AND");
-					sb.appendName("t0").appendOperator(NAME_SEPARATOR).appendName(ent.getKey()).appendOperator("=").appendName("t" + i).appendOperator(NAME_SEPARATOR).appendName(ent.getValue());
+					sb.appendName("t0").appendOperator(NAME_SEPARATOR).appendName(dialect.quoteIdentifier(ent.getKey())).appendOperator("=").appendName("t" + i).appendOperator(NAME_SEPARATOR).appendName(dialect.quoteIdentifier(ent.getValue()));
 					}
 				sb.closeBrace();
 				i++;
@@ -205,7 +205,7 @@ public class SQLGeneratorServiceImpl implements SQLGeneratorService
 						sb.appendName("AND");
 					if (joins != Joins.NONE)
 						sb.appendName("t0").appendOperator(NAME_SEPARATOR);
-					sb.appendName(c);
+					sb.appendName(dialect.quoteIdentifier(c));
 					sb.appendOperator("=");
 					sb.appendName("?");
 					}
@@ -233,7 +233,7 @@ public class SQLGeneratorServiceImpl implements SQLGeneratorService
 					sb.appendOperator(",");
 				if (joins != Joins.NONE)
 					sb.appendName("t0").appendOperator(NAME_SEPARATOR);
-				sb.appendName(c);
+				sb.appendName(dialect.quoteIdentifier(c));
 				}
 			}
 		else if ((orderBy == OrderBy.DATA) && (pk.size() < t.getColumns().size()))
@@ -249,7 +249,7 @@ public class SQLGeneratorServiceImpl implements SQLGeneratorService
 						first = false;
 					else
 						sb.appendOperator(",");
-					sb.appendName(c.getName());
+					sb.appendName(dialect.quoteIdentifier(c.getName()));
 					}
 				i++;
 				}
@@ -266,7 +266,7 @@ public class SQLGeneratorServiceImpl implements SQLGeneratorService
 		sb.appendName("SELECT").appendString("Nulls").appendName("AS").appendName("Name");
 		sb.appendOperator(",").appendName("COUNT").openBrace().appendName("*").closeBrace();
 		for (ColumnDescription c : t.getColumns())
-			sb.appendOperator(",").appendName("COUNT").openBrace().appendName("*").closeBrace().appendOperator("-").appendName("COUNT").openBrace().appendName(c.getName()).closeBrace().appendName("AS").appendName(c.getName());
+			sb.appendOperator(",").appendName("COUNT").openBrace().appendName("*").closeBrace().appendOperator("-").appendName("COUNT").openBrace().appendName(dialect.quoteIdentifier(c.getName())).closeBrace().appendName("AS").appendName(dialect.quoteIdentifier(c.getName()));
 		sb.appendName("FROM").appendName(dialect.getQualifiedTableName(t.getName()));
 		final List<String> whereTokens = parseSQL(where);
 		if (whereTokens != null)
@@ -316,7 +316,7 @@ public class SQLGeneratorServiceImpl implements SQLGeneratorService
 				first = false;
 			else
 				sb.appendOperator(",");
-			sb.appendName(c.getName());
+			sb.appendName(dialect.quoteIdentifier(c.getName()));
 			}
 		
 		sb.appendName("FROM").appendName(dialect.getQualifiedTableName(t.getName()));
@@ -329,7 +329,7 @@ public class SQLGeneratorServiceImpl implements SQLGeneratorService
 			case 1:
 				sb.appendName("WHERE");
 				for (Integer i : critColumns)
-					sb.appendName(t.getColumns().get(i).getName());
+					sb.appendName(dialect.quoteIdentifier(t.getColumns().get(i).getName()));
 				sb.appendName("IN").openBrace();
 				first = true;
 				for (int i = 0; i < critCount; i++)
@@ -351,7 +351,7 @@ public class SQLGeneratorServiceImpl implements SQLGeneratorService
 						first = false;
 					else
 						sb.appendOperator(",");
-					sb.appendName(t.getColumns().get(i).getName());
+					sb.appendName(dialect.quoteIdentifier(t.getColumns().get(i).getName()));
 					}
 				sb.closeBrace().appendName("IN").openBrace();
 				first = true;
