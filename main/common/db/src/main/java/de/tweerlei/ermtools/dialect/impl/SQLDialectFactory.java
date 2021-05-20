@@ -65,9 +65,12 @@ public class SQLDialectFactory
 	 */
 	public static SQLDialect getSQLDialect(String name)
 		{
-		SQLDialect ret = dialects.get(name);
-		if (ret != null)
-			return (ret);
+		if (name != null)
+			{
+			final SQLDialect ret = dialects.get(name);
+			if (ret != null)
+				return (ret);
+			}
 		
 		return (dialects.get("generic"));
 		}
