@@ -36,7 +36,7 @@ import de.tweerlei.dbgrazer.web.session.ConnectionSettings;
  * @author Robert Wruck <wruck@tweerlei.de>
  */
 @Service
-@Order(8)
+@Order(12)
 public class MongoDBExtension extends FrontendExtensionAdapter
 	{
 	private final FrontendHelperService frontendHelper;
