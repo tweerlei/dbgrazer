@@ -25,6 +25,7 @@
 		<module>kubernetes</module>
 		<module>lang</module>
 		<module>ldap</module>
+		<module>mongodb</module>
 		<module>spring</module>
 		<module>sql</module>
 		<module>web</module>

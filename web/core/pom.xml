@@ -323,6 +323,24 @@
 				</dependency>
 			</dependencies>
 		</profile>
+ 		<profile>
+			<id>mongodb</id>
+			<dependencies>
+				<dependency>
+					<groupId>de.tweerlei</groupId>
+					<artifactId>dbgrazer-plugin-mongodb</artifactId>
+					<version>${project.version}</version>
+					<scope>runtime</scope>
+				</dependency>
+				<dependency>
+					<groupId>de.tweerlei</groupId>
+					<artifactId>dbgrazer-web-mongodb</artifactId>
+					<version>${project.version}</version>
+					<type>war</type>
+					<scope>runtime</scope>
+				</dependency>
+			</dependencies>
+		</profile>
 		<profile>
 			<id>sql</id>
 			<dependencies>

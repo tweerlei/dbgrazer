@@ -25,6 +25,7 @@
 		<module>kubernetes-web</module>
 		<module>ldap-web</module>
 		<module>linkedit-web</module>
+		<module>mongodb-web</module>
 		<module>tnsnames-web</module>
 		<module>useredit-web</module>
 	</modules>

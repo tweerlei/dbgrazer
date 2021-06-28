@@ -1,0 +1,56 @@
+<%--
+ * Copyright 2018 tweerlei Wruck + Buchmeier GbR - http://www.tweerlei.de/
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+--%><%--
+	
+	Tab panel for directory contents
+	
+--%><div class="tab-header">
+			<div id="tools-${label}" class="hidden"><div class="menucolumn">
+				<div class="menuitem"><span onclick="return downloadElement('text-${label}', 'text/plain;charset=utf-8');"><fmt:message key="PLAIN"/></a></div>
+			</div></div>
+<c:if test="${rs != null}"
+>			<form class="filter" action="db/${currentConnection.linkName}/document.html" method="get"<c:if test="${not empty targetElement}"> onsubmit="return showDocument(event, $F('f1-database'), $F('f1-collection'), $F('f1-id'), $F('f1-format'), $F('f1-formatting'));"</c:if>>
+				<input type="hidden" id="f1-database" name="database" value="${database}"/>
+				<input type="hidden" id="f1-collection" name="collection" value="${collection}"/>
+				<input type="hidden" id="f1-id" name="id" value="${id}"/>
+				<div class="filter"><span class="menu" onclick="return showElementMenu(event, 'tools-${label}');"><fmt:message key="download"/></span></div>
+				<div class="filter"><input id="f1-format" type="checkbox" name="format" value="JSON"<c:if test="${not empty format}"> checked="checked"</c:if> onchange="Forms.submit(form);"/><label for="f1-format"> <fmt:message key="formatter"/></label></div>
+				<div class="filter"><input id="f1-formatting" type="checkbox" name="formatting" value="true"<c:if test="${formatting}"> checked="checked"</c:if> onchange="Forms.submit(form);"/> <label for="f1-formatting"><fmt:message key="formatter"/></label></div>
+			</form><hr/>
+</c:if
+>			<div class="column3"><dl class="result">
+				<dt><fmt:message key="mongoDatabase"/></dt>
+				<dd>${database}</dd>
+				<dt><fmt:message key="mongoCollection"/></dt>
+				<dd><a href="db/${currentConnection.linkName}/documents.html?database=${database}&amp;collection=${collection}&amp;id=${id}"<c:if test="${not empty targetElement}"> onclick="return showCollection(event, '${database}', '${collection}');"</c:if>>${collection}</a></dd>
+				<dt><fmt:message key="id"/></dt>
+				<dd>${id}</dd>
+			</dl><hr/></div>
+<c:if test="${rs != null}"
+>			<div class="column3"><dl class="result">
+				<dt><fmt:message key="size"/></dt>
+				<dd>${rs.valueSize}</dd>
+			</dl><hr/></div>
+</c:if
+>		<hr/></div>
+		<div class="tab-body">
+<c:choose><c:when test="${rs != null && format == 'HTML'}"
+>			<div id="text-${label}" class="hidden">${rs.value}</div><iframe id="html-${label}" class="result"></iframe>
+</c:when><c:when test="${rs != null}"
+>			<pre id="text-${label}" class="code">${rs.value}</pre>
+</c:when><c:otherwise
+>			<strong><fmt:message key="noData"/></strong>
+</c:otherwise></c:choose
+>		</div>

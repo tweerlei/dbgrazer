@@ -1,0 +1,45 @@
+<%--
+ * Copyright 2018 tweerlei Wruck + Buchmeier GbR - http://www.tweerlei.de/
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+--%><%--
+	
+	Tab panel for directory contents
+	
+--%><div class="tab-header">
+			<form class="filter" action="db/${currentConnection.linkName}/documents.html" method="get"<c:if test="${not empty targetElement}"> onsubmit="return showCollection(event, $F('f2-database'), $F('f2-collection'), $F('f2-id'), $F('f2-value'));"</c:if>>
+				<input type="hidden" id="f2-database" name="database" value="${database}"/>
+				<input type="hidden" id="f2-collection" name="collection" value="${collection}"/>
+				<p><label for="f2-id"><fmt:message key="seek"/>:</label> <input type="text" id="f2-id" name="offset" value="${offset}" size="10"/></p>
+				<p><label for="f2-value"><fmt:message key="searchTerm"/>:</label> <textarea id="f2-value" name="value" rows="5" cols="20">${fn:escapeXml(value)}</textarea></p>
+				<p><input type="submit" value="<fmt:message key="apply"/>"/></p>
+				<ui:filter id="filter-table-${label}" target="table-${label}"/>
+			</form>
+			<hr/>
+		</div><div class="tab-body"><table id="table-${label}" class="multiple table-autosort">
+			<thead>
+				<tr>
+					<th class="table-sortable table-sortable:numeric"><fmt:message key="id"/></th>
+					<th class="table-sortable table-sortable:numeric"><fmt:message key="size"/></th>
+				</tr>
+			</thead>
+			<tbody>
+<c:forEach items="${rs}" var="row"
+>				<tr>
+					<td><a href="db/${currentConnection.linkName}/document.html?database=${database}&amp;collection=${collection}&amp;id=${row.id}"<c:if test="${not empty targetElement}"> onclick="return showDocument(event, '${database}', '${collection}', '${row.id}');"</c:if>>${row.id}</a></td>
+					<td>${row.valueSize}</td>
+				</tr>
+</c:forEach
+>			</tbody>
+		</table>
+</div>
