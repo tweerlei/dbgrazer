@@ -76,7 +76,7 @@ public class MongoDBBrowseController
 		 */
 		public ConsumerRecordBean(Document r)
 			{
-			this.id = r.getString(MongoDBConstants.ID_PROPERTY);
+			this.id = r.get(MongoDBConstants.ID_PROPERTY).toString();
 			this.value = r.toJson();
 			this.valueSize = this.value.length();
 			}
