@@ -75,10 +75,13 @@ public class SQLGeneratorServiceImpl implements SQLGeneratorService
 		}
 	
 	@Override
-	public final String formatColumnName(String name)
+	public final String formatColumnName(String name, SQLDialect dialect)
 		{
 		if (StringUtils.empty(name))
 			return ("");
+		
+		if (dialect.isCaseSensitive())
+			return (name);
 		
 		final int l = name.length();
 		final StringBuilder sb = new StringBuilder(l);

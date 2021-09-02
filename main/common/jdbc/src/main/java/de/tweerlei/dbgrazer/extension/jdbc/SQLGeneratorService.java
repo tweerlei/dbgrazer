@@ -151,9 +151,10 @@ public interface SQLGeneratorService
 	/**
 	 * Format a column name
 	 * @param name Name
+	 * @param dialect SQLDialect
 	 * @return Formatted name
 	 */
-	public String formatColumnName(String name);
+	public String formatColumnName(String name, SQLDialect dialect);
 	
 	/**
 	 * Generate a SELECT statement for all columns and all rows

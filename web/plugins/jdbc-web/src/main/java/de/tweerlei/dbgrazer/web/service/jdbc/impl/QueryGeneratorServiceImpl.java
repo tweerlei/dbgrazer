@@ -83,7 +83,7 @@ public class QueryGeneratorServiceImpl implements QueryGeneratorService
 		{
 		final String stmt = sqlGenerator.generatePKSelect(t, Style.INDENTED, dialect);
 		
-		return (new QueryImpl("", null, null, stmt, queryService.findQueryType(JdbcConstants.QUERYTYPE_MULTIPLE), getPKParameters(t), null, null));
+		return (new QueryImpl("", null, null, stmt, queryService.findQueryType(JdbcConstants.QUERYTYPE_MULTIPLE), getPKParameters(t, dialect), null, null));
 		}
 	
 	@Override
@@ -111,7 +111,7 @@ public class QueryGeneratorServiceImpl implements QueryGeneratorService
 					if ((fk.getColumns().size() == 1) && fk.getColumns().keySet().iterator().next().equals(c.getName()))
 						fkTable = fk.getTableName().toString();
 					}
-				params.add(new ParameterDefImpl(sqlGenerator.formatColumnName(c.getName()), type, fkTable));
+				params.add(new ParameterDefImpl(sqlGenerator.formatColumnName(c.getName(), dialect), type, fkTable));
 				j++;
 				}
 			else
@@ -129,7 +129,7 @@ public class QueryGeneratorServiceImpl implements QueryGeneratorService
 				if ((type == ColumnType.BOOLEAN) || (fmt.parse(type, value) != null))
 					{
 					columns.add(new ColumnDefImpl(c.getName(), type, dialect.dataTypeToString(c.getType()), null, t.getName(), c.getName()));
-					params.add(new ParameterDefImpl(sqlGenerator.formatColumnName(c.getName()), type, null));
+					params.add(new ParameterDefImpl(sqlGenerator.formatColumnName(c.getName(), dialect), type, null));
 					if (pk.contains(i))
 						pkFilled = true;
 					j++;
@@ -174,13 +174,13 @@ public class QueryGeneratorServiceImpl implements QueryGeneratorService
 					if ((fk.getColumns().size() == 1) && fk.getColumns().keySet().iterator().next().equals(c.getName()))
 						fkTable = fk.getTableName().toString();
 					}
-				params.add(new ParameterDefImpl(sqlGenerator.formatColumnName(c.getName()), type, fkTable));
+				params.add(new ParameterDefImpl(sqlGenerator.formatColumnName(c.getName(), dialect), type, fkTable));
 				}
 			i++;
 			}
 		
 		if (includePK)
-			params.addAll(getPKParameters(t));
+			params.addAll(getPKParameters(t, dialect));
 		
 		final StringWriter sw = new StringWriter();
 		final SQLWriter sqlWriter = factory.getSQLWriter(new StatementWriter(sw), dialect, true);
@@ -205,10 +205,10 @@ public class QueryGeneratorServiceImpl implements QueryGeneratorService
 		
 		sqlWriter.writeDelete(t.getName(), columns, null, t.getPKColumns());
 		
-		return (new QueryImpl("", null, null, sw.toString(), queryService.findQueryType(JdbcConstants.QUERYTYPE_DML), getPKParameters(t), null, null));
+		return (new QueryImpl("", null, null, sw.toString(), queryService.findQueryType(JdbcConstants.QUERYTYPE_DML), getPKParameters(t, dialect), null, null));
 		}
 	
-	private List<ParameterDef> getPKParameters(TableDescription t)
+	private List<ParameterDef> getPKParameters(TableDescription t, SQLDialect dialect)
 		{
 		final Set<Integer> pk = t.getPKColumns();
 		final List<ParameterDef> params = new ArrayList<ParameterDef>(pk.size());
@@ -216,7 +216,7 @@ public class QueryGeneratorServiceImpl implements QueryGeneratorService
 			{
 			final ColumnDescription c = t.getColumns().get(i);
 			final ColumnType type = ColumnType.forSQLType(c.getType());
-			params.add(new ParameterDefImpl(sqlGenerator.formatColumnName(c.getName()), type, null));
+			params.add(new ParameterDefImpl(sqlGenerator.formatColumnName(c.getName(), dialect), type, null));
 			}
 		return (params);
 		}

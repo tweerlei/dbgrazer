@@ -125,7 +125,7 @@ public class ResultSetAccessor
 		final ResultColumnInfo info = getColumnInfo(rs, column);
 		
 		return (new ColumnDefImpl(
-				sqlGenerator.formatColumnName(info.label),
+				sqlGenerator.formatColumnName(info.label, dialect),
 				ColumnType.forSQLType(info.type),
 				dialect.dataTypeToString(info.type),
 				target,

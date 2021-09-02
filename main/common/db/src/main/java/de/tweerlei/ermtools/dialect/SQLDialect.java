@@ -50,6 +50,12 @@ public interface SQLDialect
 	public SQLDataType getSQLDataType(int type);
 	
 	/**
+	 * Check whether identifiers are case sensitive
+	 * @return true if case sensitive
+	 */
+	public boolean isCaseSensitive();
+	
+	/**
 	 * Quote an identifier (schema/table/column name) for safe usage in SQL statements
 	 * @param c Identifier
 	 * @return Quoted identifier

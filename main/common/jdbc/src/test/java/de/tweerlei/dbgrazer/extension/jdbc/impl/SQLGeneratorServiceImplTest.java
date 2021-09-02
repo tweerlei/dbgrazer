@@ -18,7 +18,7 @@ package de.tweerlei.dbgrazer.extension.jdbc.impl;
 import de.tweerlei.common5.jdbc.model.QualifiedName;
 import de.tweerlei.dbgrazer.extension.jdbc.SQLGeneratorService;
 import de.tweerlei.dbgrazer.extension.jdbc.SQLGeneratorService.Style;
-import de.tweerlei.dbgrazer.extension.jdbc.impl.SQLGeneratorServiceImpl;
+import de.tweerlei.ermtools.dialect.SQLDialect;
 import de.tweerlei.ermtools.dialect.impl.GenericDialect;
 import junit.framework.TestCase;
 
@@ -35,14 +35,15 @@ public class SQLGeneratorServiceImplTest extends TestCase
 	public void testFormatColumnName()
 		{
 		final SQLGeneratorService svc = new SQLGeneratorServiceImpl();
+		final SQLDialect d = new GenericDialect();
 		
-		assertEquals("", svc.formatColumnName(null));
-		assertEquals("", svc.formatColumnName(""));
-		assertEquals("Abc", svc.formatColumnName("abc"));
-		assertEquals("Abc", svc.formatColumnName("ABC"));
-		assertEquals("Abc_Def", svc.formatColumnName("ABC_def"));
-		assertEquals("Abc2Def", svc.formatColumnName("ABC2def"));
-		assertEquals("1Abc.Def", svc.formatColumnName("1ABC.def"));
+		assertEquals("", svc.formatColumnName(null, d));
+		assertEquals("", svc.formatColumnName("", d));
+		assertEquals("Abc", svc.formatColumnName("abc", d));
+		assertEquals("Abc", svc.formatColumnName("ABC", d));
+		assertEquals("Abc_Def", svc.formatColumnName("ABC_def", d));
+		assertEquals("Abc2Def", svc.formatColumnName("ABC2def", d));
+		assertEquals("1Abc.Def", svc.formatColumnName("1ABC.def", d));
 		}
 	
 	/**

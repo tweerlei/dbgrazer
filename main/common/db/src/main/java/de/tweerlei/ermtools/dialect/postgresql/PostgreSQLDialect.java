@@ -86,6 +86,12 @@ public class PostgreSQLDialect extends CommonSQLDialect
 		}
 	
 	@Override
+	public boolean isCaseSensitive()
+		{
+		return (true);
+		}
+	
+	@Override
 	public String quoteIdentifier(String c)
 		{
 		return ("\"" + c + "\"");

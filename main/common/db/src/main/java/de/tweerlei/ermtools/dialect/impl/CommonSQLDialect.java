@@ -97,6 +97,11 @@ public abstract class CommonSQLDialect implements SQLDialect
 		return (typeMap.get(type));
 		}
 	
+	public boolean isCaseSensitive()
+		{
+		return (false);
+		}
+	
 	public String quoteIdentifier(String c)
 		{
 		return (c);
