@@ -52,6 +52,15 @@ public class MapBuilder<K, V>
 		}
 	
 	/**
+	 * Construct a MapBuilder that builds a HashMap
+	 * @param capacity Initial capacity
+	 */
+	public MapBuilder(int capacity)
+		{
+		this(new HashMap<K, V>(capacity));
+		}
+	
+	/**
 	 * Populate the given Map
 	 * @param <K> Key type
 	 * @param <V> Value type
@@ -72,6 +81,18 @@ public class MapBuilder<K, V>
 	public static <K, V> MapBuilder<K, V> ordered()
 		{
 		return (new MapBuilder<K, V>(new LinkedHashMap<K, V>()));
+		}
+	
+	/**
+	 * Populate a Map retaining insertion order
+	 * @param <K> Key type
+	 * @param <V> Value type
+	 * @param capacity Initial capacity
+	 * @return MapBuilder
+	 */
+	public static <K, V> MapBuilder<K, V> ordered(int capacity)
+		{
+		return (new MapBuilder<K, V>(new LinkedHashMap<K, V>(capacity)));
 		}
 	
 	/**
@@ -101,7 +122,7 @@ public class MapBuilder<K, V>
 	 * Populate a Map with Enum keys
 	 * @param <K> Key type
 	 * @param <V> Value type
-	 * @param type Key type
+	 * @param keyType Key type
 	 * @return MapBuilder
 	 */
 	public static <K extends Enum<K>, V> MapBuilder<K, V> keyedBy(Class<K> keyType)
@@ -128,7 +149,8 @@ public class MapBuilder<K, V>
 	 */
 	public MapBuilder<K, V> putAll(Map<? extends K, ? extends V> values)
 		{
-		map.putAll(values);
+		if (values != null)
+			map.putAll(values);
 		return (this);
 		}
 	

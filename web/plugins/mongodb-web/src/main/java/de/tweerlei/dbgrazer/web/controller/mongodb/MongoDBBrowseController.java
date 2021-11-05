@@ -67,6 +67,7 @@ public class MongoDBBrowseController
 	public static class ConsumerRecordBean implements Comparable<ConsumerRecordBean>
 		{
 		private final String id;
+		private final String idFilter;
 		private int valueSize;
 		private String value;
 		
@@ -77,6 +78,7 @@ public class MongoDBBrowseController
 		public ConsumerRecordBean(Document r)
 			{
 			this.id = r.get(MongoDBConstants.ID_PROPERTY).toString();
+			this.idFilter = getDocumentIdFilter(r);
 			this.value = r.toJson();
 			this.valueSize = this.value.length();
 			}
@@ -89,9 +91,17 @@ public class MongoDBBrowseController
 		 */
 		public ConsumerRecordBean(Document r, String value, int valueSize)
 			{
-			this.id = r.getString(MongoDBConstants.ID_PROPERTY);
+			this.id = r.get(MongoDBConstants.ID_PROPERTY).toString();
+			this.idFilter = getDocumentIdFilter(r);
 			this.value = value;
 			this.valueSize = valueSize;
+			}
+		
+		private static String getDocumentIdFilter(Document r)
+			{
+			final Object id = r.get(MongoDBConstants.ID_PROPERTY);
+			final Document doc = (id == null) ? new Document() : new Document(MongoDBConstants.ID_PROPERTY, id);
+			return (doc.toJson());
 			}
 		
 		/**
@@ -100,6 +110,14 @@ public class MongoDBBrowseController
 		public String getId()
 			{
 			return id;
+			}
+		
+		/**
+		 * @return the idFilter
+		 */
+		public String getIdFilter()
+			{
+			return idFilter;
 			}
 		
 		/**
@@ -326,7 +344,7 @@ public class MongoDBBrowseController
 		return (model);
 		}
 	
-	private final Document buildFilter(String value, String id)
+	private Document buildFilter(String value, String id)
 		{
 		if (!StringUtils.empty(value))
 			{
@@ -341,9 +359,18 @@ public class MongoDBBrowseController
 			}
 		
 		if (!StringUtils.empty(id))
-			return (new Document(MongoDBConstants.ID_PROPERTY,
-					new Document("$gte", id)
-					));
+			{
+			try	{
+				final Document filter = Document.parse(id);
+				return (new Document(MongoDBConstants.ID_PROPERTY,
+						new Document("$gte", filter.get(MongoDBConstants.ID_PROPERTY))
+						));
+				}
+			catch (RuntimeException e)
+				{
+				// skip
+				}
+			}
 		
 		return (null);
 		}
@@ -420,7 +447,7 @@ public class MongoDBBrowseController
 		
 		model.put("formats", textFormatterService.getSupportedTextFormats());
 		
-		final Iterable<Document> records = mongoClientService.getMongoClient(connectionSettings.getLinkName()).getDatabase(database).getCollection(collection).find(new Document(MongoDBConstants.ID_PROPERTY, id)).limit(1);
+		final Iterable<Document> records = mongoClientService.getMongoClient(connectionSettings.getLinkName()).getDatabase(database).getCollection(collection).find(buildFilter(id)).limit(1);
 		
 		final ConsumerRecordBean rec;
 		final Iterator<Document> it = records.iterator();
@@ -443,5 +470,16 @@ public class MongoDBBrowseController
 		model.put("extensionJS", MongoDBMessageKeys.EXTENSION_JS);
 		
 		return (model);
+		}
+	
+	private Document buildFilter(String id)
+		{
+		try	{
+			return (Document.parse(id));
+			}
+		catch (RuntimeException e)
+			{
+			return (new Document());
+			}
 		}
 	}

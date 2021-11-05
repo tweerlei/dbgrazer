@@ -46,7 +46,7 @@ public class MongoDBLinkType extends BaseLinkType
 	@Override
 	public boolean isCustomQuerySupported()
 		{
-		return (false);
+		return (true);
 		}
 	
 	@Override

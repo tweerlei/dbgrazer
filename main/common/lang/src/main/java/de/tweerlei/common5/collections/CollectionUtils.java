@@ -64,7 +64,9 @@ public final class CollectionUtils
 	 * @param <T> Argument type
 	 * @param a Elements
 	 * @return LinkedHashSet
+	 * @deprecated Use SetBuilder
 	 */
+	@Deprecated
 	public static <T> Set<T> set(T... a)
 		{
 		final Set<T> ret = new LinkedHashSet<T>(a.length);
@@ -80,7 +82,9 @@ public final class CollectionUtils
 	 * @param <T> Argument type
 	 * @param a Elements
 	 * @return ArrayList
+	 * @deprecated Use ListBuilder
 	 */
+	@Deprecated
 	public static <T> List<T> list(T... a)
 		{
 		final List<T> ret = new ArrayList<T>(a.length);
@@ -96,7 +100,9 @@ public final class CollectionUtils
 	 * @param <T> Argument type
 	 * @param a Elements
 	 * @return Set
+	 * @deprecated Use SetBuilder
 	 */
+	@Deprecated
 	public static <T> Set<T> set(Iterable<T> a)
 		{
 		final Set<T> ret = new LinkedHashSet<T>();
@@ -115,7 +121,9 @@ public final class CollectionUtils
 	 * @param <T> Argument type
 	 * @param a Elements
 	 * @return ArrayList
+	 * @deprecated Use ListBuilder
 	 */
+	@Deprecated
 	public static <T> List<T> list(Iterable<T> a)
 		{
 		final List<T> ret = new LinkedList<T>();
@@ -134,7 +142,9 @@ public final class CollectionUtils
 	 * @param <T> Argument type
 	 * @param a Iterables
 	 * @return Union set
+	 * @deprecated Use SetBuilder
 	 */
+	@Deprecated
 	public static <T> Set<T> union(Iterable<T>... a)
 		{
 		final Set<T> ret = new LinkedHashSet<T>();
@@ -154,7 +164,9 @@ public final class CollectionUtils
 	 * @param a Iterable
 	 * @param b Iterable
 	 * @return Concatenated list
+	 * @deprecated Use ListBuilder
 	 */
+	@Deprecated
 	public static <T> List<T> concat(Iterable<T> a, Iterable<T> b)
 		{
 		final List<T> ret = new LinkedList<T>();
@@ -178,7 +190,9 @@ public final class CollectionUtils
 	 * @param <T> Element type
 	 * @param l List to sort
 	 * @return Sorted list
+	 * @deprecated Use ListBuilder
 	 */
+	@Deprecated
 	public static <T extends Comparable<? super T>> List<T> sort(Collection<T> l)
 		{
 		if (l == null)
@@ -197,7 +211,9 @@ public final class CollectionUtils
 	 * @param l List to sort
 	 * @param c Comparator
 	 * @return Sorted list
+	 * @deprecated Use ListBuilder
 	 */
+	@Deprecated
 	public static <T> List<T> sort(Collection<T> l, Comparator<? super T> c)
 		{
 		if (l == null)

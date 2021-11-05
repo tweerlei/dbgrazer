@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumSet;
+import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -36,7 +37,7 @@ public class SetBuilder<V>
 	
 	/**
 	 * Constructor
-	 * @param map Set to populate
+	 * @param set Set to populate
 	 */
 	public SetBuilder(Set<V> set)
 		{
@@ -52,6 +53,15 @@ public class SetBuilder<V>
 		}
 	
 	/**
+	 * Construct a SetBuilder that builds a HashSet
+	 * @param capacity Initial capacity
+	 */
+	public SetBuilder(int capacity)
+		{
+		this(new HashSet<V>(capacity));
+		}
+	
+	/**
 	 * Factory method
 	 * @param <V> Value type
 	 * @param set Set to populate
@@ -64,13 +74,23 @@ public class SetBuilder<V>
 	
 	/**
 	 * Populate a Set retaining insertion order
-	 * @param <K> Key type
 	 * @param <V> Value type
 	 * @return MapBuilder
 	 */
 	public static <V> SetBuilder<V> ordered()
 		{
 		return (new SetBuilder<V>(new LinkedHashSet<V>()));
+		}
+	
+	/**
+	 * Populate a Set retaining insertion order
+	 * @param <V> Value type
+	 * @param capacity Initial capacity
+	 * @return MapBuilder
+	 */
+	public static <V> SetBuilder<V> ordered(int capacity)
+		{
+		return (new SetBuilder<V>(new LinkedHashSet<V>(capacity)));
 		}
 	
 	/**
@@ -97,12 +117,12 @@ public class SetBuilder<V>
 	/**
 	 * Factory method
 	 * @param <V> Value type
-	 * @param type Key type
+	 * @param valueType Value type
 	 * @return SetBuilder
 	 */
-	public static <V extends Enum<V>> SetBuilder<V> of(Class<V> keyType)
+	public static <V extends Enum<V>> SetBuilder<V> of(Class<V> valueType)
 		{
-		return (new SetBuilder<V>(EnumSet.noneOf(keyType)));
+		return (new SetBuilder<V>(EnumSet.noneOf(valueType)));
 		}
 	
 	/**
@@ -123,7 +143,53 @@ public class SetBuilder<V>
 	 */
 	public SetBuilder<V> addAll(Collection<? extends V> values)
 		{
-		set.addAll(values);
+		if (values != null)
+			set.addAll(values);
+		return (this);
+		}
+	
+	/**
+	 * Add all values from a given Iterable
+	 * @param values Iterable
+	 * @return this
+	 */
+	public SetBuilder<V> addAll(Iterable<? extends V> values)
+		{
+		if (values != null)
+			{
+			for (V v : values)
+				set.add(v);
+			}
+		return (this);
+		}
+	
+	/**
+	 * Add all values from a given Enumeration
+	 * @param values Enumeration
+	 * @return this
+	 */
+	public SetBuilder<V> addAll(Enumeration<? extends V> values)
+		{
+		if (values != null)
+			{
+			while (values.hasMoreElements())
+				set.add(values.nextElement());
+			}
+		return (this);
+		}
+	
+	/**
+	 * Add all values from a given Array
+	 * @param values Array
+	 * @return this
+	 */
+	public SetBuilder<V> addAll(V[] values)
+		{
+		if (values != null)
+			{
+			for (V v : values)
+				set.add(v);
+			}
 		return (this);
 		}
 	

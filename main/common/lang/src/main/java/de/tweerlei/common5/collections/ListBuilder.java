@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -47,6 +48,15 @@ public class ListBuilder<V>
 	public ListBuilder()
 		{
 		this(new ArrayList<V>());
+		}
+	
+	/**
+	 * Construct a ListBuilder that builds an ArrayList
+	 * @param capacity Initial capacity
+	 */
+	public ListBuilder(int capacity)
+		{
+		this(new ArrayList<V>(capacity));
 		}
 	
 	/**
@@ -88,7 +98,53 @@ public class ListBuilder<V>
 	 */
 	public ListBuilder<V> addAll(Collection<? extends V> values)
 		{
-		list.addAll(values);
+		if (values != null)
+			list.addAll(values);
+		return (this);
+		}
+	
+	/**
+	 * Add all values from a given Iterable
+	 * @param values Iterable
+	 * @return this
+	 */
+	public ListBuilder<V> addAll(Iterable<? extends V> values)
+		{
+		if (values != null)
+			{
+			for (V v : values)
+				list.add(v);
+			}
+		return (this);
+		}
+	
+	/**
+	 * Add all values from a given Enumeration
+	 * @param values Enumeration
+	 * @return this
+	 */
+	public ListBuilder<V> addAll(Enumeration<? extends V> values)
+		{
+		if (values != null)
+			{
+			while (values.hasMoreElements())
+				list.add(values.nextElement());
+			}
+		return (this);
+		}
+	
+	/**
+	 * Add all values from a given Array
+	 * @param values Array
+	 * @return this
+	 */
+	public ListBuilder<V> addAll(V[] values)
+		{
+		if (values != null)
+			{
+			for (V v : values)
+				list.add(v);
+			}
 		return (this);
 		}
 	
