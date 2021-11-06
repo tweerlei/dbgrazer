@@ -49,7 +49,7 @@
 						><c:when test="${c.type == 'INTEGER' || c.type == 'FLOAT'}">table-sortable:numeric</c:when
 						><c:when test="${c.type == 'DATE'}">table-sortable:date</c:when
 						><c:otherwise>table-sortable:ignorecase</c:otherwise
-					></c:choose>" title="${fn:escapeXml(c.typeName)}">${fn:escapeXml(c.name)}</th>
+					></c:choose>" title="${fn:escapeXml(c.typeName)}" data-columnname="${fn:escapeXml(c.sourceColumn)}">${fn:escapeXml(c.name)}</th>
 </c:forEach
 >				</tr>
 			</thead>

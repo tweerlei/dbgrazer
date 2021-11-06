@@ -84,7 +84,7 @@ public class ResultSetAccessor
 			columns = new ArrayList<ResultColumnInfo>(n);
 			for (int i = 1; i <= n; i++)
 				{
-				final String name = rsmd.getColumnName(i);
+				final String name = dialect.quoteIdentifier(rsmd.getColumnName(i));
 				final String label = rsmd.getColumnLabel(i);
 				final String tn = rsmd.getTableName(i);
 				final QualifiedName qn = StringUtils.empty(tn) ? null : new QualifiedName(rsmd.getCatalogName(i), rsmd.getSchemaName(i), tn);

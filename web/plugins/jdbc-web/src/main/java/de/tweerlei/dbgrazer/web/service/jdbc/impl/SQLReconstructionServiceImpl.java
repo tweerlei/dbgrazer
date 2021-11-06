@@ -75,7 +75,7 @@ public class SQLReconstructionServiceImpl implements SQLReconstructionService
 					}
 				sb.appendName(alias).appendOperator(".");
 				}
-			sb.appendName((c.getSourceColumn() == null) ? c.getName() : c.getSourceColumn());
+			sb.appendName((c.getSourceColumn() == null) ? dialect.quoteIdentifier(c.getName()) : c.getSourceColumn());
 			sb.appendName("AS");
 			sb.appendName(c.getName());
 			

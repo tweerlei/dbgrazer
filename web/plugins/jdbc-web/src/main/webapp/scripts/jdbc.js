@@ -232,17 +232,17 @@ function setOrder(f, v) {
 
 function addOrderAsc(ev) {
 	var cell = Popup.parent;
-	setOrder(cell.textContent, 'ASC');
+	setOrder(cell.dataset.columnname, 'ASC');
 }
 
 function addOrderDesc(ev) {
 	var cell = Popup.parent;
-	setOrder(cell.textContent, 'DESC');
+	setOrder(cell.dataset.columnname, 'DESC');
 }
 
 function removeOrder(ev) {
 	var cell = Popup.parent;
-	setOrder(cell.textContent);
+	setOrder(cell.dataset.columnname);
 }
 
 function setWhere(f, v) {
@@ -266,9 +266,13 @@ function addWhere(ev) {
 	var n = cell.previousSiblings().length;
 	var hdr = cell.up('table').down('tr').childElements()[n];
 	if (cell.textContent === '\u2205')
-		setWhere(hdr.textContent, 'IS NULL');
+		setWhere(hdr.dataset.columnname, 'IS NULL');
+	else if (cell.textContent === '\u2612')
+		setWhere(hdr.dataset.columnname, '= true');
+	else if (cell.textContent === '\u2610')
+		setWhere(hdr.dataset.columnname, '= false');
 	else
-		setWhere(hdr.textContent, '= \'' + cell.textContent.replace(/'/g, "''") + '\'');
+		setWhere(hdr.dataset.columnname, '= \'' + cell.textContent.replace(/'/g, "''") + '\'');
 }
 
 function addWhereNot(ev) {
@@ -276,16 +280,20 @@ function addWhereNot(ev) {
 	var n = cell.previousSiblings().length;
 	var hdr = cell.up('table').down('tr').childElements()[n];
 	if (cell.textContent === '\u2205')
-		setWhere(hdr.textContent, 'IS NOT NULL');
+		setWhere(hdr.dataset.columnname, 'IS NOT NULL');
+	else if (cell.textContent === '\u2612')
+		setWhere(hdr.dataset.columnname, '= false');
+	else if (cell.textContent === '\u2610')
+		setWhere(hdr.dataset.columnname, '= true');
 	else
-		setWhere(hdr.textContent, '<> \'' + cell.textContent.replace(/'/g, "''") + '\'');
+		setWhere(hdr.dataset.columnname, '<> \'' + cell.textContent.replace(/'/g, "''") + '\'');
 }
 
 function removeWhere(ev) {
 	var cell = Popup.parent;
 	var n = cell.previousSiblings().length;
 	var hdr = cell.up('table').down('tr').childElements()[n];
-	setWhere(hdr.textContent);
+	setWhere(hdr.dataset.columnname);
 }
 
 function formatContent(ev) {
