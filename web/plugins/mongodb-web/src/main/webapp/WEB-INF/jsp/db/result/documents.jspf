@@ -36,7 +36,7 @@
 			<tbody>
 <c:forEach items="${rs}" var="row"
 >				<tr>
-					<td><a href="db/${currentConnection.linkName}/document.html?database=${database}&amp;collection=${collection}&amp;id=${row.id}"<c:if test="${not empty targetElement}"> onclick="return showDocument(event, '${database}', '${collection}', '${row.id}');"</c:if>>${row.id}</a></td>
+					<td><a href="db/${currentConnection.linkName}/document.html?database=${database}&amp;collection=${collection}&amp;id=${fn:escapeXml(row.idFilter)}"<c:if test="${not empty targetElement}"> onclick="return showDocument(event, '${database}', '${collection}', '${fn:escapeXml(row.idFilter)}');"</c:if>>${fn:escapeXml(row.id)}</a></td>
 					<td>${row.valueSize}</td>
 				</tr>
 </c:forEach
