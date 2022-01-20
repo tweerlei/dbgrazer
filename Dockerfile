@@ -9,7 +9,7 @@ COPY web /build/web
 
 WORKDIR /build
 RUN ./mvnw -f pom clean install
-RUN ./mvnw clean package
+RUN ./mvnw -P bookmark,configedit,c3p0,csv,dbunit,dml,file,http,jdbc,js,json,kafka,kubernetes,ldap,ldif,linkedit,mongodb,sql,template,text,tnsnames,useredit,wiki,xml clean package
 
 
 # Use Tomcat 9.0
