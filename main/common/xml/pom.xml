@@ -21,11 +21,4 @@
 		<version>3.1-SNAPSHOT</version>
 		<relativePath></relativePath>
 	</parent>
-	
-	<repositories>
-		<repository>
-			<id>tweerlei</id>
-			<url>http://localhost</url>
-		</repository>
-	</repositories>
 </project>

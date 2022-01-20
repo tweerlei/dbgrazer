@@ -421,11 +421,4 @@
 			</dependencies>
 		</profile>
 	</profiles>
-	
-	<repositories>
-		<repository>
-			<id>tweerlei</id>
-			<url>http://localhost</url>
-		</repository>
-	</repositories>
 </project>

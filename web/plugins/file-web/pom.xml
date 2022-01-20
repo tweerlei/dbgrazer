@@ -51,11 +51,4 @@
 			</exclusions>
 		</dependency>
 	</dependencies>
-	
-	<repositories>
-		<repository>
-			<id>tweerlei</id>
-			<url>http://localhost</url>
-		</repository>
-	</repositories>
 </project>
