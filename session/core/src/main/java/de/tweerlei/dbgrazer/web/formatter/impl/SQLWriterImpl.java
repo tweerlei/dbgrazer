@@ -120,7 +120,7 @@ public class SQLWriterImpl implements SQLWriter
 					sb.append(",\n       ");
 				else
 					sb.append(", ");
-				sb.append((c.getSourceColumn() == null) ? dialect.quoteIdentifier(c.getName()) : c.getSourceColumn());
+				sb.append(getColumnName(c));
 				sb.append(" = ");
 				if (n == NO_VALUE)
 					sb.append("?");
@@ -160,7 +160,7 @@ public class SQLWriterImpl implements SQLWriter
 //					w.write("\nAND ");
 				else
 					sb.append(" AND ");
-				sb.append((c.getSourceColumn() == null) ? dialect.quoteIdentifier(c.getName()) : c.getSourceColumn());
+				sb.append(getColumnName(c));
 				if (values == null)
 					sb.append(" = ?");
 				else
@@ -188,7 +188,7 @@ public class SQLWriterImpl implements SQLWriter
 //					w.write("\nAND ");
 				else
 					sb.append(" AND ");
-				sb.append((c.getSourceColumn() == null) ? dialect.quoteIdentifier(c.getName()) : c.getSourceColumn());
+				sb.append(getColumnName(c));
 				if (oi == null)
 					sb.append(" = ?");
 				else
@@ -316,9 +316,9 @@ public class SQLWriterImpl implements SQLWriter
 			else
 				sb.append(" AND ");
 			sb.append("dst.");
-			sb.append((c.getSourceColumn() == null) ? dialect.quoteIdentifier(c.getName()) : c.getSourceColumn());
+			sb.append(getColumnName(c));
 			sb.append(" = src.");
-			sb.append((c.getSourceColumn() == null) ? dialect.quoteIdentifier(c.getName()) : c.getSourceColumn());
+			sb.append(getColumnName(c));
 			}
 		
 		sb.append(")");
@@ -342,9 +342,9 @@ public class SQLWriterImpl implements SQLWriter
 						sb.append(", ");
 					
 //					w.write("dst.");
-					sb.append((c.getSourceColumn() == null) ? dialect.quoteIdentifier(c.getName()) : c.getSourceColumn());
+					sb.append(getColumnName(c));
 					sb.append(" = src.");
-					sb.append((c.getSourceColumn() == null) ? dialect.quoteIdentifier(c.getName()) : c.getSourceColumn());
+					sb.append(getColumnName(c));
 					}
 				i++;
 				}
@@ -392,7 +392,7 @@ public class SQLWriterImpl implements SQLWriter
 				if (label)
 					{
 					sb.append(" AS ");
-					sb.append((c.getSourceColumn() == null) ? dialect.quoteIdentifier(c.getName()) : c.getSourceColumn());
+					sb.append(getColumnName(c));
 					}
 				}
 			}
@@ -412,9 +412,14 @@ public class SQLWriterImpl implements SQLWriter
 				else
 					sb.append(", ");
 				sb.append(prefix);
-				sb.append((c.getSourceColumn() == null) ? dialect.quoteIdentifier(c.getName()) : c.getSourceColumn());
+				sb.append(getColumnName(c));
 				}
 			}
+		}
+	
+	private String getColumnName(ColumnDef c)
+		{
+		return ((c.getSourceColumn() == null) ? dialect.quoteIdentifier(c.getName()) : c.getSourceColumn());
 		}
 	
 	@Override

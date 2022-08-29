@@ -101,10 +101,10 @@ public class QueryGeneratorServiceImpl implements QueryGeneratorService
 			{
 			final ColumnType type = ColumnType.forSQLType(c.getType());
 			if (hasPK && pk.contains(i))
-				pkColumns.add(new ColumnDefImpl(c.getName(), type, dialect.dataTypeToString(c.getType()), null, t.getName(), c.getName()));
+				pkColumns.add(new ColumnDefImpl(c.getName(), type, dialect.dataTypeToString(c.getType()), null, null, null));
 			else if (values == null)
 				{
-				columns.add(new ColumnDefImpl(c.getName(), type, dialect.dataTypeToString(c.getType()), null, t.getName(), c.getName()));
+				columns.add(new ColumnDefImpl(c.getName(), type, dialect.dataTypeToString(c.getType()), null, null, null));
 				String fkTable = null;
 				for (ForeignKeyDescription fk : t.getReferencedKeys())
 					{
@@ -128,7 +128,7 @@ public class QueryGeneratorServiceImpl implements QueryGeneratorService
 					}
 				if ((type == ColumnType.BOOLEAN) || (fmt.parse(type, value) != null))
 					{
-					columns.add(new ColumnDefImpl(c.getName(), type, dialect.dataTypeToString(c.getType()), null, t.getName(), c.getName()));
+					columns.add(new ColumnDefImpl(c.getName(), type, dialect.dataTypeToString(c.getType()), null, null, null));
 					params.add(new ParameterDefImpl(sqlGenerator.formatColumnName(c.getName(), dialect), type, null));
 					if (pk.contains(i))
 						pkFilled = true;
@@ -165,7 +165,7 @@ public class QueryGeneratorServiceImpl implements QueryGeneratorService
 		for (ColumnDescription c : t.getColumns())
 			{
 			final ColumnType type = ColumnType.forSQLType(c.getType());
-			columns.add(new ColumnDefImpl(c.getName(), type, dialect.dataTypeToString(c.getType()), null, t.getName(), c.getName()));
+			columns.add(new ColumnDefImpl(c.getName(), type, dialect.dataTypeToString(c.getType()), null, null, null));
 			if (!pk.contains(i))
 				{
 				String fkTable = null;
@@ -197,7 +197,7 @@ public class QueryGeneratorServiceImpl implements QueryGeneratorService
 		for (ColumnDescription c : t.getColumns())
 			{
 			final ColumnType type = ColumnType.forSQLType(c.getType());
-			columns.add(new ColumnDefImpl(c.getName(), type, dialect.dataTypeToString(c.getType()), null, t.getName(), c.getName()));
+			columns.add(new ColumnDefImpl(c.getName(), type, dialect.dataTypeToString(c.getType()), null, null, null));
 			}
 		
 		final StringWriter sw = new StringWriter();

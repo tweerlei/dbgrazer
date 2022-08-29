@@ -1267,7 +1267,7 @@ public class DataDiffController
 				for (ColumnDescription cd : srcDesc.getColumns())
 					{
 					final ColumnType ct = ColumnType.forSQLType(cd.getType());
-					columns.add(new ColumnDefImpl(cd.getName(), ct, dialect.dataTypeToString(cd.getType()), null, srcDesc.getName(), cd.getName()));
+					columns.add(new ColumnDefImpl(cd.getName(), ct, dialect.dataTypeToString(cd.getType()), null, null, null));
 					}
 				
 				final StatementCollection sc = new StatementCollection(null, null);

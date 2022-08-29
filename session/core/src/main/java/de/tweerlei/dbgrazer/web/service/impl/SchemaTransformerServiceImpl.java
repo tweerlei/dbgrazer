@@ -98,7 +98,7 @@ public class SchemaTransformerServiceImpl implements SchemaTransformerService
 			final List<ColumnDef> columns = new ArrayList<ColumnDef>(t.getColumns().size());
 			final Set<Integer> pk = t.getPKColumns();
 			for (ColumnDescription c : t.getColumns())
-				columns.add(new ColumnDefImpl(c.getName(), ColumnType.forSQLType(c.getType()), dialect.dataTypeToString(c.getType()), null, t.getName(), c.getName()));
+				columns.add(new ColumnDefImpl(c.getName(), ColumnType.forSQLType(c.getType()), dialect.dataTypeToString(c.getType()), null, null, null));
 			
 			final SQLWriter sqlWriter = dataFormatterFactory.getSQLWriter(h, dialect, true);
 			sqlWriter.writeInsert(t.getName(), columns, null);
