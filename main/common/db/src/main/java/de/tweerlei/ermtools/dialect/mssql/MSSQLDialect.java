@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import de.tweerlei.common.util.StringUtils;
 import de.tweerlei.common5.jdbc.MetadataReader;
 import de.tweerlei.common5.jdbc.model.ColumnDescription;
 import de.tweerlei.common5.jdbc.model.ForeignKeyDescription;
@@ -185,8 +186,9 @@ public class MSSQLDialect extends CommonSQLDialect
 		final PrimaryKeyDescription pk = t.getPrimaryKey();
 		if (pk != null)
 			{
-			sb.append(",\n\tCONSTRAINT ");
-			sb.append(pk.getName());
+			sb.append(",\n\t");
+			if (!StringUtils.empty(pk.getName()))
+				sb.append("CONSTRAINT ").append(pk.getName());
 			sb.append(" PRIMARY KEY (");
 			
 			first = true;
@@ -333,8 +335,9 @@ public class MSSQLDialect extends CommonSQLDialect
 		final StringBuffer sb = new StringBuffer();
 		sb.append("ALTER TABLE ");
 		sb.append(getQualifiedTableName(t.getName()));
-		sb.append("\n\tADD CONSTRAINT ");
-		sb.append(k.getName());
+		sb.append("\n\tADD ");
+		if (!StringUtils.empty(k.getName()))
+			sb.append("CONSTRAINT ").append(k.getName());
 		sb.append(" PRIMARY KEY (");
 		
 		boolean first = true;
@@ -366,9 +369,10 @@ public class MSSQLDialect extends CommonSQLDialect
 		final StringBuffer sb = new StringBuffer();
 		sb.append("ALTER TABLE ");
 		sb.append(getQualifiedTableName(t.getName()));
-		sb.append("\n\tADD CONSTRAINT ");
-		sb.append(fk.getName());
-		sb.append("\n\tFOREIGN KEY (");
+		sb.append("\n\tADD ");
+		if (!StringUtils.empty(fk.getName()))
+			sb.append("CONSTRAINT ").append(fk.getName()).append("\n\t");
+		sb.append("FOREIGN KEY (");
 		
 		boolean first = true;
 		for (Iterator<String> i = fk.getColumns().keySet().iterator(); i.hasNext(); )

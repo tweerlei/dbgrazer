@@ -340,9 +340,10 @@ public class PostgreSQLDialect extends CommonSQLDialect
 		final StringBuffer sb = new StringBuffer();
 		sb.append("ALTER TABLE ");
 		sb.append(getQualifiedTableName(t.getName()));
-		sb.append("\n\tADD CONSTRAINT ");
-		sb.append(k.getName());
-		sb.append("\n\tPRIMARY KEY (");
+		sb.append("\n\tADD ");
+		if (!StringUtils.empty(k.getName()))
+			sb.append("CONSTRAINT ").append(k.getName()).append("\n\t");
+		sb.append("PRIMARY KEY (");
 		
 		boolean first = true;
 		for (Iterator<String> i = k.getColumns().iterator(); i.hasNext(); )
@@ -373,9 +374,10 @@ public class PostgreSQLDialect extends CommonSQLDialect
 		final StringBuffer sb = new StringBuffer();
 		sb.append("ALTER TABLE ");
 		sb.append(getQualifiedTableName(t.getName()));
-		sb.append("\n\tADD CONSTRAINT ");
-		sb.append(fk.getName());
-		sb.append("\n\tFOREIGN KEY (");
+		sb.append("\n\tADD ");
+		if (!StringUtils.empty(fk.getName()))
+			sb.append("CONSTRAINT ").append(fk.getName()).append("\n\t");
+		sb.append("FOREIGN KEY (");
 		
 		boolean first = true;
 		for (Iterator<String> i = fk.getColumns().keySet().iterator(); i.hasNext(); )

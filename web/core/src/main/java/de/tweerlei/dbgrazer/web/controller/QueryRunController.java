@@ -1111,13 +1111,13 @@ public class QueryRunController
 			}
 		
 		final DataFormatter fmt = factory.getWebFormatter();
-		final QueryParameters query = querySettingsManager.prepareParameters(fbo.getQuery(), fbo.getEffectiveParams());
+		final Query q = queryService.findQueryByName(connectionSettings.getLinkName(), fbo.getQuery().getSubQueries().get(level).getName());
+		final QueryParameters query = querySettingsManager.prepareParameters(q, fbo.getEffectiveParams());
 		final List<String> allParams = query.getAllParameters();
 		Collections.reverse(allParams);
 		final Map<Integer, String> params = querySettingsManager.buildParameterMap(allParams);
 		
 		try	{
-			final Query q = queryService.findQueryByName(connectionSettings.getLinkName(), fbo.getQuery().getSubQueries().get(level).getName());
 			final Result r = performQuery(connectionSettings.getLinkName(), query);
 			final Map<String, TabItem<RowSet>> rowSets = new LinkedHashMap<String, TabItem<RowSet>>();
 			
