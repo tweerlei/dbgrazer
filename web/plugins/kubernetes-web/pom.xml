@@ -89,7 +89,7 @@
 	</dependencies>
 	
 	<properties>
-		<spring-version>2.5.6</spring-version>
+		<spring-version>5.2.21.RELEASE</spring-version>
 		<jdk>1.7</jdk>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
