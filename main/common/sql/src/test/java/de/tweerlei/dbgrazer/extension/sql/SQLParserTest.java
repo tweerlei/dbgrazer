@@ -71,6 +71,8 @@ public class SQLParserTest extends TestCase
 		assertEquals(Arrays.asList("select", "column", "from", "table", "where", "\"column 2\"", "=", ":var"), parse("select column from table where \"column 2\" = :var"));
 		assertEquals(Arrays.asList("select", "column", "from", "table", "where", "column2", "=", ":\"var 1\""), parse("select column from table where column2 = : \"var 1\""));
 		
+		assertEquals(Arrays.asList("select", "fun1", "(", "a", ",", "b", ",", "c", ":", "(", "select", "3", "from", "dual", ")", ",", "d", ")", "from", "dual"), parse("select fun1(a, b, c: (select 3 from dual), d) from dual"));
+		
 		assertEquals(Arrays.asList("DO", "' this is verbatim ''text''; with a $1 placeholder '"), parse("DO $$ this is verbatim 'text'; with a $1 placeholder $$"));
 		assertEquals(Arrays.asList("DO", "' this is verbatim ''text''; with a $1 placeholder '"), parse("DO $body$ this is verbatim 'text'; with a $1 placeholder $body$"));
 		assertEquals(Arrays.asList("DO", "' this is verbatim ''text''; with a $head$ placeholder '"), parse("DO $body$ this is verbatim 'text'; with a $head$ placeholder $body$"));

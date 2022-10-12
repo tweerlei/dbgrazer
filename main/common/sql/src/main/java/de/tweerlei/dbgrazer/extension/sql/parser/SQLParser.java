@@ -464,12 +464,18 @@ public class SQLParser
 						token.append(c);
 						state = State.QUOTED_NAME;
 						}
-					else if ((c == '='))
+					else if (c == '=')
 						{
 						// special case to distinguish the assignment operator from a host variable declaration
 						state = State.OPERATOR;
 						token.append(c);
 						flushToken();
+						}
+					else if (c == '(')
+						{
+						flushToken();
+						consumer.openBrace();
+						state = State.INITIAL;
 						}
 					else if (Character.isWhitespace(c))
 						space.append(c);

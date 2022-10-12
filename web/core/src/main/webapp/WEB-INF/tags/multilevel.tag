@@ -83,7 +83,7 @@
 			><c:when test="${links == null}"><a class="action" title="<fmt:message key="refresh"/>" href="#" onclick="return loadQueryLevel(event, '${query}', ${fn:length(params)});"></c:when
 			><c:otherwise><a class="action" title="<fmt:message key="refresh"/>" href="${links[fn:length(params)]}"></c:otherwise
 		></c:choose><fmt:message key="refreshIcon"/></a><c:if test="${currentConnection.editorActive && (not empty editLinkTemplate) && (not empty subQuery)}"
-			> <span class="action" title="${editTitle}" href="${fn:replace(editLinkTemplate, '%%', subQuery)}"><fmt:message key="editQueryIcon"/></span></c:if
+			> <a class="action" title="${editTitle}" href="${fn:replace(editLinkTemplate, '%%', subQuery)}"><fmt:message key="editQueryIcon"/></a></c:if
 	></c:forEach
 ></c:when><c:otherwise
 	><form action="#" method="get" onsubmit="return false;"><select id="combo-${name}" name="combo" onchange="return showTab('${name}', this.selectedIndex);">
@@ -106,7 +106,7 @@
 			><c:when test="${links == null}"><a class="action" title="<fmt:message key="refresh"/>" href="#" onclick="return loadQueryLevel(event, '${query}', ${fn:length(params)});"></c:when
 			><c:otherwise><a class="action" title="<fmt:message key="refresh"/>" href="${links[fn:length(params)]}"></c:otherwise
 		></c:choose><fmt:message key="refreshIcon"/></a><c:if test="${currentConnection.editorActive && (not empty editLinkTemplate) && (not empty subQuery)}"
-			> <span class="action" title="${editTitle}" href="${fn:replace(editLinkTemplate, '%%', subQuery)}"><fmt:message key="editQueryIcon"/></span></c:if
+			> <a class="action" title="${editTitle}" href="${fn:replace(editLinkTemplate, '%%', subQuery)}"><fmt:message key="editQueryIcon"/></a></c:if
 ></form></c:otherwise></c:choose
 ><c:forEach items="${params}" var="p"></div></c:forEach></div>
 	
