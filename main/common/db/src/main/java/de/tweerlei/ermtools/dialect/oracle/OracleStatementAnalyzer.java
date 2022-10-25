@@ -51,6 +51,10 @@ public class OracleStatementAnalyzer implements SQLStatementAnalyzer
 	
 	public SQLExecutionPlan analyzeStatement(String stmt, List<Object> params) throws SQLException
 		{
+		final boolean resetAutoCommit = conn.getAutoCommit();
+		if (resetAutoCommit)
+			conn.setAutoCommit(false);
+		
 		try	{
 			final String explainStmt = "EXPLAIN PLAN"
 					+ " SET statement_id = '" + STATEMENT_ID + "'"
@@ -156,6 +160,9 @@ public class OracleStatementAnalyzer implements SQLStatementAnalyzer
 			{
 			// clear plan_table
 			conn.rollback();
+			
+			if (resetAutoCommit)
+				conn.setAutoCommit(true);
 			}
 		}
 	}
