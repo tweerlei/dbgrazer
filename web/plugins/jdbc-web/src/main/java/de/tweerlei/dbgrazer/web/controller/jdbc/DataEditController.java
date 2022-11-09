@@ -70,6 +70,7 @@ public class DataEditController
 		private String schema;
 		private String object;
 		private String backTo;
+		private boolean move;
 		private final Map<Integer, String> ids;
 		private final Map<Integer, String> params;
 		private final Map<Integer, Boolean> nulls;
@@ -172,6 +173,22 @@ public class DataEditController
 		public void setBackTo(String backTo)
 			{
 			this.backTo = backTo;
+			}
+		
+		/**
+		 * @return the move
+		 */
+		public boolean isMove()
+			{
+			return move;
+			}
+		
+		/**
+		 * @param move the move to set
+		 */
+		public void setMove(boolean move)
+			{
+			this.move = move;
 			}
 		}
 	
@@ -299,6 +316,20 @@ public class DataEditController
 			final Result r = runner.performQuery(connectionSettings.getLinkName(), query);
 			model.put("result", frontendHelperService.toJSONString(String.valueOf(r.getFirstRowSet().getFirstValue())));
 			model.put("exceptionText", null);
+			
+			if (fbo.isMove() && !fbo.getIds().isEmpty())
+				{
+				final Query q2 = queryGeneratorService.createDeleteQuery(t, getSQLDialect(), fmt);
+				final QueryParameters query2 = querySettingsManager.prepareParameters(q2, fbo.getIds());
+				
+				try	{
+					runner.performQuery(connectionSettings.getLinkName(), query2);
+					}
+				catch (PerformQueryException e)
+					{
+					// ignore
+					}
+				}
 			}
 		catch (PerformQueryException e)
 			{
