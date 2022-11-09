@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import de.tweerlei.common.util.StringUtils;
+import de.tweerlei.common5.jdbc.model.ColumnDescription;
 import de.tweerlei.common5.jdbc.model.QualifiedName;
 import de.tweerlei.common5.jdbc.model.TableDescription;
 import de.tweerlei.dbgrazer.extension.jdbc.MetadataService;
@@ -265,14 +266,24 @@ public class DataEditController
 		final Query src = queryService.findQueryByName(connectionSettings.getLinkName(), fbo.getBackTo());
 		final Query query;
 		if (src == null)
+			{
 			query = queryGeneratorService.createInsertQuery(info, getSQLDialect(), fmt, null, null);
+			int i = 0;
+			for (ColumnDescription cd : info.getColumns())
+				{
+				fbo.getNulls().put(i, !cd.isNullable());
+				i++;
+				}
+			}
 		else
+			{
 			query = queryGeneratorService.createInsertQuery(info, getSQLDialect(), fmt, src.getAttributes().get(RowSetConstants.ATTR_TABLE_PK_SELECT), null);
+			for (int i = 0, n = query.getParameters().size(); i < n; i++)
+				fbo.getNulls().put(i, true);
+			}
 		
 		model.put("parameters", query.getParameters());
 		model.put("fkTables", extractFkTables(query));
-		for (int i = 0, n = query.getParameters().size(); i < n; i++)
-			fbo.getNulls().put(i, true);
 		
 		return (model);
 		}
