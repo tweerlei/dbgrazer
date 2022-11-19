@@ -150,8 +150,10 @@ public class ResultSetAccessor
 			case Types.DATE:
 				return (rs.getDate(column, calendar));
 			case Types.TIME:
+			case Types.TIME_WITH_TIMEZONE:
 				return (rs.getTime(column, calendar));
 			case Types.TIMESTAMP:
+			case Types.TIMESTAMP_WITH_TIMEZONE:
 				return (rs.getTimestamp(column, calendar));
 			default:
 				return (rs.getObject(column));
