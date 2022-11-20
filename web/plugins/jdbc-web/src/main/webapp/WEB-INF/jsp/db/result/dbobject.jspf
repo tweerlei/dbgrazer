@@ -75,7 +75,7 @@
 							<td>${c.name}</td>
 							<td>${pkIndices[st.index]}</td>
 							<td><fmt:message key="${c.nullable}"/></td>
-							<td>${c.type.name}</td>
+							<td title="JDBC type ID ${c.type.type}">${c.type.name}</td>
 							<td>${c.type.length}</td>
 							<td>${c.type.decimals > 0 ? c.type.decimals : ''}</td>
 							<td>${fn:escapeXml(c.defaultValue)}</td>
