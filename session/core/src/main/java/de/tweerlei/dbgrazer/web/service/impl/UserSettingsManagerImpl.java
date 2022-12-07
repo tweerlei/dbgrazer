@@ -84,6 +84,24 @@ public class UserSettingsManagerImpl implements UserSettingsManager
 		}
 	
 	@Override
+	public int getMaxParameters()
+		{
+		return (configService.get(ConfigKeys.PARAMS_LIMIT));
+		}
+	
+	@Override
+	public int getMaxLinks()
+		{
+		return (configService.get(ConfigKeys.LINKS_LIMIT));
+		}
+	
+	@Override
+	public int getMaxViews()
+		{
+		return (configService.get(ConfigKeys.VIEWS_LIMIT));
+		}
+	
+	@Override
 	public SortedSet<Integer> getAutorefreshIntervals()
 		{
 		return (configService.get(ConfigKeys.AUTOREFRESH_INTERVALS));

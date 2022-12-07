@@ -60,6 +60,7 @@ import de.tweerlei.dbgrazer.web.constant.VisualizationSettings;
 import de.tweerlei.dbgrazer.web.exception.AccessDeniedException;
 import de.tweerlei.dbgrazer.web.exception.QueryNotFoundException;
 import de.tweerlei.dbgrazer.web.service.TextTransformerService;
+import de.tweerlei.dbgrazer.web.service.UserSettingsManager;
 import de.tweerlei.dbgrazer.web.service.VisualizationService;
 import de.tweerlei.dbgrazer.web.session.ConnectionSettings;
 import de.tweerlei.dbgrazer.web.session.UserSettings;
@@ -73,10 +74,6 @@ import de.tweerlei.spring.service.StringTransformerService;
 @Controller
 public class QueryEditController
 	{
-	private static final int MAX_PARAMS = 10;
-	private static final int MAX_LINKS = 15;
-	private static final int MAX_VIEWS = 15;
-	
 	private static final String PARAM_MARKER = "*";
 	
 	/**
@@ -463,6 +460,7 @@ public class QueryEditController
 	private final RowTransformerService transformerService;
 	private final VisualizationService visualizationService;
 	private final StringTransformerService stringTransformerService;
+	private final UserSettingsManager userSettingsManager;
 	private final UserSettings userSettings;
 	private final ConnectionSettings connectionSettings;
 	
@@ -474,6 +472,7 @@ public class QueryEditController
 	 * @param transformerService RowTransformerService
 	 * @param visualizationService VisualizationService
 	 * @param stringTransformerService StringTransformerService
+	 * @param userSettingsManager UserSettingsManager
 	 * @param userSettings UserSettings
 	 * @param connectionSettings ConnectionSettings
 	 */
@@ -481,6 +480,7 @@ public class QueryEditController
 	public QueryEditController(QueryService queryService, TextTransformerService textFormatterService,
 			DataExtractorService dataExtractorService, RowTransformerService transformerService,
 			VisualizationService visualizationService, StringTransformerService stringTransformerService,
+			UserSettingsManager userSettingsManager,
 			UserSettings userSettings, ConnectionSettings connectionSettings)
 		{
 		this.queryService = queryService;
@@ -489,6 +489,7 @@ public class QueryEditController
 		this.transformerService = transformerService;
 		this.visualizationService = visualizationService;
 		this.stringTransformerService = stringTransformerService;
+		this.userSettingsManager = userSettingsManager;
 		this.userSettings = userSettings;
 		this.connectionSettings = connectionSettings;
 		}
@@ -589,7 +590,8 @@ public class QueryEditController
 			ret.setStatement("");
 			}
 		
-		for (int i = 0; i < MAX_PARAMS; i++)
+		final int maxParams = userSettingsManager.getMaxParameters();
+		for (int i = 0; i < maxParams; i++)
 			{
 			if (!ret.getParams().containsKey(i))
 				{
@@ -601,13 +603,15 @@ public class QueryEditController
 				}
 			}
 		
-		for (int i = 0; i < MAX_LINKS; i++)
+		final int maxLinks = userSettingsManager.getMaxLinks();
+		for (int i = 0; i < maxLinks; i++)
 			{
 			if (!ret.getLinks().containsKey(i))
 				ret.getLinks().put(i, "");
 			}
 		
-		for (int i = 0; i < MAX_VIEWS; i++)
+		final int maxViews = userSettingsManager.getMaxViews();
+		for (int i = 0; i < maxViews; i++)
 			{
 			if (!ret.getViews().containsKey(i))
 				{

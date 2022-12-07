@@ -55,6 +55,24 @@ public interface UserSettingsManager
 	public Rational getMenuRatio();
 	
 	/**
+	 * Get the max. number of query parameters
+	 * @return max. number of query parameters
+	 */
+	public int getMaxParameters();
+	
+	/**
+	 * Get the max. number of query links
+	 * @return max. number of query links
+	 */
+	public int getMaxLinks();
+	
+	/**
+	 * Get the max. number of query views
+	 * @return max. number of query views
+	 */
+	public int getMaxViews();
+	
+	/**
 	 * Get the selectable autorefresh intervals
 	 * @return selectable autorefresh intervals
 	 */

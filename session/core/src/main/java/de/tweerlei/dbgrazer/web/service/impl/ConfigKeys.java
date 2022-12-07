@@ -53,6 +53,15 @@ public final class ConfigKeys
 	/** Session timeout */
 	public static final ConfigKey<Integer> SESSION_TIMEOUT = ConfigKey.create(PACKAGE_NAME, "sessionTimeout", Integer.class, null);
 	
+	/** Editable query params */
+	public static final ConfigKey<Integer> PARAMS_LIMIT = ConfigKey.create(PACKAGE_NAME, "paramsLimit", Integer.class, 10);
+	
+	/** Editable query links */
+	public static final ConfigKey<Integer> LINKS_LIMIT = ConfigKey.create(PACKAGE_NAME, "linksLimit", Integer.class, 10);
+	
+	/** Editable query views */
+	public static final ConfigKey<Integer> VIEWS_LIMIT = ConfigKey.create(PACKAGE_NAME, "viewsLimit", Integer.class, 10);
+	
 	/*
 	 * Global permissions (config.properties only)
 	 */
