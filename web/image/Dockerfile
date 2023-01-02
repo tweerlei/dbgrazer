@@ -46,8 +46,12 @@ RUN chmod -R og+rX /usr/local/tomcat && \
 	chmod -R og+w /usr/local/tomcat/work
 
 # Add config directory
-COPY examples /opt/dbgrazer
+COPY root/opt/dbgrazer /opt/dbgrazer
 RUN chmod +x /opt/dbgrazer/bin/*
+
+# Add state directory
+COPY root/var/opt/dbgrazer /var/opt/dbgrazer
+VOLUME /var/opt/dbgrazer
 
 # Set Tomcat options
 ENV CATALINA_OPTS -Xmx512m -XX:-OmitStackTraceInFastThrow -Ddbgrazer.configPath=/opt/dbgrazer -Duser.language=de -Duser.country=DE -Duser.timezone=Europe/Berlin
