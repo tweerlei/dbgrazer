@@ -16,15 +16,13 @@ RUN ./mvnw -P bookmark,configedit,c3p0,csv,dbunit,dml,file,http,jdbc,js,json,kaf
 FROM tomcat:9.0-jre8-alpine
 
 # Install GraphViz and MS font installer
-RUN apk add --no-cache graphviz msttcorefonts-installer
-
-# Install fonts
-RUN update-ms-fonts && fc-cache -f
+RUN apk add --no-cache graphviz msttcorefonts-installer && \
+	update-ms-fonts && \
+	fc-cache -f
 
 # Enable SSL and copy certificate
 COPY --from=build /build/web/image/root/usr/local/tomcat/conf/* /usr/local/tomcat/conf/
 COPY --from=build /build/web/image/root/usr/local/bin/* /usr/local/bin/
-RUN chmod +x /usr/local/bin/*
 
 # Add required libraries
 COPY --from=build /build/web/image/target/*.jar /usr/local/tomcat/lib/
@@ -40,8 +38,11 @@ RUN chmod -R og+rX /usr/local/tomcat && \
 	chmod -R og+w /usr/local/tomcat/work
 
 # Add config directory
-COPY --from=build /build/web/image/examples /opt/dbgrazer
-RUN chmod +x /opt/dbgrazer/bin/*
+COPY --from=build /build/web/image/root/opt/dbgrazer /opt/dbgrazer
+
+# Add state directory
+COPY --from=build /build/web/image/root/var/opt/dbgrazer /var/opt/dbgrazer
+VOLUME /var/opt/dbgrazer
 
 # Set Tomcat options
 ENV CATALINA_OPTS -Xmx512m -XX:-OmitStackTraceInFastThrow -Ddbgrazer.configPath=/opt/dbgrazer -Duser.language=de -Duser.country=DE -Duser.timezone=Europe/Berlin
