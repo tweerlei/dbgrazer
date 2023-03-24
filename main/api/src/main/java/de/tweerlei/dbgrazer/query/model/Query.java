@@ -48,6 +48,12 @@ public interface Query extends Named, Serializable
 	public String getStatement();
 	
 	/**
+	 * Get the statement text
+	 * @return Statement text
+	 */
+	public Map<String, String> getStatementVariants();
+	
+	/**
 	 * Get the parameters
 	 * @return Parameters
 	 */

@@ -1028,7 +1028,7 @@ public class QueryServiceImpl implements QueryService, ConfigListener, LinkListe
 						if (!found)
 							continue;
 						
-						tmp = new QueryImpl(q.getName(), q.getSourceSchema(), q.getGroupName(), q.getStatement(), q.getType(), params, targets, q.getAttributes());
+						tmp = new QueryImpl(q.getName(), q.getSourceSchema(), q.getGroupName(), q.getStatement(), q.getStatementVariants(), q.getType(), params, targets, q.getAttributes());
 						}
 					
 					try	{
@@ -1077,7 +1077,7 @@ public class QueryServiceImpl implements QueryService, ConfigListener, LinkListe
 				if (q.getType().getResultType().isView())
 					tmp = new ViewImpl(q.getName(), q.getSourceSchema(), qnNew, q.getType(), q.getParameters(), q.getSubQueries(), q.getAttributes());
 				else
-					tmp = new QueryImpl(q.getName(), q.getSourceSchema(), qnNew, q.getStatement(), q.getType(), q.getParameters(), q.getTargetQueries(), q.getAttributes());
+					tmp = new QueryImpl(q.getName(), q.getSourceSchema(), qnNew, q.getStatement(), q.getStatementVariants(), q.getType(), q.getParameters(), q.getTargetQueries(), q.getAttributes());
 				
 				try	{
 					loader.updateQuery(ent.getKey(), user, tmp.getName(), tmp.getName(), tmp);
@@ -1133,7 +1133,7 @@ public class QueryServiceImpl implements QueryService, ConfigListener, LinkListe
 				if (q.getType().getResultType().isView())
 					tmp = new ViewImpl(q.getName(), q.getSourceSchema(), q.getGroupName(), q.getType(), params, q.getSubQueries(), q.getAttributes());
 				else
-					tmp = new QueryImpl(q.getName(), q.getSourceSchema(), q.getGroupName(), q.getStatement(), q.getType(), params, q.getTargetQueries(), q.getAttributes());
+					tmp = new QueryImpl(q.getName(), q.getSourceSchema(), q.getGroupName(), q.getStatement(), q.getStatementVariants(), q.getType(), params, q.getTargetQueries(), q.getAttributes());
 				
 				try	{
 					loader.updateQuery(ent.getKey(), user, tmp.getName(), tmp.getName(), tmp);
@@ -1300,7 +1300,7 @@ public class QueryServiceImpl implements QueryService, ConfigListener, LinkListe
 					if (!found)
 						continue;
 					
-					tmp = new QueryImpl(q.getName(), q.getSourceSchema(), q.getGroupName(), q.getStatement(), q.getType(), params, targets, q.getAttributes());
+					tmp = new QueryImpl(q.getName(), q.getSourceSchema(), q.getGroupName(), q.getStatement(), q.getStatementVariants(), q.getType(), params, targets, q.getAttributes());
 					}
 				
 				try	{

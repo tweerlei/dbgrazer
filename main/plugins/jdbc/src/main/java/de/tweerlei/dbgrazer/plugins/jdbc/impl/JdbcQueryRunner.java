@@ -254,7 +254,7 @@ public class JdbcQueryRunner extends BaseQueryRunner
 		if (query.getType() instanceof ReportQueryType)
 			{
 			final String countStmt = sqlGenerator.createRowCountQuery(query.getStatement());
-			runQuery = new QueryImpl(query.getName(), query.getSourceSchema(), query.getGroupName(), countStmt, query.getType(), query.getParameters(), null, query.getAttributes());
+			runQuery = new QueryImpl(query.getName(), query.getSourceSchema(), query.getGroupName(), countStmt, null, query.getType(), query.getParameters(), null, query.getAttributes());
 			}
 		else
 			runQuery = query;

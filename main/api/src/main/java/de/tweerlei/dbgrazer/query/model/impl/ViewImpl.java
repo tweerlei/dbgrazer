@@ -58,6 +58,12 @@ public class ViewImpl extends AbstractQueryImpl
 		}
 	
 	@Override
+	public Map<String, String> getStatementVariants()
+		{
+		return (Collections.emptyMap());
+		}
+	
+	@Override
 	public Map<Integer, TargetDef> getTargetQueries()
 		{
 		return (Collections.emptyMap());

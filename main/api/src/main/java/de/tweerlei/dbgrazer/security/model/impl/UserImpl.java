@@ -23,18 +23,20 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import de.tweerlei.dbgrazer.common.util.impl.NamedBase;
 import de.tweerlei.dbgrazer.security.model.Authority;
 import de.tweerlei.dbgrazer.security.model.User;
 
 /**
- * User details
+ * User details.
+ * 
+ * Attention: We cannot extend NamedBase here, because that is not Serializable
  * 
  * @author Robert Wruck
  */
-public class UserImpl extends NamedBase implements User, Serializable
+public class UserImpl implements User, Serializable
 	{
 	private final String login;
+	private final String name;
 	private final String password;
 	private final Set<Authority> authorities;
 	private final Map<String, Set<Authority>> groups;
@@ -51,8 +53,8 @@ public class UserImpl extends NamedBase implements User, Serializable
 	 */
 	public UserImpl(String login, String name, String password, Set<Authority> authorities, Map<String, Set<Authority>> groups, Map<String, String> attributes)
 		{
-		super(name);
 		this.login = login;
+		this.name = name;
 		this.password = password;
 		// EnumSet.copyOf doesn't work for empty sets
 		this.authorities = ((authorities == null) || authorities.isEmpty()) ? Collections.<Authority>emptySet() : Collections.unmodifiableSet(EnumSet.copyOf(authorities));
@@ -66,6 +68,12 @@ public class UserImpl extends NamedBase implements User, Serializable
 		return login;
 		}
 
+	@Override
+	public final String getName()
+		{
+		return (name);
+		}
+	
 	@Override
 	public String getPassword()
 		{
@@ -104,5 +112,11 @@ public class UserImpl extends NamedBase implements User, Serializable
 	public final Map<String, String> getAttributes()
 		{
 		return (attributes);
+		}
+	
+	@Override
+	public final String toString()
+		{
+		return (name);
 		}
 	}

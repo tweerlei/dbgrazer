@@ -33,7 +33,7 @@
 			</dl><hr/>
 		</form></div>
 </c:when><c:otherwise
-		><fmt:message key="motd"/></c:otherwise
+		><div class="login"><fmt:message key="motd"/></div></c:otherwise
 ></c:choose></div></div>
 <%@
 	include file="include/footer.jspf"

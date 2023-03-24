@@ -322,7 +322,7 @@ public class MongoDBController
 		{
 		final QueryType t = queryService.findQueryType(MongoDBConstants.QUERYTYPE_COMMAND);
 		
-		final Query q = new QueryImpl(label, new SchemaDef(null, null), null, statement, t, null, null, Collections.singletonMap(MongoDBConstants.ATTR_DATABASE, database));
+		final Query q = new QueryImpl(label, new SchemaDef(null, null), null, statement, null, t, null, null, Collections.singletonMap(MongoDBConstants.ATTR_DATABASE, database));
 		
 		try	{
 			final Result r = runner.performQuery(connectionSettings.getLinkName(), q, 0, Collections.emptyList(), factory.getTimeZone(), limit, null);

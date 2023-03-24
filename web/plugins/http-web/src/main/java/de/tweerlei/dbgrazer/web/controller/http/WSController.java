@@ -341,7 +341,7 @@ public class WSController
 		{
 		final QueryType t = queryService.findQueryType(type);
 		
-		final Query q = new QueryImpl(label, new SchemaDef(null, null), null, statement, t, null, null, attrs);
+		final Query q = new QueryImpl(label, new SchemaDef(null, null), null, statement, null, t, null, null, attrs);
 		
 		try	{
 			final Result r = runner.performQuery(connectionSettings.getLinkName(), q, 0, Collections.emptyList(), factory.getTimeZone(), limit, null);

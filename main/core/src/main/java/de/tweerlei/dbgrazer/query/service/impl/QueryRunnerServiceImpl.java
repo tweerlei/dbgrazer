@@ -151,7 +151,7 @@ public class QueryRunnerServiceImpl implements QueryRunnerService, ConfigListene
 		{
 		final Result res;
 		
-		final Query q = new QueryImpl(type.getName(), null, null, null, type, null, null, null);
+		final Query q = new QueryImpl(type.getName(), null, null, null, null, type, null, null, null);
 		
 		final QueryRunner r = findRunner(type);
 		if (r == null)
@@ -171,7 +171,7 @@ public class QueryRunnerServiceImpl implements QueryRunnerService, ConfigListene
 		{
 		final Result res;
 		
-		final Query q = new QueryImpl(type.getName(), null, null, query, type, null, null, null);
+		final Query q = new QueryImpl(type.getName(), null, null, query, null, type, null, null, null);
 		
 		final QueryRunner r = findRunner(type);
 		if (r == null)

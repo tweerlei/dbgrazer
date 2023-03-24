@@ -336,7 +336,7 @@ public class WebserviceQueryRunner extends BaseQueryRunner
 	
 	private RowSet createHeaderRowSet(Query query, int subQueryIndex, int status, Map<String, String> headers, long time)
 		{
-		final Query q = new QueryImpl(query.getName(), query.getSourceSchema(), query.getGroupName(), query.getStatement(), new HeadQueryType(null), query.getParameters(), null, query.getAttributes());
+		final Query q = new QueryImpl(query.getName(), query.getSourceSchema(), query.getGroupName(), query.getStatement(), query.getStatementVariants(), new HeadQueryType(null), query.getParameters(), null, query.getAttributes());
 		final RowSetImpl rs = resultBuilder.createMapRowSet(q, subQueryIndex, "name", "value", headers, time);
 		rs.getRows().add(0, new DefaultResultRow(STATUS_HEADER, status));
 		return (rs);

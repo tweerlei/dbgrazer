@@ -253,7 +253,7 @@ public class KafkaQueryRunner extends BaseQueryRunner
 	
 	private RowSet createHeaderRowSet(Query query, int subQueryIndex, ConsumerRecord<String, String> rec, long time)
 		{
-		final Query q = new QueryImpl(query.getName(), query.getSourceSchema(), query.getGroupName(), query.getStatement(), new MessageHeadersQueryType(null), query.getParameters(), null, query.getAttributes());
+		final Query q = new QueryImpl(query.getName(), query.getSourceSchema(), query.getGroupName(), query.getStatement(), query.getStatementVariants(), new MessageHeadersQueryType(null), query.getParameters(), null, query.getAttributes());
 		final RowSetImpl rs;
 		if (rec == null)
 			rs = resultBuilder.createEmptyRowSet(q, subQueryIndex, time);

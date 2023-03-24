@@ -65,7 +65,7 @@ public class QuerySettingsManagerImplTest extends TestCase
 	 */
 	public void testGetEffectiveParameters()
 		{
-		final Query q = new QueryImpl("test", new SchemaDef("schema", "1"), "", "", new TestQueryType(), Arrays.<ParameterDef>asList(
+		final Query q = new QueryImpl("test", new SchemaDef("schema", "1"), "", "", null, new TestQueryType(), Arrays.<ParameterDef>asList(
 				new ParameterDefImpl("p1", ColumnType.STRING, null),
 				new ParameterDefImpl("p2", ColumnType.INTEGER, null)
 				), Collections.<Integer, TargetDef>emptyMap(), Collections.<String, String>emptyMap());
@@ -121,7 +121,7 @@ public class QuerySettingsManagerImplTest extends TestCase
 	 */
 	public void testGetAdditionalParameters()
 		{
-		final Query q = new QueryImpl("test", new SchemaDef("schema", "1"), "", "", new TestQueryType(), Arrays.<ParameterDef>asList(
+		final Query q = new QueryImpl("test", new SchemaDef("schema", "1"), "", "", null, new TestQueryType(), Arrays.<ParameterDef>asList(
 				new ParameterDefImpl("p1", ColumnType.STRING, null),
 				new ParameterDefImpl("p2", ColumnType.INTEGER, null)
 				), Collections.<Integer, TargetDef>emptyMap(), Collections.<String, String>emptyMap());
@@ -159,7 +159,7 @@ public class QuerySettingsManagerImplTest extends TestCase
 	 */
 	public void testTranslateParameters()
 		{
-		final Query q = new QueryImpl("test", new SchemaDef("schema", "1"), "", "", new TestQueryType(), Arrays.<ParameterDef>asList(
+		final Query q = new QueryImpl("test", new SchemaDef("schema", "1"), "", "", null, new TestQueryType(), Arrays.<ParameterDef>asList(
 				new ParameterDefImpl("p1", ColumnType.STRING, null),
 				new ParameterDefImpl("p2", ColumnType.INTEGER, null)
 				), Collections.<Integer, TargetDef>emptyMap(), Collections.<String, String>emptyMap());

@@ -166,7 +166,7 @@ public class QueryPersisterImpl implements QueryPersister
 //			if (StringUtils.empty(s))
 //				throw new IOException("Invalid query definition");
 			
-			return (new QueryImpl(name, scope, groupName, s, type, params, targets, attributes));
+			return (new QueryImpl(name, scope, groupName, s, null, type, params, targets, attributes));
 			}
 		}
 	

@@ -323,7 +323,7 @@ public class LdapController
 		{
 		final QueryType t = queryService.findQueryType(type);
 		
-		final Query q = new QueryImpl(label, new SchemaDef(null, null), null, statement, t, null, null, null);
+		final Query q = new QueryImpl(label, new SchemaDef(null, null), null, statement, null, t, null, null, null);
 		
 		try	{
 			final Result r = runner.performQuery(connectionSettings.getLinkName(), q, 0, Collections.emptyList(), factory.getTimeZone(), limit, null);

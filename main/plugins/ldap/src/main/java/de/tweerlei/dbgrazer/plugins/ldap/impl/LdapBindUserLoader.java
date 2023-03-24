@@ -28,6 +28,7 @@ import org.springframework.ldap.core.LdapEntryIdentificationContextMapper;
 import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.stereotype.Service;
 
+import de.tweerlei.common.util.StringUtils;
 import de.tweerlei.dbgrazer.common.service.ConfigListener;
 import de.tweerlei.dbgrazer.common.service.ConfigService;
 import de.tweerlei.dbgrazer.extension.ldap.LdapAccessService;
@@ -86,21 +87,26 @@ public class LdapBindUserLoader implements UserAuthenticator, ConfigListener
 			return (false);
 			}
 		
+		final String base = configService.get(ConfigKeys.LDAP_USER_DN);
 		final String pattern = configService.get(ConfigKeys.LDAP_USER_PATTERN);
 		final String ldapUsername = pattern.replace("?", username);
+		final String ldapUserDN;
+		if (StringUtils.empty(base))
+			ldapUserDN = ldapUsername;
+		else
+			ldapUserDN = ldapUsername + "," + base;
 		
-		final LdapTemplate ldap = ldapAccessService.getLdapTemplate(link, ldapUsername, password);
+		final LdapTemplate ldap = ldapAccessService.getLdapTemplate(link, ldapUserDN, password);
 		if (ldap == null)
 			{
 			logger.log(Level.SEVERE, "Unknown link for authentication: " + link);
 			return (false);
 			}
 		
-		final String base = configService.get(ConfigKeys.LDAP_USER_DN);
 		final String filter = configService.get(ConfigKeys.LDAP_USER_FILTER);
 		final String userFilter = filter.replace("?", username);
 		
-		logger.log(Level.INFO, "Trying to authenticate: [" + ldapUsername + "] [" + base + "] [" + userFilter + "]");
+		logger.log(Level.INFO, "Trying to authenticate: [" + ldapUserDN + "] [" + base + "] [" + userFilter + "]");
 		
 		try	{
 			@SuppressWarnings("unchecked")
@@ -117,7 +123,7 @@ public class LdapBindUserLoader implements UserAuthenticator, ConfigListener
 			}
 		catch (NamingException e)
 			{
-			logger.log(Level.SEVERE, "LDAP search failed for bind user DN: " + ldapUsername, e);
+			logger.log(Level.SEVERE, "LDAP search failed for bind user DN: " + ldapUserDN, e);
 			return (false);
 			}
 		}

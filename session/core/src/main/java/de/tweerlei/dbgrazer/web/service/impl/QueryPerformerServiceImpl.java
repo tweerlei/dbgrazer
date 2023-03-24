@@ -319,7 +319,7 @@ public class QueryPerformerServiceImpl implements QueryPerformerService
 		if (t == null)
 			throw new IllegalArgumentException("Unknown query type: " + type);
 		
-		final Query q = new QueryImpl(label, new SchemaDef(null, null), null, statement, t, paramDefs, null, null);
+		final Query q = new QueryImpl(label, new SchemaDef(null, null), null, statement, null, t, paramDefs, null, null);
 		
 		return (q);
 		}
@@ -391,7 +391,7 @@ public class QueryPerformerServiceImpl implements QueryPerformerService
 		
 		final Result r = runner.performQuery(link, q, 0, Collections.emptyList(), timeZone, Integer.MAX_VALUE, null);
 		
-		final Query qc = new QueryImpl(label, new SchemaDef(null, null), null, null, queryService.findQueryType(VisualizationSettings.CHART_QUERY_TYPE), null, null, null);
+		final Query qc = new QueryImpl(label, new SchemaDef(null, null), null, null, null, queryService.findQueryType(VisualizationSettings.CHART_QUERY_TYPE), null, null, null);
 		final Result rc = new ResultImpl(qc);
 		rc.getRowSets().putAll(r.getRowSets());
 		return (rc);

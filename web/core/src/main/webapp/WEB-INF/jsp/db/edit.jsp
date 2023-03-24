@@ -29,7 +29,7 @@
 	<div id="tools-1" class="hidden"><div class="menucolumn">
 <c:if test="${currentConnection.submitEnabled && currentConnection.type.customQuerySupported}"
 >		<form id="toolsform-1" class="hidden" action="db/${currentConnection.linkName}/submit-${currentConnection.type}.html" method="post" target="_blank">
-			<input type="hidden" name="statement" value="${fn:escapeXml(model.statement)}"/>
+			<input type="hidden" name="statement" value="${fn:escapeXml(model.defaultStatement)}"/>
 			<input type="hidden" name="type" value="${model.type}"/>
 <c:forEach items="${model.attributes}" var="a"
 >			<input type="hidden" name="attributes[${a.key}]" value="${fn:escapeXml(a.value)}"/>
@@ -230,12 +230,14 @@
 						</tr></c:forEach>
 					</tbody>
 					</table></dd>
-				<dt class="query-only"<c:if test="${model.viewType}"> style="display: none;"</c:if>><spring:label path="statement"><fmt:message key="sqlStatement"/></spring:label></dt>
+				<dt class="query-only"<c:if test="${model.viewType}"> style="display: none;"</c:if>><spring:label path="statements['']"><fmt:message key="sqlStatement"/></spring:label></dt>
 				<dd class="query-only"<c:if test="${model.viewType}"> style="display: none;"</c:if>><div>
-					<span class="action" title="<fmt:message key="clear"/>" onclick="return clearElement('statement');"><fmt:message key="clearIcon"/></span>
-					<span class="action" title="<fmt:message key="maximize"/>" onclick="return zoomForm('statement');"><fmt:message key="maximizeIcon"/></span>
 					<ui:info name="sqlStatement"><fmt:message key="help_sqlStatement"/></ui:info></div>
-					<spring:textarea path="statement" cssClass="large" cols="80" rows="25"/></dd>
+					<ui:tabs items="${dialects}" var="content" varKey="key" varLink="link" varParams="params" varParamString="paramString">
+						<div><span class="action" title="<fmt:message key="clear"/>" onclick="return clearElement('statements_${content}');"><fmt:message key="clearIcon"/></span>
+						<span class="action" title="<fmt:message key="maximize"/>" onclick="return zoomForm('statement_${content}');"><fmt:message key="maximizeIcon"/></span></div>
+						<spring:textarea path="statements['${content}']" cssClass="large" cols="80" rows="25"/>
+					</ui:tabs></dd>
 				<dt>&nbsp;</dt>
 				<dd><input type="submit" value="<fmt:message key="apply"/>"/>
 					<input type="reset" value="<fmt:message key="cancel"/>"/></dd>

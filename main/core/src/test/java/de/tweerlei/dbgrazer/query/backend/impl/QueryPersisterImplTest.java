@@ -278,7 +278,7 @@ public class QueryPersisterImplTest extends TestCase
 		final Map<String, String> attributes = new LinkedHashMap<String, String>();
 		attributes.put("key1", "value1");
 		attributes.put("key2", "value2");
-		final Query def = new QueryImpl("qn", new SchemaDef(null, null), "group", "SELECT 42\nFROM DUAL", new TestQueryType(), params, targets, attributes);
+		final Query def = new QueryImpl("qn", new SchemaDef(null, null), "group", "SELECT 42\nFROM DUAL", null, new TestQueryType(), params, targets, attributes);
 		
 		final StringWriter sw = new StringWriter();
 		// Properties with reserved names shall be suppressed

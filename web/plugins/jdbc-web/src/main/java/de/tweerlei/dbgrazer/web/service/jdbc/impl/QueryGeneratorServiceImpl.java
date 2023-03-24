@@ -83,7 +83,7 @@ public class QueryGeneratorServiceImpl implements QueryGeneratorService
 		{
 		final String stmt = sqlGenerator.generatePKSelect(t, Style.INDENTED, dialect);
 		
-		return (new QueryImpl("", null, null, stmt, queryService.findQueryType(JdbcConstants.QUERYTYPE_MULTIPLE), getPKParameters(t, dialect), null, null));
+		return (new QueryImpl("", null, null, stmt, null, queryService.findQueryType(JdbcConstants.QUERYTYPE_MULTIPLE), getPKParameters(t, dialect), null, null));
 		}
 	
 	@Override
@@ -152,7 +152,7 @@ public class QueryGeneratorServiceImpl implements QueryGeneratorService
 		else
 			tp = queryService.findQueryType(JdbcConstants.QUERYTYPE_DML_KEY);
 		
-		return (new QueryImpl("", null, null, sw.toString(), tp, params, null, null));
+		return (new QueryImpl("", null, null, sw.toString(), null, tp, params, null, null));
 		}
 	
 	@Override
@@ -187,7 +187,7 @@ public class QueryGeneratorServiceImpl implements QueryGeneratorService
 		
 		sqlWriter.writeUpdate(t.getName(), columns, null, null, t.getPKColumns());
 		
-		return (new QueryImpl("", null, null, sw.toString(), queryService.findQueryType(JdbcConstants.QUERYTYPE_DML), params, null, null));
+		return (new QueryImpl("", null, null, sw.toString(), null, queryService.findQueryType(JdbcConstants.QUERYTYPE_DML), params, null, null));
 		}
 	
 	@Override
@@ -205,7 +205,7 @@ public class QueryGeneratorServiceImpl implements QueryGeneratorService
 		
 		sqlWriter.writeDelete(t.getName(), columns, null, t.getPKColumns());
 		
-		return (new QueryImpl("", null, null, sw.toString(), queryService.findQueryType(JdbcConstants.QUERYTYPE_DML), getPKParameters(t, dialect), null, null));
+		return (new QueryImpl("", null, null, sw.toString(), null, queryService.findQueryType(JdbcConstants.QUERYTYPE_DML), getPKParameters(t, dialect), null, null));
 		}
 	
 	private List<ParameterDef> getPKParameters(TableDescription t, SQLDialect dialect)
@@ -224,84 +224,84 @@ public class QueryGeneratorServiceImpl implements QueryGeneratorService
 	@Override
 	public Query createAddColumnQuery(TableDescription t, SQLDialect dialect, ColumnDescription c)
 		{
-		return (new QueryImpl("", null, null, dialect.addColumn(t, c), queryService.findQueryType(JdbcConstants.QUERYTYPE_DML), null, null, null));
+		return (new QueryImpl("", null, null, dialect.addColumn(t, c), null, queryService.findQueryType(JdbcConstants.QUERYTYPE_DML), null, null, null));
 		}
 	
 	@Override
 	public Query createAlterColumnQuery(TableDescription t, SQLDialect dialect, ColumnDescription prev, ColumnDescription c)
 		{
-		return (new QueryImpl("", null, null, dialect.modifyColumn(t, c, prev), queryService.findQueryType(JdbcConstants.QUERYTYPE_DML), null, null, null));
+		return (new QueryImpl("", null, null, dialect.modifyColumn(t, c, prev), null, queryService.findQueryType(JdbcConstants.QUERYTYPE_DML), null, null, null));
 		}
 	
 	@Override
 	public Query createDropColumnQuery(TableDescription t, SQLDialect dialect, ColumnDescription c)
 		{
-		return (new QueryImpl("", null, null, dialect.removeColumn(t, c), queryService.findQueryType(JdbcConstants.QUERYTYPE_DML), null, null, null));
+		return (new QueryImpl("", null, null, dialect.removeColumn(t, c), null, queryService.findQueryType(JdbcConstants.QUERYTYPE_DML), null, null, null));
 		}
 	
 	@Override
 	public Query createAddIndexQuery(TableDescription t, SQLDialect dialect, IndexDescription i)
 		{
-		return (new QueryImpl("", null, null, dialect.createIndex(t, i), queryService.findQueryType(JdbcConstants.QUERYTYPE_DML), null, null, null));
+		return (new QueryImpl("", null, null, dialect.createIndex(t, i), null, queryService.findQueryType(JdbcConstants.QUERYTYPE_DML), null, null, null));
 		}
 	
 	@Override
 	public Query createDropIndexQuery(TableDescription t, SQLDialect dialect, IndexDescription i)
 		{
-		return (new QueryImpl("", null, null, dialect.dropIndex(t, i), queryService.findQueryType(JdbcConstants.QUERYTYPE_DML), null, null, null));
+		return (new QueryImpl("", null, null, dialect.dropIndex(t, i), null, queryService.findQueryType(JdbcConstants.QUERYTYPE_DML), null, null, null));
 		}
 	
 	@Override
 	public Query createAddPrimaryKeyQuery(TableDescription t, SQLDialect dialect, PrimaryKeyDescription i)
 		{
-		return (new QueryImpl("", null, null, dialect.addPrimaryKey(t, i), queryService.findQueryType(JdbcConstants.QUERYTYPE_DML), null, null, null));
+		return (new QueryImpl("", null, null, dialect.addPrimaryKey(t, i), null, queryService.findQueryType(JdbcConstants.QUERYTYPE_DML), null, null, null));
 		}
 	
 	@Override
 	public Query createDropPrimaryKeyQuery(TableDescription t, SQLDialect dialect, PrimaryKeyDescription i)
 		{
-		return (new QueryImpl("", null, null, dialect.removePrimaryKey(t, i), queryService.findQueryType(JdbcConstants.QUERYTYPE_DML), null, null, null));
+		return (new QueryImpl("", null, null, dialect.removePrimaryKey(t, i), null, queryService.findQueryType(JdbcConstants.QUERYTYPE_DML), null, null, null));
 		}
 	
 	@Override
 	public Query createAddForeignKeyQuery(TableDescription t, SQLDialect dialect, ForeignKeyDescription f)
 		{
-		return (new QueryImpl("", null, null, dialect.addForeignKey(t, f), queryService.findQueryType(JdbcConstants.QUERYTYPE_DML), null, null, null));
+		return (new QueryImpl("", null, null, dialect.addForeignKey(t, f), null, queryService.findQueryType(JdbcConstants.QUERYTYPE_DML), null, null, null));
 		}
 	
 	@Override
 	public Query createDropForeignKeyQuery(TableDescription t, SQLDialect dialect, ForeignKeyDescription f)
 		{
-		return (new QueryImpl("", null, null, dialect.removeForeignKey(t, f), queryService.findQueryType(JdbcConstants.QUERYTYPE_DML), null, null, null));
+		return (new QueryImpl("", null, null, dialect.removeForeignKey(t, f), null, queryService.findQueryType(JdbcConstants.QUERYTYPE_DML), null, null, null));
 		}
 	
 	@Override
 	public Query createGrantQuery(TableDescription t, SQLDialect dialect, PrivilegeDescription p)
 		{
-		return (new QueryImpl("", null, null, dialect.grantPrivilege(t, p), queryService.findQueryType(JdbcConstants.QUERYTYPE_DML), null, null, null));
+		return (new QueryImpl("", null, null, dialect.grantPrivilege(t, p), null, queryService.findQueryType(JdbcConstants.QUERYTYPE_DML), null, null, null));
 		}
 	
 	@Override
 	public Query createRevokeQuery(TableDescription t, SQLDialect dialect, PrivilegeDescription p)
 		{
-		return (new QueryImpl("", null, null, dialect.revokePrivilege(t, p), queryService.findQueryType(JdbcConstants.QUERYTYPE_DML), null, null, null));
+		return (new QueryImpl("", null, null, dialect.revokePrivilege(t, p), null, queryService.findQueryType(JdbcConstants.QUERYTYPE_DML), null, null, null));
 		}
 	
 	@Override
 	public Query createCreateTableQuery(TableDescription t, SQLDialect dialect)
 		{
-		return (new QueryImpl("", null, null, dialect.createTable(t), queryService.findQueryType(JdbcConstants.QUERYTYPE_DML), null, null, null));
+		return (new QueryImpl("", null, null, dialect.createTable(t), null, queryService.findQueryType(JdbcConstants.QUERYTYPE_DML), null, null, null));
 		}
 	
 	@Override
 	public Query createAlterTableQuery(TableDescription prev, SQLDialect dialect, TableDescription t)
 		{
-		return (new QueryImpl("", null, null, dialect.modifyTable(prev, t), queryService.findQueryType(JdbcConstants.QUERYTYPE_DML), null, null, null));
+		return (new QueryImpl("", null, null, dialect.modifyTable(prev, t), null, queryService.findQueryType(JdbcConstants.QUERYTYPE_DML), null, null, null));
 		}
 	
 	@Override
 	public Query createDropTableQuery(TableDescription t, SQLDialect dialect)
 		{
-		return (new QueryImpl("", null, null, dialect.dropTable(t), queryService.findQueryType(JdbcConstants.QUERYTYPE_DML), null, null, null));
+		return (new QueryImpl("", null, null, dialect.dropTable(t), null, queryService.findQueryType(JdbcConstants.QUERYTYPE_DML), null, null, null));
 		}
 	}

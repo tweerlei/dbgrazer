@@ -34,6 +34,7 @@ import de.tweerlei.dbgrazer.query.model.TargetDef;
 public class QueryImpl extends AbstractQueryImpl
 	{
 	private final String stmt;
+	private final Map<String, String> variants;
 	private final Map<Integer, TargetDef> targets;
 	
 	/**
@@ -42,15 +43,17 @@ public class QueryImpl extends AbstractQueryImpl
 	 * @param scope Applicability scope
 	 * @param groupName Group name
 	 * @param stmt Statement text
+	 * @param variants Alternate statement variants
 	 * @param type Query type
 	 * @param params Parameters
 	 * @param targets Target queries
 	 * @param attributes Attributes
 	 */
-	public QueryImpl(String name, SchemaDef scope, String groupName, String stmt, QueryType type, List<ParameterDef> params, Map<Integer, TargetDef> targets, Map<String, String> attributes)
+	public QueryImpl(String name, SchemaDef scope, String groupName, String stmt, Map<String, String> variants, QueryType type, List<ParameterDef> params, Map<Integer, TargetDef> targets, Map<String, String> attributes)
 		{
 		super(name, scope, groupName, type, params, attributes);
 		this.stmt = stmt;
+		this.variants = (variants == null) ? Collections.<String, String>emptyMap() : Collections.unmodifiableMap(new TreeMap<String, String>(variants));
 		this.targets = (targets == null) ? Collections.<Integer, TargetDef>emptyMap() : Collections.unmodifiableMap(new TreeMap<Integer, TargetDef>(targets));
 		}
 	
@@ -58,6 +61,12 @@ public class QueryImpl extends AbstractQueryImpl
 	public String getStatement()
 		{
 		return (stmt);
+		}
+	
+	@Override
+	public Map<String, String> getStatementVariants()
+		{
+		return (variants);
 		}
 	
 	@Override

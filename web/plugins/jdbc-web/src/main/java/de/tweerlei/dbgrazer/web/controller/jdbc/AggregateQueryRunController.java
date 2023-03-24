@@ -311,7 +311,7 @@ public class AggregateQueryRunController
 		
 		final String q = sqlGenerator.createAggregateQuery(fbo.getQuery().getStatement(), columns);
 		
-		return (new QueryImpl(fbo.getQuery().getName(), new SchemaDef(null, null), null, q, fbo.getQuery().getType(), fbo.getQuery().getParameters(), fbo.getQuery().getTargetQueries(), fbo.getQuery().getAttributes()));
+		return (new QueryImpl(fbo.getQuery().getName(), new SchemaDef(null, null), null, q, null, fbo.getQuery().getType(), fbo.getQuery().getParameters(), fbo.getQuery().getTargetQueries(), fbo.getQuery().getAttributes()));
 		}
 	
 	private Result performQuery(String connection, QueryParameters query)

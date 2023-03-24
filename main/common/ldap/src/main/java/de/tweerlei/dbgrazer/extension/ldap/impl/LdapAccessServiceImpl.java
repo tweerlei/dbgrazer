@@ -133,7 +133,13 @@ public class LdapAccessServiceImpl implements LdapAccessService, LinkListener, L
 		if ((def == null) /*|| !(def.getType() instanceof LdapLinkType)*/)
 			throw new RuntimeException("Unknown link " + c);
 		
-		return (createLdapTemplate(def, username, password));
+		final String qualifiedUserDN;
+		if (StringUtils.empty(def.getDriver()))
+			qualifiedUserDN = username;
+		else
+			qualifiedUserDN = username + "," + def.getDriver();
+		
+		return (createLdapTemplate(def, qualifiedUserDN, password));
 		}
 	
 	@Override

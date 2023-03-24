@@ -18,6 +18,7 @@ package de.tweerlei.dbgrazer.web.controller;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -59,11 +60,13 @@ import de.tweerlei.dbgrazer.web.constant.MessageKeys;
 import de.tweerlei.dbgrazer.web.constant.VisualizationSettings;
 import de.tweerlei.dbgrazer.web.exception.AccessDeniedException;
 import de.tweerlei.dbgrazer.web.exception.QueryNotFoundException;
+import de.tweerlei.dbgrazer.web.model.TabItem;
 import de.tweerlei.dbgrazer.web.service.TextTransformerService;
 import de.tweerlei.dbgrazer.web.service.UserSettingsManager;
 import de.tweerlei.dbgrazer.web.service.VisualizationService;
 import de.tweerlei.dbgrazer.web.session.ConnectionSettings;
 import de.tweerlei.dbgrazer.web.session.UserSettings;
+import de.tweerlei.ermtools.dialect.impl.SQLDialectFactory;
 import de.tweerlei.spring.service.StringTransformerService;
 
 /**
@@ -75,6 +78,7 @@ import de.tweerlei.spring.service.StringTransformerService;
 public class QueryEditController
 	{
 	private static final String PARAM_MARKER = "*";
+	private static final String DEFAULT_STATEMENT_KEY = "";
 	
 	/**
 	 * Helper class used as form backing object
@@ -227,7 +231,7 @@ public class QueryEditController
 		private final Map<Integer, ParameterFBO> params;
 		private final Map<Integer, String> links;
 		private final Map<Integer, SubQueryFBO> views;
-		private String statement;
+		private final Map<String, String> statements;
 		private QueryType resultType;
 		
 		/**
@@ -239,6 +243,7 @@ public class QueryEditController
 			this.params = new TreeMap<Integer, ParameterFBO>();
 			this.links = new TreeMap<Integer, String>();
 			this.views = new TreeMap<Integer, SubQueryFBO>();
+			this.statements = new TreeMap<String, String>();
 			}
 		
 		/**
@@ -303,6 +308,24 @@ public class QueryEditController
 			}
 
 		/**
+		 * Get the statements
+		 * @return the statements
+		 */
+		public Map<String, String> getStatements()
+			{
+			return statements;
+			}
+
+		/**
+		 * Get the default statement
+		 * @return the default statement
+		 */
+		public String getDefaultStatement()
+			{
+			return statements.get(DEFAULT_STATEMENT_KEY);
+			}
+
+		/**
 		 * Get the params
 		 * @return the params
 		 */
@@ -327,24 +350,6 @@ public class QueryEditController
 		public Map<Integer, SubQueryFBO> getViews()
 			{
 			return views;
-			}
-
-		/**
-		 * Get the statement
-		 * @return the statement
-		 */
-		public String getStatement()
-			{
-			return statement;
-			}
-
-		/**
-		 * Set the statement
-		 * @param statement the statement to set
-		 */
-		public void setStatement(String statement)
-			{
-			this.statement = statement;
 			}
 
 		/**
@@ -534,7 +539,9 @@ public class QueryEditController
 			ret.setGroupName(q.getGroupName());
 			ret.setType(q.getType().getName());
 			ret.setViewType(q.getType().getResultType().isView());
-			ret.setStatement(q.getStatement());
+			for (Map.Entry<String, String> ent : q.getStatementVariants().entrySet())
+				ret.getStatements().put(ent.getKey(), ent.getValue());
+			ret.getStatements().put(DEFAULT_STATEMENT_KEY, q.getStatement());
 			for (Map.Entry<Integer, TargetDef> ent : q.getTargetQueries().entrySet())
 				{
 				if (ent.getValue().isParameter())
@@ -561,7 +568,6 @@ public class QueryEditController
 			ret.setGroupName(connectionSettings.getQueryGroup());
 			ret.setType(queryService.findViewQueryTypes().iterator().next().getName());
 			ret.setViewType(true);
-			ret.setStatement("");
 			
 			final Query q = queryService.findQueryByName(connectionSettings.getLinkName(), subquery);
 			if (q != null)
@@ -587,7 +593,6 @@ public class QueryEditController
 			ret.setGroupName(connectionSettings.getQueryGroup());
 			ret.setType("");
 			ret.setViewType(false);
-			ret.setStatement("");
 			}
 		
 		final int maxParams = userSettingsManager.getMaxParameters();
@@ -756,6 +761,20 @@ public class QueryEditController
 		}
 	
 	/**
+	 * Get all dialects
+	 * @return dialects
+	 */
+	@ModelAttribute("dialects")
+	public Map<String, TabItem<String>> getSQLDialects()
+		{
+		final Map<String, TabItem<String>> ret = new LinkedHashMap<String, TabItem<String>>();
+		ret.put("default", new TabItem<String>(DEFAULT_STATEMENT_KEY));
+		for (String d : SQLDialectFactory.getSQLDialects().keySet())
+			ret.put(d, new TabItem<String>(d));
+		return (ret);
+		}
+	
+	/**
 	 * Get all extensionJS
 	 * @return extensionJS
 	 */
@@ -784,11 +803,12 @@ public class QueryEditController
 	/**
 	 * Show a parameter input form
 	 * @param fbo FormBackingObject
+	 * @param initialStatement Statement template to use for new queries
 	 * @param result BindingResult
 	 * @return Model
 	 */
 	@RequestMapping(value = "/db/*/edit.html", method = RequestMethod.POST)
-	public String updateQuery(@ModelAttribute("model") FormBackingObject fbo, BindingResult result)
+	public String updateQuery(@ModelAttribute("model") FormBackingObject fbo, BindingResult result, @RequestParam(value = "statement", required = false) String initialStatement)
 		{
 		final boolean creating = StringUtils.empty(fbo.getOriginalName());
 		if (creating)
@@ -800,6 +820,9 @@ public class QueryEditController
 				result.reject(ErrorKeys.EXISTS);
 				return ("db/edit");
 				}
+			
+			if (fbo.getStatements().isEmpty() && !StringUtils.empty(initialStatement))
+				fbo.getStatements().put("", initialStatement);
 			}
 		else
 			{
@@ -863,7 +886,18 @@ public class QueryEditController
 		if (type.getResultType().isView())
 			q = new ViewImpl(fbo.getName(), SchemaDef.valueOf(fbo.getScope()), fbo.getGroupName(), type, params, views, attributes);
 		else
-			q = new QueryImpl(fbo.getName(), SchemaDef.valueOf(fbo.getScope()), fbo.getGroupName(), fbo.getStatement(), type, params, links, attributes);
+			{
+			String statement = "";
+			final Map<String, String> variants = new HashMap<String, String>();
+			for (Map.Entry<String, String> ent : fbo.getStatements().entrySet())
+				{
+				if (StringUtils.empty(ent.getKey()))
+					statement = ent.getValue();
+				else
+					variants.put(ent.getKey(), ent.getValue());
+				}
+			q = new QueryImpl(fbo.getName(), SchemaDef.valueOf(fbo.getScope()), fbo.getGroupName(), statement, variants, type, params, links, attributes);
+			}
 		
 		try	{
 			final String name;

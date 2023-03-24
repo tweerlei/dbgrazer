@@ -158,7 +158,7 @@ public class AggregateSubQueryResolver implements SubQueryResolver
 					
 					final String q = sqlGenerator.createVariableAggregateQuery(mainQuery.getStatement(), cols);
 					
-					final Query subQuery = new QueryImpl(mainQuery.getName(), mainQuery.getSourceSchema(), mainQuery.getGroupName(), q, defaultQueryType, mainQuery.getParameters(),
+					final Query subQuery = new QueryImpl(mainQuery.getName(), mainQuery.getSourceSchema(), mainQuery.getGroupName(), q, null, defaultQueryType, mainQuery.getParameters(),
 							Collections.<Integer, TargetDef>emptyMap(), Collections.<String, String>singletonMap(QueryTypeAttributes.ATTR_DIMENSION, String.valueOf(i + n)));
 					
 					ret.add(new SubQueryInfo(subQuery, c.getName(), null, null, qParams));
@@ -182,7 +182,7 @@ public class AggregateSubQueryResolver implements SubQueryResolver
 			
 			final String q = sqlGenerator.createVariableAggregateQuery(mainQuery.getStatement(), cols);
 			
-			final Query subQuery = new QueryImpl(mainQuery.getName(), mainQuery.getSourceSchema(), mainQuery.getGroupName(), q, defaultQueryType, mainQuery.getParameters(),
+			final Query subQuery = new QueryImpl(mainQuery.getName(), mainQuery.getSourceSchema(), mainQuery.getGroupName(), q, null, defaultQueryType, mainQuery.getParameters(),
 					Collections.<Integer, TargetDef>emptyMap(), Collections.<String, String>emptyMap());
 			
 			ret.add(new SubQueryInfo(subQuery, SUM_TAB, null, null, qParams));
@@ -220,7 +220,7 @@ public class AggregateSubQueryResolver implements SubQueryResolver
 			
 			final String q = sqlGenerator.createVariableAggregateQuery(mainQuery.getStatement(), columns);
 			
-			final Query subQuery = new QueryImpl(mainQuery.getName(), mainQuery.getSourceSchema(), mainQuery.getGroupName(), q, defaultQueryType, mainQuery.getParameters(),
+			final Query subQuery = new QueryImpl(mainQuery.getName(), mainQuery.getSourceSchema(), mainQuery.getGroupName(), q, null, defaultQueryType, mainQuery.getParameters(),
 					Collections.<Integer, TargetDef>emptyMap(), Collections.<String, String>emptyMap());
 			
 			ret.add(new SubQueryInfo(subQuery, SUM_TAB, null, null, qParams));
