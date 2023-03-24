@@ -53,9 +53,9 @@ public final class MongoDBMessageKeys
 	/** ID column */
 	public static final String ID = "id";
 	/** Name column */
-	public static final String TOPIC = "kafkaTopic";
+	public static final String DATABASE = "mongoDatabase";
 	/** Name column */
-	public static final String PARTITION = "kafkaPartition";
+	public static final String COLLECTION = "mongoCollection";
 	/** ID column */
 	public static final String REPLICAS = "replicas";
 	/** ID column */

@@ -34,6 +34,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.mongodb.client.MongoCollection;
+
 import de.tweerlei.common.util.StringUtils;
 import de.tweerlei.dbgrazer.extension.mongodb.MongoDBClientService;
 import de.tweerlei.dbgrazer.extension.mongodb.MongoDBConstants;
@@ -63,8 +65,8 @@ import de.tweerlei.spring.service.TimeService;
 @Controller
 public class MongoDBBrowseController
 	{
-	/** Re-package Kafka objects as Java Beans */
-	public static class ConsumerRecordBean implements Comparable<ConsumerRecordBean>
+	/** Re-package Document objects as Java Beans */
+	public static class DocumentBean implements Comparable<DocumentBean>
 		{
 		private final String id;
 		private final String idFilter;
@@ -74,13 +76,16 @@ public class MongoDBBrowseController
 		/**
 		 * Constructor
 		 * @param r ConsumerRecord
+		 * @param value Formatted value
+		 * @param valueSize Original value size
+		 * @param idPropertyName Name of the property containing the document's ID
 		 */
-		public ConsumerRecordBean(Document r)
+		public DocumentBean(Document r, String value, int valueSize, String idPropertyName)
 			{
-			this.id = r.get(MongoDBConstants.ID_PROPERTY).toString();
+			this.id = r.get(idPropertyName).toString();
 			this.idFilter = getDocumentIdFilter(r);
-			this.value = r.toJson();
-			this.valueSize = this.value.length();
+			this.value = value;
+			this.valueSize = valueSize;
 			}
 		
 		/**
@@ -89,12 +94,28 @@ public class MongoDBBrowseController
 		 * @param value Formatted value
 		 * @param valueSize Original value size
 		 */
-		public ConsumerRecordBean(Document r, String value, int valueSize)
+		public DocumentBean(Document r, String value, int valueSize)
 			{
-			this.id = r.get(MongoDBConstants.ID_PROPERTY).toString();
-			this.idFilter = getDocumentIdFilter(r);
-			this.value = value;
-			this.valueSize = valueSize;
+			this(r, value, valueSize, MongoDBConstants.ID_PROPERTY);
+			}
+		
+		/**
+		 * Constructor
+		 * @param r ConsumerRecord
+		 * @param value Formatted value
+		 */
+		public DocumentBean(Document r, String value)
+			{
+			this(r, value, value.length());
+			}
+		
+		/**
+		 * Constructor
+		 * @param r ConsumerRecord
+		 */
+		public DocumentBean(Document r)
+			{
+			this(r, r.toJson());
 			}
 		
 		private static String getDocumentIdFilter(Document r)
@@ -137,11 +158,15 @@ public class MongoDBBrowseController
 			}
 		
 		@Override
-		public int compareTo(ConsumerRecordBean o)
+		public int compareTo(DocumentBean o)
 			{
 			return (o.id.compareTo(id));
 			}
 		}
+	
+	private static final String VIEW_COUNT = "count";
+	private static final String JSON_FORMAT_NAME = "JSON";
+	private static final int MONGODB_FETCH_LIMIT = 100;
 	
 	private final MongoDBClientService mongoClientService;
 	private final TextTransformerService textFormatterService;
@@ -190,7 +215,7 @@ public class MongoDBBrowseController
 		final List<SubQueryDef> levels = new ArrayList<SubQueryDef>();
 		final Query query = new ViewImpl(MongoDBMessageKeys.DATABASE_LEVEL, null, null, null, null, levels, null);
 		
-		final RowSet cats = buildRowSet(query, topics, topicTime);
+		final RowSet cats = buildRowSet(query, topics, MongoDBMessageKeys.DATABASE, topicTime);
 		
 		final Map<String, TabItem<RowSet>> tabs = new LinkedHashMap<String, TabItem<RowSet>>();
 		tabs.put(MongoDBMessageKeys.DATABASES_TAB, new TabItem<RowSet>(cats, cats.getRows().size()));
@@ -202,11 +227,11 @@ public class MongoDBBrowseController
 		return (model);
 		}
 	
-	private RowSet buildRowSet(Query query, Iterable<String> values, long time)
+	private RowSet buildRowSet(Query query, Iterable<String> values, String label, long time)
 		{
 		final List<ColumnDef> columns = new ArrayList<ColumnDef>(2);
 		columns.add(new ColumnDefImpl(MongoDBMessageKeys.ID, ColumnType.STRING, null, null, null, null));
-		columns.add(new ColumnDefImpl(MongoDBMessageKeys.TOPIC, ColumnType.STRING, null, null, null, null));
+		columns.add(new ColumnDefImpl(label, ColumnType.STRING, null, null, null, null));
 		final RowSetImpl rs = new RowSetImpl(query, RowSetConstants.INDEX_MULTILEVEL, columns);
 		rs.setQueryTime(time);
 		
@@ -246,7 +271,7 @@ public class MongoDBBrowseController
 		levels.add(new SubQueryDefImpl(MongoDBMessageKeys.DATABASE_LEVEL, null));
 		final Query query = new ViewImpl(MongoDBMessageKeys.COLLECTION_LEVEL, null, null, null, null, levels, null);
 		
-		final RowSet cats = buildRowSet(query, partitions, partTime);
+		final RowSet cats = buildRowSet(query, partitions, MongoDBMessageKeys.COLLECTION, partTime);
 		
 		final Map<String, TabItem<RowSet>> tabs = new LinkedHashMap<String, TabItem<RowSet>>();
 		tabs.put(MongoDBMessageKeys.COLLECTIONS_TAB, new TabItem<RowSet>(cats, cats.getRows().size() - 1));
@@ -264,6 +289,7 @@ public class MongoDBBrowseController
 	 * @param collection Partition number
 	 * @param id Message offset
 	 * @param value Value search term
+	 * @param view View mode
 	 * @return Model
 	 */
 	@RequestMapping(value = "/db/*/documents.html", method = RequestMethod.GET)
@@ -271,10 +297,11 @@ public class MongoDBBrowseController
 			@RequestParam("database") String database,
 			@RequestParam(value = "collection", required = false) String collection,
 			@RequestParam(value = "id", required = false) String id,
-			@RequestParam(value = "value", required = false) String value
+			@RequestParam(value = "value", required = false) String value,
+			@RequestParam(value = "view", required = false) String view
 			)
 		{
-		return (showDocumentsInternal(database, collection, id, value));
+		return (showDocumentsInternal(database, collection, id, value, view));
 		}
 	
 	/**
@@ -283,6 +310,7 @@ public class MongoDBBrowseController
 	 * @param collection Partition number
 	 * @param id Message offset
 	 * @param value Value search term
+	 * @param view View mode
 	 * @return Model
 	 */
 	@RequestMapping(value = "/db/*/ajax/documents.html", method = RequestMethod.GET)
@@ -290,17 +318,19 @@ public class MongoDBBrowseController
 			@RequestParam("database") String database,
 			@RequestParam(value = "collection", required = false) String collection,
 			@RequestParam(value = "id", required = false) String id,
-			@RequestParam(value = "value", required = false) String value
+			@RequestParam(value = "value", required = false) String value,
+			@RequestParam(value = "view", required = false) String view
 			)
 		{
-		return (showDocumentsInternal(database, collection, id, value));
+		return (showDocumentsInternal(database, collection, id, value, view));
 		}
 	
 	private Map<String, Object> showDocumentsInternal(
 			String database,
 			String collection,
 			String id,
-			String value
+			String value,
+			String view
 			)
 		{
 		if (!connectionSettings.isBrowserEnabled())
@@ -312,29 +342,39 @@ public class MongoDBBrowseController
 		model.put("collection", collection);
 		model.put("id", id);
 		model.put("value", value);
+		model.put("view", view);
 		
+		final MongoCollection<Document> coll = mongoClientService.getMongoClient(connectionSettings.getLinkName()).getDatabase(database).getCollection(collection);
 		final Document filter = buildFilter(value, id);
-		final Iterable<Document> records;
-		if (filter != null)
-			records = mongoClientService.getMongoClient(connectionSettings.getLinkName()).getDatabase(database).getCollection(collection).find(filter).limit(100);
-		else
-			records = mongoClientService.getMongoClient(connectionSettings.getLinkName()).getDatabase(database).getCollection(collection).find().limit(100);
-		
-		final List<ConsumerRecordBean> l = new ArrayList<ConsumerRecordBean>(100);
-		for (Document doc : records)
+		final List<DocumentBean> l;
+		if (VIEW_COUNT.equals(view))
 			{
-			// MongoDB magic ID
-			l.add(new ConsumerRecordBean(doc));
+			l = countDocuments(coll, filter);
 			}
-		Collections.sort(l);
+		else
+			{
+			if (filter == null)
+				{
+				final List<DocumentBean> indexes = findIndexes(coll);
+				if (!indexes.isEmpty())
+					{
+					final Map<String, TabItem<DocumentBean>> mainTabs = new HashMap<String, TabItem<DocumentBean>>(10);
+					for (DocumentBean rec : indexes)
+						mainTabs.put(rec.getId(), new TabItem<DocumentBean>(rec, 1));
+					model.put("mainTabs", mainTabs);
+					}
+				}
+			
+			l = findDocuments(coll, filter);
+			}
 		
 		final List<SubQueryDef> levels = new ArrayList<SubQueryDef>();
 		levels.add(new SubQueryDefImpl(MongoDBMessageKeys.DATABASE_LEVEL, null));
 		levels.add(new SubQueryDefImpl(MongoDBMessageKeys.COLLECTION_LEVEL, null));
 		final Query query = new ViewImpl(MongoDBMessageKeys.DOCUMENT_LEVEL, null, null, null, null, levels, null);
 		
-		final Map<String, TabItem<List<ConsumerRecordBean>>> tabs = new HashMap<String, TabItem<List<ConsumerRecordBean>>>(1);
-		tabs.put(MongoDBMessageKeys.DOCUMENTS_TAB, new TabItem<List<ConsumerRecordBean>>(l, l.size()));
+		final Map<String, TabItem<List<DocumentBean>>> tabs = new HashMap<String, TabItem<List<DocumentBean>>>(1);
+		tabs.put(MongoDBMessageKeys.DOCUMENTS_TAB, new TabItem<List<DocumentBean>>(l, l.size()));
 		
 		model.put("query", query);
 		model.put("tabs", tabs);
@@ -375,25 +415,70 @@ public class MongoDBBrowseController
 		return (null);
 		}
 	
+	private List<DocumentBean> countDocuments(MongoCollection<Document> coll, Document filter)
+		{
+		final long c;
+		if (filter == null)
+			c = coll.countDocuments();
+		else
+			c = coll.countDocuments(filter);
+		
+		final Document doc = new Document(MongoDBConstants.ID_PROPERTY, "count");
+		
+		return (Collections.singletonList(new DocumentBean(doc, "count", (int) c)));
+		}
+	
+	private List<DocumentBean> findDocuments(MongoCollection<Document> coll, Document filter)
+		{
+		final Iterable<Document> records;
+		if (filter == null)
+			records = coll.find().limit(MONGODB_FETCH_LIMIT);
+		else
+			records = coll.find(filter).limit(MONGODB_FETCH_LIMIT);
+		
+		final List<DocumentBean> l = new ArrayList<DocumentBean>(100);
+		for (Document doc : records)
+			{
+			// MongoDB magic ID
+			l.add(new DocumentBean(doc));
+			}
+		Collections.sort(l);
+		return (l);
+		}
+	
+	private List<DocumentBean> findIndexes(MongoCollection<Document> coll)
+		{
+		final Iterator<Document> indexes = coll.listIndexes().iterator();
+		if (!indexes.hasNext())
+			return (Collections.emptyList());
+		
+		final List<DocumentBean> l = new ArrayList<DocumentBean>(10);
+		do	{
+			final Document doc = indexes.next();
+			final Set<TextTransformerService.Option> options = EnumSet.of(TextTransformerService.Option.SYNTAX_COLORING, TextTransformerService.Option.LINE_NUMBERS, TextTransformerService.Option.FORMATTING);
+			final String rawValue = doc.toJson();
+			final DocumentBean rec = new DocumentBean(doc, textFormatterService.format(rawValue, JSON_FORMAT_NAME, options), rawValue.length(), MongoDBConstants.INDEX_NAME_PROPERTY);
+			l.add(rec);
+			}
+		while (indexes.hasNext());
+		return (l);
+		}
+	
 	/**
 	 * Show the file browser
 	 * @param database Topic name
 	 * @param collection Partition number
 	 * @param id Starting offset
-	 * @param format Format
-	 * @param formatting Pretty print
 	 * @return Model
 	 */
 	@RequestMapping(value = "/db/*/document.html", method = RequestMethod.GET)
 	public Map<String, Object> showMessage(
 			@RequestParam("database") String database,
 			@RequestParam("collection") String collection,
-			@RequestParam("id") String id,
-			@RequestParam(value = "format", required = false) String format,
-			@RequestParam(value = "formatting", required = false) Boolean formatting
+			@RequestParam("id") String id
 			)
 		{
-		return (showDocumentInternal(database, collection, id, format, formatting));
+		return (showDocumentInternal(database, collection, id));
 		}
 	
 	/**
@@ -401,70 +486,47 @@ public class MongoDBBrowseController
 	 * @param database Topic name
 	 * @param collection Partition number
 	 * @param id Starting offset
-	 * @param format Format
-	 * @param formatting Pretty print
 	 * @return Model
 	 */
 	@RequestMapping(value = "/db/*/ajax/document.html", method = RequestMethod.GET)
 	public Map<String, Object> showAjaxMessage(
 			@RequestParam("database") String database,
 			@RequestParam("collection") String collection,
-			@RequestParam("id") String id,
-			@RequestParam(value = "format", required = false) String format,
-			@RequestParam(value = "formatting", required = false) Boolean formatting
+			@RequestParam("id") String id
 			)
 		{
-		return (showDocumentInternal(database, collection, id, format, formatting));
+		return (showDocumentInternal(database, collection, id));
 		}
 	
-	private Map<String, Object> showDocumentInternal(String database, String collection, String id, String format, Boolean formatting)
+	private Map<String, Object> showDocumentInternal(String database, String collection, String id)
 		{
 		if (!connectionSettings.isBrowserEnabled())
 			throw new AccessDeniedException();
-		
-		final String formatName;
-		final boolean formattingActive;
-		if (format == null)
-			{
-			formatName = querySettingsManager.getFormatName(null);
-			formattingActive = querySettingsManager.isFormattingActive(null);
-			}
-		else
-			{
-			formatName = format;
-			formattingActive = (formatting == null) ? false : formatting;
-			querySettingsManager.setFormatName(null, formatName);
-			querySettingsManager.setFormattingActive(null, formattingActive);
-			}
 		
 		final Map<String, Object> model = new HashMap<String, Object>();
 		
 		model.put("database", database);
 		model.put("collection", collection);
 		model.put("id", id);
-		model.put("format", formatName);
-		model.put("formatting", formattingActive);
 		
 		model.put("formats", textFormatterService.getSupportedTextFormats());
 		
 		final Iterable<Document> records = mongoClientService.getMongoClient(connectionSettings.getLinkName()).getDatabase(database).getCollection(collection).find(buildFilter(id)).limit(1);
 		
-		final ConsumerRecordBean rec;
+		final DocumentBean rec;
 		final Iterator<Document> it = records.iterator();
 		if (!it.hasNext())
 			rec = null;
 		else
 			{
 			final Document doc = it.next();
-			final Set<TextTransformerService.Option> options = EnumSet.of(TextTransformerService.Option.SYNTAX_COLORING, TextTransformerService.Option.LINE_NUMBERS);
-			if (formattingActive)
-				options.add(TextTransformerService.Option.FORMATTING);
+			final Set<TextTransformerService.Option> options = EnumSet.of(TextTransformerService.Option.SYNTAX_COLORING, TextTransformerService.Option.LINE_NUMBERS, TextTransformerService.Option.FORMATTING);
 			final String rawValue = doc.toJson();
-			rec = new ConsumerRecordBean(doc, textFormatterService.format(rawValue, formatName, options), rawValue.length());
+			rec = new DocumentBean(doc, textFormatterService.format(rawValue, JSON_FORMAT_NAME, options), rawValue.length());
 			}
 		
-		final Map<String, TabItem<ConsumerRecordBean>> tabs = new HashMap<String, TabItem<ConsumerRecordBean>>(1);
-		tabs.put(id, new TabItem<ConsumerRecordBean>(rec, 1));
+		final Map<String, TabItem<DocumentBean>> tabs = new HashMap<String, TabItem<DocumentBean>>(1);
+		tabs.put(id, new TabItem<DocumentBean>(rec, 1));
 		
 		model.put("tabs", tabs);
 		model.put("extensionJS", MongoDBMessageKeys.EXTENSION_JS);

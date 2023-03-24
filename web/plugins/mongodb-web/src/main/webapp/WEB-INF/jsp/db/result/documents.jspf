@@ -22,9 +22,14 @@
 				<input type="hidden" id="f2-collection" name="collection" value="${collection}"/>
 				<p><label for="f2-id"><fmt:message key="seek"/>:</label> <input type="text" id="f2-id" name="offset" value="${offset}" size="10"/></p>
 				<p><label for="f2-value"><fmt:message key="searchTerm"/>:</label> <textarea id="f2-value" name="value" rows="5" cols="20">${fn:escapeXml(value)}</textarea></p>
-				<p><input type="submit" value="<fmt:message key="apply"/>"/></p>
-				<ui:filter id="filter-table-${label}" target="table-${label}"/>
+				<p><input type="submit" value="<fmt:message key="apply"/>"/>
+					<input type="button" value="<fmt:message key="showCount"/>" onclick="return showCollection(event, $F('f2-database'), $F('f2-collection'), $F('f2-id'), $F('f2-value'), 'count');"/>
+				</p>
 			</form>
+			<ui:filter id="filter-table-${label}" target="table-${label}" form="true"/>
+			<div class="filter">
+				<fmt:message key="rowCount"><fmt:param value="${fn:length(rs)}"/></fmt:message>
+			</div>
 			<hr/>
 		</div><div class="tab-body"><table id="table-${label}" class="multiple table-autosort">
 			<thead>
@@ -34,12 +39,21 @@
 				</tr>
 			</thead>
 			<tbody>
-<c:forEach items="${rs}" var="row"
+<c:choose><c:when test="${view == 'count'}"
+><c:forEach items="${rs}" var="row"
+>				<tr>
+					<td>${fn:escapeXml(row.id)}</td>
+					<td>${row.valueSize}</td>
+				</tr>
+</c:forEach
+></c:when><c:otherwise
+><c:forEach items="${rs}" var="row"
 >				<tr>
 					<td><a href="db/${currentConnection.linkName}/document.html?database=${database}&amp;collection=${collection}&amp;id=${fn:escapeXml(row.idFilter)}"<c:if test="${not empty targetElement}"> onclick="return showDocument(event, '${database}', '${collection}', '${fn:escapeXml(row.idFilter)}');"</c:if>>${fn:escapeXml(row.id)}</a></td>
 					<td>${row.valueSize}</td>
 				</tr>
 </c:forEach
->			</tbody>
+></c:otherwise></c:choose>
+			</tbody>
 		</table>
 </div>

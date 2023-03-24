@@ -26,8 +26,6 @@
 				<input type="hidden" id="f1-collection" name="collection" value="${collection}"/>
 				<input type="hidden" id="f1-id" name="id" value="${fn:escapeXml(id)}"/>
 				<div class="filter"><span class="menu" onclick="return showElementMenu(event, 'tools-${label}');"><fmt:message key="download"/></span></div>
-				<div class="filter"><input id="f1-format" type="checkbox" name="format" value="JSON"<c:if test="${not empty format}"> checked="checked"</c:if> onchange="Forms.submit(form);"/><label for="f1-format"> <fmt:message key="formatter"/></label></div>
-				<div class="filter"><input id="f1-formatting" type="checkbox" name="formatting" value="true"<c:if test="${formatting}"> checked="checked"</c:if> onchange="Forms.submit(form);"/> <label for="f1-formatting"><fmt:message key="formatter"/></label></div>
 			</form><hr/>
 </c:if
 >			<div class="column3"><dl class="result">

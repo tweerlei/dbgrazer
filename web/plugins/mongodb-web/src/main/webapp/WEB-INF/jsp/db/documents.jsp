@@ -46,10 +46,22 @@
 	
 	<c:set var="links" value="db/${currentConnection.linkName}/databases.html,db/${currentConnection.linkName}/collections.html?database=${database},db/${currentConnection.linkName}/documents.html?database=${database}&amp;collection=${collection}"
 	/><c:set var="links" value="${fn:split(links, ',')}"
-	/><ui:explorer><ui:multilevel query="${query.name}" levels="${query.subQueries}" params="${params}" links="${links}" items="${tabs}" var="rs" varKey="label" varParams="detailParams" varParamString="detailParamString" name="combo"
+	/><div id="explorer-left"><ui:multilevel query="${query.name}" levels="${query.subQueries}" params="${params}" links="${links}" items="${tabs}" var="rs" varKey="label" varParams="detailParams" varParamString="detailParamString" name="combo"
 		><%@
 		include file="result/documents.jspf"
-	%></ui:multilevel></ui:explorer>
+	%></ui:multilevel></div>
+	
+	<div id="explorer-right"><c:choose><c:when test="${mainTabs == null}"
+>		<p class="center"><fmt:message key="chooseObject"/></p>
+</c:when><c:otherwise
+>		<fmt:message key="mongoIndexes" var="subTitle"/><ui:headline2 label="${subTitle}" zoomable="true"></ui:headline2>
+		
+		<ui:tabs items="${mainTabs}" var="rs" varKey="label" varLink="detailLink" varParams="detailParams" varParamString="detailParamString" name="result"><%@
+			include file="result/document.jspf"
+		%></ui:tabs>
+</c:otherwise></c:choose
+	></div>
+	<hr/>
 <%@
 	include file="../include/footer.jspf"
 %>

@@ -1,4 +1,4 @@
-function showCollection(ev, database, collection, id, value) {
+function showCollection(ev, database, collection, id, value, view) {
 	if (ev) {
 		Event.stop(ev);
 	}
@@ -11,6 +11,9 @@ function showCollection(ev, database, collection, id, value) {
 		}
 		if (!Object.isUndefined(value)) {
 			params.value = value;
+		}
+		if (!Object.isUndefined(view)) {
+			params.view = view;
 		}
 		WSApi.getDBAsync('documents', params, function(txt) {
 			el.innerHTML = extractLocalStyles(txt);

@@ -28,6 +28,9 @@ public final class MongoDBConstants
 	/** MongoDB magic ID */
 	public static final String ID_PROPERTY = "_id"; 
 	
+	/** MongoDB magic ID */
+	public static final String INDEX_NAME_PROPERTY = "name"; 
+	
 	private MongoDBConstants()
 		{
 		}

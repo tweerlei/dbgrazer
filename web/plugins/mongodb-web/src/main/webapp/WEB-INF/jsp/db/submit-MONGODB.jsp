@@ -57,7 +57,7 @@
 		<span class="menu" onclick="return showDbMenu(event, 'submit-history');"><fmt:message key="history"/></span>
 	</div>
 	<div class="h1-actions">
-		<a class="action" title="<fmt:message key="newWindow"/>" href="db/${currentConnection.linkName}/submit-JDBC.html" target="_blank"><fmt:message key="newWindowIcon"/></a>
+		<a class="action" title="<fmt:message key="newWindow"/>" href="db/${currentConnection.linkName}/submit-MONGODB.html" target="_blank"><fmt:message key="newWindowIcon"/></a>
 	</div>
 	
 	<div id="tools-1" class="hidden"><div class="menucolumn">
