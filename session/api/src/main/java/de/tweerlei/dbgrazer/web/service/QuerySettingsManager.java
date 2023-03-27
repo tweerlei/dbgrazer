@@ -95,6 +95,20 @@ public interface QuerySettingsManager
 	public void setLineNumbersActive(Query query, boolean b);
 	
 	/**
+	 * Check whether structure display is active
+	 * @param query Query
+	 * @return Line numbering active
+	 */
+	public boolean isStructureActive(Query query);
+	
+	/**
+	 * Set structure display active
+	 * @param query Query
+	 * @param b Line numbering active
+	 */
+	public void setStructureActive(Query query, boolean b);
+	
+	/**
 	 * Get the format name to use for result text formatting
 	 * @param query Query
 	 * @return Format name

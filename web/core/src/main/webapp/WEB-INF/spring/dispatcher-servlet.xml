@@ -43,7 +43,6 @@
 		<property name="excludedPaths">
 			<!-- Paths the user should not be redirected to after login or choosing a connection -->
 			<list>
-				<value>static/</value>
 				<value>ajax/</value>
 				<value>login.html</value>
 				<value>logout.html</value>
@@ -67,6 +66,8 @@
 				<value>db/reload-</value>
 				<value>db/rename-</value>
 				<value>db/remove-</value>
+				<!-- Since the servlet is mapped to /static/*, servletPath will NOT contain the file name -->
+				<value>static</value>
 			</list>
 		</property>
 		<property name="ajaxPaths">

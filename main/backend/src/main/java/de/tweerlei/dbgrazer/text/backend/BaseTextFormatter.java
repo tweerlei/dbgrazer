@@ -32,4 +32,10 @@ public abstract class BaseTextFormatter extends NamedBase implements TextFormatt
 		{
 		super(name);
 		}
+	
+	@Override
+	public final boolean isXMLEncoded()
+		{
+		return (false);
+		}
 	}

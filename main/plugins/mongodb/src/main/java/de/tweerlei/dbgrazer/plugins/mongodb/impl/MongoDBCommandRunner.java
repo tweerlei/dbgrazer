@@ -26,7 +26,6 @@ import org.springframework.stereotype.Service;
 import com.mongodb.client.MongoClient;
 
 import de.tweerlei.dbgrazer.extension.mongodb.MongoDBClientService;
-import de.tweerlei.dbgrazer.plugins.mongodb.types.MongoDBSingleQueryType;
 import de.tweerlei.dbgrazer.plugins.mongodb.types.QueryTypeAttributes;
 import de.tweerlei.dbgrazer.query.backend.BaseQueryRunner;
 import de.tweerlei.dbgrazer.query.backend.ParamReplacer;
@@ -48,7 +47,7 @@ import de.tweerlei.spring.service.TimeService;
  * @author Robert Wruck
  */
 @Service
-public class MongoDBQueryRunner extends BaseQueryRunner
+public class MongoDBCommandRunner extends BaseQueryRunner
 	{
 	private final TimeService timeService;
 	private final MongoDBClientService clientService;
@@ -59,9 +58,9 @@ public class MongoDBQueryRunner extends BaseQueryRunner
 	 * @param clientService MongoDBClientService
 	 */
 	@Autowired
-	public MongoDBQueryRunner(TimeService timeService, MongoDBClientService clientService)
+	public MongoDBCommandRunner(TimeService timeService, MongoDBClientService clientService)
 		{
-		super("MONGODB");
+		super("MONGODBCommand");
 		this.timeService = timeService;
 		this.clientService = clientService;
 		}
@@ -69,7 +68,7 @@ public class MongoDBQueryRunner extends BaseQueryRunner
 	@Override
 	public boolean supports(QueryType t)
 		{
-		return ((t.getLinkType() instanceof MongoDBLinkType) && !t.isManipulation());
+		return ((t.getLinkType() instanceof MongoDBLinkType) && t.isManipulation());
 		}
 	
 	@Override
@@ -78,10 +77,6 @@ public class MongoDBQueryRunner extends BaseQueryRunner
 		final String database = query.getAttributes().get(QueryTypeAttributes.ATTR_DATABASE);
 		if (database == null)
 			throw new PerformQueryException(query.getName(), new RuntimeException("No database specified"));
-		
-		final String collection = query.getAttributes().get(QueryTypeAttributes.ATTR_COLLECTION);
-		if (collection == null)
-			throw new PerformQueryException(query.getName(), new RuntimeException("No collection specified"));
 		
 		final MongoClient client = clientService.getMongoClient(link);
 		if (client == null)
@@ -92,10 +87,7 @@ public class MongoDBQueryRunner extends BaseQueryRunner
 		try	{
 			final String stmt = new ParamReplacer(params).replaceAll(query.getStatement());
 			
-			if (query.getType() instanceof MongoDBSingleQueryType)
-				performMongoQuery(client, database, collection, stmt, 1, query, subQueryIndex, res);
-			else
-				performMongoQuery(client, database, collection, stmt, limit, query, subQueryIndex, res);
+			performMongoCommand(client, database, stmt, query, subQueryIndex, res);
 			}
 		catch (RuntimeException e)
 			{
@@ -105,20 +97,19 @@ public class MongoDBQueryRunner extends BaseQueryRunner
 		return (res);
 		}
 	
-	private void performMongoQuery(MongoClient client, String database, String collection, String statement, int limit, Query query, int subQueryIndex, Result res)
+	private void performMongoCommand(MongoClient client, String database, String statement, Query query, int subQueryIndex, Result res)
 		{
 		final Document q = Document.parse(statement);
 		
 		final long start = timeService.getCurrentTime();
-		final Iterable<Document> l = client.getDatabase(database).getCollection(collection).find(q).limit(limit);
+		final Document r = client.getDatabase(database).runCommand(q);
 		final long end = timeService.getCurrentTime();
 		
 		final RowSetImpl rs = new RowSetImpl(query, subQueryIndex, Collections.singletonList(new ColumnDefImpl(
 				"result", ColumnType.STRING, null, null, null, null
 				)));
 		
-		for (Document r: l)
-			rs.getRows().add(new DefaultResultRow(r.toJson()));
+		rs.getRows().add(new DefaultResultRow(r.toJson()));
 		rs.setMoreAvailable(false);
 		rs.setQueryTime(end - start);
 		

@@ -25,7 +25,7 @@ function showCollection(ev, database, collection, id, value, view) {
 	return false;
 }
 
-function showDocument(ev, database, collection, id, format, formatting) {
+function showDocument(ev, database, collection, id, formatting, coloring, lineno, struct) {
 	if (ev) {
 		Event.stop(ev);
 	}
@@ -33,11 +33,17 @@ function showDocument(ev, database, collection, id, format, formatting) {
 	var el = $('explorer-right');
 	if (el) {
 		var params = { database: database, collection: collection, id: id };
-		if (!Object.isUndefined(format)) {
-			params.format = format;
-		}
 		if (formatting) {
-			params.formatting = 'true';
+			params.formatting = formatting;
+		}
+		if (coloring) {
+			params.coloring = coloring;
+		}
+		if (lineno) {
+			params.lineno = lineno;
+		}
+		if (struct) {
+			params.struct = struct;
 		}
 		WSApi.getDBAsync('document', params, function(txt) {
 			el.innerHTML = extractLocalStyles(txt);
@@ -94,11 +100,13 @@ function restoreDatabase() {
 	var database = HashMonitor.get('database');
 	var collection = HashMonitor.get('collection');
 	var id = HashMonitor.get('id');
-	var format = HashMonitor.get('format');
 	var formatting = HashMonitor.get('formatting');
+	var coloring = HashMonitor.get('coloring');
+	var lineno = HashMonitor.get('lineno');
+	var struct = HashMonitor.get('struct');
 	
 	if (database && collection && id) {
-		showDocument(null, database, collection, id, format, formatting);
+		showDocument(null, database, collection, id, coloring, lineno, struct);
 	} else if (database) {
 		showCollection(null, database, collection, id);
 	}

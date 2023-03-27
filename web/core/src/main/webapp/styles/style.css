@@ -657,6 +657,32 @@ pre.code span.errmsg {
 
 /********************************************************************
  *
+ * Syntax tree
+ *
+ ********************************************************************/
+
+dl.json-object dl,
+dl.json-array dl {
+	margin-left: 2em;
+}
+
+dl.json-object dl:before,
+dl.json-array dl:before {
+	content: '\00a0\000a';
+}
+
+dl.json-object dt,
+dl.json-array dt {
+	width: auto;
+}
+
+dl.json-object dd,
+dl.json-array dd {
+	float: none;
+}
+
+/********************************************************************
+ *
  * Tree
  *
  ********************************************************************/

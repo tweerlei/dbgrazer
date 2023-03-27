@@ -32,7 +32,9 @@ public interface TextTransformerService
 		/** Syntax coloring */
 		SYNTAX_COLORING,
 		/** Formatted output */
-		FORMATTING
+		FORMATTING,
+		/** Visualize structure */
+		STRUCTURE
 		}
 	
 	/**

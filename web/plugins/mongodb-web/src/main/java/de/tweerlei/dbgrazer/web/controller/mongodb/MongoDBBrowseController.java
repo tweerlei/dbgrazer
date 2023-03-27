@@ -54,6 +54,7 @@ import de.tweerlei.dbgrazer.web.exception.AccessDeniedException;
 import de.tweerlei.dbgrazer.web.model.TabItem;
 import de.tweerlei.dbgrazer.web.service.QuerySettingsManager;
 import de.tweerlei.dbgrazer.web.service.TextTransformerService;
+import de.tweerlei.dbgrazer.web.service.TextTransformerService.Option;
 import de.tweerlei.dbgrazer.web.session.ConnectionSettings;
 import de.tweerlei.spring.service.TimeService;
 
@@ -469,16 +470,24 @@ public class MongoDBBrowseController
 	 * @param database Topic name
 	 * @param collection Partition number
 	 * @param id Starting offset
+	 * @param formatting Pretty print
+	 * @param coloring Syntax coloring
+	 * @param lineno Line numbers
+	 * @param struct Structure
 	 * @return Model
 	 */
 	@RequestMapping(value = "/db/*/document.html", method = RequestMethod.GET)
 	public Map<String, Object> showMessage(
 			@RequestParam("database") String database,
 			@RequestParam("collection") String collection,
-			@RequestParam("id") String id
+			@RequestParam("id") String id,
+			@RequestParam(value = "formatting", required = false) Boolean formatting,
+			@RequestParam(value = "coloring", required = false) Boolean coloring,
+			@RequestParam(value = "lineno", required = false) Boolean lineno,
+			@RequestParam(value = "struct", required = false) Boolean struct
 			)
 		{
-		return (showDocumentInternal(database, collection, id));
+		return (showDocumentInternal(database, collection, id, formatting, coloring, lineno, struct));
 		}
 	
 	/**
@@ -486,22 +495,57 @@ public class MongoDBBrowseController
 	 * @param database Topic name
 	 * @param collection Partition number
 	 * @param id Starting offset
+	 * @param formatting Pretty print
+	 * @param coloring Syntax coloring
+	 * @param lineno Line numbers
+	 * @param struct Structure
 	 * @return Model
 	 */
 	@RequestMapping(value = "/db/*/ajax/document.html", method = RequestMethod.GET)
 	public Map<String, Object> showAjaxMessage(
 			@RequestParam("database") String database,
 			@RequestParam("collection") String collection,
-			@RequestParam("id") String id
+			@RequestParam("id") String id,
+			@RequestParam(value = "formatting", required = false) Boolean formatting,
+			@RequestParam(value = "coloring", required = false) Boolean coloring,
+			@RequestParam(value = "lineno", required = false) Boolean lineno,
+			@RequestParam(value = "struct", required = false) Boolean struct
 			)
 		{
-		return (showDocumentInternal(database, collection, id));
+		return (showDocumentInternal(database, collection, id, formatting, coloring, lineno, struct));
 		}
 	
-	private Map<String, Object> showDocumentInternal(String database, String collection, String id)
+	private Map<String, Object> showDocumentInternal(String database, String collection, String id,
+			Boolean formatting,
+			Boolean coloring,
+			Boolean lineno,
+			Boolean struct
+			)
 		{
 		if (!connectionSettings.isBrowserEnabled())
 			throw new AccessDeniedException();
+		
+//		final boolean formattingActive;
+		final boolean coloringActive;
+		final boolean linenoActive;
+		final boolean structureActive;
+		if (formatting != null)
+			{
+//			formattingActive = formatting;
+			coloringActive = (coloring == null) ? false : coloring;
+			linenoActive = (lineno == null) ? false : lineno;
+			structureActive = (struct == null) ? false : struct;
+			querySettingsManager.setSyntaxColoringActive(null, coloringActive);
+			querySettingsManager.setLineNumbersActive(null, linenoActive);
+			querySettingsManager.setStructureActive(null, structureActive);
+			}
+		else
+			{
+//			formattingActive = querySettingsManager.isFormattingActive(null);
+			coloringActive = querySettingsManager.isSyntaxColoringActive(null);
+			linenoActive = querySettingsManager.isLineNumbersActive(null);
+			structureActive = querySettingsManager.isStructureActive(null);
+			}
 		
 		final Map<String, Object> model = new HashMap<String, Object>();
 		
@@ -509,7 +553,10 @@ public class MongoDBBrowseController
 		model.put("collection", collection);
 		model.put("id", id);
 		
-		model.put("formats", textFormatterService.getSupportedTextFormats());
+//		model.put("formats", textFormatterService.getSupportedTextFormats());
+		model.put("coloring", coloringActive);
+		model.put("lineno", linenoActive);
+		model.put("struct", structureActive);
 		
 		final Iterable<Document> records = mongoClientService.getMongoClient(connectionSettings.getLinkName()).getDatabase(database).getCollection(collection).find(buildFilter(id)).limit(1);
 		
@@ -520,8 +567,14 @@ public class MongoDBBrowseController
 		else
 			{
 			final Document doc = it.next();
-			final Set<TextTransformerService.Option> options = EnumSet.of(TextTransformerService.Option.SYNTAX_COLORING, TextTransformerService.Option.LINE_NUMBERS, TextTransformerService.Option.FORMATTING);
 			final String rawValue = doc.toJson();
+			final Set<TextTransformerService.Option> options = EnumSet.of(TextTransformerService.Option.FORMATTING);
+			if (coloringActive)
+				options.add(Option.SYNTAX_COLORING);
+			if (linenoActive)
+				options.add(Option.LINE_NUMBERS);
+			if (structureActive)
+				options.add(Option.STRUCTURE);
 			rec = new DocumentBean(doc, textFormatterService.format(rawValue, JSON_FORMAT_NAME, options), rawValue.length());
 			}
 		

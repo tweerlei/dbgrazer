@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.tweerlei.dbgrazer.extension.json.handler;
+package de.tweerlei.dbgrazer.plugins.json;
 
 import java.util.Map;
 import java.util.regex.Pattern;

@@ -102,10 +102,4 @@ public class HexFormatter extends BaseTextFormatter
 			sb.append(SPACE);
 		sb.append(EOL);
 		}
-	
-	@Override
-	public boolean isXMLEncoded()
-		{
-		return (true);
-		}
 	}

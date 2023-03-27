@@ -45,10 +45,4 @@ public class VerbatimJSONFormatter extends BaseTextFormatter
 		new JSONParser(h).parse(value);
 		return (h.toString());
 		}
-	
-	@Override
-	public boolean isXMLEncoded()
-		{
-		return (false);
-		}
 	}

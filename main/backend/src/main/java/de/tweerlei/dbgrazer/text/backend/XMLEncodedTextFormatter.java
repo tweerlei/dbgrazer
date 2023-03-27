@@ -13,44 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.tweerlei.dbgrazer.text.backend.impl;
+package de.tweerlei.dbgrazer.text.backend;
 
-import java.util.regex.Pattern;
-
-import org.springframework.stereotype.Service;
-
-import de.tweerlei.dbgrazer.text.backend.XMLEncodedTextFormatter;
+import de.tweerlei.dbgrazer.common.util.impl.NamedBase;
 
 /**
- * Format text
+ * Format text where the result MUST NOT be escaped for embedding in HTML
  * 
  * @author Robert Wruck
  */
-@Service
-public class HTMLFormatter extends XMLEncodedTextFormatter
+public abstract class XMLEncodedTextFormatter extends NamedBase implements TextFormatter
 	{
-	private static final Pattern HTML_PATTERN = Pattern.compile("<html[\\s>]", Pattern.CASE_INSENSITIVE);
-	
 	/**
 	 * Constructor
+	 * @param name Name
 	 */
-	public HTMLFormatter()
+	protected XMLEncodedTextFormatter(String name)
 		{
-		super("HTML");
+		super(name);
 		}
 	
 	@Override
-	public String format(String value)
+	public final boolean isXMLEncoded()
 		{
-		final String body;
-		
-		if (value == null)
-			body = "";
-		else if (HTML_PATTERN.matcher(value).find())
-			return (value);
-		else
-			body = value;
-		
-		return ("<html><body>" + body + "</body></html>");
+		return (true);
 		}
 	}

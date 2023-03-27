@@ -18,9 +18,9 @@ package de.tweerlei.dbgrazer.text.backend.impl;
 import org.springframework.stereotype.Service;
 
 import de.tweerlei.common.util.StringUtils;
-import de.tweerlei.dbgrazer.text.backend.BaseTextFormatter;
 import de.tweerlei.dbgrazer.text.backend.EscapeXMLFormatter;
 import de.tweerlei.dbgrazer.text.backend.TextFormatter;
+import de.tweerlei.dbgrazer.text.backend.XMLEncodedTextFormatter;
 
 /**
  * Syntax highlighting for unified diffs
@@ -28,7 +28,7 @@ import de.tweerlei.dbgrazer.text.backend.TextFormatter;
  * @author Robert Wruck
  */
 @Service
-public class DiffHighlighter extends BaseTextFormatter
+public class DiffHighlighter extends XMLEncodedTextFormatter
 	{
 	private static final String STYLE_HUNK = "diff-hunk";
 	private static final String STYLE_ADD = "diff-add";
@@ -76,11 +76,5 @@ public class DiffHighlighter extends BaseTextFormatter
 			}
 		
 		return (sb.toString());
-		}
-	
-	@Override
-	public boolean isXMLEncoded()
-		{
-		return (true);
 		}
 	}

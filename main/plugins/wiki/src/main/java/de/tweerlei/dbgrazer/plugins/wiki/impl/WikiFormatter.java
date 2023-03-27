@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
 import de.tweerlei.dbgrazer.extension.wiki.handler.SimpleCreoleHandler;
 import de.tweerlei.dbgrazer.extension.wiki.parser.CreoleHandler;
 import de.tweerlei.dbgrazer.extension.wiki.parser.CreoleParser;
-import de.tweerlei.dbgrazer.text.backend.BaseTextFormatter;
+import de.tweerlei.dbgrazer.text.backend.XMLEncodedTextFormatter;
 
 /**
  * Format text
@@ -28,7 +28,7 @@ import de.tweerlei.dbgrazer.text.backend.BaseTextFormatter;
  * @author Robert Wruck
  */
 @Service
-public class WikiFormatter extends BaseTextFormatter
+public class WikiFormatter extends XMLEncodedTextFormatter
 	{
 	/**
 	 * Constructor
@@ -49,11 +49,5 @@ public class WikiFormatter extends BaseTextFormatter
 		parser.parse(value);
 		
 		return (handler.toString());
-		}
-	
-	@Override
-	public boolean isXMLEncoded()
-		{
-		return (true);
 		}
 	}

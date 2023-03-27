@@ -64,6 +64,7 @@ public class QuerySettingsManagerImpl implements QuerySettingsManager
 			.put(RowSetConstants.ATTR_FORMATTING, Boolean.FALSE)
 			.put(RowSetConstants.ATTR_SYNTAX_COLORING, Boolean.TRUE)
 			.put(RowSetConstants.ATTR_LINE_NUMBERS, Boolean.FALSE)
+			.put(RowSetConstants.ATTR_STRUCTURE, Boolean.FALSE)
 			.buildReadOnly();
 	
 	private final TimeService timeService;
@@ -173,6 +174,18 @@ public class QuerySettingsManagerImpl implements QuerySettingsManager
 	public void setLineNumbersActive(Query query, boolean b)
 		{
 		setSetting(query, RowSetConstants.ATTR_LINE_NUMBERS, b);
+		}
+	
+	@Override
+	public boolean isStructureActive(Query query)
+		{
+		return (isSettingActive(query, RowSetConstants.ATTR_STRUCTURE));
+		}
+	
+	@Override
+	public void setStructureActive(Query query, boolean b)
+		{
+		setSetting(query, RowSetConstants.ATTR_STRUCTURE, b);
 		}
 	
 	@Override
@@ -312,6 +325,8 @@ public class QuerySettingsManagerImpl implements QuerySettingsManager
 			ret.add(TextTransformerService.Option.SYNTAX_COLORING);
 		if (isFormattingActive(query))
 			ret.add(TextTransformerService.Option.FORMATTING);
+		if (isStructureActive(query))
+			ret.add(TextTransformerService.Option.STRUCTURE);
 		
 		return (ret);
 		}

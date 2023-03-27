@@ -80,6 +80,8 @@
 >				<div class="filter"><input id="coloring-${label}" type="checkbox" name="dummy2" value="true"<c:if test="${rs.attributes['syntaxColoring']}"> checked="checked"</c:if> onchange="toggleColoringMode('${rs.query.name}', ${rs.attributes['syntaxColoring'] ? 'false' : 'true'});"/> <label for="coloring-${label}"><fmt:message key="syntaxColoring"/></label></div>
 </c:if><c:if test="${empty rs.query.attributes['lineNumbers']}"
 >				<div class="filter"><input id="lineno-${label}" type="checkbox" name="dummy4" value="true"<c:if test="${rs.attributes['lineNumbers']}"> checked="checked"</c:if> onchange="toggleLineNumberMode('${rs.query.name}', ${rs.attributes['lineNumbers'] ? 'false' : 'true'});"/> <label for="lineno-${label}"><fmt:message key="lineNumbers"/></label></div>
+</c:if><c:if test="${empty rs.query.attributes['structure']}"
+>				<div class="filter"><input id="struct-${label}" type="checkbox" name="dummy6" value="true"<c:if test="${rs.attributes['structure']}"> checked="checked"</c:if> onchange="toggleStructureMode('${rs.query.name}', ${rs.attributes['structure'] ? 'false' : 'true'});"/> <label for="struct-${label}"><fmt:message key="structure"/></label></div>
 </c:if
 ></c:if><c:if test="${(fn:length(rs.rows) > 0) && rs.query.type.resultType == 'TABLE' && rs.query.type != 'REPORT'}"
 >				<div class="filter"><input id="trim-${label}" type="checkbox" name="dummy5" value="true"<c:if test="${rs.attributes['trim']}"> checked="checked"</c:if> onchange="toggleTrimColumnsMode('${rs.query.name}', ${rs.attributes['trim'] ? 'false' : 'true'});"/> <label for="trim-${label}"><fmt:message key="trim"/></label></div>
@@ -111,6 +113,8 @@
 ><div id="text-${label}" class="wiki">${rs.firstValue}</div></c:when
 ><c:when test="${rs.query.type.resultType == 'SINGLE' && rs.query.attributes['formatter'] == 'HTML'}"
 ><div id="text-${label}" class="hidden">${rs.firstValue}</div><iframe id="html-${label}" class="result"></iframe></c:when
+><c:when test="${rs.query.type.resultType == 'SINGLE' && rs.attributes['structure']}"
+><div id="text-${label}">${rs.firstValue}</div></c:when
 ><c:when test="${rs.query.type.resultType == 'SINGLE'}"
 ><pre id="text-${label}" class="code">${rs.firstValue}</pre></c:when
 ><%--
@@ -120,7 +124,7 @@
 *
 ***********************************************************************
 --%><c:when test="${(rs.query.type == 'ROW_EDITOR') && currentConnection.writable}"
-><span class="button" onclick="showUpdateDialog(event, '${rs.query.attributes['tableCatalog']}', '${rs.query.attributes['tableSchema']}', '${rs.query.attributes['tableName']}', '${rs.firstValue}', '${rs.query.name}');"><fmt:message key="updateRow"/></span>
+><div><span class="button" onclick="showUpdateDialog(event, '${rs.query.attributes['tableCatalog']}', '${rs.query.attributes['tableSchema']}', '${rs.query.attributes['tableName']}', '${rs.firstValue}', '${rs.query.name}');"><fmt:message key="updateRow"/></span></div>
 <ui:result-row rs="${rs}" label="${label}" columns="3" targetElement="${targetElement}"/></c:when
 ><%--
 ***********************************************************************

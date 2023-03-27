@@ -30,8 +30,12 @@ public final class QueryTypeAttributes
 	public static final String ATTR_SYNTAX_COLORING = "syntaxColoring";
 	/** RowSet attribute for the line numbers flag */
 	public static final String ATTR_LINE_NUMBERS = "lineNumbers";
-	/** RowSet attribute for the topic name */
+	/** RowSet attribute for the line numbers flag */
+	public static final String ATTR_STRUCTURE = "structure";
+	/** RowSet attribute for the database name */
 	public static final String ATTR_DATABASE = "mongoDatabase";
+	/** RowSet attribute for the collection name */
+	public static final String ATTR_COLLECTION = "mongoCollection";
 	
 	private QueryTypeAttributes()
 		{

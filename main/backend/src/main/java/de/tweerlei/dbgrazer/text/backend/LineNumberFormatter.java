@@ -59,10 +59,4 @@ public class LineNumberFormatter extends BaseTextFormatter
 		
 		return (sb.toString());
 		}
-	
-	@Override
-	public boolean isXMLEncoded()
-		{
-		return (false);
-		}
 	}

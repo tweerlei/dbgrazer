@@ -45,10 +45,4 @@ public class VerbatimXMLFormatter extends BaseTextFormatter
 		new XMLParser(h, false).parse(value);
 		return (h.toString());
 		}
-	
-	@Override
-	public boolean isXMLEncoded()
-		{
-		return (false);
-		}
 	}

@@ -73,6 +73,8 @@ public final class RowSetConstants
 	public static final String ATTR_SYNTAX_COLORING = "syntaxColoring";
 	/** RowSet attribute for the line numbers flag */
 	public static final String ATTR_LINE_NUMBERS = "lineNumbers";
+	/** RowSet attribute for the line numbers flag */
+	public static final String ATTR_STRUCTURE = "structure";
 	/** RowSet attribute for the table catalog name */
 	public static final String ATTR_TABLE_CATALOG = "tableCatalog";
 	/** RowSet attribute for the table schema name */

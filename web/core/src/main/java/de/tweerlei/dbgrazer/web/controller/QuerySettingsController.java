@@ -226,6 +226,25 @@ public class QuerySettingsController
 		}
 	
 	/**
+	 * Toggle structure display active/inactive
+	 * @param query Query name
+	 * @param value New setting
+	 * @return View
+	 */
+	@RequestMapping(value = "/db/*/ajax/structure.html", method = RequestMethod.GET)
+	public String toggleStructureActive(
+			@RequestParam("q") String query,
+			@RequestParam("v") Boolean value
+			)
+		{
+		final Query q = queryService.findQueryByName(connectionSettings.getLinkName(), query);
+		
+		querySettingsManager.setStructureActive(q, value);
+		
+		return (ViewConstants.EMPTY_VIEW);
+		}
+	
+	/**
 	 * Toggle the trim columns mode
 	 * @param query Query name
 	 * @param value New setting

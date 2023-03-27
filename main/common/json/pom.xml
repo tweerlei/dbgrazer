@@ -21,15 +21,4 @@
 		<version>3.1-SNAPSHOT</version>
 		<relativePath></relativePath>
 	</parent>
-	
-	<dependencies>
-		<!--
-			tweerlei packages
-		-->
-		<dependency>
-			<groupId>de.tweerlei</groupId>
-			<artifactId>dbgrazer-common-xml</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-	</dependencies>
 </project>

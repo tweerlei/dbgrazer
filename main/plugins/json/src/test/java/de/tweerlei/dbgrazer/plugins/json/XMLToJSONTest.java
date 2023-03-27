@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.tweerlei.dbgrazer.extension.json;
+package de.tweerlei.dbgrazer.plugins.json;
 
 import java.util.Collections;
 
 import junit.framework.TestCase;
 import de.tweerlei.dbgrazer.extension.json.handler.SimpleJSONHandler;
-import de.tweerlei.dbgrazer.extension.json.handler.XMLToJSONHandler;
 import de.tweerlei.dbgrazer.extension.xml.parser.XMLConsumer;
+import de.tweerlei.dbgrazer.plugins.json.XMLToJSONHandler;
 
 /**
  * Tests for XMLFormatter

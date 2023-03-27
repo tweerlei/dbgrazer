@@ -35,10 +35,4 @@ public class IdentityFormatter extends BaseTextFormatter
 		{
 		return (value);
 		}
-	
-	@Override
-	public boolean isXMLEncoded()
-		{
-		return (false);
-		}
 	}

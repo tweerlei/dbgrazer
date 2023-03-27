@@ -45,6 +45,7 @@ public class TextTransformerServiceImpl implements TextTransformerService, Confi
 	private static final char SUFFIX_SEPARATOR = '-';
 	private static final String SYNTAX_COLOR_SUFFIX = "Highlight";
 	private static final String FORMATTED_SUFFIX = "Formatted";
+	private static final String STRUCTURED_SUFFIX = "Structured";
 	
 	private final ConfigService configService;
 	private final TextFormatterService formatterService;
@@ -97,7 +98,7 @@ public class TextTransformerServiceImpl implements TextTransformerService, Confi
 	@Override
 	public String format(String text, String format, Set<Option> options)
 		{
-		final boolean numbering = (options != null && options.contains(Option.LINE_NUMBERS));
+		final boolean numbering = (options != null && options.contains(Option.LINE_NUMBERS) && !options.contains(Option.STRUCTURE));
 		
 		String ret = null;
 		String formatterError = null;
@@ -143,11 +144,26 @@ public class TextTransformerServiceImpl implements TextTransformerService, Confi
 	
 	private String findEffectiveFormatName(String format, Set<Option> options)
 		{
+		final boolean structured = (options != null && options.contains(Option.STRUCTURE));
 		final boolean formatted = (options != null && options.contains(Option.FORMATTING));
 		final boolean color = (options != null && options.contains(Option.SYNTAX_COLORING));
 		
 		final String formatPrefix = StringUtils.notNull(format);
 		final Set<String> knownFormats = formatterService.getSupportedTextFormats();
+		
+		// If structured output requested, check for supporting formatters (with or without coloring)
+		if (structured)
+			{
+			if (color)
+				{
+				final String formatName = formatPrefix + SUFFIX_SEPARATOR + STRUCTURED_SUFFIX + SUFFIX_SEPARATOR + SYNTAX_COLOR_SUFFIX;
+				if (knownFormats.contains(formatName))
+					return (formatName);
+				}
+			final String formatName = formatPrefix + SUFFIX_SEPARATOR + STRUCTURED_SUFFIX;
+			if (knownFormats.contains(formatName))
+				return (formatName);
+			}
 		
 		// If formatted output requested, check for supporting formatters (with or without coloring)
 		if (formatted)

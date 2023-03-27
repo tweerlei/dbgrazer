@@ -21,7 +21,7 @@ import de.tweerlei.dbgrazer.extension.sql.handler.SimpleSQLHandler;
 import de.tweerlei.dbgrazer.extension.sql.parser.SQLHandler;
 import de.tweerlei.dbgrazer.extension.sql.parser.SQLParser;
 import de.tweerlei.dbgrazer.extension.sql.printer.SyntaxHighlightSQLPrinter;
-import de.tweerlei.dbgrazer.text.backend.BaseTextFormatter;
+import de.tweerlei.dbgrazer.text.backend.XMLEncodedTextFormatter;
 
 /**
  * Format text
@@ -29,7 +29,7 @@ import de.tweerlei.dbgrazer.text.backend.BaseTextFormatter;
  * @author Robert Wruck
  */
 @Service
-public class VerbatimSyntaxHighlightPLSQLFormatter extends BaseTextFormatter
+public class VerbatimSyntaxHighlightPLSQLFormatter extends XMLEncodedTextFormatter
 	{
 	/**
 	 * Constructor
@@ -45,11 +45,5 @@ public class VerbatimSyntaxHighlightPLSQLFormatter extends BaseTextFormatter
 		final SQLHandler h = new SimpleSQLHandler(new SyntaxHighlightSQLPrinter(true));
 		new SQLParser(h, true).parse(value);
 		return (h.toString());
-		}
-	
-	@Override
-	public boolean isXMLEncoded()
-		{
-		return (true);
 		}
 	}

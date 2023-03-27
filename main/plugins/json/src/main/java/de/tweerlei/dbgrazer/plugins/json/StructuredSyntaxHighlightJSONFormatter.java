@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.tweerlei.dbgrazer.text.backend.impl;
-
-import java.util.regex.Pattern;
+package de.tweerlei.dbgrazer.plugins.json;
 
 import org.springframework.stereotype.Service;
 
+import de.tweerlei.dbgrazer.extension.json.parser.JSONHandler;
+import de.tweerlei.dbgrazer.extension.json.parser.JSONParser;
+import de.tweerlei.dbgrazer.extension.json.printer.XmlEncodedJSONPrinter;
 import de.tweerlei.dbgrazer.text.backend.XMLEncodedTextFormatter;
 
 /**
@@ -27,30 +28,21 @@ import de.tweerlei.dbgrazer.text.backend.XMLEncodedTextFormatter;
  * @author Robert Wruck
  */
 @Service
-public class HTMLFormatter extends XMLEncodedTextFormatter
+public class StructuredSyntaxHighlightJSONFormatter extends XMLEncodedTextFormatter
 	{
-	private static final Pattern HTML_PATTERN = Pattern.compile("<html[\\s>]", Pattern.CASE_INSENSITIVE);
-	
 	/**
 	 * Constructor
 	 */
-	public HTMLFormatter()
+	public StructuredSyntaxHighlightJSONFormatter()
 		{
-		super("HTML");
+		super("JSON-Structured-Highlight");
 		}
 	
 	@Override
 	public String format(String value)
 		{
-		final String body;
-		
-		if (value == null)
-			body = "";
-		else if (HTML_PATTERN.matcher(value).find())
-			return (value);
-		else
-			body = value;
-		
-		return ("<html><body>" + body + "</body></html>");
+		final JSONHandler h = new StructuredJSONHandler(new XmlEncodedJSONPrinter(true));
+		new JSONParser(h).parse(value);
+		return (h.toString());
 		}
 	}

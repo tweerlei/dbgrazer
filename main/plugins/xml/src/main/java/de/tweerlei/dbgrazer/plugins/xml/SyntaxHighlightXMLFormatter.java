@@ -21,7 +21,7 @@ import de.tweerlei.dbgrazer.extension.xml.handler.PrettyPrintXMLHandler;
 import de.tweerlei.dbgrazer.extension.xml.parser.XMLHandler;
 import de.tweerlei.dbgrazer.extension.xml.parser.XMLParser;
 import de.tweerlei.dbgrazer.extension.xml.printer.SyntaxHighlightXMLPrinter;
-import de.tweerlei.dbgrazer.text.backend.BaseTextFormatter;
+import de.tweerlei.dbgrazer.text.backend.XMLEncodedTextFormatter;
 
 /**
  * Format text
@@ -29,7 +29,7 @@ import de.tweerlei.dbgrazer.text.backend.BaseTextFormatter;
  * @author Robert Wruck
  */
 @Service
-public class SyntaxHighlightXMLFormatter extends BaseTextFormatter
+public class SyntaxHighlightXMLFormatter extends XMLEncodedTextFormatter
 	{
 	/**
 	 * Constructor
@@ -45,11 +45,5 @@ public class SyntaxHighlightXMLFormatter extends BaseTextFormatter
 		final XMLHandler h = new PrettyPrintXMLHandler(new SyntaxHighlightXMLPrinter());
 		new XMLParser(h, true).parse(value);
 		return (h.toString());
-		}
-	
-	@Override
-	public boolean isXMLEncoded()
-		{
-		return (true);
 		}
 	}

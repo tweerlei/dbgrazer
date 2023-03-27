@@ -20,7 +20,7 @@ package de.tweerlei.dbgrazer.text.backend;
  * 
  * @author Robert Wruck
  */
-public class EscapeXMLFormatter extends BaseTextFormatter
+public class EscapeXMLFormatter extends XMLEncodedTextFormatter
 	{
 	/**
 	 * Constructor
@@ -67,11 +67,5 @@ public class EscapeXMLFormatter extends BaseTextFormatter
 			}
 		
 		return (sb.toString());
-		}
-	
-	@Override
-	public boolean isXMLEncoded()
-		{
-		return (true);
 		}
 	}

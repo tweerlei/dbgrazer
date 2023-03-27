@@ -45,10 +45,4 @@ public class VerbatimPLSQLFormatter extends BaseTextFormatter
 		new SQLParser(h, true).parse(value);
 		return (h.toString());
 		}
-	
-	@Override
-	public boolean isXMLEncoded()
-		{
-		return (false);
-		}
 	}

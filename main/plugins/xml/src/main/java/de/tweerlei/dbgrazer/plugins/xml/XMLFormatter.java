@@ -45,10 +45,4 @@ public class XMLFormatter extends BaseTextFormatter
 		new XMLParser(h, true).parse(value);
 		return (h.toString());
 		}
-	
-	@Override
-	public boolean isXMLEncoded()
-		{
-		return (false);
-		}
 	}

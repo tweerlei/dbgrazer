@@ -39,6 +39,15 @@
 ><%--
 ***********************************************************************
 *
+* Single row editor
+*
+***********************************************************************
+--%><c:when test="${(rs.query.type == 'ROW_EDITOR') && currentConnection.writable}"
+><div><span class="button" onclick="showUpdateDialog(event, '${rs.query.attributes['tableCatalog']}', '${rs.query.attributes['tableSchema']}', '${rs.query.attributes['tableName']}', '${rs.firstValue}', '${rs.query.name}');"><fmt:message key="updateRow"/></span></div>
+<ui:result-row rs="${rs}" label="${label}" columns="3" targetElement="${targetElement}"/></c:when
+><%--
+***********************************************************************
+*
 * Map (name, value)
 *
 ***********************************************************************
@@ -68,6 +77,15 @@
 ***********************************************************************
 --%><c:when test="${rs.query.type.resultType == 'HIERARCHICAL'}"
 ><ui:result-statictree rs="${rs}" label="${label}" root="${rs}" targetElement="${targetElement}"/></c:when
+><%--
+***********************************************************************
+*
+* Record editor
+*
+***********************************************************************
+--%><c:when test="${(rs.query.type == 'EDITOR' || rs.query.type == 'GROUPED_EDITOR') && currentConnection.writable}"
+><span class="button" onclick="showInsertDialog(event, '${rs.query.attributes['tableCatalog']}', '${rs.query.attributes['tableSchema']}', '${rs.query.attributes['tableName']}', '${rs.query.name}');"><fmt:message key="insertRow"/></span>
+<ui:result-table rs="${rs}" label="${label}" params="${detailParams}" paramString="${detailParamString}" detailLink="${detailLink}" targetElement="${targetElement}" catalogName="${rs.query.attributes['tableCatalog']}" schemaName="${rs.query.attributes['tableSchema']}" objectName="${rs.query.attributes['tableName']}" pkColumns="${pkColumns}"/></c:when
 ><%--
 ***********************************************************************
 *

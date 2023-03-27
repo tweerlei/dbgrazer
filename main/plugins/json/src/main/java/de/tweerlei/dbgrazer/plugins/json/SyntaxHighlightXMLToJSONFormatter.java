@@ -18,11 +18,10 @@ package de.tweerlei.dbgrazer.plugins.json;
 import org.springframework.stereotype.Service;
 
 import de.tweerlei.dbgrazer.extension.json.handler.PrettyPrintJSONHandler;
-import de.tweerlei.dbgrazer.extension.json.handler.XMLToJSONHandler;
 import de.tweerlei.dbgrazer.extension.json.parser.JSONHandler;
 import de.tweerlei.dbgrazer.extension.json.printer.SyntaxHighlightJSONPrinter;
 import de.tweerlei.dbgrazer.extension.xml.parser.XMLParser;
-import de.tweerlei.dbgrazer.text.backend.BaseTextFormatter;
+import de.tweerlei.dbgrazer.text.backend.XMLEncodedTextFormatter;
 
 /**
  * Format text
@@ -30,7 +29,7 @@ import de.tweerlei.dbgrazer.text.backend.BaseTextFormatter;
  * @author Robert Wruck
  */
 @Service
-public class SyntaxHighlightXMLToJSONFormatter extends BaseTextFormatter
+public class SyntaxHighlightXMLToJSONFormatter extends XMLEncodedTextFormatter
 	{
 	/**
 	 * Constructor
@@ -46,11 +45,5 @@ public class SyntaxHighlightXMLToJSONFormatter extends BaseTextFormatter
 		final JSONHandler h = new PrettyPrintJSONHandler(new SyntaxHighlightJSONPrinter());
 		new XMLParser(new XMLToJSONHandler(h)).parse(value);
 		return (h.toString());
-		}
-	
-	@Override
-	public boolean isXMLEncoded()
-		{
-		return (true);
 		}
 	}

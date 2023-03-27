@@ -31,7 +31,7 @@ import java.util.regex.Pattern;
  * 
  * @author Robert Wruck
  */
-public class LineNumberTableFormatter extends BaseTextFormatter
+public class LineNumberTableFormatter extends XMLEncodedTextFormatter
 	{
 	private static final Pattern PATTERN = Pattern.compile("\\r?\\n");
 	
@@ -98,11 +98,5 @@ public class LineNumberTableFormatter extends BaseTextFormatter
 		sb.append("</span>\n");
 		
 		return (sb.toString());
-		}
-	
-	@Override
-	public boolean isXMLEncoded()
-		{
-		return (true);
 		}
 	}

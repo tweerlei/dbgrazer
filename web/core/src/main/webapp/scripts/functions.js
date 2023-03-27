@@ -1073,6 +1073,11 @@ function toggleLineNumberMode(q, v) {
 	return false;
 }
 
+function toggleStructureMode(q, v) {
+	WSApi.getDBAsync('structure', { q: q, v: (v ? 'true' : 'false') }, reloadPage);
+	return false;
+}
+
 function toggleTrimColumnsMode(q, v) {
 	WSApi.getDBAsync('trimcols', { q: q, v: (v ? 'true' : 'false') }, reloadPage);
 	return false;

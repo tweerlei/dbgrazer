@@ -21,7 +21,7 @@ import de.tweerlei.dbgrazer.extension.json.handler.PrettyPrintJSONHandler;
 import de.tweerlei.dbgrazer.extension.json.parser.JSONHandler;
 import de.tweerlei.dbgrazer.extension.json.parser.JSONParser;
 import de.tweerlei.dbgrazer.extension.json.printer.SyntaxHighlightJSONPrinter;
-import de.tweerlei.dbgrazer.text.backend.BaseTextFormatter;
+import de.tweerlei.dbgrazer.text.backend.XMLEncodedTextFormatter;
 
 /**
  * Format text
@@ -29,7 +29,7 @@ import de.tweerlei.dbgrazer.text.backend.BaseTextFormatter;
  * @author Robert Wruck
  */
 @Service
-public class SyntaxHighlightJSONFormatter extends BaseTextFormatter
+public class SyntaxHighlightJSONFormatter extends XMLEncodedTextFormatter
 	{
 	/**
 	 * Constructor
@@ -45,11 +45,5 @@ public class SyntaxHighlightJSONFormatter extends BaseTextFormatter
 		final JSONHandler h = new PrettyPrintJSONHandler(new SyntaxHighlightJSONPrinter());
 		new JSONParser(h).parse(value);
 		return (h.toString());
-		}
-	
-	@Override
-	public boolean isXMLEncoded()
-		{
-		return (true);
 		}
 	}
