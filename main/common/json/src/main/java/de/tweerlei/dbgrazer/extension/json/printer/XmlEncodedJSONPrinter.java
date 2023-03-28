@@ -120,6 +120,9 @@ public class XmlEncodedJSONPrinter implements JSONPrinter
 	
 	private String textEncode(String s)
 		{
+		if (s.length() == 0)
+			return ("\u00a0");
+		
 		return (s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\r\n", "<br/>").replace("\r", "<br/>").replace("\n", "<br/>"));
 		}
 	}
