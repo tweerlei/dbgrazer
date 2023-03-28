@@ -20,12 +20,14 @@ import java.util.List;
 import java.util.TimeZone;
 
 import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.mongodb.client.MongoClient;
 
 import de.tweerlei.dbgrazer.extension.mongodb.MongoDBClientService;
+import de.tweerlei.dbgrazer.plugins.mongodb.types.MongoDBAggregateQueryType;
 import de.tweerlei.dbgrazer.plugins.mongodb.types.MongoDBSingleQueryType;
 import de.tweerlei.dbgrazer.plugins.mongodb.types.QueryTypeAttributes;
 import de.tweerlei.dbgrazer.query.backend.BaseQueryRunner;
@@ -92,7 +94,9 @@ public class MongoDBQueryRunner extends BaseQueryRunner
 		try	{
 			final String stmt = new ParamReplacer(params).replaceAll(query.getStatement());
 			
-			if (query.getType() instanceof MongoDBSingleQueryType)
+			if (query.getType() instanceof MongoDBAggregateQueryType)
+				performMongoAggregateQuery(client, database, collection, stmt, limit, query, subQueryIndex, res);
+			else if (query.getType() instanceof MongoDBSingleQueryType)
 				performMongoQuery(client, database, collection, stmt, 1, query, subQueryIndex, res);
 			else
 				performMongoQuery(client, database, collection, stmt, limit, query, subQueryIndex, res);
@@ -111,6 +115,30 @@ public class MongoDBQueryRunner extends BaseQueryRunner
 		
 		final long start = timeService.getCurrentTime();
 		final Iterable<Document> l = client.getDatabase(database).getCollection(collection).find(q).limit(limit);
+		final long end = timeService.getCurrentTime();
+		
+		final RowSetImpl rs = new RowSetImpl(query, subQueryIndex, Collections.singletonList(new ColumnDefImpl(
+				"result", ColumnType.STRING, null, null, null, null
+				)));
+		
+		for (Document r: l)
+			rs.getRows().add(new DefaultResultRow(r.toJson()));
+		rs.setMoreAvailable(false);
+		rs.setQueryTime(end - start);
+		
+		res.getRowSets().put(res.getQuery().getName(), rs);
+		}
+	
+	private void performMongoAggregateQuery(MongoClient client, String database, String collection, String statement, int limit, Query query, int subQueryIndex, Result res)
+		{
+		final Document q = Document.parse("{pipeline:" + statement + "}");
+		final List<Bson> pipeline = q.getList("pipeline", Bson.class);
+		
+		// aggregate() does not support limit(), so just add a final $limit step
+		pipeline.add(new Document("$limit", limit));
+		
+		final long start = timeService.getCurrentTime();
+		final Iterable<Document> l = client.getDatabase(database).getCollection(collection).aggregate(pipeline);
 		final long end = timeService.getCurrentTime();
 		
 		final RowSetImpl rs = new RowSetImpl(query, subQueryIndex, Collections.singletonList(new ColumnDefImpl(
