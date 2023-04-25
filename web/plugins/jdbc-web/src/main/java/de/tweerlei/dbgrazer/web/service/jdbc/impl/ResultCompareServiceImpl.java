@@ -79,7 +79,7 @@ public class ResultCompareServiceImpl implements ResultCompareService
 			if (flags.useUpdate)
 				return (other.rowChanged(tableName, columns, oldValues, newValues, pk));
 			else
-				return (oldValues.getValues().equals(newValues.getValues()));
+				return (!oldValues.getValues().equals(newValues.getValues()));
 			}
 		
 		@Override
