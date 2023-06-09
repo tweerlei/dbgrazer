@@ -327,7 +327,9 @@ function cancelSubmit() {
 function downloadElement(e, type) {
 	var el = $(e);
 	if (el) {
-		var uri = 'data:'+type+','+encodeURIComponent(el.textContent);
+//		var uri = 'data:'+type+','+encodeURIComponent(el.textContent);
+		var blob = new Blob([ el.textContent ], { type: type });
+		var uri = URL.createObjectURL(blob);
 		window.open(uri);
 //		Elements.selectText(el);
 	}
