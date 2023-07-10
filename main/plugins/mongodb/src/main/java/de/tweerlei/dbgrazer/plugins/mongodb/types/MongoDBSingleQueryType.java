@@ -52,10 +52,4 @@ public class MongoDBSingleQueryType extends AbstractSingleQueryType
 				.put(QueryTypeAttributes.ATTR_STRUCTURE, Boolean.class)
 				.build());
 		}
-	
-	@Override
-	public boolean isManipulation()
-		{
-		return false;
-		}
 	}

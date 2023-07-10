@@ -31,26 +31,20 @@ import de.tweerlei.dbgrazer.query.model.impl.AbstractTableQueryType;
  */
 @Service
 @Order(704)
-public class MongoDBAggregateQueryType extends AbstractTableQueryType
+public class MongoDBAggregateTableQueryType extends AbstractTableQueryType
 	{
-	private static final String NAME = "MONGODB_AGGREGATE";
+	private static final String NAME = "MONGODB_AGGREGATE_TABLE";
 	
 	/**
 	 * Constructor
 	 * @param linkType LinkType
 	 */
 	@Autowired
-	public MongoDBAggregateQueryType(MongoDBLinkType linkType)
+	public MongoDBAggregateTableQueryType(MongoDBLinkType linkType)
 		{
 		super(NAME, linkType, ResultMapMode.SINGLE, MapBuilder.<String, Class<?>>ordered()
 				.put(QueryTypeAttributes.ATTR_DATABASE, String.class)
 				.put(QueryTypeAttributes.ATTR_COLLECTION, String.class)
 				.build());
-		}
-	
-	@Override
-	public boolean isManipulation()
-		{
-		return false;
 		}
 	}

@@ -28,7 +28,6 @@ import com.mongodb.client.MongoClient;
 import de.tweerlei.dbgrazer.extension.mongodb.MongoDBClientService;
 import de.tweerlei.dbgrazer.plugins.mongodb.types.QueryTypeAttributes;
 import de.tweerlei.dbgrazer.query.backend.BaseQueryRunner;
-import de.tweerlei.dbgrazer.query.backend.ParamReplacer;
 import de.tweerlei.dbgrazer.query.exception.PerformQueryException;
 import de.tweerlei.dbgrazer.query.model.CancelableProgressMonitor;
 import de.tweerlei.dbgrazer.query.model.ColumnType;
@@ -85,9 +84,9 @@ public class MongoDBCommandRunner extends BaseQueryRunner
 		final Result res = new ResultImpl(query);
 		
 		try	{
-			final String stmt = new ParamReplacer(params).replaceAll(query.getStatement());
+//			final String stmt = new ParamReplacer(params).replaceAll(query.getStatement());
 			
-			performMongoCommand(client, database, stmt, query, subQueryIndex, res);
+			performMongoCommand(client, database, query.getStatement(), params, query, subQueryIndex, res);
 			}
 		catch (RuntimeException e)
 			{
@@ -97,9 +96,10 @@ public class MongoDBCommandRunner extends BaseQueryRunner
 		return (res);
 		}
 	
-	private void performMongoCommand(MongoClient client, String database, String statement, Query query, int subQueryIndex, Result res)
+	private void performMongoCommand(MongoClient client, String database, String statement, List<Object> params, Query query, int subQueryIndex, Result res)
 		{
 		final Document q = Document.parse(statement);
+		new MongoDBParamReplacer(params).visit(q);
 		
 		final long start = timeService.getCurrentTime();
 		final Document r = client.getDatabase(database).runCommand(q);

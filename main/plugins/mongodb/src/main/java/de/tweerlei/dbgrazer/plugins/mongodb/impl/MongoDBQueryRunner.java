@@ -15,8 +15,10 @@
  */
 package de.tweerlei.dbgrazer.plugins.mongodb.impl;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
 
 import org.bson.Document;
@@ -27,13 +29,13 @@ import org.springframework.stereotype.Service;
 import com.mongodb.client.MongoClient;
 
 import de.tweerlei.dbgrazer.extension.mongodb.MongoDBClientService;
-import de.tweerlei.dbgrazer.plugins.mongodb.types.MongoDBAggregateQueryType;
+import de.tweerlei.dbgrazer.plugins.mongodb.types.MongoDBMultipleQueryType;
 import de.tweerlei.dbgrazer.plugins.mongodb.types.MongoDBSingleQueryType;
 import de.tweerlei.dbgrazer.plugins.mongodb.types.QueryTypeAttributes;
 import de.tweerlei.dbgrazer.query.backend.BaseQueryRunner;
-import de.tweerlei.dbgrazer.query.backend.ParamReplacer;
 import de.tweerlei.dbgrazer.query.exception.PerformQueryException;
 import de.tweerlei.dbgrazer.query.model.CancelableProgressMonitor;
+import de.tweerlei.dbgrazer.query.model.ColumnDef;
 import de.tweerlei.dbgrazer.query.model.ColumnType;
 import de.tweerlei.dbgrazer.query.model.Query;
 import de.tweerlei.dbgrazer.query.model.QueryType;
@@ -92,14 +94,14 @@ public class MongoDBQueryRunner extends BaseQueryRunner
 		final Result res = new ResultImpl(query);
 		
 		try	{
-			final String stmt = new ParamReplacer(params).replaceAll(query.getStatement());
+//			final String stmt = new ParamReplacer(params).replaceAll(query.getStatement());
 			
-			if (query.getType() instanceof MongoDBAggregateQueryType)
-				performMongoAggregateQuery(client, database, collection, stmt, limit, query, subQueryIndex, res);
-			else if (query.getType() instanceof MongoDBSingleQueryType)
-				performMongoQuery(client, database, collection, stmt, 1, query, subQueryIndex, res);
+			if (query.getType() instanceof MongoDBSingleQueryType)
+				performMongoQuery(client, database, collection, query.getStatement(), params, 1, query, subQueryIndex, res);
+			else if (query.getType() instanceof MongoDBMultipleQueryType)
+				performMongoQuery(client, database, collection, query.getStatement(), params, limit, query, subQueryIndex, res);
 			else
-				performMongoQuery(client, database, collection, stmt, limit, query, subQueryIndex, res);
+				performMongoAggregateQuery(client, database, collection, query.getStatement(), params, limit, query, subQueryIndex, res);
 			}
 		catch (RuntimeException e)
 			{
@@ -109,9 +111,10 @@ public class MongoDBQueryRunner extends BaseQueryRunner
 		return (res);
 		}
 	
-	private void performMongoQuery(MongoClient client, String database, String collection, String statement, int limit, Query query, int subQueryIndex, Result res)
+	private void performMongoQuery(MongoClient client, String database, String collection, String statement, List<Object> params, int limit, Query query, int subQueryIndex, Result res)
 		{
 		final Document q = Document.parse(statement);
+		new MongoDBParamReplacer(params).visit(q);
 		
 		final long start = timeService.getCurrentTime();
 		final Iterable<Document> l = client.getDatabase(database).getCollection(collection).find(q).limit(limit);
@@ -129,10 +132,10 @@ public class MongoDBQueryRunner extends BaseQueryRunner
 		res.getRowSets().put(res.getQuery().getName(), rs);
 		}
 	
-	private void performMongoAggregateQuery(MongoClient client, String database, String collection, String statement, int limit, Query query, int subQueryIndex, Result res)
+	private void performMongoAggregateQuery(MongoClient client, String database, String collection, String statement, List<Object> params, int limit, Query query, int subQueryIndex, Result res)
 		{
-		final Document q = Document.parse("{pipeline:" + statement + "}");
-		final List<Bson> pipeline = q.getList("pipeline", Bson.class);
+		final List<Bson> pipeline = parseAggregatePipeline(statement);
+		new MongoDBParamReplacer(params).visit(pipeline);
 		
 		// aggregate() does not support limit(), so just add a final $limit step
 		pipeline.add(new Document("$limit", limit));
@@ -141,15 +144,40 @@ public class MongoDBQueryRunner extends BaseQueryRunner
 		final Iterable<Document> l = client.getDatabase(database).getCollection(collection).aggregate(pipeline);
 		final long end = timeService.getCurrentTime();
 		
-		final RowSetImpl rs = new RowSetImpl(query, subQueryIndex, Collections.singletonList(new ColumnDefImpl(
-				"result", ColumnType.STRING, null, null, null, null
-				)));
+		final List<ColumnDef> columns = new ArrayList<ColumnDef>(); 
+		final RowSetImpl rs = new RowSetImpl(query, subQueryIndex, columns);
+ 		
+		boolean first = true;
+ 		for (Document r: l)
+			{
+			if (first)
+				{
+				// TODO: There could be more columns in the following documents
+				for (Map.Entry<String, Object> ent : r.entrySet())
+					{
+					columns.add(new ColumnDefImpl(
+							ent.getKey(), ColumnType.forObject(ent.getValue()), null, null, null, null
+							));
+					}
+				first = false;
+				}
+			
+			final DefaultResultRow row = new DefaultResultRow(columns.size());
+			for (ColumnDef cd : columns)
+				row.getValues().add(r.get(cd.getName()));
+			rs.getRows().add(row);
+			}
 		
-		for (Document r: l)
-			rs.getRows().add(new DefaultResultRow(r.toJson()));
 		rs.setMoreAvailable(false);
 		rs.setQueryTime(end - start);
 		
 		res.getRowSets().put(res.getQuery().getName(), rs);
+		}
+	
+	private List<Bson> parseAggregatePipeline(String statement)
+		{
+		final Document q = Document.parse("{pipeline:" + statement + "}");
+		final List<Bson> pipeline = q.getList("pipeline", Bson.class);
+		return (pipeline);
 		}
 	}

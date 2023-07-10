@@ -21,8 +21,7 @@ import org.springframework.stereotype.Service;
 
 import de.tweerlei.common5.collections.MapBuilder;
 import de.tweerlei.dbgrazer.plugins.mongodb.impl.MongoDBLinkType;
-import de.tweerlei.dbgrazer.query.model.ResultMapMode;
-import de.tweerlei.dbgrazer.query.model.impl.AbstractTableQueryType;
+import de.tweerlei.dbgrazer.query.model.impl.AbstractRowQueryType;
 
 /**
  * List LDAP entries
@@ -30,19 +29,19 @@ import de.tweerlei.dbgrazer.query.model.impl.AbstractTableQueryType;
  * @author Robert Wruck
  */
 @Service
-@Order(703)
-public class MongoDBMultipleQueryType extends AbstractTableQueryType
+@Order(704)
+public class MongoDBAggregateRowQueryType extends AbstractRowQueryType
 	{
-	private static final String NAME = "MONGODB_MULTIPLE";
+	private static final String NAME = "MONGODB_AGGREGATE_ROW";
 	
 	/**
 	 * Constructor
 	 * @param linkType LinkType
 	 */
 	@Autowired
-	public MongoDBMultipleQueryType(MongoDBLinkType linkType)
+	public MongoDBAggregateRowQueryType(MongoDBLinkType linkType)
 		{
-		super(NAME, linkType, ResultMapMode.SINGLE, MapBuilder.<String, Class<?>>ordered()
+		super(NAME, linkType, MapBuilder.<String, Class<?>>ordered()
 				.put(QueryTypeAttributes.ATTR_DATABASE, String.class)
 				.put(QueryTypeAttributes.ATTR_COLLECTION, String.class)
 				.build());
