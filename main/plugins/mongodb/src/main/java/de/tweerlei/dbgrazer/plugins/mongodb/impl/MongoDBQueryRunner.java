@@ -166,7 +166,13 @@ public class MongoDBQueryRunner extends BaseQueryRunner
 			
 			final DefaultResultRow row = new DefaultResultRow(columns.size());
 			for (ColumnDef cd : columns)
-				row.getValues().add(r.get(cd.getName()));
+				{
+				final Object value = r.get(cd.getName());
+				if (value instanceof Document)
+					row.getValues().add(((Document) value).toJson());
+				else
+					row.getValues().add(value);
+				}
 			rs.getRows().add(row);
 			}
 		

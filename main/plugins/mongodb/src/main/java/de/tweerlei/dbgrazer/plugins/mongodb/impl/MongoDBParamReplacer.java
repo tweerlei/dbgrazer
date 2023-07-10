@@ -18,21 +18,18 @@ package de.tweerlei.dbgrazer.plugins.mongodb.impl;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
+import de.tweerlei.dbgrazer.query.backend.ParamReplacer;
 
 /**
  * Replace placeholder values of the form "?n?" with the nth parameter.
- * To enable passing literal question marks, a "??" sequence at the beginning of
- * a string will be replaced by a single "?".
+ * To enable passing literal question marks, "?0?" will be replaced with a single "?".
  * 
  * @author Robert Wruck
  */
 public class MongoDBParamReplacer
 	{
-	private static final Pattern PAT_PARAM = Pattern.compile("\\?(\\d)\\?");
-	
-	private final List<Object> params;
+	private final ParamReplacer replacer;
 	
 	/**
 	 * Constructor
@@ -40,7 +37,7 @@ public class MongoDBParamReplacer
 	 */
 	public MongoDBParamReplacer(List<Object> params)
 		{
-		this.params = params;
+		this.replacer = new ParamReplacer(params);
 		}
 	
 	/**
@@ -79,30 +76,7 @@ public class MongoDBParamReplacer
 	private <T> T replace(T value)
 		{
 		if (value instanceof String)
-			{
-			final String stringValue = (String) value;
-			final Matcher m = PAT_PARAM.matcher(stringValue);
-			if (m.matches())
-				{
-				final int n;
-				try	{
-					n = Integer.parseInt(m.group(1));
-					}
-				catch (NumberFormatException e)
-					{
-					throw new RuntimeException("Invalid parameter index: " + m.group(1));
-					}
-				
-				if ((n < 1) || (n > params.size()))
-					throw new RuntimeException("Undefined parameter index: " + m.group(1));
-				
-				return ((T) params.get(n - 1));
-				}
-			else if (stringValue.startsWith("??"))
-				{
-				return ((T) stringValue.substring(1));
-				}
-			}
+			return ((T) replacer.replaceAll((String) value));
 		else if (value instanceof Map)
 			visit((Map<?, ?>) value);
 		else if (value instanceof List)
