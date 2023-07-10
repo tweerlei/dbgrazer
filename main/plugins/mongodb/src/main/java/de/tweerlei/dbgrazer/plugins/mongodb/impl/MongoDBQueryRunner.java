@@ -18,6 +18,7 @@ package de.tweerlei.dbgrazer.plugins.mongodb.impl;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.TimeZone;
 
@@ -166,13 +167,7 @@ public class MongoDBQueryRunner extends BaseQueryRunner
 			
 			final DefaultResultRow row = new DefaultResultRow(columns.size());
 			for (ColumnDef cd : columns)
-				{
-				final Object value = r.get(cd.getName());
-				if (value instanceof Document)
-					row.getValues().add(((Document) value).toJson());
-				else
-					row.getValues().add(value);
-				}
+				row.getValues().add(recursiveToJson(r.get(cd.getName())));
 			rs.getRows().add(row);
 			}
 		
@@ -187,5 +182,27 @@ public class MongoDBQueryRunner extends BaseQueryRunner
 		final Document q = Document.parse("{pipeline:" + statement + "}");
 		final List<Bson> pipeline = q.getList("pipeline", Bson.class);
 		return (pipeline);
+		}
+	
+	private Object recursiveToJson(Object value)
+		{
+		if (value instanceof Document)
+			{
+			final Document doc = (Document) value;
+			return (doc.toJson());
+			}
+		
+		if (value instanceof List)
+			{
+			@SuppressWarnings("unchecked")
+			final List<Object> list = (List<Object>) value;
+			for (ListIterator<Object> it = list.listIterator(); it.hasNext(); )
+				{
+				final Object entry = it.next();
+				it.set(recursiveToJson(entry));
+				}
+			}
+		
+		return (value);
 		}
 	}
