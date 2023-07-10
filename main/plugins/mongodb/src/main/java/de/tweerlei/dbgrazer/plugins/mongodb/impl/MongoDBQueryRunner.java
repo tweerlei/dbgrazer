@@ -153,11 +153,13 @@ public class MongoDBQueryRunner extends BaseQueryRunner
 			if (first)
 				{
 				// TODO: There could be more columns in the following documents
+				int i = 0;
 				for (Map.Entry<String, Object> ent : r.entrySet())
 					{
 					columns.add(new ColumnDefImpl(
-							ent.getKey(), ColumnType.forObject(ent.getValue()), null, null, null, null
+							ent.getKey(), ColumnType.forObject(ent.getValue()), null, query.getTargetQueries().get(i), null, null
 							));
+					i++;
 					}
 				first = false;
 				}
