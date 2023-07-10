@@ -13,30 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.tweerlei.ermtools.schema.matchers;
+package de.tweerlei.ermtools.dialect.mssql;
 
-import java.util.Comparator;
-
-import de.tweerlei.common5.jdbc.model.TypeDescription;
+import de.tweerlei.ermtools.dialect.SQLDialect;
+import junit.framework.TestCase;
 
 /**
- * Type matching by JDBC type only
+ * Tests for MSSQLDialect
  * 
  * @author Robert Wruck
  */
-public class LaxTypeMatcher implements Comparator<TypeDescription>
+public class MSSQLDialectTest extends TestCase
 	{
-	public int compare(TypeDescription a, TypeDescription b)
+	public void testQuoteIdentifier()
 		{
-		int d = b.getDecimals() - a.getDecimals();
-		if (d != 0)
-			return (d);
-		d = b.getLength() - a.getLength();
-		if (d != 0)
-			return (d);
-		d = b.getType() - a.getType();
-		if (d != 0)
-			return (d);
-		return (0);
+		final SQLDialect d = new MSSQLDialect();
+		
+		assertEquals("", d.quoteIdentifier(""));
+		assertEquals("hello", d.quoteIdentifier("hello"));
+		assertEquals("HELLO", d.quoteIdentifier("HELLO"));
+		assertEquals("Hello", d.quoteIdentifier("Hello"));
+		assertEquals("Hello_World2", d.quoteIdentifier("Hello_World2"));
+		assertEquals("[Hello, World!]", d.quoteIdentifier("Hello, World!"));
 		}
 	}

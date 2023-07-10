@@ -15,27 +15,32 @@
  */
 package de.tweerlei.ermtools.schema.matchers;
 
+import java.util.Comparator;
+
 import de.tweerlei.common.util.StringUtils;
 import de.tweerlei.common5.jdbc.model.TypeDescription;
-import de.tweerlei.ermtools.schema.ObjectMatcher;
 
 /**
  * Strict type matching
  * 
  * @author Robert Wruck
  */
-public class StrictTypeMatcher implements ObjectMatcher<TypeDescription>
+public class StrictTypeMatcher implements Comparator<TypeDescription>
 	{
-	public boolean equals(TypeDescription a, TypeDescription b)
+	public int compare(TypeDescription a, TypeDescription b)
 		{
-		if (!StringUtils.equals(a.getName(), b.getName()))
-			return false;
-		if (a.getDecimals() != b.getDecimals())
-			return false;
-		if (a.getLength() != b.getLength())
-			return false;
-		if (a.getType() != b.getType())
-			return false;
-		return true;
+		int d = StringUtils.compareTo(a.getName(), b.getName());
+		if (d != 0)
+			return (d);
+		d = b.getDecimals() - a.getDecimals();
+		if (d != 0)
+			return (d);
+		d = b.getLength() - a.getLength();
+		if (d != 0)
+			return (d);
+		d = b.getType() - a.getType();
+		if (d != 0)
+			return (d);
+		return (0);
 		}
 	}

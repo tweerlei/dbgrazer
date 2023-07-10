@@ -15,25 +15,39 @@
  */
 package de.tweerlei.ermtools.schema.matchers;
 
+import java.util.Comparator;
+import java.util.Map;
+
 import de.tweerlei.common.util.StringUtils;
 import de.tweerlei.common5.jdbc.model.ForeignKeyDescription;
-import de.tweerlei.ermtools.schema.ObjectMatcher;
 
 /**
  * Strict FK matching
  * 
  * @author Robert Wruck
  */
-public class StrictForeignKeyMatcher implements ObjectMatcher<ForeignKeyDescription>
+public class StrictForeignKeyMatcher implements Comparator<ForeignKeyDescription>
 	{
-	public boolean equals(ForeignKeyDescription a, ForeignKeyDescription b)
+	public int compare(ForeignKeyDescription a, ForeignKeyDescription b)
 		{
-		if (!StringUtils.equals(a.getName(), b.getName()))
-			return false;
-		if (!a.getTableName().equals(b.getTableName()))
-			return (false);
-		if (!a.getColumns().equals(b.getColumns()))
-			return false;
-		return true;
+		int d = StringUtils.compareTo(a.getName(), b.getName());
+		if (d != 0)
+			return (d);
+		d = a.getTableName().compareTo(b.getTableName());
+		if (d != 0)
+			return (d);
+		d = b.getColumns().size() - a.getColumns().size();
+		if (d != 0)
+			return (d);
+		for (Map.Entry<String, String> ent : a.getColumns().entrySet())
+			{
+			final String v = b.getColumns().get(ent.getKey());
+			if (v == null)
+				return (-1);
+			d = StringUtils.compareTo(ent.getValue(), v);
+			if (d != 0)
+				return (d);
+			}
+		return (0);
 		}
 	}

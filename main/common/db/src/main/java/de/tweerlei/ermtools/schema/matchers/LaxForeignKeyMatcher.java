@@ -15,34 +15,48 @@
  */
 package de.tweerlei.ermtools.schema.matchers;
 
+import java.util.Comparator;
+import java.util.Map;
+
+import de.tweerlei.common.util.StringUtils;
 import de.tweerlei.common5.jdbc.model.ForeignKeyDescription;
-import de.tweerlei.ermtools.schema.ObjectMatcher;
-import de.tweerlei.ermtools.schema.SchemaNamingStrategy;
+import de.tweerlei.ermtools.dialect.SQLNamingStrategy;
 
 /**
  * FK matching ignoring the name
  * 
  * @author Robert Wruck
  */
-public class LaxForeignKeyMatcher implements ObjectMatcher<ForeignKeyDescription>
+public class LaxForeignKeyMatcher implements Comparator<ForeignKeyDescription>
 	{
-	private final SchemaNamingStrategy namingStrategy;
+	private final SQLNamingStrategy namingStrategy;
 	
 	/**
 	 * Constructor
 	 * @param namingStrategy SchemaNamingStrategy
 	 */
-	public LaxForeignKeyMatcher(SchemaNamingStrategy namingStrategy)
+	public LaxForeignKeyMatcher(SQLNamingStrategy namingStrategy)
 		{
 		this.namingStrategy = namingStrategy;
 		}
 	
-	public boolean equals(ForeignKeyDescription a, ForeignKeyDescription b)
+	public int compare(ForeignKeyDescription a, ForeignKeyDescription b)
 		{
-		if (!namingStrategy.getTableName(a.getTableName()).equals(namingStrategy.getTableName(b.getTableName())))
-			return (false);
-		if (!a.getColumns().equals(b.getColumns()))
-			return false;
-		return true;
+		int d = StringUtils.compareTo(namingStrategy.getQualifiedTableName(a.getTableName()), namingStrategy.getQualifiedTableName(b.getTableName()));
+		if (d != 0)
+			return (d);
+		d = b.getColumns().size() - a.getColumns().size();
+		if (d != 0)
+			return (d);
+		for (Map.Entry<String, String> ent : a.getColumns().entrySet())
+			{
+			final String v = b.getColumns().get(ent.getKey());
+			if (v == null)
+				return (-1);
+			d = StringUtils.compareTo(ent.getValue(), v);
+			if (d != 0)
+				return (d);
+			}
+		return (0);
 		}
 	}

@@ -78,6 +78,8 @@
 >					</spring:select></dd>
 				<dt><label for="f1-file"><fmt:message key="file"/></label></dt>
 				<dd><input type="file" id="f1-file" name="file" onchange="selectComplete(this);"/></dd>
+				<dt><spring:label path="prefix"><fmt:message key="prefix"/></spring:label></dt>
+				<dd><spring:input path="prefix"/></dd>
 <c:if test="${currentConnection.writable}"
 >				<dt><spring:label path="mode"><fmt:message key="executeAs"/></spring:label></dt>
 				<dd><spring:select path="mode">

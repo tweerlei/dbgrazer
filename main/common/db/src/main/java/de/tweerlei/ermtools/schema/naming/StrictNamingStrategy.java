@@ -16,21 +16,21 @@
 package de.tweerlei.ermtools.schema.naming;
 
 import de.tweerlei.common5.jdbc.model.QualifiedName;
-import de.tweerlei.ermtools.schema.SchemaNamingStrategy;
+import de.tweerlei.ermtools.dialect.SQLNamingStrategy;
 
 /**
  * Strict comparison
  * 
  * @author Robert Wruck
  */
-public class StrictNamingStrategy implements SchemaNamingStrategy
+public class StrictNamingStrategy implements SQLNamingStrategy
 	{
-	public String getTableName(QualifiedName qn)
+	public String getQualifiedTableName(QualifiedName qn)
 		{
 		return (qn.toString());
 		}
 	
-	public String getColumnName(String c)
+	public String quoteIdentifier(String c)
 		{
 		return (c);
 		}

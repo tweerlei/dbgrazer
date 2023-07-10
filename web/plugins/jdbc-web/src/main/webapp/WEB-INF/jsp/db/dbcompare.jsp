@@ -75,6 +75,8 @@
 >					</spring:select></dd>
 				<dt><label for="f1-file"><fmt:message key="file"/></label></dt>
 				<dd><input type="file" id="f1-file" name="file" onchange="selectComplete(this);"/></dd>
+				<dt><spring:label path="prefix"><fmt:message key="prefix"/></spring:label></dt>
+				<dd><spring:input path="prefix"/></dd>
 				<dt><spring:label path="filter"><fmt:message key="filter"/></spring:label></dt>
 				<dd><spring:input path="filter"/> <ui:info name="f1-filter"><fmt:message key="help_REGEXP"/></ui:info></dd>
 <c:if test="${currentConnection.writable}"

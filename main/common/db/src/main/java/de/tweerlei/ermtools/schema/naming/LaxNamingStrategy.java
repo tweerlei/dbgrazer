@@ -16,21 +16,21 @@
 package de.tweerlei.ermtools.schema.naming;
 
 import de.tweerlei.common5.jdbc.model.QualifiedName;
-import de.tweerlei.ermtools.schema.SchemaNamingStrategy;
+import de.tweerlei.ermtools.dialect.SQLNamingStrategy;
 
 /**
  * Comparison ignoring catalog, schema and case
  * 
  * @author Robert Wruck
  */
-public class LaxNamingStrategy implements SchemaNamingStrategy
+public class LaxNamingStrategy implements SQLNamingStrategy
 	{
-	public String getTableName(QualifiedName qn)
+	public String getQualifiedTableName(QualifiedName qn)
 		{
 		return (qn.getObjectName().toLowerCase());
 		}
 	
-	public String getColumnName(String c)
+	public String quoteIdentifier(String c)
 		{
 		return (c.toLowerCase());
 		}

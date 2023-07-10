@@ -93,7 +93,22 @@ public class MSSQLDialect extends CommonSQLDialect
 	@Override
 	public String quoteIdentifier(String c)
 		{
-		return ("[" + c + "]");
+		final int len = c.length();
+		final StringBuilder sb = new StringBuilder(len + 2);
+		boolean needsQuote = false;
+		sb.append('[');
+		for (int i = 0; i < len; i++)
+			{
+			final char ch = c.charAt(i);
+			if ((ch != '_') && (ch < '0' || ch > '9') && (ch < 'A' || ch > 'Z') && (ch < 'a' || ch > 'z'))
+				needsQuote = true;
+			sb.append(ch);
+			}
+		sb.append(']');
+		if (needsQuote)
+			return (sb.toString());
+		else
+			return (c);
 		}
 	
 	@Override

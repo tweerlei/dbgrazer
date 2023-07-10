@@ -33,7 +33,7 @@ import de.tweerlei.common5.jdbc.model.TypeDescription;
  * 
  * @author Robert Wruck
  */
-public interface SQLDialect
+public interface SQLDialect extends SQLNamingStrategy
 	{
 	/**
 	 * Liefert den Spaltentyp für ein CREATE-Statement

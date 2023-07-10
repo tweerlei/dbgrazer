@@ -13,22 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.tweerlei.ermtools.schema;
+package de.tweerlei.ermtools.dialect;
+
+import de.tweerlei.common5.jdbc.model.QualifiedName;
 
 /**
- * Test objects for equality
- * @param <T> Object type
+ * Compare schema objects
  * 
  * @author Robert Wruck
  */
-public interface ObjectMatcher<T>
+public interface SQLNamingStrategy
 	{
 	/**
-	 * Test objects for equality.
-	 * @see Object#equals(Object)
-	 * @param a An object
-	 * @param b Another object
-	 * @return true if equal or both null
+	 * Get the name to use for matching tables
+	 * @param qn Table name
+	 * @return Table name
 	 */
-	public boolean equals(T a, T b);
+	public String getQualifiedTableName(QualifiedName qn);
+	
+	/**
+	 * Get the name to use for matching columns
+	 * @param c Column name
+	 * @return Column name
+	 */
+	public String quoteIdentifier(String c);
 	}

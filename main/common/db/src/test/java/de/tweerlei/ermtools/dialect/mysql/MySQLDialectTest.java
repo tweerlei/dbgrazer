@@ -13,28 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.tweerlei.ermtools.schema;
+package de.tweerlei.ermtools.dialect.mysql;
 
-import de.tweerlei.common5.jdbc.model.QualifiedName;
+import de.tweerlei.ermtools.dialect.SQLDialect;
+import junit.framework.TestCase;
 
 /**
- * Compare schema objects
+ * Tests for MSSQLDialect
  * 
  * @author Robert Wruck
  */
-public interface SchemaNamingStrategy
+public class MySQLDialectTest extends TestCase
 	{
-	/**
-	 * Get the name to use for matching tables
-	 * @param qn Table name
-	 * @return Table name
-	 */
-	public String getTableName(QualifiedName qn);
-	
-	/**
-	 * Get the name to use for matching columns
-	 * @param c Column name
-	 * @return Column name
-	 */
-	public String getColumnName(String c);
+	public void testQuoteIdentifier()
+		{
+		final SQLDialect d = new MySQLDialect();
+		
+		assertEquals("", d.quoteIdentifier(""));
+		assertEquals("hello", d.quoteIdentifier("hello"));
+		assertEquals("HELLO", d.quoteIdentifier("HELLO"));
+		assertEquals("Hello", d.quoteIdentifier("Hello"));
+		assertEquals("Hello_World2", d.quoteIdentifier("Hello_World2"));
+		assertEquals("`Hello, World!`", d.quoteIdentifier("Hello, World!"));
+		}
 	}

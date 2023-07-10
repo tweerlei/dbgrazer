@@ -16,14 +16,14 @@
 package de.tweerlei.ermtools.schema.naming;
 
 import de.tweerlei.common5.jdbc.model.QualifiedName;
-import de.tweerlei.ermtools.schema.SchemaNamingStrategy;
+import de.tweerlei.ermtools.dialect.SQLNamingStrategy;
 
 /**
  * Strict comparison, but ignoring catalog and schema
  * 
  * @author Robert Wruck
  */
-public class PrefixNamingStrategy implements SchemaNamingStrategy
+public class PrefixNamingStrategy implements SQLNamingStrategy
 	{
 	private final String prefix;
 	
@@ -32,7 +32,7 @@ public class PrefixNamingStrategy implements SchemaNamingStrategy
 		this.prefix = prefix;
 		}
 	
-	public String getTableName(QualifiedName qn)
+	public String getQualifiedTableName(QualifiedName qn)
 		{
 		if (qn.getObjectName().startsWith(prefix))
 			return (qn.getObjectName().substring(prefix.length()));
@@ -40,7 +40,7 @@ public class PrefixNamingStrategy implements SchemaNamingStrategy
 			return (qn.getObjectName());
 		}
 	
-	public String getColumnName(String c)
+	public String quoteIdentifier(String c)
 		{
 		return (c);
 		}

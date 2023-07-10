@@ -15,17 +15,18 @@
  */
 package de.tweerlei.ermtools.schema.matchers;
 
+import java.util.Comparator;
+
 import de.tweerlei.common5.jdbc.model.TypeDescription;
 import de.tweerlei.ermtools.dialect.SQLDataType;
 import de.tweerlei.ermtools.dialect.SQLDialect;
-import de.tweerlei.ermtools.schema.ObjectMatcher;
 
 /**
  * Type matching by JDBC type and dialect specific handling of length and decimals
  * 
  * @author Robert Wruck
  */
-public class DialectTypeMatcher implements ObjectMatcher<TypeDescription>
+public class DialectTypeMatcher implements Comparator<TypeDescription>
 	{
 	private final SQLDialect dialect;
 	
@@ -38,15 +39,24 @@ public class DialectTypeMatcher implements ObjectMatcher<TypeDescription>
 		this.dialect = dialect;
 		}
 	
-	public boolean equals(TypeDescription a, TypeDescription b)
+	public int compare(TypeDescription a, TypeDescription b)
 		{
-		if (a.getType() != b.getType())
-			return false;
+		int d = b.getType() - a.getType();
+		if (d != 0)
+			return (d);
 		final SQLDataType t = dialect.getSQLDataType(a.getType());
-		if ((t == null || t.hasDecimals()) && (a.getDecimals() != b.getDecimals()))
-			return false;
-		if ((t == null || t.hasLength()) && (a.getLength() != b.getLength()))
-			return false;
-		return true;
+		if ((t == null) || (t.hasDecimals()))
+			{
+			d = b.getDecimals() - a.getDecimals();
+			if (d != 0)
+				return (d);
+			}
+		if ((t == null) || (t.hasLength()))
+			{
+			d = b.getLength() - a.getLength();
+			if (d != 0)
+				return (d);
+			}
+		return (0);
 		}
 	}

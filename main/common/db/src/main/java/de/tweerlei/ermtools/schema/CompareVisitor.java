@@ -15,6 +15,7 @@
  */
 package de.tweerlei.ermtools.schema;
 
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -28,6 +29,7 @@ import de.tweerlei.common5.jdbc.model.IndexDescription;
 import de.tweerlei.common5.jdbc.model.PrimaryKeyDescription;
 import de.tweerlei.common5.jdbc.model.PrivilegeDescription;
 import de.tweerlei.common5.jdbc.model.TableDescription;
+import de.tweerlei.ermtools.dialect.SQLNamingStrategy;
 import de.tweerlei.ermtools.model.SQLSchema;
 import de.tweerlei.ermtools.model.SQLVisitor;
 import de.tweerlei.ermtools.schema.matchers.LaxColumnMatcher;
@@ -52,11 +54,11 @@ public class CompareVisitor implements SQLVisitor
 	private final DifferenceHandler handler;
 	private final Map<String, TableDescription> right;
 	
-	private final SchemaNamingStrategy namingStrategy;
-	private final ObjectMatcher<ColumnDescription> columnMatcher;
-	private final ObjectMatcher<IndexDescription> indexMatcher;
-	private final ObjectMatcher<ForeignKeyDescription> fkMatcher;
-	private final ObjectMatcher<PrivilegeDescription> privMatcher;
+	private final SQLNamingStrategy namingStrategy;
+	private final Comparator<ColumnDescription> columnMatcher;
+	private final Comparator<IndexDescription> indexMatcher;
+	private final Comparator<ForeignKeyDescription> fkMatcher;
+	private final Comparator<PrivilegeDescription> privMatcher;
 	
 	private TableDescription rightTable;
 	private Map<String, ColumnDescription> rightCols;
@@ -81,7 +83,7 @@ public class CompareVisitor implements SQLVisitor
 	 * @param namingStrategy SchemaNamingStrategy
 	 */
 	public CompareVisitor(SQLSchema schema, DifferenceHandler handler,
-			SchemaNamingStrategy namingStrategy)
+			SQLNamingStrategy namingStrategy)
 		{
 		this(schema, handler, namingStrategy,
 				new LaxColumnMatcher(new StrictTypeMatcher()),
@@ -101,11 +103,11 @@ public class CompareVisitor implements SQLVisitor
 	 * @param privMatcher Privilege matcher
 	 */
 	public CompareVisitor(SQLSchema schema, DifferenceHandler handler,
-			SchemaNamingStrategy namingStrategy,
-			ObjectMatcher<ColumnDescription> columnMatcher,
-			ObjectMatcher<IndexDescription> indexMatcher,
-			ObjectMatcher<ForeignKeyDescription> fkMatcher,
-			ObjectMatcher<PrivilegeDescription> privMatcher
+			SQLNamingStrategy namingStrategy,
+			Comparator<ColumnDescription> columnMatcher,
+			Comparator<IndexDescription> indexMatcher,
+			Comparator<ForeignKeyDescription> fkMatcher,
+			Comparator<PrivilegeDescription> privMatcher
 			)
 		{
 		this.other = schema;
@@ -124,15 +126,25 @@ public class CompareVisitor implements SQLVisitor
 			{
 			// Compare real tables only (we don't know how to handle views)
 			if (table.getType().equals(TableDescription.TABLE))
-				right.put(namingStrategy.getTableName(table.getName()), table);
+				right.put(namingStrategy.getQualifiedTableName(table.getName()), table);
 			}
 		}
 	
 	public void endSchema(SQLSchema schema)
 		{
-		for (TableDescription a : right.values())
-			handler.tableRemoved(a);
-		right.clear();
+		if (!right.isEmpty())
+			{
+			final SQLSchema tmp = new SQLSchema(other.getCatalog(), other.getSchema());
+			for (TableDescription a : right.values())
+				tmp.addTable(a);
+			
+			final SchemaChangeVisitor scv = new SchemaChangeVisitor(schema.getCatalog(), schema.getSchema());
+			tmp.accept(scv);
+			
+			for (TableDescription a : scv.getSchema().getTables().values())
+				handler.tableRemoved(a);
+			right.clear();
+			}
 		}
 	
 	public void beginTable(TableDescription table)
@@ -141,30 +153,30 @@ public class CompareVisitor implements SQLVisitor
 		if (!table.getType().equals(TableDescription.TABLE))
 			return;
 		
-		final TableDescription otherTable = right.remove(namingStrategy.getTableName(table.getName()));
+		final TableDescription otherTable = right.remove(namingStrategy.getQualifiedTableName(table.getName()));
 		if (otherTable == null)
 			{
 			handler.tableAdded(table);
 			return;
 			}
 		
-		handler.startTable(otherTable, table);
-		
 		rightTable = otherTable;
+		
+		handler.startTable(rightTable, table);
 		
 		// Handle PK
 		
 		if (indexMatcher != null)
 			{
-			if ((table.getPrimaryKey() != null) && (otherTable.getPrimaryKey() == null))
-				handler.pkAdded(table, table.getPrimaryKey());
-			else if ((table.getPrimaryKey() != null) && (otherTable.getPrimaryKey() != null))
+			if ((table.getPrimaryKey() != null) && (rightTable.getPrimaryKey() == null))
+				handler.pkAdded(rightTable, table.getPrimaryKey());
+			else if ((table.getPrimaryKey() != null) && (rightTable.getPrimaryKey() != null))
 				{
-				if (!indexMatcher.equals(table.getPrimaryKey(), otherTable.getPrimaryKey()))
-					handler.pkChanged(table, table.getPrimaryKey(), otherTable.getPrimaryKey());
+				if (indexMatcher.compare(table.getPrimaryKey(), rightTable.getPrimaryKey()) != 0)
+					handler.pkChanged(rightTable, table.getPrimaryKey(), rightTable.getPrimaryKey());
 				}
-			else if ((table.getPrimaryKey() == null) && (otherTable.getPrimaryKey() != null))
-				handler.pkRemoved(otherTable, otherTable.getPrimaryKey());
+			else if ((table.getPrimaryKey() == null) && (rightTable.getPrimaryKey() != null))
+				handler.pkRemoved(rightTable, rightTable.getPrimaryKey());
 			}
 		}
 
@@ -185,7 +197,7 @@ public class CompareVisitor implements SQLVisitor
 		
 		rightCols = new LinkedHashMap<String, ColumnDescription>();
 		for (ColumnDescription c : rightTable.getColumns())
-			rightCols.put(namingStrategy.getColumnName(c.getName()), c);
+			rightCols.put(namingStrategy.quoteIdentifier(c.getName()), c);
 		}
 	
 	public void visitColumn(ColumnDescription a)
@@ -193,12 +205,12 @@ public class CompareVisitor implements SQLVisitor
 		if (rightCols == null)
 			return;
 		
-		final ColumnDescription b = rightCols.get(namingStrategy.getColumnName(a.getName()));
+		final ColumnDescription b = rightCols.get(namingStrategy.quoteIdentifier(a.getName()));
 		if (b == null)
 			handler.columnAdded(rightTable, a);
 		else
 			{
-			if (!columnMatcher.equals(a, b))
+			if (columnMatcher.compare(a, b) != 0)
 				handler.columnChanged(rightTable, a, b);
 			rightCols.remove(b.getName());
 			}
@@ -236,7 +248,7 @@ public class CompareVisitor implements SQLVisitor
 		for (Iterator<IndexDescription> j = rightIndices.iterator(); j.hasNext(); )
 			{
 			final IndexDescription b = j.next();
-			if (indexMatcher.equals(a, b))
+			if (indexMatcher.compare(a, b) == 0)
 				{
 				j.remove();
 				found = true;
@@ -275,7 +287,7 @@ public class CompareVisitor implements SQLVisitor
 		for (Iterator<ForeignKeyDescription> j = rightFKs.iterator(); j.hasNext(); )
 			{
 			final ForeignKeyDescription b = j.next();
-			if (fkMatcher.equals(a, b))
+			if (fkMatcher.compare(a, b) == 0)
 				{
 				j.remove();
 				found = true;
@@ -314,7 +326,7 @@ public class CompareVisitor implements SQLVisitor
 		for (Iterator<PrivilegeDescription> j = rightPrivs.iterator(); j.hasNext(); )
 			{
 			final PrivilegeDescription b = j.next();
-			if (privMatcher.equals(a, b))
+			if (privMatcher.compare(a, b) == 0)
 				{
 				j.remove();
 				found = true;

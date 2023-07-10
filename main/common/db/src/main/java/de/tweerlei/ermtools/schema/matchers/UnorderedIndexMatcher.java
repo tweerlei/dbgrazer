@@ -15,27 +15,31 @@
  */
 package de.tweerlei.ermtools.schema.matchers;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Comparator;
 
 import de.tweerlei.common5.jdbc.model.IndexDescription;
-import de.tweerlei.ermtools.schema.ObjectMatcher;
 
 /**
  * Index matching ignoring the name and column ordering
  * 
  * @author Robert Wruck
  */
-public class UnorderedIndexMatcher implements ObjectMatcher<IndexDescription>
+public class UnorderedIndexMatcher implements Comparator<IndexDescription>
 	{
-	public boolean equals(IndexDescription a, IndexDescription b)
+	public int compare(IndexDescription a, IndexDescription b)
 		{
-		if (a.isUnique() != b.isUnique())
-			return false;
-		final Set<String> ca = new HashSet<String>(a.getColumns());
-		final Set<String> cb = new HashSet<String>(b.getColumns());
-		if (!ca.equals(cb))
-			return false;
-		return true;
+		if (a.isUnique() && !b.isUnique())
+			return (-1);
+		if (!a.isUnique() && b.isUnique())
+			return (1);
+		int d = b.getColumns().size() - a.getColumns().size();
+		if (d != 0)
+			return (d);
+		for (String v : a.getColumns())
+			{
+			if (!b.getColumns().contains(v))
+				return (-1);
+			}
+		return (0);
 		}
 	}

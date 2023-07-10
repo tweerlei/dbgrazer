@@ -79,6 +79,7 @@ public class SchemaDiffController
 		private String connection2;
 		private String catalog2;
 		private String schema2;
+		private String prefix;
 		private String mode;
 		private MultipartFile file;
 		
@@ -195,6 +196,24 @@ public class SchemaDiffController
 		public void setSchema2(String schema2)
 			{
 			this.schema2 = schema2;
+			}
+		
+		/**
+		 * Get the prefix
+		 * @return the prefix
+		 */
+		public String getPrefix()
+			{
+			return prefix;
+			}
+		
+		/**
+		 * Set the prefix
+		 * @param prefix the prefix to set
+		 */
+		public void setPrefix(String prefix)
+			{
+			this.prefix = prefix;
 			}
 		
 		/**
@@ -323,6 +342,7 @@ public class SchemaDiffController
 			}
 		
 		fbo.setFilter(connectionSettings.getParameterHistory().get("filter"));
+		fbo.setPrefix(connectionSettings.getParameterHistory().get("prefix"));
 		fbo.setMode(connectionSettings.getParameterHistory().get("mode"));
 		
 		final Map<String, String> all = linkService.findAllLinkNames(userSettingsManager.getEffectiveUserGroups(userSettings.getPrincipal()), null, null);
@@ -405,11 +425,11 @@ public class SchemaDiffController
 					model.put("exception", ex);
 					}
 				else
-					model = compareSchemasInternal(fbo.getCatalog(), fbo.getSchema(), fbo.getFilter(), sch, "XML", fbo.getMode(), pr, c, false, true, true);
+					model = compareSchemasInternal(fbo.getCatalog(), fbo.getSchema(), fbo.getFilter(), sch, "XML", fbo.getPrefix(), fbo.getMode(), pr, c, false, true, true);
 				}
 			else
 				{
-				model = compareSchemasInternal(fbo.getCatalog(), fbo.getSchema(), fbo.getFilter(), fbo.getConnection2(), fbo.getCatalog2(), fbo.getSchema2(), fbo.getMode(), pr, c, false, false);
+				model = compareSchemasInternal(fbo.getCatalog(), fbo.getSchema(), fbo.getFilter(), fbo.getConnection2(), fbo.getCatalog2(), fbo.getSchema2(), fbo.getPrefix(), fbo.getMode(), pr, c, false, false);
 				
 				connectionSettings.getParameterHistory().put("connection2", fbo.getConnection2());
 				connectionSettings.getParameterHistory().put("catalog2", fbo.getCatalog2());
@@ -417,6 +437,7 @@ public class SchemaDiffController
 				}
 			
 			connectionSettings.getParameterHistory().put("filter", fbo.getFilter());
+			connectionSettings.getParameterHistory().put("prefix", fbo.getPrefix());
 			connectionSettings.getParameterHistory().put("mode", fbo.getMode());
 			}
 		finally
@@ -443,7 +464,7 @@ public class SchemaDiffController
 		final TaskDMLProgressMonitor p = new TaskDMLProgressMonitor();
 		final TaskCompareProgressMonitor c = new TaskCompareProgressMonitor();
 		
-		model = compareSchemasInternal(fbo.getCatalog(), fbo.getSchema(), fbo.getFilter(), fbo.getConnection2(), fbo.getCatalog2(), fbo.getSchema2(), fbo.getMode(), p, c, true, true);
+		model = compareSchemasInternal(fbo.getCatalog(), fbo.getSchema(), fbo.getFilter(), fbo.getConnection2(), fbo.getCatalog2(), fbo.getSchema2(), fbo.getPrefix(), fbo.getMode(), p, c, true, true);
 		
 		return (model);
 		}
@@ -454,6 +475,7 @@ public class SchemaDiffController
 			String filter,
 			SQLSchema right,
 			String rightLabel,
+			String prefix,
 			String mode,
 			TaskDMLProgressMonitor pr,
 			TaskCompareProgressMonitor c,
@@ -472,7 +494,7 @@ public class SchemaDiffController
 		final SQLSchema left = readSchema(connectionSettings.getLinkName(), catalog, schema, filter, c.getSourceRows(), flushConn);
 		
 		final SQLDialect dialect = getSQLDialect();
-		final StatementProducer p = schemaTransformer.compareSchemas(left, right, crossSchema, dialect, crossDialect);
+		final StatementProducer p = schemaTransformer.compareSchemas(left, right, crossSchema, prefix, dialect, crossDialect);
 		
 		try	{
 			if (!StringUtils.empty(mode) && connectionSettings.isWritable())
@@ -511,6 +533,7 @@ public class SchemaDiffController
 			String conn2,
 			String catalog2,
 			String schema2,
+			String prefix,
 			String mode,
 			TaskDMLProgressMonitor pr,
 			TaskCompareProgressMonitor c,
@@ -524,7 +547,7 @@ public class SchemaDiffController
 		final boolean crossDialect = !StringUtils.equals(connectionSettings.getDialectName(),
 				linkService.getLink(conn2, null).getDialectName());
 		
-		return (compareSchemasInternal(catalog, schema, filter, right, conn2, mode, pr, c, flushConn, crossSchema, crossDialect));
+		return (compareSchemasInternal(catalog, schema, filter, right, conn2, prefix, mode, pr, c, flushConn, crossSchema, crossDialect));
 		}
 	
 	private SQLSchema readSchema(String conn, String catalog, String schema, String filter, TaskProgress p, boolean flush)

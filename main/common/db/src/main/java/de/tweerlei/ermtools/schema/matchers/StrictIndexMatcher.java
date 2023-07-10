@@ -15,25 +15,37 @@
  */
 package de.tweerlei.ermtools.schema.matchers;
 
+import java.util.Comparator;
+
 import de.tweerlei.common.util.StringUtils;
 import de.tweerlei.common5.jdbc.model.IndexDescription;
-import de.tweerlei.ermtools.schema.ObjectMatcher;
 
 /**
  * Strict index matching
  * 
  * @author Robert Wruck
  */
-public class StrictIndexMatcher implements ObjectMatcher<IndexDescription>
+public class StrictIndexMatcher implements Comparator<IndexDescription>
 	{
-	public boolean equals(IndexDescription a, IndexDescription b)
+	public int compare(IndexDescription a, IndexDescription b)
 		{
-		if (!StringUtils.equals(a.getName(), b.getName()))
-			return false;
-		if (a.isUnique() != b.isUnique())
-			return false;
-		if (!a.getColumns().equals(b.getColumns()))
-			return false;
-		return true;
+		int d = StringUtils.compareTo(a.getName(), b.getName());
+		if (d != 0)
+			return (d);
+		if (a.isUnique() && !b.isUnique())
+			return (-1);
+		if (!a.isUnique() && b.isUnique())
+			return (1);
+		int n = a.getColumns().size();
+		d = b.getColumns().size() - n;
+		if (d != 0)
+			return (d);
+		for (int i = 0; i < n; i++)
+			{
+			d = StringUtils.compareTo(a.getColumns().get(i), b.getColumns().get(i));
+			if (d != 0)
+				return (d);
+			}
+		return (0);
 		}
 	}

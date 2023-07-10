@@ -15,39 +15,42 @@
  */
 package de.tweerlei.ermtools.schema.matchers;
 
+import java.util.Comparator;
+
 import de.tweerlei.common.util.StringUtils;
 import de.tweerlei.common5.jdbc.model.ColumnDescription;
 import de.tweerlei.common5.jdbc.model.TypeDescription;
-import de.tweerlei.ermtools.schema.ObjectMatcher;
 
 /**
  * Strict column matching
  * 
  * @author Robert Wruck
  */
-public class StrictColumnMatcher implements ObjectMatcher<ColumnDescription>
+public class StrictColumnMatcher implements Comparator<ColumnDescription>
 	{
-	private final ObjectMatcher<TypeDescription> typeMatcher;
+	private final Comparator<TypeDescription> typeMatcher;
 	
 	/**
 	 * Constructor
 	 * @param typeMatcher Type matcher
 	 */
-	public StrictColumnMatcher(ObjectMatcher<TypeDescription> typeMatcher)
+	public StrictColumnMatcher(Comparator<TypeDescription> typeMatcher)
 		{
 		this.typeMatcher = typeMatcher;
 		}
 	
-	public boolean equals(ColumnDescription a, ColumnDescription b)
+	public int compare(ColumnDescription a, ColumnDescription b)
 		{
-		if (!StringUtils.equals(a.getName(), b.getName()))
-			return false;
-		if (!StringUtils.equals(a.getDefaultValue(), b.getDefaultValue()))
-			return false;
-		if (a.isNullable() != b.isNullable())
-			return false;
-		if (!typeMatcher.equals(a.getType(), b.getType()))
-			return false;
-		return true;
+		int d = StringUtils.compareTo(a.getName(), b.getName());
+		if (d != 0)
+			return (d);
+		d = StringUtils.compareTo(a.getDefaultValue(), b.getDefaultValue());
+		if (d != 0)
+			return (d);
+		if (a.isNullable() && !b.isNullable())
+			return (-1);
+		if (!a.isNullable() && b.isNullable())
+			return (1);
+		return (typeMatcher.compare(a.getType(), b.getType()));
 		}
 	}

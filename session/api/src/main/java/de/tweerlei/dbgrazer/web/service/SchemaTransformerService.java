@@ -110,9 +110,10 @@ public interface SchemaTransformerService
 	 * @param left Left schema
 	 * @param right Right schema
 	 * @param ignoreCatalogSchema Ignore catalog and schema of tables
+	 * @param prefix Table prefix to strip when comparing
 	 * @param dialect SQLDialect
 	 * @param crossDialect Schemas belong to different SQLDialects
 	 * @return StatementProducer
 	 */
-	public StatementProducer compareSchemas(SQLSchema left, SQLSchema right, boolean ignoreCatalogSchema, SQLDialect dialect, boolean crossDialect);
+	public StatementProducer compareSchemas(SQLSchema left, SQLSchema right, boolean ignoreCatalogSchema, String prefix, SQLDialect dialect, boolean crossDialect);
 	}

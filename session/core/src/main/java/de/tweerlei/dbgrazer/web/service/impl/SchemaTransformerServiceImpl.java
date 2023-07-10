@@ -17,6 +17,7 @@ package de.tweerlei.dbgrazer.web.service.impl;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -52,11 +53,10 @@ import de.tweerlei.dbgrazer.web.model.Visualization;
 import de.tweerlei.dbgrazer.web.service.DataFormatterFactory;
 import de.tweerlei.dbgrazer.web.service.SchemaTransformerService;
 import de.tweerlei.ermtools.dialect.SQLDialect;
+import de.tweerlei.ermtools.dialect.SQLNamingStrategy;
 import de.tweerlei.ermtools.dialect.impl.SQLDialectFactory;
 import de.tweerlei.ermtools.model.SQLSchema;
 import de.tweerlei.ermtools.schema.CompareVisitor;
-import de.tweerlei.ermtools.schema.ObjectMatcher;
-import de.tweerlei.ermtools.schema.SchemaNamingStrategy;
 import de.tweerlei.ermtools.schema.matchers.DialectTypeMatcher;
 import de.tweerlei.ermtools.schema.matchers.LaxColumnMatcher;
 import de.tweerlei.ermtools.schema.matchers.LaxForeignKeyMatcher;
@@ -65,6 +65,7 @@ import de.tweerlei.ermtools.schema.matchers.LaxPrivilegeMatcher;
 import de.tweerlei.ermtools.schema.matchers.StrictTypeMatcher;
 import de.tweerlei.ermtools.schema.matchers.UnorderedIndexMatcher;
 import de.tweerlei.ermtools.schema.naming.CrossNamingStrategy;
+import de.tweerlei.ermtools.schema.naming.PrefixNamingStrategy;
 import de.tweerlei.ermtools.schema.naming.StrictNamingStrategy;
 
 /**
@@ -236,17 +237,17 @@ public class SchemaTransformerServiceImpl implements SchemaTransformerService
 	@Override
 	public StatementProducer buildDDL(SQLSchema schema, SQLDialect dialect)
 		{
-		return (compareSchemas(new SQLSchema(null, null), schema, true, dialect, false));
+		return (compareSchemas(new SQLSchema(null, null), schema, true, null, dialect, false));
 		}
 	
 	@Override
-	public StatementProducer compareSchemas(SQLSchema left, SQLSchema right, boolean ignoreCatalogSchema, SQLDialect dialect, boolean crossDialect)
+	public StatementProducer compareSchemas(SQLSchema left, SQLSchema right, boolean ignoreCatalogSchema, String prefix, SQLDialect dialect, boolean crossDialect)
 		{
 		final StatementDifferenceHandler handler = new StatementDifferenceHandler(dialect);
 		
-		final SchemaNamingStrategy namingStrategy = ignoreCatalogSchema ? new CrossNamingStrategy() : new StrictNamingStrategy();
-		final ObjectMatcher<TypeDescription> typeMatcher = crossDialect ? new DialectTypeMatcher(dialect) : new StrictTypeMatcher();
-		final ObjectMatcher<PrivilegeDescription> privMatcher = (ignoreCatalogSchema || crossDialect) ? null : new LaxPrivilegeMatcher();
+		final SQLNamingStrategy namingStrategy = (prefix != null) ? new PrefixNamingStrategy(prefix) : (ignoreCatalogSchema ? new CrossNamingStrategy() : new StrictNamingStrategy());
+		final Comparator<TypeDescription> typeMatcher = crossDialect ? new DialectTypeMatcher(dialect) : new StrictTypeMatcher();
+		final Comparator<PrivilegeDescription> privMatcher = (ignoreCatalogSchema || crossDialect) ? null : new LaxPrivilegeMatcher();
 		
 		right.accept(new CompareVisitor(left, handler,
 				namingStrategy,

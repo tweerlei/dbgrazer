@@ -15,27 +15,33 @@
  */
 package de.tweerlei.ermtools.schema.matchers;
 
+import java.util.Comparator;
+
 import de.tweerlei.common.util.StringUtils;
 import de.tweerlei.common5.jdbc.model.PrivilegeDescription;
-import de.tweerlei.ermtools.schema.ObjectMatcher;
 
 /**
  * Strict privilege matching
  * 
  * @author Robert Wruck
  */
-public class StrictPrivilegeMatcher implements ObjectMatcher<PrivilegeDescription>
+public class StrictPrivilegeMatcher implements Comparator<PrivilegeDescription>
 	{
-	public boolean equals(PrivilegeDescription a, PrivilegeDescription b)
+	public int compare(PrivilegeDescription a, PrivilegeDescription b)
 		{
-		if (!StringUtils.equals(a.getGrantor(), b.getGrantor()))
-			return false;
-		if (!StringUtils.equals(a.getGrantee(), b.getGrantee()))
-			return false;
-		if (!StringUtils.equals(a.getPrivilege(), b.getPrivilege()))
-			return false;
-		if (a.isGrantable() != b.isGrantable())
-			return false;
-		return true;
+		int d = StringUtils.compareTo(a.getGrantor(), b.getGrantor());
+		if (d != 0)
+			return (d);
+		d = StringUtils.compareTo(a.getGrantee(), b.getGrantee());
+		if (d != 0)
+			return (d);
+		d = StringUtils.compareTo(a.getPrivilege(), b.getPrivilege());
+		if (d != 0)
+			return (d);
+		if (a.isGrantable() && !b.isGrantable())
+			return (-1);
+		if (!a.isGrantable() && b.isGrantable())
+			return (1);
+		return (0);
 		}
 	}

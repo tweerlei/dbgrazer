@@ -255,7 +255,7 @@ public class DesignDiffController
 					linkService.getLink(fbo.getConnection2(), null).getDialectName());
 			
 			final SQLDialect dialect = getSQLDialect();
-			final StatementProducer p = schemaTransformer.compareSchemas(left, right, false, dialect, crossDialect);
+			final StatementProducer p = schemaTransformer.compareSchemas(left, right, false, null, dialect, crossDialect);
 			
 			if (!StringUtils.empty(fbo.getMode()) && connectionSettings.isWritable())
 				{

@@ -76,6 +76,7 @@ public class ObjectDiffController
 		private String connection2;
 		private String catalog2;
 		private String schema2;
+		private String prefix;
 		private String mode;
 		private MultipartFile file;
 		
@@ -192,6 +193,24 @@ public class ObjectDiffController
 		public void setSchema2(String schema2)
 			{
 			this.schema2 = schema2;
+			}
+		
+		/**
+		 * Get the prefix
+		 * @return the prefix
+		 */
+		public String getPrefix()
+			{
+			return prefix;
+			}
+		
+		/**
+		 * Set the prefix
+		 * @param prefix the prefix to set
+		 */
+		public void setPrefix(String prefix)
+			{
+			this.prefix = prefix;
 			}
 		
 		/**
@@ -319,6 +338,7 @@ public class ObjectDiffController
 			fbo.setSchema2(connectionSettings.getParameterHistory().get("schema2"));
 			}
 		
+		fbo.setPrefix(connectionSettings.getParameterHistory().get("prefix"));
 		fbo.setMode(connectionSettings.getParameterHistory().get("mode"));
 		
 		final Map<String, String> all = linkService.findAllLinkNames(userSettingsManager.getEffectiveUserGroups(userSettings.getPrincipal()), null, null);
@@ -382,17 +402,18 @@ public class ObjectDiffController
 					model.put("exception", ex);
 					}
 				else
-					model = compareObjectsInternal(fbo.getCatalog(), fbo.getSchema(), fbo.getObject(), sch, "XML", fbo.getMode(), pr, true, true);
+					model = compareObjectsInternal(fbo.getCatalog(), fbo.getSchema(), fbo.getObject(), sch, "XML", fbo.getPrefix(), fbo.getMode(), pr, true, true);
 				}
 			else
 				{
-				model = compareObjectsInternal(fbo.getCatalog(), fbo.getSchema(), fbo.getObject(), fbo.getConnection2(), fbo.getCatalog2(), fbo.getSchema2(), fbo.getMode(), pr);
+				model = compareObjectsInternal(fbo.getCatalog(), fbo.getSchema(), fbo.getObject(), fbo.getConnection2(), fbo.getCatalog2(), fbo.getSchema2(), fbo.getPrefix(), fbo.getMode(), pr);
 				
 				connectionSettings.getParameterHistory().put("connection2", fbo.getConnection2());
 				connectionSettings.getParameterHistory().put("catalog2", fbo.getCatalog2());
 				connectionSettings.getParameterHistory().put("schema2", fbo.getSchema2());
 				}
 			
+			connectionSettings.getParameterHistory().put("prefix", fbo.getPrefix());
 			connectionSettings.getParameterHistory().put("mode", fbo.getMode());
 			}
 		finally
@@ -409,6 +430,7 @@ public class ObjectDiffController
 			String object,
 			SQLSchema right,
 			String rightLabel,
+			String prefix,
 			String mode,
 			TaskDMLProgressMonitor pr,
 			boolean crossSchema,
@@ -421,7 +443,7 @@ public class ObjectDiffController
 			final SQLSchema left = readSingletonSchema(connectionSettings.getLinkName(), catalog, schema, object);
 			
 			final SQLDialect dialect = getSQLDialect();
-			final StatementProducer p = schemaTransformer.compareSchemas(left, right, crossSchema, dialect, crossDialect);
+			final StatementProducer p = schemaTransformer.compareSchemas(left, right, crossSchema, prefix, dialect, crossDialect);
 			
 			if (!StringUtils.empty(mode) && connectionSettings.isWritable())
 				{
@@ -459,6 +481,7 @@ public class ObjectDiffController
 			String conn2,
 			String catalog2,
 			String schema2,
+			String prefix,
 			String mode,
 			TaskDMLProgressMonitor pr
 			)
@@ -469,7 +492,7 @@ public class ObjectDiffController
 		final boolean crossDialect = !StringUtils.equals(connectionSettings.getDialectName(),
 				linkService.getLink(conn2, null).getDialectName());
 		
-		return (compareObjectsInternal(catalog, schema, object, right, conn2, mode, pr, crossSchema, crossDialect));
+		return (compareObjectsInternal(catalog, schema, object, right, conn2, prefix, mode, pr, crossSchema, crossDialect));
 		}
 	
 	private SQLSchema readSingletonSchema(String conn, String catalog, String schema, String object)
