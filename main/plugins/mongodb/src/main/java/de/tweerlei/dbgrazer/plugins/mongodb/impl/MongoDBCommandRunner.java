@@ -99,7 +99,7 @@ public class MongoDBCommandRunner extends BaseQueryRunner
 	private void performMongoCommand(MongoClient client, String database, String statement, List<Object> params, Query query, int subQueryIndex, Result res)
 		{
 		final Document q = Document.parse(statement);
-		new MongoDBParamReplacer(params).visit(q);
+		new MongoDBParamReplacer(query.getParameters(), params).visit(q);
 		
 		final long start = timeService.getCurrentTime();
 		final Document r = client.getDatabase(database).runCommand(q);

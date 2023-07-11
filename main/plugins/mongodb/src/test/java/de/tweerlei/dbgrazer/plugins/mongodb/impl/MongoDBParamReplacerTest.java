@@ -18,7 +18,10 @@ package de.tweerlei.dbgrazer.plugins.mongodb.impl;
 import java.util.Arrays;
 
 import org.bson.Document;
+import org.bson.types.ObjectId;
 
+import de.tweerlei.dbgrazer.query.model.ColumnType;
+import de.tweerlei.dbgrazer.query.model.impl.ParameterDefImpl;
 import junit.framework.TestCase;
 
 /**
@@ -32,10 +35,20 @@ public class MongoDBParamReplacerTest extends TestCase
 		{
 		final Document doc = Document.parse("{ numVal: 42, strVal: 'Hello ?1? World', objVal: { nestedString: '?2?.*' } }");
 		
-		final MongoDBParamReplacer replacer = new MongoDBParamReplacer(Arrays.asList("new", "1234"));
+		final MongoDBParamReplacer replacer = new MongoDBParamReplacer(null, Arrays.asList("new", "1234"));
 		replacer.visit(doc);
 		
 		assertEquals("Hello new World", doc.get("strVal"));
 		assertEquals("1234.*", ((Document) doc.get("objVal")).get("nestedString"));
+		}
+	
+	public void testOID()
+		{
+		final Document doc = Document.parse("{ _id: '?1?' }");
+		
+		final MongoDBParamReplacer replacer = new MongoDBParamReplacer(Arrays.asList(new ParameterDefImpl("ttt", ColumnType.ROWID, null)), Arrays.asList("6409e8e8d1ad4c18856e8a1a"));
+		replacer.visit(doc);
+		
+		assertEquals(new ObjectId("6409e8e8d1ad4c18856e8a1a"), doc.get("_id"));
 		}
 	}

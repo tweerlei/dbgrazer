@@ -19,7 +19,10 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
+import org.bson.types.ObjectId;
+
 import de.tweerlei.dbgrazer.query.backend.ParamReplacer;
+import de.tweerlei.dbgrazer.query.model.ParameterDef;
 
 /**
  * Replace placeholder values of the form "?n?" with the nth parameter.
@@ -30,14 +33,19 @@ import de.tweerlei.dbgrazer.query.backend.ParamReplacer;
 public class MongoDBParamReplacer
 	{
 	private final ParamReplacer replacer;
+	private final List<ParameterDef> paramDefs;
+	private final List<Object> params;
 	
 	/**
 	 * Constructor
+	 * @param paramDefs Parameter definitions
 	 * @param params Actual parameters
 	 */
-	public MongoDBParamReplacer(List<Object> params)
+	public MongoDBParamReplacer(List<ParameterDef> paramDefs, List<Object> params)
 		{
 		this.replacer = new ParamReplacer(params);
+		this.paramDefs = paramDefs;
+		this.params = params;
 		}
 	
 	/**
@@ -76,12 +84,48 @@ public class MongoDBParamReplacer
 	private <T> T replace(T value)
 		{
 		if (value instanceof String)
-			return ((T) replacer.replaceAll((String) value));
+			{
+			final String fullMatch = replacer.findMatch((String) value);
+			if (fullMatch != null)
+				return ((T) replaceSpecial(fullMatch));
+			else
+				return ((T) replacer.replaceAll((String) value));
+			}
 		else if (value instanceof Map)
 			visit((Map<?, ?>) value);
 		else if (value instanceof List)
 			visit((List<?>) value);
 		
 		return (value);
+		}
+	
+	private Object replaceSpecial(String match)
+		{
+		final int n;
+		try	{
+			n = Integer.parseInt(match);
+			}
+		catch (NumberFormatException e)
+			{
+			throw new RuntimeException("Invalid parameter index: " + match);
+			}
+		
+		if ((n < 1) || (n > params.size()))
+			throw new RuntimeException("Undefined parameter index: " + match);
+		
+		final ParameterDef def = paramDefs.get(n - 1);
+		final Object p = params.get(n - 1);
+		
+		switch (def.getType())
+			{
+			case ROWID:
+				return (new ObjectId(p.toString()));
+			case INTEGER:
+			case FLOAT:
+			case DATE:
+				return (p);
+			default:
+				return (p.toString());
+			}
 		}
 	}

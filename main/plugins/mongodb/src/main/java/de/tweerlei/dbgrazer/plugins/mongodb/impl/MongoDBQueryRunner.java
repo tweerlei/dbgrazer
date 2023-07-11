@@ -115,7 +115,7 @@ public class MongoDBQueryRunner extends BaseQueryRunner
 	private void performMongoQuery(MongoClient client, String database, String collection, String statement, List<Object> params, int limit, Query query, int subQueryIndex, Result res)
 		{
 		final Document q = Document.parse(statement);
-		new MongoDBParamReplacer(params).visit(q);
+		new MongoDBParamReplacer(query.getParameters(), params).visit(q);
 		
 		final long start = timeService.getCurrentTime();
 		final Iterable<Document> l = client.getDatabase(database).getCollection(collection).find(q).limit(limit);
@@ -136,7 +136,7 @@ public class MongoDBQueryRunner extends BaseQueryRunner
 	private void performMongoAggregateQuery(MongoClient client, String database, String collection, String statement, List<Object> params, int limit, Query query, int subQueryIndex, Result res)
 		{
 		final List<Bson> pipeline = parseAggregatePipeline(statement);
-		new MongoDBParamReplacer(params).visit(pipeline);
+		new MongoDBParamReplacer(query.getParameters(), params).visit(pipeline);
 		
 		// aggregate() does not support limit(), so just add a final $limit step
 		pipeline.add(new Document("$limit", limit));
