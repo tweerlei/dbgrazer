@@ -7,22 +7,22 @@
 	<modelVersion>4.0.0</modelVersion>
 	
 	<groupId>de.tweerlei</groupId>
-	<artifactId>dbgrazer-parent</artifactId>
+	<artifactId>dbgrazer-common-parent</artifactId>
 	<version>3.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	
-	<name>dbgrazer-parent</name>
+	<name>dbgrazer-common-parent</name>
 	<description>Web application for browsing DB schemas</description>
 	<url>http://www.tweerlei.de/</url>
 	
 	<modules>
-<!--
-		Parent POMs need to be installed before building the application
-		<module>pom</module>
--->
-		<module>common</module>
-		<module>main</module>
-		<module>session</module>
+		<module>db</module>
+		<module>json</module>
+		<module>lang</module>
+		<module>spring</module>
+		<module>sql</module>
 		<module>web</module>
+		<module>wiki</module>
+		<module>xml</module>
 	</modules>
 </project>

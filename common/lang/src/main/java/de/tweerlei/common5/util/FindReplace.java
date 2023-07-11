@@ -48,6 +48,24 @@ public abstract class FindReplace
 		}
 	
 	/**
+	 * Find the matching substring applying the pattern to the whole string
+	 * @param s String to match
+	 * @return Matched substring or null if no match
+	 */
+	public String findMatch(String s)
+		{
+		if (s == null)
+			return (null);
+		if (pattern == null)
+			return (null);
+		
+		final Matcher m = pattern.matcher(s);
+		if (m.matches())
+			return (getMatch(m));
+		return (null);
+		}
+	
+	/**
 	 * Find the first matching substring
 	 * @param s String to match
 	 * @return Matched substring or null if no match
@@ -82,6 +100,26 @@ public abstract class FindReplace
 		while (m.find())
 			ret.add(getMatch(m));
 		return (ret);
+		}
+	
+	/**
+	 * Replace the matching substring applying the pattern to the whole string
+	 * @param s String to match
+	 * @return Replaced String
+	 */
+	public String replace(String s)
+		{
+		if (s == null)
+			return (null);
+		if (pattern == null)
+			return (null);
+		
+		final StringBuffer sb = new StringBuffer();
+		final Matcher m = pattern.matcher(s);
+		if (m.matches())
+			m.appendReplacement(sb, getReplacement(getMatch(m), 0));
+		m.appendTail(sb);
+		return (sb.toString());
 		}
 	
 	/**
