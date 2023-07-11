@@ -3,6 +3,7 @@ FROM openjdk:8-jdk AS build
 COPY mvnw* pom.xml /build/
 COPY .mvn /build/.mvn
 COPY pom /build/pom
+COPY common /build/common
 COPY main /build/main
 COPY session /build/session
 COPY web /build/web
