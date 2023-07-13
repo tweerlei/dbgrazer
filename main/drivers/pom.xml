@@ -7,11 +7,11 @@
 	<modelVersion>4.0.0</modelVersion>
 	
 	<groupId>de.tweerlei</groupId>
-	<artifactId>dbgrazer-common</artifactId>
+	<artifactId>dbgrazer-drivers</artifactId>
 	<version>3.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	
-	<name>dbgrazer-common</name>
+	<name>dbgrazer-drivers</name>
 	<description>Web application for browsing DB schemas</description>
 	<url>http://www.tweerlei.de/</url>
 	

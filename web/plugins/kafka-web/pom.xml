@@ -33,7 +33,7 @@
 		</dependency>
 		<dependency>
 			<groupId>de.tweerlei</groupId>
-			<artifactId>dbgrazer-common-kafka</artifactId>
+			<artifactId>dbgrazer-driver-kafka</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<!--

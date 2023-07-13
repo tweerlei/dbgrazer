@@ -33,7 +33,7 @@
 		</dependency>
 		<dependency>
 			<groupId>de.tweerlei</groupId>
-			<artifactId>dbgrazer-common-http</artifactId>
+			<artifactId>dbgrazer-driver-http</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>

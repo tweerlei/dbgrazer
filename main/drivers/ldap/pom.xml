@@ -7,11 +7,11 @@
 	<modelVersion>4.0.0</modelVersion>
 	
 	<groupId>de.tweerlei</groupId>
-	<artifactId>dbgrazer-common-http</artifactId>
+	<artifactId>dbgrazer-driver-ldap</artifactId>
 	<version>3.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	
-	<name>dbgrazer-common-http</name>
+	<name>dbgrazer-driver-ldap</name>
 	<description>Web application for browsing DB schemas</description>
 	<url>http://www.tweerlei.de/</url>
 	
@@ -30,6 +30,20 @@
 			<groupId>de.tweerlei</groupId>
 			<artifactId>dbgrazer-api</artifactId>
 			<version>${project.version}</version>
+		</dependency>
+		<!--
+			compile time dependencies
+		-->
+		<dependency>
+			<groupId>org.springframework.ldap</groupId>
+			<artifactId>spring-ldap-core</artifactId>
+			<version>1.3.0.RELEASE</version>
+			<exclusions>
+				<exclusion>
+					<groupId>commons-logging</groupId>
+					<artifactId>commons-logging</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 	</dependencies>
 </project>

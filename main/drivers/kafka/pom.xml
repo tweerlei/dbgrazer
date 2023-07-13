@@ -7,11 +7,11 @@
 	<modelVersion>4.0.0</modelVersion>
 	
 	<groupId>de.tweerlei</groupId>
-	<artifactId>dbgrazer-common-mongodb</artifactId>
+	<artifactId>dbgrazer-driver-kafka</artifactId>
 	<version>3.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	
-	<name>dbgrazer-common-mongodb</name>
+	<name>dbgrazer-driver-kafka</name>
 	<description>Web application for browsing DB schemas</description>
 	<url>http://www.tweerlei.de/</url>
 	
@@ -35,32 +35,9 @@
 			compile time dependencies
 		-->
 		<dependency>
-			<groupId>org.mongodb</groupId>
-			<artifactId>mongodb-driver-sync</artifactId>
-			<version>4.2.3</version>
-		</dependency>
-		<!--
-			test dependencies
-		-->
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>3.8.1</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.easymock</groupId>
-			<artifactId>easymock</artifactId>
-			<version>2.4</version>
-			<scope>test</scope>
+			<groupId>org.apache.kafka</groupId>
+			<artifactId>kafka-clients</artifactId>
+			<version>2.0.0</version>
 		</dependency>
 	</dependencies>
-	
-	<properties>
-		<spring-version>2.5.6</spring-version>
-		<jdk>1.8</jdk>
-		<additionalJOption>-Xdoclint:none</additionalJOption>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-	</properties>
 </project>

@@ -33,7 +33,7 @@
 		</dependency>
 		<dependency>
 			<groupId>de.tweerlei</groupId>
-			<artifactId>dbgrazer-common-kubernetes</artifactId>
+			<artifactId>dbgrazer-driver-kubernetes</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<!--

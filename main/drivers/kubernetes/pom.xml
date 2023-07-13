@@ -7,11 +7,11 @@
 	<modelVersion>4.0.0</modelVersion>
 	
 	<groupId>de.tweerlei</groupId>
-	<artifactId>dbgrazer-common-kubernetes</artifactId>
+	<artifactId>dbgrazer-driver-kubernetes</artifactId>
 	<version>3.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	
-	<name>dbgrazer-common-kubernetes</name>
+	<name>dbgrazer-driver-kubernetes</name>
 	<description>Web application for browsing DB schemas</description>
 	<url>http://www.tweerlei.de/</url>
 	

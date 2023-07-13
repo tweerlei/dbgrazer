@@ -33,7 +33,7 @@
 		</dependency>
 		<dependency>
 			<groupId>de.tweerlei</groupId>
-			<artifactId>dbgrazer-common-mongodb</artifactId>
+			<artifactId>dbgrazer-driver-mongodb</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<!--

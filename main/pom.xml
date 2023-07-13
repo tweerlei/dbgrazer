@@ -19,7 +19,7 @@
 		<module>api</module>
 		<module>backend</module>
 		<module>core</module>
-		<module>common</module>
+		<module>drivers</module>
 		<module>plugins</module>
 	</modules>
 </project>

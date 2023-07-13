@@ -28,7 +28,7 @@
 		-->
 		<dependency>
 			<groupId>de.tweerlei</groupId>
-			<artifactId>dbgrazer-common-jdbc</artifactId>
+			<artifactId>dbgrazer-driver-jdbc</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<!--
