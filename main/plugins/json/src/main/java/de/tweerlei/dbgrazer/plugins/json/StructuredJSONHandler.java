@@ -15,6 +15,8 @@
  */
 package de.tweerlei.dbgrazer.plugins.json;
 
+import java.util.LinkedList;
+
 import de.tweerlei.dbgrazer.extension.json.handler.JSONPrinter;
 import de.tweerlei.dbgrazer.extension.json.parser.JSONHandler;
 import de.tweerlei.dbgrazer.extension.json.printer.DefaultJSONPrinter;
@@ -26,9 +28,19 @@ import de.tweerlei.dbgrazer.extension.json.printer.DefaultJSONPrinter;
  */
 public class StructuredJSONHandler implements JSONHandler
 	{
+	private static final class State
+		{
+		public int arrayIndex;
+		
+		public State(int arrayIndex)
+			{
+			this.arrayIndex = arrayIndex;
+			}
+		}
+	
 	private final StringBuilder sb;
 	private final JSONPrinter printer;
-	private int arrayIndex;
+	private LinkedList<State> stack;
 	
 	/**
 	 * Constructor
@@ -38,7 +50,8 @@ public class StructuredJSONHandler implements JSONHandler
 		{
 		this.sb = new StringBuilder();
 		this.printer = printer;
-		this.arrayIndex = -1;
+		this.stack = new LinkedList<State>();
+		this.stack.push(new State(-1));
 		}
 	
 	/**
@@ -95,10 +108,11 @@ public class StructuredJSONHandler implements JSONHandler
 	
 	private void printArrayIndex()
 		{
-		if (arrayIndex >= 0)
+		final State state = stack.peek();
+		if (state.arrayIndex >= 0)
 			{
 			sb.append("<dt>");
-			sb.append(printer.printNumber(String.valueOf(arrayIndex)));
+			sb.append(printer.printNumber(String.valueOf(state.arrayIndex)));
 			sb.append("</dt>");
 			}
 		}
@@ -106,9 +120,13 @@ public class StructuredJSONHandler implements JSONHandler
 	@Override
 	public void startObject(int level)
 		{
+		printArrayIndex();
+		
 		if (level > 0)
 			sb.append("<dd>");
 		sb.append("<dl class=\"json-object\">");
+		
+		stack.push(new State(-1));
 		}
 	
 	@Override
@@ -117,6 +135,8 @@ public class StructuredJSONHandler implements JSONHandler
 		sb.append("</dl>");
 		if (level > 0)
 			sb.append("</dd>");
+		
+		stack.pop();
 		}
 	
 	@Override
@@ -127,18 +147,21 @@ public class StructuredJSONHandler implements JSONHandler
 	@Override
 	public void handleValueSeparator(int level)
 		{
-		if (arrayIndex >= 0)
-			arrayIndex++;
+		final State state = stack.peek();
+		if (state.arrayIndex >= 0)
+			state.arrayIndex++;
 		}
 	
 	@Override
 	public void startArray(int level)
 		{
+		printArrayIndex();
+		
 		if (level > 0)
 			sb.append("<dd>");
 		sb.append("<dl class=\"json-array\">");
 		
-		arrayIndex = 0;
+		stack.push(new State(0));
 		}
 	
 	@Override
@@ -148,7 +171,7 @@ public class StructuredJSONHandler implements JSONHandler
 		if (level > 0)
 			sb.append("</dd>");
 		
-		arrayIndex = -1;
+		stack.pop();
 		}
 	
 	@Override
