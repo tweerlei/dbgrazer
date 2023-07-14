@@ -19,7 +19,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.Errors;
 
-import de.tweerlei.common5.collections.MapBuilder;
+import de.tweerlei.common5.collections.builders.MapBuilder;
 import de.tweerlei.dbgrazer.query.model.Query;
 import de.tweerlei.dbgrazer.query.model.QueryErrorKeys;
 import de.tweerlei.dbgrazer.query.model.impl.AbstractVisualizationQueryType;

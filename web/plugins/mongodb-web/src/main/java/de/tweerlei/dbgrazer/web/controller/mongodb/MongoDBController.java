@@ -31,7 +31,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import de.tweerlei.common.util.StringUtils;
-import de.tweerlei.common5.collections.ListBuilder;
+import de.tweerlei.common5.collections.builders.ListBuilder;
 import de.tweerlei.dbgrazer.extension.mongodb.MongoDBClientService;
 import de.tweerlei.dbgrazer.link.model.SchemaDef;
 import de.tweerlei.dbgrazer.query.exception.PerformQueryException;

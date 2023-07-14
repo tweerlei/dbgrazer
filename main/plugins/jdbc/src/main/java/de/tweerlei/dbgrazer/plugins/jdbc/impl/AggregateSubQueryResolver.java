@@ -25,7 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import de.tweerlei.common.util.StringUtils;
-import de.tweerlei.common5.collections.ListBuilder;
+import de.tweerlei.common5.collections.builders.ListBuilder;
 import de.tweerlei.dbgrazer.common.service.KeywordService;
 import de.tweerlei.dbgrazer.extension.jdbc.SQLGeneratorService;
 import de.tweerlei.dbgrazer.extension.jdbc.SQLGeneratorService.AggregateColumn;

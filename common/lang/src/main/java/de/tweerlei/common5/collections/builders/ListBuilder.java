@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.tweerlei.common5.collections;
+package de.tweerlei.common5.collections.builders;
 
 import java.util.ArrayList;
 import java.util.Collection;

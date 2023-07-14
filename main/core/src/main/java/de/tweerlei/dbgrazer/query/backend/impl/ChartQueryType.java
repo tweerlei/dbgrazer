@@ -18,7 +18,7 @@ package de.tweerlei.dbgrazer.query.backend.impl;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
-import de.tweerlei.common5.collections.MapBuilder;
+import de.tweerlei.common5.collections.builders.MapBuilder;
 import de.tweerlei.dbgrazer.query.model.impl.AbstractVisualizationQueryType;
 import de.tweerlei.dbgrazer.visualization.service.ChartScaling;
 import de.tweerlei.dbgrazer.visualization.service.ChartType;
