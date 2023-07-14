@@ -31,6 +31,9 @@ public final class VisualizationSettings
 	/** Query type name for charts */
 	public static final String CHART_QUERY_TYPE = "CHART";
 	
+	/** Query type name for graphics */
+	public static final String SVG_QUERY_TYPE = "SVG";
+	
 	/** Query type name for time charts */
 	public static final String TIMECHART_QUERY_TYPE = "TIMECHART";
 	

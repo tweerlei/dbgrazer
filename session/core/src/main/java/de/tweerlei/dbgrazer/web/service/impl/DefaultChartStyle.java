@@ -96,11 +96,16 @@ public class DefaultChartStyle implements ChartStyle
 		{
 		final HSLColor c = new HSLColor(new RGBColor(themeSettings.getConfig().get(ThemeKeys.BASE_COLOR)));
 		final double h = c.getHue();
+		final double s = c.getSaturation();
 		final double l = c.getLightness();
-		c.setHue((h + i * 210.0 / 360.0) % 1.0);
-		c.setLightness(l + ((i + 1) % 3 - 1) * 0.15);
 		
-		return (c.toRGBColor().toColor());
+		final HSLColor c2 = new HSLColor(
+				(h + i * 210.0 / 360.0) % 1.0,
+				s,
+				l + ((i + 1) % 3 - 1) * 0.15
+				);
+		
+		return (c2.toRGBColor().toColor());
 		}
 	
 	@Override

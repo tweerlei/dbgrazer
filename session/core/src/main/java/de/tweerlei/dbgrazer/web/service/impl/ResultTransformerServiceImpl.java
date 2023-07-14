@@ -141,19 +141,21 @@ public class ResultTransformerServiceImpl implements ResultTransformerService
 			RowSet rs = r.getRowSets().get(ent.getKey());
 			if (rs == null)
 				{
-				final List<ColumnDef> columns = new ArrayList<ColumnDef>(rsNew.getColumns());
-				columns.set(0, new ColumnDefImpl(prefixName, prefixType, null, null, null, null));
+				final List<ColumnDef> columns = new ArrayList<ColumnDef>(rsNew.getColumns().size() + 1);
+				columns.add(new ColumnDefImpl(prefixName, prefixType, null, null, null, null));
+				columns.addAll(rsNew.getColumns());
 				rs = new RowSetImpl(rsNew.getQuery(), rsNew.getSubQueryIndex(), columns);
 				r.getRowSets().put(ent.getKey(), rs);
 				}
 			
-			if (rs.getColumns().size() != rsNew.getColumns().size())
+			if (rs.getColumns().size() != rsNew.getColumns().size() + 1)
 				continue;
 			
 			for (ResultRow l : rsNew.getRows())
 				{
-				final ResultRow row = l.clone();
-				row.getValues().set(0, prefix);
+				final ResultRow row = new DefaultResultRow(l.getColumns().size() + 1);
+				row.getValues().add(prefix);
+				row.getValues().addAll(l.getValues());
 				rs.getRows().add(row);
 				}
 			

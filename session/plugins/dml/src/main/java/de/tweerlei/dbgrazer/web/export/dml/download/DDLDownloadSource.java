@@ -60,7 +60,7 @@ public class DDLDownloadSource extends AbstractDDLDownloadSource
 	@Override
 	protected void writeDDL(Writer sw, SQLDialect d) throws IOException
 		{
-		final StatementProducer p = schemaTransformerService.buildDDL(new SQLSchema(null, null, tables), d);
+		final StatementProducer p = schemaTransformerService.compareSchemas(new SQLSchema(null, null), new SQLSchema(null, null, tables), true, null, d, false);
 		sw.write(resultBuilder.writeScript(p, comment, d.getScriptStatementWrapper()));
 		}
 	}

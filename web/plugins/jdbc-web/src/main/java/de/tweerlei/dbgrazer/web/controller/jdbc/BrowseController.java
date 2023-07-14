@@ -46,8 +46,8 @@ import de.tweerlei.common5.jdbc.model.QualifiedName;
 import de.tweerlei.common5.jdbc.model.TableDescription;
 import de.tweerlei.dbgrazer.extension.jdbc.ConfigKeys;
 import de.tweerlei.dbgrazer.extension.jdbc.MetadataService;
-import de.tweerlei.dbgrazer.extension.jdbc.MetadataService.ColumnMode;
 import de.tweerlei.dbgrazer.extension.jdbc.SQLGeneratorService;
+import de.tweerlei.dbgrazer.extension.jdbc.MetadataService.ColumnMode;
 import de.tweerlei.dbgrazer.extension.jdbc.SQLGeneratorService.Joins;
 import de.tweerlei.dbgrazer.extension.jdbc.SQLGeneratorService.OrderBy;
 import de.tweerlei.dbgrazer.extension.jdbc.SQLGeneratorService.Style;
@@ -72,9 +72,9 @@ import de.tweerlei.dbgrazer.web.service.FrontendHelperService;
 import de.tweerlei.dbgrazer.web.service.MetadataExportService;
 import de.tweerlei.dbgrazer.web.service.QuerySettingsManager;
 import de.tweerlei.dbgrazer.web.service.SchemaTransformerService;
-import de.tweerlei.dbgrazer.web.service.SchemaTransformerService.GraphMode;
 import de.tweerlei.dbgrazer.web.service.ScriptWriterService;
 import de.tweerlei.dbgrazer.web.service.VisualizationService;
+import de.tweerlei.dbgrazer.web.service.SchemaTransformerService.GraphMode;
 import de.tweerlei.dbgrazer.web.service.jdbc.BrowserSettingsManagerService;
 import de.tweerlei.dbgrazer.web.service.jdbc.impl.TableFilterEntry;
 import de.tweerlei.dbgrazer.web.session.ConnectionSettings;
@@ -744,7 +744,8 @@ public class BrowseController
 		model.put("pkIndices", pkIndices);
 		model.put("privs", privs);
 		model.put("statement", generateSELECT(info, dialect));
-		model.put("ddl", generateDDL(info, dialect));
+		model.put("createDDL", generateCreateDDL(info, dialect));
+		model.put("dropDDL", generateDropDDL(info, dialect));
 		model.put("dml", generateDML(info, dialect));
 		model.put("maxDepth", configService.get(ConfigKeys.ERM_LEVELS));
 		model.put("tableColumns", Collections.emptyList());
@@ -808,9 +809,16 @@ public class BrowseController
 		return (model);
 		}
 	
-	private String generateDDL(TableDescription t, SQLDialect dialect)
+	private String generateCreateDDL(TableDescription t, SQLDialect dialect)
 		{
-		final StatementProducer p = schemaTransformer.buildDDL(new SQLSchema(null, null, Collections.singleton(t)), dialect);
+		final StatementProducer p = schemaTransformer.compareSchemas(new SQLSchema(null, null), new SQLSchema(null, null, Collections.singleton(t)), true, null, dialect, false);
+		
+		return (scriptWriter.writeScript(p, null, new BlankLineSQLStatementWrapper(dialect.getScriptStatementWrapper())));
+		}
+	
+	private String generateDropDDL(TableDescription t, SQLDialect dialect)
+		{
+		final StatementProducer p = schemaTransformer.compareSchemas(new SQLSchema(null, null, Collections.singleton(t)), new SQLSchema(null, null), true, null, dialect, false);
 		
 		return (scriptWriter.writeScript(p, null, new BlankLineSQLStatementWrapper(dialect.getScriptStatementWrapper())));
 		}

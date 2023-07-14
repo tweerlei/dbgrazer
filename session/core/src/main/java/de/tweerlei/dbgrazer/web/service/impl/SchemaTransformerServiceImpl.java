@@ -235,12 +235,6 @@ public class SchemaTransformerServiceImpl implements SchemaTransformerService
 		}
 	
 	@Override
-	public StatementProducer buildDDL(SQLSchema schema, SQLDialect dialect)
-		{
-		return (compareSchemas(new SQLSchema(null, null), schema, true, null, dialect, false));
-		}
-	
-	@Override
 	public StatementProducer compareSchemas(SQLSchema left, SQLSchema right, boolean ignoreCatalogSchema, String prefix, SQLDialect dialect, boolean crossDialect)
 		{
 		final StatementDifferenceHandler handler = new StatementDifferenceHandler(dialect);

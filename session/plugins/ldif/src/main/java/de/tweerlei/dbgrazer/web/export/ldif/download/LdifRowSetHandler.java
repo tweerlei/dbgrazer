@@ -97,11 +97,12 @@ public class LdifRowSetHandler implements RowSetHandler
 				{
 				Object dn = null;
 				i = 0;
+				data.clear();
 				for (Object o : row.getValues())
 					{
 					if (i == dnIndex)
 						dn = o;
-					else if (i != rdnIndex)
+					else if ((i != rdnIndex) && (o != null))
 						{
 						switch (cols[i])
 							{

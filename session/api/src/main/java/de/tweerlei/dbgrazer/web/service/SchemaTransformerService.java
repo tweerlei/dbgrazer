@@ -98,14 +98,6 @@ public interface SchemaTransformerService
 	public StatementProducer buildDML(TableDescription t, SQLDialect dialect);
 	
 	/**
-	 * Generate example DDL statements for a schema
-	 * @param schema SQLSchema
-	 * @param dialect SQLDialect
-	 * @return StatementProducer
-	 */
-	public StatementProducer buildDDL(SQLSchema schema, SQLDialect dialect);
-	
-	/**
 	 * Compare two SQLSchemas, producing DDL statements for modification
 	 * @param left Left schema
 	 * @param right Right schema
