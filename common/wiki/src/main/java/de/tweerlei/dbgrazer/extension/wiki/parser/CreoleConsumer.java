@@ -28,10 +28,12 @@ public class CreoleConsumer
 		{
 		PARAGRAPH
 			{
+			@Override
 			public void start(CreoleHandler handler)
 				{
 				handler.startParagraph();
 				}
+			@Override
 			public void end(CreoleHandler handler)
 				{
 				handler.endParagraph();
@@ -39,14 +41,17 @@ public class CreoleConsumer
 			},
 		BOLD
 			{
+			@Override
 			public boolean isTextLevel()
 				{
 				return (true);
 				}
+			@Override
 			public void start(CreoleHandler handler)
 				{
 				handler.startBold();
 				}
+			@Override
 			public void end(CreoleHandler handler)
 				{
 				handler.endBold();
@@ -54,14 +59,17 @@ public class CreoleConsumer
 			},
 		ITALIC
 			{
+			@Override
 			public boolean isTextLevel()
 				{
 				return (true);
 				}
+			@Override
 			public void start(CreoleHandler handler)
 				{
 				handler.startItalic();
 				}
+			@Override
 			public void end(CreoleHandler handler)
 				{
 				handler.endItalic();
@@ -69,14 +77,17 @@ public class CreoleConsumer
 			},
 		CODE
 			{
+			@Override
 			public boolean isTextLevel()
 				{
 				return (true);
 				}
+			@Override
 			public void start(CreoleHandler handler)
 				{
 				handler.startCode();
 				}
+			@Override
 			public void end(CreoleHandler handler)
 				{
 				handler.endCode();
@@ -84,10 +95,12 @@ public class CreoleConsumer
 			},
 		ORDERED_LIST
 			{
+			@Override
 			public void start(CreoleHandler handler)
 				{
 				handler.startOrderedList();
 				}
+			@Override
 			public void end(CreoleHandler handler)
 				{
 				handler.endOrderedList();
@@ -95,10 +108,12 @@ public class CreoleConsumer
 			},
 		UNORDERED_LIST
 			{
+			@Override
 			public void start(CreoleHandler handler)
 				{
 				handler.startUnorderedList();
 				}
+			@Override
 			public void end(CreoleHandler handler)
 				{
 				handler.endUnorderedList();
@@ -106,10 +121,12 @@ public class CreoleConsumer
 			},
 		LIST_ITEM
 			{
+			@Override
 			public void start(CreoleHandler handler)
 				{
 				handler.startListItem();
 				}
+			@Override
 			public void end(CreoleHandler handler)
 				{
 				handler.endListItem();
@@ -117,10 +134,12 @@ public class CreoleConsumer
 			},
 		TABLE
 			{
+			@Override
 			public void start(CreoleHandler handler)
 				{
 				handler.startTable();
 				}
+			@Override
 			public void end(CreoleHandler handler)
 				{
 				handler.endTable();
@@ -128,10 +147,12 @@ public class CreoleConsumer
 			},
 		TABLE_ROW
 			{
+			@Override
 			public void start(CreoleHandler handler)
 				{
 				handler.startTableRow();
 				}
+			@Override
 			public void end(CreoleHandler handler)
 				{
 				handler.endTableRow();
@@ -139,10 +160,12 @@ public class CreoleConsumer
 			},
 		TABLE_HEADING
 			{
+			@Override
 			public void start(CreoleHandler handler)
 				{
 				handler.startTableHeading();
 				}
+			@Override
 			public void end(CreoleHandler handler)
 				{
 				handler.endTableHeading();
@@ -150,10 +173,12 @@ public class CreoleConsumer
 			},
 		TABLE_CELL
 			{
+			@Override
 			public void start(CreoleHandler handler)
 				{
 				handler.startTableCell();
 				}
+			@Override
 			public void end(CreoleHandler handler)
 				{
 				handler.endTableCell();
@@ -161,10 +186,12 @@ public class CreoleConsumer
 			},
 		CODE_BLOCK
 			{
+			@Override
 			public void start(CreoleHandler handler)
 				{
 				handler.startCodeBlock();
 				}
+			@Override
 			public void end(CreoleHandler handler)
 				{
 				handler.endCodeBlock();
@@ -256,7 +283,6 @@ public class CreoleConsumer
 	
 	/**
 	 * Handle a single token
-	 * @param tag Token
 	 * @return this
 	 */
 	public CreoleConsumer toggleBold()
@@ -271,7 +297,6 @@ public class CreoleConsumer
 	
 	/**
 	 * Handle a single token
-	 * @param tag Token
 	 * @return this
 	 */
 	public CreoleConsumer toggleItalic()
