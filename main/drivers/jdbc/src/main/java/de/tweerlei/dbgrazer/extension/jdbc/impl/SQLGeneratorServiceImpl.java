@@ -47,7 +47,8 @@ import de.tweerlei.spring.util.OrderedSet;
 @Service
 public class SQLGeneratorServiceImpl implements SQLGeneratorService
 	{
-	private static final String NAME_SEPARATOR = ".";	// TODO: Get from SQLDialect
+	private static final String COLUMN_SEPARATOR = ".";
+	private static final String PARAMETER_PLACEHOLDER = "?";
 	private static final String INNER_TABLE_NAME = "a_";
 	
 	private final SQLFormat sqlFormat;
@@ -137,7 +138,7 @@ public class SQLGeneratorServiceImpl implements SQLGeneratorService
 				else
 					sb.appendOperator(",");
 				if (joins != Joins.NONE)
-					sb.appendName("t0").appendOperator(NAME_SEPARATOR);
+					sb.appendName("t0").appendOperator(COLUMN_SEPARATOR);
 				sb.appendName(dialect.quoteIdentifier(c.getName()));
 				if (joins != Joins.NONE)
 					sb.appendName("AS").appendName(dialect.quoteIdentifier(c.getName()));
@@ -187,7 +188,7 @@ public class SQLGeneratorServiceImpl implements SQLGeneratorService
 						first = false;
 					else
 						sb.appendName("AND");
-					sb.appendName("t0").appendOperator(NAME_SEPARATOR).appendName(dialect.quoteIdentifier(ent.getKey())).appendOperator("=").appendName("t" + i).appendOperator(NAME_SEPARATOR).appendName(dialect.quoteIdentifier(ent.getValue()));
+					sb.appendName("t0").appendOperator(COLUMN_SEPARATOR).appendName(dialect.quoteIdentifier(ent.getKey())).appendOperator("=").appendName("t" + i).appendOperator(COLUMN_SEPARATOR).appendName(dialect.quoteIdentifier(ent.getValue()));
 					}
 				sb.closeBrace();
 				i++;
@@ -207,10 +208,10 @@ public class SQLGeneratorServiceImpl implements SQLGeneratorService
 					else
 						sb.appendName("AND");
 					if (joins != Joins.NONE)
-						sb.appendName("t0").appendOperator(NAME_SEPARATOR);
+						sb.appendName("t0").appendOperator(COLUMN_SEPARATOR);
 					sb.appendName(dialect.quoteIdentifier(c));
 					sb.appendOperator("=");
-					sb.appendName("?");
+					sb.appendName(PARAMETER_PLACEHOLDER);
 					}
 				}
 			}
@@ -235,7 +236,7 @@ public class SQLGeneratorServiceImpl implements SQLGeneratorService
 				else
 					sb.appendOperator(",");
 				if (joins != Joins.NONE)
-					sb.appendName("t0").appendOperator(NAME_SEPARATOR);
+					sb.appendName("t0").appendOperator(COLUMN_SEPARATOR);
 				sb.appendName(dialect.quoteIdentifier(c));
 				}
 			}
@@ -341,7 +342,7 @@ public class SQLGeneratorServiceImpl implements SQLGeneratorService
 						first = false;
 					else
 						sb.appendOperator(",");
-					sb.appendName("?");
+					sb.appendName(PARAMETER_PLACEHOLDER);
 					}
 				sb.closeBrace();
 				break;
@@ -373,7 +374,7 @@ public class SQLGeneratorServiceImpl implements SQLGeneratorService
 						else
 							sb.appendOperator(",");
 						t.getColumns().get(j);
-						sb.appendName("?");
+						sb.appendName(PARAMETER_PLACEHOLDER);
 						}
 					sb.closeBrace();
 					}
@@ -446,26 +447,26 @@ public class SQLGeneratorServiceImpl implements SQLGeneratorService
 					sb.appendString("");
 					break;
 				case NONE:
-					sb.appendName(INNER_TABLE_NAME).appendOperator(NAME_SEPARATOR).appendName(col.getName());
+					sb.appendName(INNER_TABLE_NAME).appendOperator(COLUMN_SEPARATOR).appendName(col.getName());
 					gc++;
 					break;
 				case MIN:
-					sb.appendName("MIN").openBrace().appendName(INNER_TABLE_NAME).appendOperator(NAME_SEPARATOR).appendName(col.getName()).closeBrace();
+					sb.appendName("MIN").openBrace().appendName(INNER_TABLE_NAME).appendOperator(COLUMN_SEPARATOR).appendName(col.getName()).closeBrace();
 					break;
 				case MAX:
-					sb.appendName("MAX").openBrace().appendName(INNER_TABLE_NAME).appendOperator(NAME_SEPARATOR).appendName(col.getName()).closeBrace();
+					sb.appendName("MAX").openBrace().appendName(INNER_TABLE_NAME).appendOperator(COLUMN_SEPARATOR).appendName(col.getName()).closeBrace();
 					break;
 				case COUNT:
-					sb.appendName("COUNT").openBrace().appendName(INNER_TABLE_NAME).appendOperator(NAME_SEPARATOR).appendName(col.getName()).closeBrace();
+					sb.appendName("COUNT").openBrace().appendName(INNER_TABLE_NAME).appendOperator(COLUMN_SEPARATOR).appendName(col.getName()).closeBrace();
 					break;
 				case COUNT_DISTINCT:
-					sb.appendName("COUNT").openBrace().appendName("DISTINCT").appendName(INNER_TABLE_NAME).appendOperator(NAME_SEPARATOR).appendName(col.getName()).closeBrace();
+					sb.appendName("COUNT").openBrace().appendName("DISTINCT").appendName(INNER_TABLE_NAME).appendOperator(COLUMN_SEPARATOR).appendName(col.getName()).closeBrace();
 					break;
 				case SUM:
-					sb.appendName("SUM").openBrace().appendName(INNER_TABLE_NAME).appendOperator(NAME_SEPARATOR).appendName(col.getName()).closeBrace();
+					sb.appendName("SUM").openBrace().appendName(INNER_TABLE_NAME).appendOperator(COLUMN_SEPARATOR).appendName(col.getName()).closeBrace();
 					break;
 				case AVG:
-					sb.appendName("AVG").openBrace().appendName(INNER_TABLE_NAME).appendOperator(NAME_SEPARATOR).appendName(col.getName()).closeBrace();
+					sb.appendName("AVG").openBrace().appendName(INNER_TABLE_NAME).appendOperator(COLUMN_SEPARATOR).appendName(col.getName()).closeBrace();
 					break;
 				}
 			
@@ -484,7 +485,7 @@ public class SQLGeneratorServiceImpl implements SQLGeneratorService
 			final List<String> tokens = parseSQL(col.getCondition());
 			if (tokens != null)
 				{
-				sb.appendName("AND").openBrace().appendName(INNER_TABLE_NAME).appendOperator(NAME_SEPARATOR).appendName(col.getName());
+				sb.appendName("AND").openBrace().appendName(INNER_TABLE_NAME).appendOperator(COLUMN_SEPARATOR).appendName(col.getName());
 				appendSQL(sb, tokens);
 				sb.closeBrace();
 				}
@@ -503,7 +504,7 @@ public class SQLGeneratorServiceImpl implements SQLGeneratorService
 					else
 						sb.appendOperator(",");
 					
-					sb.appendName(INNER_TABLE_NAME).appendOperator(NAME_SEPARATOR).appendName(col.getName());
+					sb.appendName(INNER_TABLE_NAME).appendOperator(COLUMN_SEPARATOR).appendName(col.getName());
 					}
 				}
 			}
@@ -525,32 +526,32 @@ public class SQLGeneratorServiceImpl implements SQLGeneratorService
 				case HIDDEN:
 					continue;
 				case NONE:
-					sb.appendName(INNER_TABLE_NAME).appendOperator(NAME_SEPARATOR).appendName(col.getName());
+					sb.appendName(INNER_TABLE_NAME).appendOperator(COLUMN_SEPARATOR).appendName(col.getName());
 					sb.appendName("AS").appendName(col.getName());
 					gc++;
 					break;
 				case MIN:
-					sb.appendName("MIN").openBrace().appendName(INNER_TABLE_NAME).appendOperator(NAME_SEPARATOR).appendName(col.getName()).closeBrace();
+					sb.appendName("MIN").openBrace().appendName(INNER_TABLE_NAME).appendOperator(COLUMN_SEPARATOR).appendName(col.getName()).closeBrace();
 					sb.appendName("AS").appendName("MIN_" + col.getName());
 					break;
 				case MAX:
-					sb.appendName("MAX").openBrace().appendName(INNER_TABLE_NAME).appendOperator(NAME_SEPARATOR).appendName(col.getName()).closeBrace();
+					sb.appendName("MAX").openBrace().appendName(INNER_TABLE_NAME).appendOperator(COLUMN_SEPARATOR).appendName(col.getName()).closeBrace();
 					sb.appendName("AS").appendName("MAX_" + col.getName());
 					break;
 				case COUNT:
-					sb.appendName("COUNT").openBrace().appendName(INNER_TABLE_NAME).appendOperator(NAME_SEPARATOR).appendName(col.getName()).closeBrace();
+					sb.appendName("COUNT").openBrace().appendName(INNER_TABLE_NAME).appendOperator(COLUMN_SEPARATOR).appendName(col.getName()).closeBrace();
 					sb.appendName("AS").appendName("COUNT_" + col.getName());
 					break;
 				case COUNT_DISTINCT:
-					sb.appendName("COUNT").openBrace().appendName("DISTINCT").appendName(INNER_TABLE_NAME).appendOperator(NAME_SEPARATOR).appendName(col.getName()).closeBrace();
+					sb.appendName("COUNT").openBrace().appendName("DISTINCT").appendName(INNER_TABLE_NAME).appendOperator(COLUMN_SEPARATOR).appendName(col.getName()).closeBrace();
 					sb.appendName("AS").appendName("DISTINCT_" + col.getName());
 					break;
 				case SUM:
-					sb.appendName("SUM").openBrace().appendName(INNER_TABLE_NAME).appendOperator(NAME_SEPARATOR).appendName(col.getName()).closeBrace();
+					sb.appendName("SUM").openBrace().appendName(INNER_TABLE_NAME).appendOperator(COLUMN_SEPARATOR).appendName(col.getName()).closeBrace();
 					sb.appendName("AS").appendName("SUM_" + col.getName());
 					break;
 				case AVG:
-					sb.appendName("AVG").openBrace().appendName(INNER_TABLE_NAME).appendOperator(NAME_SEPARATOR).appendName(col.getName()).closeBrace();
+					sb.appendName("AVG").openBrace().appendName(INNER_TABLE_NAME).appendOperator(COLUMN_SEPARATOR).appendName(col.getName()).closeBrace();
 					sb.appendName("AS").appendName("AVG_" + col.getName());
 					break;
 				}
@@ -570,9 +571,9 @@ public class SQLGeneratorServiceImpl implements SQLGeneratorService
 			if (col.getCondition() != null)
 				{
 				if (StringUtils.empty(col.getCondition()))
-					sb.appendName("AND").openBrace().appendName(INNER_TABLE_NAME).appendOperator(NAME_SEPARATOR).appendName(col.getName()).appendName("IS").appendName("NULL").closeBrace();
+					sb.appendName("AND").openBrace().appendName(INNER_TABLE_NAME).appendOperator(COLUMN_SEPARATOR).appendName(col.getName()).appendName("IS").appendName("NULL").closeBrace();
 				else
-					sb.appendName("AND").openBrace().appendName(INNER_TABLE_NAME).appendOperator(NAME_SEPARATOR).appendName(col.getName()).appendOperator("=").appendName("?").closeBrace();
+					sb.appendName("AND").openBrace().appendName(INNER_TABLE_NAME).appendOperator(COLUMN_SEPARATOR).appendName(col.getName()).appendOperator("=").appendName(PARAMETER_PLACEHOLDER).closeBrace();
 				}
 			}
 		
@@ -589,7 +590,7 @@ public class SQLGeneratorServiceImpl implements SQLGeneratorService
 					else
 						sb.appendOperator(",");
 					
-					sb.appendName(INNER_TABLE_NAME).appendOperator(NAME_SEPARATOR).appendName(col.getName());
+					sb.appendName(INNER_TABLE_NAME).appendOperator(COLUMN_SEPARATOR).appendName(col.getName());
 					}
 				}
 			sb.appendName("ORDER").appendName("BY").appendName("COUNT").openBrace().appendName("*").closeBrace().appendName("DESC");
@@ -598,7 +599,7 @@ public class SQLGeneratorServiceImpl implements SQLGeneratorService
 				if (col.getMode() == AggregationMode.NONE)
 					{
 					sb.appendOperator(",");
-					sb.appendName(INNER_TABLE_NAME).appendOperator(NAME_SEPARATOR).appendName(col.getName());
+					sb.appendName(INNER_TABLE_NAME).appendOperator(COLUMN_SEPARATOR).appendName(col.getName());
 					}
 				}
 			}
@@ -609,7 +610,7 @@ public class SQLGeneratorServiceImpl implements SQLGeneratorService
 	@Override
 	public String createRowCountQuery(String query)
 		{
-		return ("SELECT COUNT(*) AS Rows FROM ( " + query + " ) " + INNER_TABLE_NAME);
+		return ("SELECT COUNT(*) AS Num_Rows FROM ( " + query + " ) " + INNER_TABLE_NAME);
 		}
 	
 	private List<String> parseSQL(String sql)

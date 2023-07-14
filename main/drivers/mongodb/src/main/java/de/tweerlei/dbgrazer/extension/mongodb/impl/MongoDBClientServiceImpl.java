@@ -44,7 +44,7 @@ import de.tweerlei.dbgrazer.link.service.LinkService;
 /**
  * Default impl.
  * 
- * @author Robert Wruck <wruck@tweerlei.de>
+ * @author Robert Wruck
  */
 @Service
 public class MongoDBClientServiceImpl implements MongoDBClientService, LinkListener, LinkManager

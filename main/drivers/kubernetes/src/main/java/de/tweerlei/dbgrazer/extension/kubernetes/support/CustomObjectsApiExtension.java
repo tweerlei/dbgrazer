@@ -57,10 +57,10 @@ public class CustomObjectsApiExtension extends CustomObjectsApi
 		{
 		Object localVarPostBody = null;
 		String localVarPath = "/apis/{group}/{version}/".replaceAll("\\{group\\}", this.getApiClient().escapeString(group.toString())).replaceAll("\\{version\\}", this.getApiClient().escapeString(version.toString()));
-		List<Pair> localVarQueryParams = new ArrayList();
-		List<Pair> localVarCollectionQueryParams = new ArrayList();
-		Map<String, String> localVarHeaderParams = new HashMap();
-		Map<String, Object> localVarFormParams = new HashMap();
+		List<Pair> localVarQueryParams = new ArrayList<Pair>();
+		List<Pair> localVarCollectionQueryParams = new ArrayList<Pair>();
+		Map<String, String> localVarHeaderParams = new HashMap<String, String>();
+		Map<String, Object> localVarFormParams = new HashMap<String, Object>();
 		String[] localVarAccepts = new String[]{"application/json", "application/yaml", "application/vnd.kubernetes.protobuf"};
 		String localVarAccept = this.getApiClient().selectHeaderAccept(localVarAccepts);
 		if (localVarAccept != null)
@@ -75,6 +75,7 @@ public class CustomObjectsApiExtension extends CustomObjectsApi
 			{
 			this.getApiClient().getHttpClient().networkInterceptors().add(new Interceptor()
 				{
+				@Override
 				public Response intercept(Chain chain) throws IOException
 					{
 					Response originalResponse = chain.proceed(chain.request());
@@ -96,7 +97,7 @@ public class CustomObjectsApiExtension extends CustomObjectsApi
 	public V1APIResourceList getAPIResources(String group, String version) throws ApiException
 		{
 		ApiResponse<V1APIResourceList> resp = this.getAPIResourcesWithHttpInfo(group, version);
-		return (V1APIResourceList) resp.getData();
+		return resp.getData();
 		}
 
 	public ApiResponse<V1APIResourceList> getAPIResourcesWithHttpInfo(String group, String version) throws ApiException
@@ -116,6 +117,7 @@ public class CustomObjectsApiExtension extends CustomObjectsApi
 			{
 			progressListener = new ProgressResponseBody.ProgressListener()
 				{
+				@Override
 				public void update(long bytesRead, long contentLength, boolean done)
 					{
 					callback.onDownloadProgress(bytesRead, contentLength, done);
@@ -123,6 +125,7 @@ public class CustomObjectsApiExtension extends CustomObjectsApi
 				};
 			progressRequestListener = new ProgressRequestBody.ProgressRequestListener()
 				{
+				@Override
 				public void onRequestProgress(long bytesWritten, long contentLength, boolean done)
 					{
 					callback.onUploadProgress(bytesWritten, contentLength, done);

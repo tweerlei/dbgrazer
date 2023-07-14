@@ -18,7 +18,7 @@ package de.tweerlei.dbgrazer.extension.mongodb;
 /**
  * Constants used by the MongoDB plugin
  * 
- * @author Robert Wruck <wruck@tweerlei.de>
+ * @author Robert Wruck
  */
 public final class MongoDBConstants
 	{

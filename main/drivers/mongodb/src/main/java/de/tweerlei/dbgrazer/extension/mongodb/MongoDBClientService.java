@@ -20,7 +20,7 @@ import com.mongodb.client.MongoClient;
 /**
  * Perform HTTP requests
  * 
- * @author Robert Wruck <wruck@tweerlei.de>
+ * @author Robert Wruck
  */
 public interface MongoDBClientService
 	{
