@@ -38,13 +38,13 @@ import de.tweerlei.common.io.StreamUtils;
 import de.tweerlei.common.util.StringUtils;
 import de.tweerlei.dbgrazer.common.file.StringPersister;
 import de.tweerlei.dbgrazer.security.service.UserManagerService;
+import de.tweerlei.dbgrazer.text.service.TextTransformerService;
 import de.tweerlei.dbgrazer.web.constant.ViewConstants;
 import de.tweerlei.dbgrazer.web.exception.AccessDeniedException;
 import de.tweerlei.dbgrazer.web.model.PathInfo;
 import de.tweerlei.dbgrazer.web.service.DownloadService;
 import de.tweerlei.dbgrazer.web.service.QuerySettingsManager;
 import de.tweerlei.dbgrazer.web.service.ResultDownloadService;
-import de.tweerlei.dbgrazer.web.service.TextTransformerService;
 import de.tweerlei.dbgrazer.web.session.ConnectionSettings;
 import de.tweerlei.dbgrazer.web.session.UserSettings;
 

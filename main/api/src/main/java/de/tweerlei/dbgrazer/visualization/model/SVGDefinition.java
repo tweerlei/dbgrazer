@@ -13,42 +13,46 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.tweerlei.dbgrazer.web.service;
+package de.tweerlei.dbgrazer.visualization.model;
 
-import java.util.Set;
+import java.io.Serializable;
 
 /**
- * Format strings
+ * SVG definition
  * 
  * @author Robert Wruck
  */
-public interface TextTransformerService
+public class SVGDefinition implements Serializable
 	{
-	/** Formatting options */
-	public static enum Option
+	private final String name;
+	private final Serializable svg;
+	
+	/**
+	 * Constructor
+	 * @param name Name
+	 * @param svg SVG source
+	 */
+	public SVGDefinition(String name, Serializable svg)
 		{
-		/** Add line numbers */
-		LINE_NUMBERS,
-		/** Syntax coloring */
-		SYNTAX_COLORING,
-		/** Formatted output */
-		FORMATTING,
-		/** Visualize structure */
-		STRUCTURE
+		this.name = name;
+		this.svg = svg;
 		}
-	
+
 	/**
-	 * Get the supported format names for getTextFormatter
-	 * @return Format names
+	 * Get the graph name
+	 * @return Name
 	 */
-	public Set<String> getSupportedTextFormats();
-	
+	public String getName()
+		{
+		return name;
+		}
+
 	/**
-	 * Format a String using a given format name
-	 * @param text String to format
-	 * @param format Format tag
-	 * @param options Options
-	 * @return Formatted String
+	 * Get the graph
+	 * @return Graph object
 	 */
-	public String format(String text, String format, Set<Option> options);
+	public Serializable getSVG()
+		{
+		return svg;
+		}
 	}

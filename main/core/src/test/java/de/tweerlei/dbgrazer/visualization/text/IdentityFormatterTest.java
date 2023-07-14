@@ -15,8 +15,8 @@
  */
 package de.tweerlei.dbgrazer.visualization.text;
 
-import de.tweerlei.dbgrazer.text.backend.IdentityFormatter;
 import de.tweerlei.dbgrazer.text.backend.TextFormatter;
+import de.tweerlei.dbgrazer.text.backend.impl.IdentityFormatter;
 import junit.framework.TestCase;
 
 /**

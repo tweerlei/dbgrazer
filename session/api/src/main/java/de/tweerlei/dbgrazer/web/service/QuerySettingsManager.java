@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Set;
 
 import de.tweerlei.dbgrazer.query.model.Query;
+import de.tweerlei.dbgrazer.text.service.TextTransformerService;
 import de.tweerlei.dbgrazer.web.formatter.DataFormatter;
 import de.tweerlei.dbgrazer.web.model.QueryParameters;
 import de.tweerlei.dbgrazer.web.session.SchemaSettings;

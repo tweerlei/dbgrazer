@@ -17,7 +17,9 @@ package de.tweerlei.dbgrazer.visualization.model;
 
 /**
  * Graph node
- */
+  * 
+ * @author Robert Wruck
+*/
 public class GraphNode
 	{
 	private final String id;

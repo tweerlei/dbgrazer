@@ -21,6 +21,8 @@ import java.util.Map;
  * A single data row
  * @param <K> Domain type
  * @param <V> Range type
+ * 
+ * @author Robert Wruck
  */
 public class ChartDataRow<K, V>
 	{

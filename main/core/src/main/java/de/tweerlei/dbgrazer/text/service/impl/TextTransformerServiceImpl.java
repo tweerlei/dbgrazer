@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.tweerlei.dbgrazer.web.service.impl;
+package de.tweerlei.dbgrazer.text.service.impl;
 
 import java.util.Set;
 import java.util.TreeSet;
@@ -28,11 +28,11 @@ import org.springframework.stereotype.Service;
 import de.tweerlei.common.util.StringUtils;
 import de.tweerlei.dbgrazer.common.service.ConfigListener;
 import de.tweerlei.dbgrazer.common.service.ConfigService;
-import de.tweerlei.dbgrazer.text.backend.EscapeXMLFormatter;
-import de.tweerlei.dbgrazer.text.backend.LineNumberTableFormatter;
 import de.tweerlei.dbgrazer.text.backend.TextFormatter;
+import de.tweerlei.dbgrazer.text.backend.impl.EscapeXMLFormatter;
+import de.tweerlei.dbgrazer.text.backend.impl.LineNumberTableFormatter;
 import de.tweerlei.dbgrazer.text.service.TextFormatterService;
-import de.tweerlei.dbgrazer.web.service.TextTransformerService;
+import de.tweerlei.dbgrazer.text.service.TextTransformerService;
 
 /**
  * Default impl.

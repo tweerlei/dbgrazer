@@ -13,10 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.tweerlei.dbgrazer.text.backend;
+package de.tweerlei.dbgrazer.text.backend.impl;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import de.tweerlei.dbgrazer.text.backend.BaseTextFormatter;
 
 /**
  * Format text

@@ -32,6 +32,7 @@ import de.tweerlei.dbgrazer.query.model.RowSet;
 import de.tweerlei.dbgrazer.query.model.impl.DefaultResultRow;
 import de.tweerlei.dbgrazer.query.model.impl.RowSetImpl;
 import de.tweerlei.dbgrazer.text.service.TextDiffService;
+import de.tweerlei.dbgrazer.text.service.TextTransformerService;
 import de.tweerlei.dbgrazer.web.formatter.DataFormatter;
 import de.tweerlei.dbgrazer.web.model.CompareHandler;
 import de.tweerlei.dbgrazer.web.model.CompareProgressMonitor;
@@ -39,7 +40,6 @@ import de.tweerlei.dbgrazer.web.model.DiffCompareHandler;
 import de.tweerlei.dbgrazer.web.model.TaskCompareProgressMonitor;
 import de.tweerlei.dbgrazer.web.service.ResultDiffService;
 import de.tweerlei.dbgrazer.web.service.ResultTransformerService;
-import de.tweerlei.dbgrazer.web.service.TextTransformerService;
 
 /**
  * Transform query results

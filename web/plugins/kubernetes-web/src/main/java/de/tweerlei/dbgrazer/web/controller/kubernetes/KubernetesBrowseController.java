@@ -47,6 +47,7 @@ import de.tweerlei.dbgrazer.query.model.impl.RowSetImpl;
 import de.tweerlei.dbgrazer.query.model.impl.SubQueryDefImpl;
 import de.tweerlei.dbgrazer.query.model.impl.ViewImpl;
 import de.tweerlei.dbgrazer.query.service.ResultBuilderService;
+import de.tweerlei.dbgrazer.text.service.TextTransformerService;
 import de.tweerlei.dbgrazer.web.constant.RowSetConstants;
 import de.tweerlei.dbgrazer.web.constant.ViewConstants;
 import de.tweerlei.dbgrazer.web.exception.AccessDeniedException;
@@ -54,7 +55,6 @@ import de.tweerlei.dbgrazer.web.model.TabItem;
 import de.tweerlei.dbgrazer.web.service.DataFormatterFactory;
 import de.tweerlei.dbgrazer.web.service.QuerySettingsManager;
 import de.tweerlei.dbgrazer.web.service.ResultTransformerService;
-import de.tweerlei.dbgrazer.web.service.TextTransformerService;
 import de.tweerlei.dbgrazer.web.session.ConnectionSettings;
 import de.tweerlei.spring.service.TimeService;
 

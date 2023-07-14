@@ -31,11 +31,6 @@
 			<artifactId>dbgrazer-session-backend</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>de.tweerlei</groupId>
-			<artifactId>dbgrazer-backend</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 		<!--
 			JavaEE APIs
 		-->

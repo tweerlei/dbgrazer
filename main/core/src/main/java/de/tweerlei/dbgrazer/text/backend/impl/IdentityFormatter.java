@@ -13,29 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.tweerlei.dbgrazer.visualization.text;
+package de.tweerlei.dbgrazer.text.backend.impl;
 
-import de.tweerlei.dbgrazer.text.backend.TextFormatter;
-import de.tweerlei.dbgrazer.text.backend.impl.LineNumberFormatter;
-import junit.framework.TestCase;
+import de.tweerlei.dbgrazer.text.backend.BaseTextFormatter;
 
 /**
- * Tests for LineNumberFormatter
- *
+ * Format text
+ * 
  * @author Robert Wruck
  */
-public class LineNumberFormatterTest extends TestCase
+public class IdentityFormatter extends BaseTextFormatter
 	{
 	/**
-	 * Test format
+	 * Constructor
 	 */
-	public void testFormat()
+	public IdentityFormatter()
 		{
-		final TextFormatter fmt = new LineNumberFormatter("%d:");
-		
-		assertNull(fmt.format(null));
-		assertEquals("1:", fmt.format(""));
-		assertEquals("1: Some \n2:Text ", fmt.format(" Some \nText "));
-		assertEquals("1: Some \n2:Text \n3:", fmt.format(" Some \nText \n"));
+		super("Identity");
+		}
+	
+	@Override
+	public String format(String value)
+		{
+		return (value);
 		}
 	}

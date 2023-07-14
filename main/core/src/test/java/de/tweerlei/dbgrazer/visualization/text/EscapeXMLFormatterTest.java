@@ -15,8 +15,8 @@
  */
 package de.tweerlei.dbgrazer.visualization.text;
 
-import de.tweerlei.dbgrazer.text.backend.EscapeXMLFormatter;
 import de.tweerlei.dbgrazer.text.backend.TextFormatter;
+import de.tweerlei.dbgrazer.text.backend.impl.EscapeXMLFormatter;
 import junit.framework.TestCase;
 
 /**

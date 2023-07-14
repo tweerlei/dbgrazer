@@ -18,8 +18,8 @@ package de.tweerlei.dbgrazer.visualization.service;
 import java.util.Collection;
 import java.util.Set;
 
-import de.tweerlei.dbgrazer.visualization.model.GraphEdge;
 import de.tweerlei.dbgrazer.visualization.model.GraphDefinition;
+import de.tweerlei.dbgrazer.visualization.model.GraphEdge;
 import de.tweerlei.dbgrazer.visualization.model.GraphNode;
 
 /**

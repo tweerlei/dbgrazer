@@ -13,26 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.tweerlei.dbgrazer.text.backend;
+package de.tweerlei.dbgrazer.visualization.service;
+
+import java.util.Set;
+
+import de.tweerlei.dbgrazer.visualization.model.SVGDefinition;
+import de.tweerlei.dbgrazer.visualization.model.SVGShape;
 
 /**
- * Format text
+ * Service that creates graph representations
  * 
  * @author Robert Wruck
  */
-public class IdentityFormatter extends BaseTextFormatter
+public interface SVGBuilder
 	{
 	/**
-	 * Constructor
+	 * Build an SVG
+	 * @param name Graph name (used as image map ID)
+	 * @param title Graph title
+	 * @param subtitle Graph subtitle
+	 * @param attrs Node attributes
+	 * @param shapes Shapes
+	 * @param nodeLink Query to link nodes to (may be null)
+	 * @return Graph description
 	 */
-	public IdentityFormatter()
-		{
-		super("Identity");
-		}
-	
-	@Override
-	public String format(String value)
-		{
-		return (value);
-		}
+	public SVGDefinition buildSVG(String name, String title, String subtitle, String attrs, Set<SVGShape> shapes, String nodeLink);
 	}

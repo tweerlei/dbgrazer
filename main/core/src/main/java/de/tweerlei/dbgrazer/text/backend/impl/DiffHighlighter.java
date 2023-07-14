@@ -18,7 +18,6 @@ package de.tweerlei.dbgrazer.text.backend.impl;
 import org.springframework.stereotype.Service;
 
 import de.tweerlei.common.util.StringUtils;
-import de.tweerlei.dbgrazer.text.backend.EscapeXMLFormatter;
 import de.tweerlei.dbgrazer.text.backend.TextFormatter;
 import de.tweerlei.dbgrazer.text.backend.XMLEncodedTextFormatter;
 

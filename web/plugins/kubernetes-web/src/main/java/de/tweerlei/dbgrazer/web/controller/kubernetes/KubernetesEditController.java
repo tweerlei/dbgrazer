@@ -29,9 +29,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import de.tweerlei.common.util.StringUtils;
 import de.tweerlei.dbgrazer.extension.kubernetes.KubernetesApiService;
+import de.tweerlei.dbgrazer.text.service.TextTransformerService;
 import de.tweerlei.dbgrazer.web.exception.AccessDeniedException;
 import de.tweerlei.dbgrazer.web.service.FrontendNotificationService;
-import de.tweerlei.dbgrazer.web.service.TextTransformerService;
 import de.tweerlei.dbgrazer.web.session.ConnectionSettings;
 
 /**

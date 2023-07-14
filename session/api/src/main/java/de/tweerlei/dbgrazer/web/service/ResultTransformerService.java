@@ -21,6 +21,7 @@ import java.util.Set;
 import de.tweerlei.dbgrazer.query.model.ColumnType;
 import de.tweerlei.dbgrazer.query.model.Result;
 import de.tweerlei.dbgrazer.query.model.RowSet;
+import de.tweerlei.dbgrazer.text.service.TextTransformerService;
 import de.tweerlei.dbgrazer.web.formatter.DataFormatter;
 
 /**

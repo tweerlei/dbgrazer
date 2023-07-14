@@ -17,7 +17,9 @@ package de.tweerlei.dbgrazer.visualization.model;
 
 /**
  * Graph edge
- */
+  * 
+ * @author Robert Wruck
+*/
 public class GraphEdge
 	{
 	private final String startNode;
