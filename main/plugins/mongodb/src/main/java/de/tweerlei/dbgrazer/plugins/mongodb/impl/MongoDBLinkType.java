@@ -27,7 +27,7 @@ import de.tweerlei.dbgrazer.link.model.impl.BaseLinkType;
 /**
  * File system impl.
  * 
- * @author Robert Wruck <wruck@tweerlei.de>
+ * @author Robert Wruck
  */
 @Service
 @Order(5)

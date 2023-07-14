@@ -28,8 +28,8 @@ import org.springframework.stereotype.Service;
 
 import de.tweerlei.common.util.StringUtils;
 import de.tweerlei.dbgrazer.common.util.impl.NamedMap;
-import de.tweerlei.dbgrazer.visualization.model.GraphEdge;
 import de.tweerlei.dbgrazer.visualization.model.GraphDefinition;
+import de.tweerlei.dbgrazer.visualization.model.GraphEdge;
 import de.tweerlei.dbgrazer.visualization.model.GraphNode;
 import de.tweerlei.dbgrazer.visualization.service.GraphBuilder;
 import de.tweerlei.dbgrazer.visualization.service.GraphDirection;

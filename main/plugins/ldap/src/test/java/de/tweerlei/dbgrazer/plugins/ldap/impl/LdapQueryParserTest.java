@@ -32,14 +32,15 @@ public class LdapQueryParserTest extends TestCase
 	public void testParse()
 		{
 		failParse(null);
-		parse("", "", "(objectClass=*)");
-		parse("SELECT *", "", "(objectClass=*)");
-		parse("SELECT *\nFROM o=test", "o=test", "(objectClass=*)");
-		parse("SELECT *\r\nFROM o=test\nWHERE (cn=sub)", "o=test", "(cn=sub)");
+		parse("", "", "(objectClass=*)", "*");
+		parse("SELECT *", "", "(objectClass=*)", "*");
+		parse("SELECT *\nFROM o=test", "o=test", "(objectClass=*)", "*");
+		parse("SELECT *\r\nFROM o=test\nWHERE (cn=sub)", "o=test", "(cn=sub)", "*");
 		parse("  SELECT a , b , c \n FROM o=test \n WHERE (cn=sub) \n ", "o=test", "(cn=sub)", "a", "b", "c");
-		parse("SELECT a , b , *\nFROM o=test\nWHERE (cn=sub)", "o=test", "(cn=sub)");
-		parse("SELECT a , b , *\nWHERE (cn=sub zero)", "", "(cn=sub zero)");
-		parse("SELECT \nFROM \nWHERE ", "", "");
+		parse("SELECT a , b , *\nFROM o=test\nWHERE (cn=sub)", "o=test", "(cn=sub)", "a", "b", "*");
+		parse("SELECT a , b , *\nWHERE (cn=sub zero)", "", "(cn=sub zero)", "a", "b", "*");
+		parse("SELECT *\nFROM \nWHERE ", "", "", "*");
+		failParse("SELECT \nFROM \nWHERE ");
 		}
 	
 	private void parse(String stmt, String base, String filter, String... attrs)

@@ -26,7 +26,6 @@ import java.util.regex.Pattern;
 public class LdapQueryParser
 	{
 	private static final Pattern PAT_QUERY = Pattern.compile("\\s*(\\S+)\\s+(.*)", Pattern.DOTALL);
-	private static final String ALL_ATTRIBUTES = "*";
 	private static final String DEFAULT_BASE = "";
 	private static final String DEFAULT_FILTER = "(objectClass=*)";
 	
@@ -57,16 +56,13 @@ public class LdapQueryParser
 			
 			if (key.equals("SELECT"))
 				{
-				boolean all = false;
-				final String[] attrs = value.split(",");
-				for (int i = 0; i < attrs.length; i++)
+				tmp_attrs = value.split(",");
+				for (int i = 0; i < tmp_attrs.length; i++)
 					{
-					attrs[i] = attrs[i].trim();
-					if ((attrs[i].length() == 0) || ALL_ATTRIBUTES.equals(attrs[i]))
-						all = true;
+					tmp_attrs[i] = tmp_attrs[i].trim();
+					if (tmp_attrs[i].length() == 0)
+						throw new RuntimeException("Invalid query");
 					}
-				if (!all)
-					tmp_attrs = attrs;
 				}
 			else if (key.equals("FROM"))
 				{
@@ -80,7 +76,7 @@ public class LdapQueryParser
 				throw new RuntimeException("Invalid query");
 			}
 		
-		attributes = tmp_attrs;
+		attributes = (tmp_attrs == null) ? new String[] { "*" } : tmp_attrs;
 		baseDN = tmp_base;
 		filter = tmp_filter;
 		}

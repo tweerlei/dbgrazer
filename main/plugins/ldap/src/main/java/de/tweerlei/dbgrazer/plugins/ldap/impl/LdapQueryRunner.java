@@ -32,6 +32,7 @@ import org.springframework.ldap.core.ContextMapper;
 import org.springframework.ldap.core.DirContextOperations;
 import org.springframework.ldap.core.DistinguishedName;
 import org.springframework.ldap.core.LdapTemplate;
+import org.springframework.ldap.core.support.LdapContextSource;
 import org.springframework.ldap.support.LdapUtils;
 import org.springframework.stereotype.Service;
 
@@ -71,26 +72,15 @@ public class LdapQueryRunner extends BaseQueryRunner
 	private static final String RDN_NAME_ATTRIBUTE = "rdn.name";
 	private static final String RDN_PARENT_ATTRIBUTE = "rdn.parent";
 	private static final String RDN_LINK_ATTRIBUTE = "rdn.link";
+	private static final String ALL_ATTRIBUTES = "*";
 	
 	private static abstract class RowMapper implements ContextMapper
 		{
 		private final Query query;
-		private DistinguishedName base;
 		
 		public RowMapper(Query query)
 			{
 			this.query = query;
-			this.base = null;
-			}
-		
-		public void setBaseDN(DistinguishedName base)
-			{
-			this.base = base;
-			}
-		
-		public DistinguishedName getBaseDN()
-			{
-			return (base);
 			}
 		
 		public Query getQuery()
@@ -127,15 +117,19 @@ public class LdapQueryRunner extends BaseQueryRunner
 		
 		private final String[] attrIds;
 		private final int limit;
+		private DistinguishedName prefix;
+		private DistinguishedName suffix;
 		private final List<ResultRow> rows;
 		private List<ColumnDef> columns;
 		private int count;
 		
-		public RowListMapper(Query query, String[] attrIds, int limit)
+		public RowListMapper(Query query, String[] attrIds, int limit, DistinguishedName prefix, DistinguishedName suffix)
 			{
 			super(query);
 			this.attrIds = attrIds;
 			this.limit = limit;
+			this.prefix = prefix;
+			this.suffix = suffix;
 			this.rows = new LinkedList<ResultRow>();
 			this.columns = null;
 			this.count = 0;
@@ -170,45 +164,43 @@ public class LdapQueryRunner extends BaseQueryRunner
 			
 			if (columns == null)
 				{
-				if (attrIds == null)
+				columns = new ArrayList<ColumnDef>(attrIds.length);
+				for (String attrId : attrIds)
 					{
-//					columns = new ArrayList<ColumnDef>(attributes.size() + 4);
+					if (DN_ATTRIBUTE.equalsIgnoreCase(attrId))
+						columns.add(new ColumnDefImpl(DN_ATTRIBUTE, ColumnType.STRING, null, getQuery().getTargetQueries().get(columns.size()), null, null));
+					else if (RDN_ATTRIBUTE.equalsIgnoreCase(attrId))
+						columns.add(new ColumnDefImpl(RDN_ATTRIBUTE, ColumnType.STRING, null, getQuery().getTargetQueries().get(columns.size()), null, null));
+					else if (RDN_NAME_ATTRIBUTE.equalsIgnoreCase(attrId))
+						columns.add(new ColumnDefImpl(RDN_NAME_ATTRIBUTE, ColumnType.STRING, null, getQuery().getTargetQueries().get(columns.size()), null, null));
+					else if (RDN_PARENT_ATTRIBUTE.equalsIgnoreCase(attrId))
+						columns.add(new ColumnDefImpl(RDN_PARENT_ATTRIBUTE, ColumnType.STRING, null, getQuery().getTargetQueries().get(columns.size()), null, null));
+					else if (RDN_LINK_ATTRIBUTE.equalsIgnoreCase(attrId))
+						columns.add(new ColumnDefImpl(RDN_LINK_ATTRIBUTE, ColumnType.STRING, null, getQuery().getTargetQueries().get(columns.size()), null, null));
+					else if (ALL_ATTRIBUTES.equals(attrId))
+					{
 //					columns.add(new ColumnDefImpl(DN_ATTRIBUTE, ColumnType.STRING, null, getQuery().getTargetQueries().get(0), null, null));
 //					columns.add(new ColumnDefImpl(RDN_ATTRIBUTE, ColumnType.STRING, null, getQuery().getTargetQueries().get(1), null, null));
 //					columns.add(new ColumnDefImpl(RDN_NAME_ATTRIBUTE, ColumnType.STRING, null, getQuery().getTargetQueries().get(2), null, null));
 //					columns.add(new ColumnDefImpl(RDN_PARENT_ATTRIBUTE, ColumnType.STRING, null, getQuery().getTargetQueries().get(3), null, null));
-					columns = new ArrayList<ColumnDef>(attributes.size());
+						final List<ColumnDef> allColumns = new ArrayList<ColumnDef>(attributes.size());
 					final NamingEnumeration<? extends Attribute> all = attributes.getAll();
 					try	{
 						while (all.hasMore())
 							{
 							final Attribute a = all.next();
-							columns.add(new ColumnDefImpl(a.getID(), ColumnType.forObject(a.get()), null, getQuery().getTargetQueries().get(columns.size()), null, null));
+								allColumns.add(new ColumnDefImpl(a.getID(), ColumnType.forObject(a.get()), null, null, null, null));
 							}
 						}
 					finally
 						{
 						all.close();
 						}
-					Collections.sort(columns, NamedComparators.BY_NAME);
+						Collections.sort(allColumns, NamedComparators.BY_NAME);
+						columns.addAll(allColumns);
 					}
 				else
 					{
-					columns = new ArrayList<ColumnDef>(attrIds.length);
-					for (String attrId : attrIds)
-						{
-						if (DN_ATTRIBUTE.equalsIgnoreCase(attrId))
-							columns.add(new ColumnDefImpl(DN_ATTRIBUTE, ColumnType.STRING, null, getQuery().getTargetQueries().get(columns.size()), null, null));
-						else if (RDN_ATTRIBUTE.equalsIgnoreCase(attrId))
-							columns.add(new ColumnDefImpl(RDN_ATTRIBUTE, ColumnType.STRING, null, getQuery().getTargetQueries().get(columns.size()), null, null));
-						else if (RDN_NAME_ATTRIBUTE.equalsIgnoreCase(attrId))
-							columns.add(new ColumnDefImpl(RDN_NAME_ATTRIBUTE, ColumnType.STRING, null, getQuery().getTargetQueries().get(columns.size()), null, null));
-						else if (RDN_PARENT_ATTRIBUTE.equalsIgnoreCase(attrId))
-							columns.add(new ColumnDefImpl(RDN_PARENT_ATTRIBUTE, ColumnType.STRING, null, getQuery().getTargetQueries().get(columns.size()), null, null));
-						else if (RDN_LINK_ATTRIBUTE.equalsIgnoreCase(attrId))
-							columns.add(new ColumnDefImpl(RDN_LINK_ATTRIBUTE, ColumnType.STRING, null, getQuery().getTargetQueries().get(columns.size()), null, null));
-						else
-							{
 							final Attribute a = attributes.get(attrId);
 							if (a == null)
 								columns.add(new ColumnDefImpl(attrId, ColumnType.STRING, null, getQuery().getTargetQueries().get(columns.size()), null, null));
@@ -217,7 +209,6 @@ public class LdapQueryRunner extends BaseQueryRunner
 							}
 						}
 					}
-				}
 /* TODO: Include columns not present on first entry
 			else if ((attrIds == null) && (attributes.size() + 1 > columns.size()))
 				{
@@ -230,11 +221,11 @@ public class LdapQueryRunner extends BaseQueryRunner
 				{
 				if (DN_ATTRIBUTE.equals(c.getName()))
 					{
-					if (getBaseDN() != null)
+					if (suffix != null)
 						{
 						final Name rdn = ctx.getDn();
 						final DistinguishedName dn = new DistinguishedName(ctx.getNameInNamespace());
-						dn.addAll(dn.size() - rdn.size(), getBaseDN());
+						dn.addAll(dn.size() - rdn.size(), suffix);
 						row.getValues().add(dn.toString());
 						}
 					else
@@ -302,10 +293,10 @@ public class LdapQueryRunner extends BaseQueryRunner
 		
 		private Name getRdn(DirContextOperations ctx)
 			{
-			if (getBaseDN() != null)
+			if (prefix != null)
 				{
 				final DistinguishedName rdn = new DistinguishedName(ctx.getDn());
-				rdn.prepend(getBaseDN());
+				rdn.prepend(prefix);
 				return (rdn);
 				}
 			else
@@ -444,7 +435,7 @@ public class LdapQueryRunner extends BaseQueryRunner
 		if (res.getQuery().getType() instanceof LdapSearchQueryType)
 			{
 			final LdapSearchQueryType sqt = (LdapSearchQueryType) res.getQuery().getType();
-			mapper = new RowListMapper(query, p.getAttributes(), limit);
+			mapper = new RowListMapper(query, p.getAttributes(), limit, null, null);
 			if (p.getAttributes() != null)
 				ldap.search(p.getBaseDN(), p.getFilter(), sqt.getScope(), p.getAttributes(), mapper);
 			else
@@ -452,15 +443,18 @@ public class LdapQueryRunner extends BaseQueryRunner
 			}
 		else if (res.getQuery().getType() instanceof LdapListQueryType)
 			{
-			mapper = new RowListMapper(query, p.getAttributes(), limit);
+			final DistinguishedName base;
 			if (!StringUtils.empty(p.getBaseDN()))
 				{
 				// Spring-LDAP bug:
 				// For listBindings(), the RDN returned from DirContextOperations.getDn() is incomplete
 				// and thus the DN returned from getNameInNamespace() is invalid.
 				// To fix this, we prepend the base DN passed to listBindings().
-				mapper.setBaseDN(new DistinguishedName(p.getBaseDN()));
+				base = new DistinguishedName(p.getBaseDN());
 				}
+			else
+				base = null;
+			mapper = new RowListMapper(query, p.getAttributes(), limit, base, base);
 			ldap.listBindings(p.getBaseDN(), mapper);
 			}
 		else if ((res.getQuery().getType() instanceof LdapAttributesQueryType) && (p.getAttributes() != null) && (p.getAttributes().length == 1))
@@ -473,7 +467,10 @@ public class LdapQueryRunner extends BaseQueryRunner
 			}
 		else
 			{
-			mapper = new RowListMapper(query, p.getAttributes(), limit);
+			// Spring-LDAP bug:
+			// lookup returns a stub DirContextAdapter that will just echo the passed in base DN
+			// which is not absolute, so we have to append the root DN
+			mapper = new RowListMapper(query, p.getAttributes(), limit, null, getRootDN(ldap));
 			if (p.getAttributes() != null)
 				ldap.lookup(p.getBaseDN(), p.getAttributes(), mapper);
 			else
@@ -488,5 +485,10 @@ public class LdapQueryRunner extends BaseQueryRunner
 		rs.setQueryTime(end - start);
 		
 		res.getRowSets().put(res.getQuery().getName(), rs);
+		}
+	
+	private DistinguishedName getRootDN(LdapTemplate ldap)
+		{
+		return (((LdapContextSource) ldap.getContextSource()).getBaseLdapPath());
 		}
 	}

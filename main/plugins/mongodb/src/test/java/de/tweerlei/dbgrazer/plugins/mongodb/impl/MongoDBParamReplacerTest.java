@@ -16,6 +16,7 @@
 package de.tweerlei.dbgrazer.plugins.mongodb.impl;
 
 import java.util.Arrays;
+import java.util.Date;
 
 import org.bson.Document;
 import org.bson.types.ObjectId;
@@ -31,6 +32,9 @@ import junit.framework.TestCase;
  */
 public class MongoDBParamReplacerTest extends TestCase
 	{
+	/**
+	 * Test simple and nested replacement
+	 */
 	public void testIt()
 		{
 		final Document doc = Document.parse("{ numVal: 42, strVal: 'Hello ?1? World', objVal: { nestedString: '?2?.*' } }");
@@ -42,13 +46,59 @@ public class MongoDBParamReplacerTest extends TestCase
 		assertEquals("1234.*", ((Document) doc.get("objVal")).get("nestedString"));
 		}
 	
+	/**
+	 * Test ObjectId replacement
+	 */
 	public void testOID()
 		{
 		final Document doc = Document.parse("{ _id: '?1?' }");
+		final String oid = "6409e8e8d1ad4c18856e8a1a";
 		
-		final MongoDBParamReplacer replacer = new MongoDBParamReplacer(Arrays.asList(new ParameterDefImpl("ttt", ColumnType.ROWID, null)), Arrays.asList("6409e8e8d1ad4c18856e8a1a"));
+		final MongoDBParamReplacer replacer = new MongoDBParamReplacer(Arrays.asList(new ParameterDefImpl("ttt", ColumnType.ROWID, null)), Arrays.asList(oid));
 		replacer.visit(doc);
 		
-		assertEquals(new ObjectId("6409e8e8d1ad4c18856e8a1a"), doc.get("_id"));
+		assertEquals(new ObjectId(oid), doc.get("_id"));
+		}
+	
+	/**
+	 * Test Date replacement
+	 */
+	public void testDate()
+		{
+		final Document doc = Document.parse("{ _id: '?1?' }");
+		final Date date = new Date(1689335521000L);
+		
+		final MongoDBParamReplacer replacer = new MongoDBParamReplacer(Arrays.asList(new ParameterDefImpl("ttt", ColumnType.DATE, null)), Arrays.asList(date));
+		replacer.visit(doc);
+		
+		assertEquals(date, doc.get("_id"));
+		}
+	
+	/**
+	 * Test Number replacement
+	 */
+	public void testInteger()
+		{
+		final Document doc = Document.parse("{ _id: '?1?' }");
+		final Integer number = 42;
+		
+		final MongoDBParamReplacer replacer = new MongoDBParamReplacer(Arrays.asList(new ParameterDefImpl("ttt", ColumnType.INTEGER, null)), Arrays.asList(number));
+		replacer.visit(doc);
+		
+		assertEquals(number, doc.get("_id"));
+		}
+	
+	/**
+	 * Test Number replacement
+	 */
+	public void testFloat()
+		{
+		final Document doc = Document.parse("{ _id: '?1?' }");
+		final Double number = 3.14;
+		
+		final MongoDBParamReplacer replacer = new MongoDBParamReplacer(Arrays.asList(new ParameterDefImpl("ttt", ColumnType.FLOAT, null)), Arrays.asList(number));
+		replacer.visit(doc);
+		
+		assertEquals(number, doc.get("_id"));
 		}
 	}

@@ -15,12 +15,11 @@
  */
 package de.tweerlei.dbgrazer.plugins.jdbc.impl;
 
-import junit.framework.TestCase;
-
 import org.springframework.validation.BindException;
 
 import de.tweerlei.dbgrazer.link.model.LinkDef;
 import de.tweerlei.dbgrazer.link.model.impl.LinkDefImpl;
+import junit.framework.TestCase;
 
 /**
  * Tests for JdbcLinkType

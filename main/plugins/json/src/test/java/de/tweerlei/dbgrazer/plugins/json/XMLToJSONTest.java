@@ -17,10 +17,9 @@ package de.tweerlei.dbgrazer.plugins.json;
 
 import java.util.Collections;
 
-import junit.framework.TestCase;
 import de.tweerlei.dbgrazer.extension.json.handler.SimpleJSONHandler;
 import de.tweerlei.dbgrazer.extension.xml.parser.XMLConsumer;
-import de.tweerlei.dbgrazer.plugins.json.XMLToJSONHandler;
+import junit.framework.TestCase;
 
 /**
  * Tests for XMLFormatter
