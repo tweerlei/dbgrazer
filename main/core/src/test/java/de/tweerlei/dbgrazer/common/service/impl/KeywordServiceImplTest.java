@@ -17,8 +17,8 @@ package de.tweerlei.dbgrazer.common.service.impl;
 
 import java.util.Arrays;
 
-import junit.framework.TestCase;
 import de.tweerlei.dbgrazer.common.service.KeywordService;
+import junit.framework.TestCase;
 
 /**
  * Tests for KeywordServiceImpl

@@ -30,6 +30,9 @@ public final class ConfigKeys
 	
 	private static final String PACKAGE_NAME = "dbgrazer.backend";
 	
+	/** Module prefix for the query loader impl. */
+	public static final ConfigKey<String> QUERY_FILE_ACCESS = ConfigKey.create(PACKAGE_NAME, "queryFileAccess", String.class, "direct");
+	
 	/** Path to query definitions, used by file based QueryLoaders */
 	public static final ConfigKey<String> SCHEMA_PATH = ConfigKey.create(PACKAGE_NAME, "file.schemaPath", String.class, "schemas");
 	

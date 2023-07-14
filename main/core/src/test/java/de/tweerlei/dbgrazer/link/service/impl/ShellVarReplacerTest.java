@@ -23,7 +23,7 @@ import junit.framework.TestCase;
 /**
  * Tests for ShellVarReplacer
  *
- * @author Robert Wruck <wruck@tweerlei.de>
+ * @author Robert Wruck
  */
 public class ShellVarReplacerTest extends TestCase
 	{

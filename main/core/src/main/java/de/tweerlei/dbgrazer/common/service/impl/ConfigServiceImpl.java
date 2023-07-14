@@ -23,10 +23,11 @@ import java.util.Properties;
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import de.tweerlei.dbgrazer.common.backend.ConfigLoader;
+import de.tweerlei.dbgrazer.common.backend.impl.FileConfigLoader;
+import de.tweerlei.dbgrazer.common.service.ConfigFileStore;
 import de.tweerlei.dbgrazer.common.service.ConfigListener;
 import de.tweerlei.dbgrazer.common.service.ConfigService;
 import de.tweerlei.spring.config.ConfigKey;
@@ -70,13 +71,14 @@ public class ConfigServiceImpl implements ConfigService
 	
 	/**
 	 * Constructor
-	 * @param configLoader ConfigLoader
+	 * @param store ConfigFileStore
 	 * @param serializerFactory SerializerFactory
 	 */
 	@Autowired
-	public ConfigServiceImpl(@Qualifier("fileConfigLoader") ConfigLoader configLoader, SerializerFactory serializerFactory)
+	public ConfigServiceImpl(ConfigFileStore store, SerializerFactory serializerFactory)
 		{
-		this.configProvider = new FileConfigProvider(configLoader);
+		// For reading, always use a simple file access
+		this.configProvider = new FileConfigProvider(new FileConfigLoader(store));
 		this.accessor = new CachedConfigAccessor(new ConfigProviderAccessor(configProvider, serializerFactory));
 		this.listeners = new LinkedList<ConfigListener>();
 		}

@@ -22,14 +22,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 
-import junit.framework.TestCase;
-
 import org.easymock.EasyMock;
 
 import de.tweerlei.dbgrazer.common.service.KeywordService;
 import de.tweerlei.dbgrazer.security.backend.UserPersister;
 import de.tweerlei.dbgrazer.security.model.Authority;
 import de.tweerlei.dbgrazer.security.model.User;
+import junit.framework.TestCase;
 
 /**
  * Tests for UserPersisterImpl

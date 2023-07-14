@@ -67,20 +67,22 @@ public class RecursiveQueryRunnerImpl implements RecursiveQueryRunnerService
 	@Override
 	public Map<String, Result> performRecursiveQuery(String link, Query query, List<Object> params, TimeZone timeZone, int level, int limit, boolean showEmpty) throws PerformQueryException
 		{
-		if (query.getType().getResultType() != ResultType.RECURSIVE)
-			return (Collections.singletonMap(query.getName(), performQuery(link, query, params, timeZone, limit, showEmpty)));
-		
 		final Map<String, Result> ret = new LinkedHashMap<String, Result>(query.getSubQueries().size());
 		
+		if (query.getType().getResultType() != ResultType.RECURSIVE)
+			ret.put(query.getName(), performQuery(link, query, params, timeZone, limit, showEmpty));
+		else
+			{
 		for (SubQueryInfo q : getSubQueries(link, query, params))
 			{
-			// TODO: Nested RECURSIVE queries should be splitted into separate Results, too
+				// TODO: Nested RECURSIVE queries should be split into separate Results, too
 			final Result r = recurse(link, q.getQuery(), 0, q.getSuffix(), q.getCurried(), q.getParams(), timeZone, level - 1, limit, showEmpty);
 			if (!showEmpty && r.getRowSets().isEmpty())
 				continue;
 			
 			prepareResult(r);
 			ret.put(getTitle(q.getLabel(), q.getSuffix()), r);
+			}
 			}
 		
 		if (ret.isEmpty())

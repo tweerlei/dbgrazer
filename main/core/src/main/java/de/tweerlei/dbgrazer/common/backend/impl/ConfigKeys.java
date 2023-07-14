@@ -30,6 +30,9 @@ public final class ConfigKeys
 	
 	private static final String PACKAGE_NAME = "dbgrazer";
 	
+	/** Module prefix for the link loader impl. */
+	public static final ConfigKey<String> CONFIG_FILE_ACCESS = ConfigKey.create(PACKAGE_NAME, "configFileAccess", String.class, "direct");
+	
 	/** This property will contain the path to the used config.properties */
 	public static final ConfigKey<String> CONFIG_FILE = ConfigKey.create(PACKAGE_NAME, "configFile", String.class, "config.properties");
 	

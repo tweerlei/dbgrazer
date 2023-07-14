@@ -27,20 +27,30 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.annotation.PostConstruct;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import de.tweerlei.common.io.StreamReader;
 import de.tweerlei.common.io.StreamUtils;
 import de.tweerlei.common.io.StreamWriter;
 import de.tweerlei.dbgrazer.common.backend.ConfigLoader;
 import de.tweerlei.dbgrazer.common.file.FileAccess;
 import de.tweerlei.dbgrazer.common.file.HistoryEntry;
+import de.tweerlei.dbgrazer.common.file.impl.DirectFileAccess;
 import de.tweerlei.dbgrazer.common.service.ConfigFileStore;
+import de.tweerlei.dbgrazer.common.service.ConfigListener;
+import de.tweerlei.dbgrazer.common.service.ConfigService;
+import de.tweerlei.spring.service.ModuleLookupService;
 
 /**
  * Read/write configuration from/to properties files
  * 
  * @author Robert Wruck
  */
-public abstract class AbstractFileConfigLoader implements ConfigLoader
+@Service("fileConfigLoader")
+public class FileConfigLoader implements ConfigLoader, ConfigListener
 	{
 	private static final class ConfigReader implements StreamReader
 		{
@@ -99,20 +109,26 @@ public abstract class AbstractFileConfigLoader implements ConfigLoader
 	
 	
 	private final ConfigFileStore store;
-	private final FileAccess fileAccess;
+	private final ConfigService configService;
+	private final ModuleLookupService moduleService;
 	private final String configFilePath;
 	private final Logger logger;
+	
+	private FileAccess fileAccess;
 	
 	/**
 	 * Constructor
 	 * @param store ConfigFileStore
-	 * @param fileAccess FileAccess
+	 * @param configService ConfigAccessor
+	 * @param moduleService ModuleLookupService
 	 */
-	protected AbstractFileConfigLoader(ConfigFileStore store,
-			FileAccess fileAccess)
+	@Autowired
+	public FileConfigLoader(ConfigFileStore store, ConfigService configService,
+			ModuleLookupService moduleService)
 		{
 		this.store = store;
-		this.fileAccess = fileAccess;
+		this.configService = configService;
+		this.moduleService = moduleService;
 		this.logger = Logger.getLogger(getClass().getCanonicalName());
 		
 		final String configFileProperty = System.getProperty(ConfigKeys.CONFIG_FILE.getKey());
@@ -120,6 +136,43 @@ public abstract class AbstractFileConfigLoader implements ConfigLoader
 			this.configFilePath = configFileProperty;
 		else
 			this.configFilePath = ConfigKeys.CONFIG_FILE.getDefaultValue();
+		}
+	
+	/**
+	 * Used for direct instantiation from ConfigServiceImpl
+	 * @param store ConfigFileStore
+	 */
+	public FileConfigLoader(ConfigFileStore store)
+		{
+		this(store, null, null);
+		
+		this.fileAccess = new DirectFileAccess();
+		}
+	
+	/**
+	 * Register for config changes
+	 */
+	@PostConstruct
+	public void init()
+		{
+		configService.addListener(this);
+		configChanged();
+		}
+	
+	@Override
+	public void configChanged()
+		{
+		final String loaderPrefix = configService.get(ConfigKeys.CONFIG_FILE_ACCESS);
+		
+		logger.log(Level.INFO, "Using FileAccess: " + loaderPrefix);
+		try	{
+			fileAccess = moduleService.findModuleInstance(loaderPrefix + "FileAccess", FileAccess.class);
+			}
+		catch (RuntimeException e)
+			{
+			logger.log(Level.SEVERE, "findModuleInstance", e);
+			fileAccess = new DirectFileAccess();
+			}
 		}
 	
 	@Override

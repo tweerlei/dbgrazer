@@ -40,6 +40,9 @@ public final class ConfigKeys
 	/** Admin password, used by the DummyUserLoader */
 	public static final ConfigKey<String> ADMIN_PASSWORD = ConfigKey.create(PACKAGE_NAME, "dummy.password", String.class, "admin");
 	
+	/** Module prefix for the link loader impl. */
+	public static final ConfigKey<String> USER_FILE_ACCESS = ConfigKey.create(PACKAGE_NAME, "userFileAccess", String.class, "direct");
+	
 	/** Path to user definitions, used by the FileUserLoader */
 	public static final ConfigKey<String> FILE_USER_PATH = ConfigKey.create(PACKAGE_NAME, "file.userPath", String.class, "users");
 	

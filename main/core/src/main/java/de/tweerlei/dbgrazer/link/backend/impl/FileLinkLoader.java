@@ -27,24 +27,33 @@ import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.annotation.PostConstruct;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import de.tweerlei.common.io.Filename;
 import de.tweerlei.common.io.StreamReader;
 import de.tweerlei.common.io.StreamWriter;
 import de.tweerlei.common5.collections.StringComparators;
 import de.tweerlei.dbgrazer.common.file.FileAccess;
 import de.tweerlei.dbgrazer.common.file.HistoryEntry;
+import de.tweerlei.dbgrazer.common.file.impl.DirectFileAccess;
 import de.tweerlei.dbgrazer.common.service.ConfigFileStore;
+import de.tweerlei.dbgrazer.common.service.ConfigListener;
+import de.tweerlei.dbgrazer.common.service.ConfigService;
 import de.tweerlei.dbgrazer.link.backend.LinkLoader;
 import de.tweerlei.dbgrazer.link.backend.LinkPersister;
 import de.tweerlei.dbgrazer.link.model.LinkDef;
-import de.tweerlei.spring.config.ConfigAccessor;
+import de.tweerlei.spring.service.ModuleLookupService;
 
 /**
  * Property file based impl.
  * 
  * @author Robert Wruck
  */
-public abstract class AbstractFileLinkLoader implements LinkLoader
+@Service("fileLinkLoader")
+public class FileLinkLoader implements LinkLoader, ConfigListener
 	{
 	private static final String FILE_EXTENSION = "properties";
 	
@@ -98,26 +107,55 @@ public abstract class AbstractFileLinkLoader implements LinkLoader
 		}
 	
 	private final ConfigFileStore store;
-	private final ConfigAccessor configService;
+	private final ConfigService configService;
+	private final ModuleLookupService moduleService;
 	private final LinkPersister persister;
-	private final FileAccess fileAccess;
 	private final Logger logger;
+	
+	private FileAccess fileAccess;
 	
 	/**
 	 * Constructor
 	 * @param store ConfigFileStore
 	 * @param configService ConfigAccessor
+	 * @param moduleService ModuleLookupService
 	 * @param persister LinkPersister
-	 * @param fileAccess FileAccess
 	 */
-	protected AbstractFileLinkLoader(ConfigFileStore store, ConfigAccessor configService,
-			LinkPersister persister, FileAccess fileAccess)
+	@Autowired
+	public FileLinkLoader(ConfigFileStore store, ConfigService configService,
+			ModuleLookupService moduleService, LinkPersister persister)
 		{
 		this.store = store;
 		this.configService = configService;
+		this.moduleService = moduleService;
 		this.persister = persister;
-		this.fileAccess = fileAccess;
 		this.logger = Logger.getLogger(getClass().getCanonicalName());
+		}
+	
+	/**
+	 * Register for config changes
+	 */
+	@PostConstruct
+	public void init()
+		{
+		configService.addListener(this);
+		configChanged();
+		}
+	
+	@Override
+	public void configChanged()
+		{
+		final String loaderPrefix = configService.get(ConfigKeys.LINK_FILE_ACCESS);
+		
+		logger.log(Level.INFO, "Using FileAccess: " + loaderPrefix);
+		try	{
+			fileAccess = moduleService.findModuleInstance(loaderPrefix + "FileAccess", FileAccess.class);
+			}
+		catch (RuntimeException e)
+			{
+			logger.log(Level.SEVERE, "findModuleInstance", e);
+			fileAccess = new DirectFileAccess();
+			}
 		}
 	
 	@Override

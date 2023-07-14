@@ -32,8 +32,8 @@ import de.tweerlei.dbgrazer.common.backend.ConfigLoader;
 import de.tweerlei.dbgrazer.common.backend.impl.DummyConfigLoader;
 import de.tweerlei.dbgrazer.common.file.HistoryEntry;
 import de.tweerlei.dbgrazer.common.service.ConfigListener;
-import de.tweerlei.dbgrazer.common.service.ConfigService;
 import de.tweerlei.dbgrazer.common.service.ConfigManagerService;
+import de.tweerlei.dbgrazer.common.service.ConfigService;
 import de.tweerlei.spring.service.ModuleLookupService;
 
 /**

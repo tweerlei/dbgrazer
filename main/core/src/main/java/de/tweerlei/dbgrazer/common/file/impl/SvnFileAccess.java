@@ -63,6 +63,8 @@ public class SvnFileAccess extends AbstractFileAccess
 		{
 		final File wd = dir.getParentFile();
 		
+		FileUtils.mkdir(wd);
+		
 		svn(wd, null, "mkdir", "--parents", dir.getName());
 		
 		try	{

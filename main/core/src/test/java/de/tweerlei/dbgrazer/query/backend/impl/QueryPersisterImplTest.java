@@ -26,8 +26,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import junit.framework.TestCase;
-
 import org.easymock.EasyMock;
 import org.springframework.validation.Errors;
 
@@ -50,6 +48,7 @@ import de.tweerlei.dbgrazer.query.model.impl.QueryImpl;
 import de.tweerlei.dbgrazer.query.model.impl.QueryTargetImpl;
 import de.tweerlei.dbgrazer.query.model.impl.SubQueryDefImpl;
 import de.tweerlei.dbgrazer.query.model.impl.ViewImpl;
+import junit.framework.TestCase;
 
 /**
  * Tests for LinkPersisterImpl

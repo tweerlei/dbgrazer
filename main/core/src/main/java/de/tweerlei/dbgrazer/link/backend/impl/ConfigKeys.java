@@ -30,6 +30,9 @@ public final class ConfigKeys
 	
 	private static final String PACKAGE_NAME = "dbgrazer.backend";
 	
+	/** Module prefix for the link loader impl. */
+	public static final ConfigKey<String> LINK_FILE_ACCESS = ConfigKey.create(PACKAGE_NAME, "linkFileAccess", String.class, "direct");
+	
 	/** Path to link definitions, used by the FileLinkLoaders */
 	public static final ConfigKey<String> LINK_PATH = ConfigKey.create(PACKAGE_NAME, "file.linkPath", String.class, "links");
 	

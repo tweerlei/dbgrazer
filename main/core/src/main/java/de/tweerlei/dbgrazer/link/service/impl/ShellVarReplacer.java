@@ -26,7 +26,7 @@ import de.tweerlei.common5.util.FindReplace;
  * Escaping is possible via ${$}.
  * Variables that are not defined in the passed Map will be replaced by the empty String.
  * 
- * @author Robert Wruck <wruck@tweerlei.de>
+ * @author Robert Wruck
  */
 public class ShellVarReplacer extends FindReplace
 	{

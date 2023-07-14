@@ -21,6 +21,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -32,25 +34,35 @@ import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.annotation.PostConstruct;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import de.tweerlei.common.io.Filename;
 import de.tweerlei.common.io.StreamReader;
+import de.tweerlei.common.io.StreamUtils;
 import de.tweerlei.common.io.StreamWriter;
 import de.tweerlei.common5.collections.StringComparators;
 import de.tweerlei.dbgrazer.common.file.FileAccess;
 import de.tweerlei.dbgrazer.common.file.HistoryEntry;
+import de.tweerlei.dbgrazer.common.file.impl.DirectFileAccess;
 import de.tweerlei.dbgrazer.common.service.ConfigFileStore;
+import de.tweerlei.dbgrazer.common.service.ConfigListener;
+import de.tweerlei.dbgrazer.common.service.ConfigService;
 import de.tweerlei.dbgrazer.link.model.SchemaDef;
 import de.tweerlei.dbgrazer.query.backend.QueryLoader;
 import de.tweerlei.dbgrazer.query.backend.QueryPersister;
 import de.tweerlei.dbgrazer.query.model.Query;
-import de.tweerlei.spring.config.ConfigAccessor;
+import de.tweerlei.spring.service.ModuleLookupService;
 
 /**
  * QueryLoader that loads query definitions from files
  * 
  * @author Robert Wruck
  */
-public abstract class AbstractFileQueryLoader implements QueryLoader
+@Service("fileQueryLoader")
+public class FileQueryLoader implements QueryLoader, ConfigListener
 	{
 	private static final String FILE_EXTENSION = "txt";
 	private static final String PROPERTIES_FILE = "schema.properties"; 
@@ -88,7 +100,7 @@ public abstract class AbstractFileQueryLoader implements QueryLoader
 		{
 		private final QueryPersister persister;
 		private final String charset;
-		private Query query;
+		private final Query query;
 		
 		public QueryWriter(QueryPersister persister, Query query, String charset)
 			{
@@ -137,7 +149,7 @@ public abstract class AbstractFileQueryLoader implements QueryLoader
 	private static final class AttributesWriter implements StreamWriter
 		{
 		private final String charset;
-		private Map<String, String> attributes;
+		private final Map<String, String> attributes;
 		
 		public AttributesWriter(Map<String, String> attributes, String charset)
 			{
@@ -157,27 +169,102 @@ public abstract class AbstractFileQueryLoader implements QueryLoader
 			}
 		}
 	
+	private static final class StatementReader implements StreamReader
+		{
+		private final String charset;
+		private String statement;
+		
+		public StatementReader(String charset)
+			{
+			this.charset = charset;
+			}
+		
+		@Override
+		public void read(InputStream stream) throws IOException
+			{
+			final InputStreamReader r = new InputStreamReader(stream, charset);
+			final StringWriter sw = new StringWriter();
+			StreamUtils.copy(r, sw);
+			statement = sw.toString();
+			}
+		
+		public String getStatement()
+			{
+			return (statement);
+			}
+		}
+	
+	private static final class StatementWriter implements StreamWriter
+		{
+		private final String charset;
+		private final String statement;
+		
+		public StatementWriter(String statement, String charset)
+			{
+			this.charset = charset;
+			this.statement = statement;
+			}
+		
+		@Override
+		public void write(OutputStream stream) throws IOException
+			{
+			final OutputStreamWriter w = new OutputStreamWriter(stream, charset);
+			final StringReader sr = new StringReader(statement);
+			StreamUtils.copy(sr, w);
+			w.flush();
+			}
+		}
+	
 	private final ConfigFileStore store;
-	private final ConfigAccessor configService;
+	private final ConfigService configService;
+	private final ModuleLookupService moduleService;
 	private final QueryPersister persister;
-	private final FileAccess fileAccess;
 	private final Logger logger;
+	
+	private FileAccess fileAccess;
 	
 	/**
 	 * Constructor
 	 * @param store ConfigFileStore
 	 * @param configService ConfigAccessor
+	 * @param moduleService ModuleLookupService
 	 * @param persister QueryPersister
-	 * @param fileAccess FileAccess
 	 */
-	protected AbstractFileQueryLoader(ConfigFileStore store, ConfigAccessor configService,
-			QueryPersister persister, FileAccess fileAccess)
+	@Autowired
+	public FileQueryLoader(ConfigFileStore store, ConfigService configService,
+			ModuleLookupService moduleService, QueryPersister persister)
 		{
 		this.store = store;
 		this.configService = configService;
+		this.moduleService = moduleService;
 		this.persister = persister;
-		this.fileAccess = fileAccess;
 		this.logger = Logger.getLogger(getClass().getCanonicalName());
+		}
+	
+	/**
+	 * Register for config changes
+	 */
+	@PostConstruct
+	public void init()
+		{
+		configService.addListener(this);
+		configChanged();
+		}
+	
+	@Override
+	public void configChanged()
+		{
+		final String loaderPrefix = configService.get(ConfigKeys.QUERY_FILE_ACCESS);
+		
+		logger.log(Level.INFO, "Using FileAccess: " + loaderPrefix);
+		try	{
+			fileAccess = moduleService.findModuleInstance(loaderPrefix + "FileAccess", FileAccess.class);
+			}
+		catch (RuntimeException e)
+			{
+			logger.log(Level.SEVERE, "findModuleInstance", e);
+			fileAccess = new DirectFileAccess();
+			}
 		}
 	
 	@Override
@@ -188,8 +275,10 @@ public abstract class AbstractFileQueryLoader implements QueryLoader
 		final File path = getPath(schema);
 		
 		final List<File> files;
+		final List<File> dirs;
 		try	{
 			files = fileAccess.listFiles(path);
+			dirs = fileAccess.listDirectories(path);
 			}
 		catch (IOException e)
 			{
@@ -202,6 +291,8 @@ public abstract class AbstractFileQueryLoader implements QueryLoader
 			final Filename fn = new Filename(f);
 			if (FILE_EXTENSION.equals(fn.getExtension()))
 				{
+				final Map<String, String> variants = loadVariants(fn, dirs);
+				
 				try	{
 					final QueryReader r = new QueryReader(persister, fn.getBasename(), schema, store.getFileEncoding());
 					fileAccess.readFile(f, r);
@@ -212,6 +303,27 @@ public abstract class AbstractFileQueryLoader implements QueryLoader
 					{
 					logger.log(Level.WARNING, f.getAbsolutePath(), e);
 					}
+				}
+			}
+		
+		return (ret);
+		}
+	
+	private Map<String, String> loadVariants(Filename fn, List<File> dirs)
+		{
+		final Map<String, String> ret = new HashMap<String, String>(dirs.size());
+		
+		for (File dir : dirs)
+			{
+			final File f = new File(dir, fn.getFilename());
+			final StatementReader sr = new StatementReader(store.getFileEncoding());
+			try	{
+				fileAccess.readFile(f, sr);
+				ret.put(dir.getName(), sr.getStatement());
+				}
+			catch (IOException e)
+				{
+				// file did not exist, skip
 				}
 			}
 		
