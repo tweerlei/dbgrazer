@@ -1,4 +1,4 @@
-/*
+<%--
  * Copyright 2018 tweerlei Wruck + Buchmeier GbR - http://www.tweerlei.de/
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,27 +12,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
-package de.tweerlei.dbgrazer.web.constant.ldap;
-
-/**
- * Constants used by the LDAP plugin
- * 
- * @author Robert Wruck
- */
-public final class LdapConstants
-	{
-	/** LdapLinkType.NAME */
-	public static final String LINKTYPE_LDAP = "LDAP";
-	
-	/** LdapListQueryType.NAME */
-	public static final String QUERYTYPE_LIST = "LDAP_LIST";
-	/** LdapLookupQueryType.NAME */
-	public static final String QUERYTYPE_LOOKUP = "LDAP_LOOKUP";
-	/** LdapLookupQueryType.NAME */
-	public static final String QUERYTYPE_SEARCH = "LDAP_SEARCH";
-	
-	private LdapConstants()
-		{
-		}
-	}
+--%><%@
+	include file="../../include/include.jspf"
+%><c:forEach items="${downloadFormats}" var="f"
+><div class="menuitem"><span onclick="return postForm('export-form', event, 'db/${currentConnection.linkName}/ldap-export.html', {exportfmt:'${f}'});"><fmt:message key="${f}"/></span></div>
+</c:forEach
+>

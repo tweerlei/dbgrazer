@@ -22,7 +22,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import de.tweerlei.dbgrazer.web.service.bookmark.BookmarkPersister;
-import de.tweerlei.dbgrazer.web.service.bookmark.impl.BookmarkPersisterImpl;
 import junit.framework.TestCase;
 
 /**

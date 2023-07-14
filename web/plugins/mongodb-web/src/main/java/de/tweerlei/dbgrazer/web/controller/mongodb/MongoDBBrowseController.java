@@ -61,7 +61,7 @@ import de.tweerlei.spring.service.TimeService;
 /**
  * Controller for simple pages
  * 
- * @author Robert Wruck <wruck@tweerlei.de>
+ * @author Robert Wruck
  */
 @Controller
 public class MongoDBBrowseController

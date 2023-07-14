@@ -149,6 +149,27 @@ Table.highlightColumn = function(c) {
 	}
 };
 
+Table.filterRows = function(table, filter) {
+	var t = Table.resolve(table);
+	
+	var bodies = t.tBodies;
+	if (bodies==null || bodies.length==0) { 
+		return; 
+	}
+	
+	for (var i=0,L=bodies.length; i<L; i++) {
+		var tbrows = bodies[i].rows;
+		for (var cRowIndex=0,RL=tbrows.length; cRowIndex<RL; cRowIndex++) {
+			var cRow=tbrows[cRowIndex];
+			if (filter(cRow)) {
+				this.removeClassName(cRow, 'hidden');
+			} else {
+				this.addClassName(cRow, 'hidden');
+			}
+		}
+	}
+};
+
 /*
  * SELECT list filter
  */

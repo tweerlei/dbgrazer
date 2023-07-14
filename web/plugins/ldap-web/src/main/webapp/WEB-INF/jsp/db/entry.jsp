@@ -18,6 +18,14 @@
 	include file="../include/header.jspf"
 %>
 	<ui:headline1 label="${pageTitle}" key="ldapRoot">
+	<form id="export-form" class="h1-actions" action="#" method="get" onsubmit="return false;">
+		<input type="hidden" name="path" value="${fn:escapeXml(path)}"/>
+		<input id="exportfmt" type="hidden" name="format" value=""/>
+		<span class="menu" onclick="showDbMenu(event, 'ldaplinks');"><fmt:message key="download"/></span>
+	</form>
+	<div class="h1-actions">
+		<span class="menu" onclick="showDbMenu(event, 'ldapsublinks');"><fmt:message key="downloadSubtree"/></span>
+	</div>
 	<div class="h1-actions">
 		<span class="action" title="<fmt:message key="refresh"/>" onclick="return reloadPage();"><fmt:message key="refreshIcon"/></span>
 		<a class="action" title="<fmt:message key="newWindow"/>" href="db/${currentConnection.linkName}/entry.html?path=${tools:urlEncode(path)}" target="_blank"><fmt:message key="newWindowIcon"/></a>

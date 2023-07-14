@@ -58,6 +58,7 @@ import de.tweerlei.dbgrazer.web.service.ResultDownloadService;
 import de.tweerlei.dbgrazer.web.session.ConnectionSettings;
 import de.tweerlei.dbgrazer.web.session.ResultCache;
 import de.tweerlei.dbgrazer.web.session.UserSettings;
+import de.tweerlei.spring.service.StringTransformerService;
 import de.tweerlei.spring.web.view.GenericDownloadView;
 import de.tweerlei.spring.web.view.JsonDownloadSource;
 
@@ -75,6 +76,7 @@ public class QueryController
 	private final ExportService exportService;
 	private final FrontendHelperService frontendHelper;
 	private final FrontendExtensionService extensionService;
+	private final StringTransformerService stringTransformerService;
 	private final UserSettings userSettings;
 	private final ResultCache resultCache;
 	private final ConnectionSettings connectionSettings;
@@ -112,6 +114,7 @@ public class QueryController
 	 * @param exportService ExportService
 	 * @param frontendHelper FrontendHelperService
 	 * @param extensionService FrontendExtensionService
+	 * @param stringTransformerService StringTransformerService
 	 * @param userSettings UserSettings
 	 * @param resultCache ResultCache
 	 * @param connectionSettings ConnectionSettings
@@ -119,7 +122,7 @@ public class QueryController
 	@Autowired
 	public QueryController(QueryService queryService, QueryTransformerService queryTransformerService,
 			ResultDownloadService downloadService, ExportService exportService, FrontendHelperService frontendHelper,
-			FrontendExtensionService extensionService,
+			FrontendExtensionService extensionService, StringTransformerService stringTransformerService,
 			UserSettings userSettings, ResultCache resultCache, ConnectionSettings connectionSettings)
 		{
 		this.queryService = queryService;
@@ -128,6 +131,7 @@ public class QueryController
 		this.exportService = exportService;
 		this.frontendHelper = frontendHelper;
 		this.extensionService = extensionService;
+		this.stringTransformerService = stringTransformerService;
 		this.userSettings = userSettings;
 		this.resultCache = resultCache;
 		this.connectionSettings = connectionSettings;
@@ -150,7 +154,7 @@ public class QueryController
 			{
 			final String welcomeQueryName = queryService.getSchemaAttributes(connectionSettings.getLinkName()).get(MessageKeys.WELCOME_QUERY);
 			if (welcomeQueryName != null)
-				throw new RedirectException("result.html?q=" + welcomeQueryName);
+				throw new RedirectException("result.html?q=" + stringTransformerService.toURL(welcomeQueryName));
 			}
 		
 		final Map<String, Object> model = new HashMap<String, Object>();

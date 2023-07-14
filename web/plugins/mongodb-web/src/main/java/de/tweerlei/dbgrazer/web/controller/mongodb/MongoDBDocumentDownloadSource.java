@@ -30,7 +30,7 @@ import de.tweerlei.spring.web.view.DownloadSource;
 /**
  * DownloadSource that sends the contents of an InputStream
  * 
- * @author Robert Wruck <wruck@tweerlei.de>
+ * @author Robert Wruck
  */
 public class MongoDBDocumentDownloadSource extends AbstractDownloadSource
 	{

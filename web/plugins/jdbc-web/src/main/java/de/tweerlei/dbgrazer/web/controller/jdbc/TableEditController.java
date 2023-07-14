@@ -61,6 +61,7 @@ public class TableEditController
 		private String catalog;
 		private String schema;
 		private String object;
+		private String newSchema;
 		private String newName;
 		private String objectComment;
 		private boolean primaryKey;
@@ -296,6 +297,22 @@ public class TableEditController
 			{
 			this.newName = newName;
 			}
+		
+		/**
+		 * @return the newSchema
+		 */
+		public String getNewSchema()
+			{
+			return newSchema;
+			}
+		
+		/**
+		 * @param newSchema the newSchema to set
+		 */
+		public void setNewSchema(String newSchema)
+			{
+			this.newSchema = newSchema;
+			}
 		}
 	
 	private final MetadataService metadataService;
@@ -414,8 +431,11 @@ public class TableEditController
 		final QualifiedName qname = new QualifiedName(fbo.getCatalog(), fbo.getSchema(), fbo.getObject());
 		final TableDescription info = metadataService.getTableInfo(connectionSettings.getLinkName(), qname, ColumnMode.ALL);
 		
+		fbo.setNewSchema(fbo.getSchema());
 		fbo.setNewName(fbo.getObject());
 		fbo.setComment(info.getComment());
+		
+		model.put("schemas", metadataService.getSchemas(connectionSettings.getLinkName(), fbo.getCatalog()));
 		
 		return (model);
 		}
@@ -437,7 +457,7 @@ public class TableEditController
 		
 		final QualifiedName qname = new QualifiedName(fbo.getCatalog(), fbo.getSchema(), fbo.getObject());
 		final TableDescription info = metadataService.getTableInfo(connectionSettings.getLinkName(), qname, ColumnMode.ALL);
-		final TableDescription t = new TableDescription(fbo.getCatalog(), fbo.getSchema(), fbo.getNewName(), fbo.getComment(), info.getType(), info.getPrimaryKey(), info.getColumns(), info.getIndices(), info.getReferencedKeys(), info.getReferencingKeys(), info.getPrivileges());
+		final TableDescription t = new TableDescription(fbo.getCatalog(), fbo.getNewSchema(), fbo.getNewName(), fbo.getComment(), info.getType(), info.getPrimaryKey(), info.getColumns(), info.getIndices(), info.getReferencedKeys(), info.getReferencingKeys(), info.getPrivileges());
 		
 		final Query q = queryGeneratorService.createAlterTableQuery(info, getSQLDialect(), t);
 		final QueryParameters query = querySettingsManager.prepareParameters(q, Collections.<Integer, String>emptyMap());

@@ -41,7 +41,10 @@
 	
 	// on reload (caused by changing the chart type), just reload the chart image
 	function reloadPage() {
-		return submitForm($('submitform'), 'chart');
+		if ($('resulttype').value == 'chart') {
+			getFormInto($('submitform'), 'result');
+		}
+		return false;
 	}
 	
 	/*]]>*/</script>

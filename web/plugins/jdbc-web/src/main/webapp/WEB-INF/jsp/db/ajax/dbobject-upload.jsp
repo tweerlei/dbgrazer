@@ -14,7 +14,7 @@
  * limitations under the License.
 --%><%@
 	include file="../../include/include.jspf"
-%><div id="uploadResult"><div class="tab-body">
+%><div id="uploadResult"><div class="tab-header">
 		<ui:headline2 key="uploadData">
 		<div class="h2-actions">
 			<span class="button" onclick="return downloadElement('src', 'text/plain;charset=utf-8');"><fmt:message key="downloadText"/></span>
@@ -26,7 +26,8 @@
 			<fmt:message key="duration"><fmt:param value="${rs.queryTime}"/></fmt:message>
 		</div>
 		</ui:headline2>
-		
+	</div>
+	<div class="tab-body">
 <c:choose><c:when test="${alreadyRunning != null}"
 >		<p><fmt:message key="alreadyRunning"/></p>
 		<p><ui:progress items="${progress}"/></p>

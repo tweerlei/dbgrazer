@@ -37,8 +37,11 @@ import de.tweerlei.dbgrazer.web.formatter.DataFormatter;
 import de.tweerlei.dbgrazer.web.model.TabItem;
 import de.tweerlei.dbgrazer.web.service.DataFormatterFactory;
 import de.tweerlei.dbgrazer.web.service.QueryPerformerService;
+import de.tweerlei.dbgrazer.web.service.ResultDownloadService;
 import de.tweerlei.dbgrazer.web.service.ResultTransformerService;
 import de.tweerlei.dbgrazer.web.session.ConnectionSettings;
+import de.tweerlei.spring.web.view.ErrorDownloadSource;
+import de.tweerlei.spring.web.view.GenericDownloadView;
 
 /**
  * Controller for simple pages
@@ -51,6 +54,7 @@ public class LdapBrowseController
 	private final QueryPerformerService runner;
 	private final DataFormatterFactory factory;
 	private final ResultTransformerService resultTransformer;
+	private final ResultDownloadService downloadService;
 	private final ConnectionSettings connectionSettings;
 	
 	/**
@@ -58,15 +62,18 @@ public class LdapBrowseController
 	 * @param runner QueryPerformerService
 	 * @param factory DataFormatterFactory
 	 * @param resultTransformer ResultTransformerService
+	 * @param downloadService ResultDownloadService
 	 * @param connectionSettings ConnectionSettings
 	 */
 	@Autowired
-	public LdapBrowseController(QueryPerformerService runner, DataFormatterFactory factory, ResultTransformerService resultTransformer,
+	public LdapBrowseController(QueryPerformerService runner, DataFormatterFactory factory,
+			ResultTransformerService resultTransformer, ResultDownloadService downloadService,
 			ConnectionSettings connectionSettings)
 		{
 		this.runner = runner;
 		this.factory = factory;
 		this.resultTransformer = resultTransformer;
+		this.downloadService = downloadService;
 		this.connectionSettings = connectionSettings;
 		}
 	
@@ -213,6 +220,104 @@ public class LdapBrowseController
 		catch (RuntimeException e)
 			{
 			model.put("exception", e);
+			}
+		
+		return (model);
+		}
+	
+	/**
+	 * Show download menu
+	 * @return Model
+	 */
+	@RequestMapping(value = "/db/*/ajax/ldaplinks.html", method = RequestMethod.GET)
+	public Map<String, Object> showDownloadMenu()
+		{
+		if (!connectionSettings.isBrowserEnabled())
+			throw new AccessDeniedException();
+		
+		final Map<String, Object> model = new HashMap<String, Object>();
+		
+		model.put("downloadFormats", downloadService.getSupportedDownloadFormats());
+		
+		return (model);
+		}
+	
+	/**
+	 * Show download menu
+	 * @return Model
+	 */
+	@RequestMapping(value = "/db/*/ajax/ldapsublinks.html", method = RequestMethod.GET)
+	public Map<String, Object> showDownloadSubMenu()
+		{
+		if (!connectionSettings.isBrowserEnabled())
+			throw new AccessDeniedException();
+		
+		final Map<String, Object> model = new HashMap<String, Object>();
+		
+		model.put("downloadFormats", downloadService.getSupportedDownloadFormats());
+		
+		return (model);
+		}
+	
+	/**
+	 * Show catalogs
+	 * @param path Path
+	 * @param format Export format
+	 * @return Model
+	 */
+	@RequestMapping(value = "/db/*/ldap-export.html", method = RequestMethod.GET)
+	public Map<String, Object> exportObject(
+			@RequestParam("path") String path,
+			@RequestParam("format") String format
+			)
+		{
+		if (!connectionSettings.isBrowserEnabled())
+			throw new AccessDeniedException();
+		
+		final Map<String, Object> model = new HashMap<String, Object>();
+		
+		try	{
+			final Result fileResult = runner.performCustomQuery(connectionSettings.getLinkName(), LdapConstants.QUERYTYPE_LOOKUP, "SELECT dn, *\nFROM " + path, null, null, "files", false, null);
+			final RowSet files = fileResult.getFirstRowSet();
+			
+			model.put(GenericDownloadView.SOURCE_ATTRIBUTE, downloadService.getDownloadSource(connectionSettings.getLinkName(), files, format));
+			}
+		catch (PerformQueryException e)
+			{
+//			logger.log(Level.WARNING, "performCSVQuery", e);
+			model.put(GenericDownloadView.SOURCE_ATTRIBUTE, new ErrorDownloadSource());
+			}
+		
+		return (model);
+		}
+	
+	/**
+	 * Show catalogs
+	 * @param path Path
+	 * @param format Export format
+	 * @return Model
+	 */
+	@RequestMapping(value = "/db/*/ldap-exportsub.html", method = RequestMethod.GET)
+	public Map<String, Object> exportObjects(
+			@RequestParam("path") String path,
+			@RequestParam("format") String format
+			)
+		{
+		if (!connectionSettings.isBrowserEnabled())
+			throw new AccessDeniedException();
+		
+		final Map<String, Object> model = new HashMap<String, Object>();
+		
+		try	{
+			final Result fileResult = runner.performCustomQuery(connectionSettings.getLinkName(), LdapConstants.QUERYTYPE_SEARCH, "SELECT dn, *\nFROM " + path, null, null, "files", false, null);
+			final RowSet files = fileResult.getFirstRowSet();
+			
+			model.put(GenericDownloadView.SOURCE_ATTRIBUTE, downloadService.getDownloadSource(connectionSettings.getLinkName(), files, format));
+			}
+		catch (PerformQueryException e)
+			{
+//			logger.log(Level.WARNING, "performCSVQuery", e);
+			model.put(GenericDownloadView.SOURCE_ATTRIBUTE, new ErrorDownloadSource());
 			}
 		
 		return (model);

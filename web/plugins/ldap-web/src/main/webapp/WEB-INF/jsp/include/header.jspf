@@ -14,6 +14,6 @@
  * limitations under the License.
 --%><%--
 
-	Dummy file for overlay WAR. The actual file is found in dbgrazer-Web.
+	Dummy file for overlay WAR. The actual file is found in the main web project.
 
 --%>

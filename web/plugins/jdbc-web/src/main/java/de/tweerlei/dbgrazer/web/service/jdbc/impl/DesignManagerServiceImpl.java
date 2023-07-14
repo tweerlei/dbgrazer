@@ -108,7 +108,7 @@ public class DesignManagerServiceImpl implements DesignManagerService
 		{
 		final TableSet design = getCurrentDesign();
 		
-		if (design.getTableNames().isEmpty())
+		if (!design.getTableNames().isEmpty())
 			{
 			try	{
 				final String dn = userManagerService.saveExtensionObject(userSettings.getPrincipal().getLogin(), userSettings.getPrincipal().getLogin(), connectionSettings.getSchemaName(), DESIGN_EXTENSION, name, design.getTableNames(), designPersister);

@@ -21,10 +21,9 @@ import java.io.StringWriter;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import junit.framework.TestCase;
 import de.tweerlei.common5.jdbc.model.QualifiedName;
 import de.tweerlei.dbgrazer.web.service.jdbc.DesignPersister;
-import de.tweerlei.dbgrazer.web.service.jdbc.impl.DesignPersisterImpl;
+import junit.framework.TestCase;
 
 /**
  * Tests for DesignPersisterImpl

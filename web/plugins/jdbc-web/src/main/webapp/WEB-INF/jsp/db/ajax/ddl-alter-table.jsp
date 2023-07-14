@@ -22,6 +22,12 @@
 	<dl>
 		<dt><spring:label path="newName"><fmt:message key="object"/></spring:label></dt>
 		<dd><spring:input path="newName"/></dd>
+		<dt><spring:label path="newSchema"><fmt:message key="schema"/></spring:label></dt>
+		<dd><spring:select path="newSchema">
+<c:forEach items="${schemas}" var="c"
+>			<spring:option value="${c}"><ui:message text="${c}" key="defaultSchema"/></spring:option>
+</c:forEach
+>			</spring:select></dd>
 		<dt><spring:label path="objectComment"><fmt:message key="comment"/></spring:label></dt>
 		<dd><spring:input path="objectComment"/></dd>
 		<dt>&nbsp;</dt>

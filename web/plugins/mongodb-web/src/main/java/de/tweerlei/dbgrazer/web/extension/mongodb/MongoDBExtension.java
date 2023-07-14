@@ -33,7 +33,7 @@ import de.tweerlei.dbgrazer.web.session.ConnectionSettings;
 /**
  * JDBC FrontendExtension
  * 
- * @author Robert Wruck <wruck@tweerlei.de>
+ * @author Robert Wruck
  */
 @Service
 @Order(12)

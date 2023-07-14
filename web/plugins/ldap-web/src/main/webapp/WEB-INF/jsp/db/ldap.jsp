@@ -33,16 +33,9 @@
 	</div>
 	</ui:headline1>
 	
-	<div id="explorer-left"><ui:combo items="${tabs}" var="rs" varKey="label" varParams="detailParams" varParamString="detailParamString" name="combo"
+	<ui:explorer><ui:combo items="${tabs}" var="rs" varKey="label" varParams="detailParams" varParamString="detailParamString" name="combo"
 		><div class="tab-body"><div class="treerow" id="treerow-${label}-"><div class="treebutton"><span class="action" title="<fmt:message key="expand"/>" onclick="return toggleLdapTreeItem(event, '${label}', '', '', '${targetElement}');">&#x25bc;</span></div><div class="treelabel"><a href="db/${currentConnection.linkName}/entry.html?path=" onclick="return showEntry(event, '');"><fmt:message key="ldapRoot"/></a></div><ui:result-ldaptree rs="${rs}" label="${label}" targetElement="${targetElement}"
-	/></div></div></ui:combo></div>
-	
-	<div id="explorer-right"><ui:headline2 key="ldapRoot"/>
-	
-	<ui:tabs items="${tabs2}" var="rs" varKey="label" varLink="detailLink" varParams="detailParams" varParamString="detailParamString" name="result"><%@
-		include file="result/attributes.jspf"
-	%></ui:tabs></div>
-	<hr/>
+	/></div></div></ui:combo></ui:explorer>
 <%@
 	include file="../include/footer.jspf"
 %>

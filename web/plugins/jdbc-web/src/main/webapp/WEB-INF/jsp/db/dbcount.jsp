@@ -24,6 +24,18 @@
 		return false;
 	}
 	
+	function compactResult(c, t) {
+		var cb = $(c);
+		var tbl = $(t);
+		var compact = cb.checked;
+		
+		Table.filterRows(tbl, function(row) {
+			return !compact || (row.cells[1].textContent != row.cells[2].textContent);
+		});
+		
+		return false;
+	}
+	
 	/*]]>*/</script>
 	
 	<ui:headline1><jsp:attribute name="content">${pageTitle}

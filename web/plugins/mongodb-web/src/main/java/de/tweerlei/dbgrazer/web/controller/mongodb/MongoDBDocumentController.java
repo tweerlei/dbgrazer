@@ -39,7 +39,7 @@ import de.tweerlei.dbgrazer.web.session.ConnectionSettings;
 /**
  * Controller for simple pages
  * 
- * @author Robert Wruck <wruck@tweerlei.de>
+ * @author Robert Wruck
  */
 @Controller
 public class MongoDBDocumentController

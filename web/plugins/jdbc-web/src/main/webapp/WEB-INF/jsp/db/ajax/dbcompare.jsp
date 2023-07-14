@@ -14,7 +14,7 @@
  * limitations under the License.
 --%><%@
 	include file="../../include/include.jspf"
-%><div id="uploadResult"><div class="tab-body">
+%><div id="uploadResult"><div class="tab-header">
 		<ui:headline2 key="structureCompare">
 		<form class="h2-actions" action="db/${model.connection2}/dbcompare.html" method="get">
 			:
@@ -36,7 +36,8 @@
 			<span class="action" title="<fmt:message key="maximize"/>" onclick="return toggleElement('zoomable1');"><fmt:message key="maximizeIcon"/></span>
 		</div>
 		</ui:headline2>
-		
+	</div>
+	<div class="tab-body">
 <c:choose><c:when test="${alreadyRunning != null}"
 >		<p><fmt:message key="alreadyRunning"/></p>
 		<p><ui:progress items="${progress}"/></p>

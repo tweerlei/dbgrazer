@@ -14,7 +14,7 @@
  * limitations under the License.
 --%><%@
 	include file="../../include/include.jspf"
-%><div class="tab-body">
+%><div class="tab-header">
 		<ui:headline2 key="ddlCompare">
 		<form class="h2-actions" action="db/${model.connection2}/srccompare.html" method="get">
 			:
@@ -46,7 +46,8 @@
 		</div>
 </c:if
 >		</ui:headline2>
-		
+	</div>
+	<div class="tab-body">
 <c:choose><c:when test="${alreadyRunning != null}"
 >		<p><fmt:message key="alreadyRunning"/></p>
 		<p><ui:progress items="${progress}"/></p>

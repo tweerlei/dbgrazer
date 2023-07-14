@@ -663,17 +663,27 @@ pre.code span.errmsg {
 
 dl.json-object dl,
 dl.json-array dl {
-	margin-left: 2em;
+	margin-left: 1em;
 }
 
 dl.json-object dl:before,
 dl.json-array dl:before {
-	content: '\00a0\000a';
+	content: '\00a0';
 }
 
 dl.json-object dt,
 dl.json-array dt {
 	width: auto;
+}
+
+dl.json-object dt::before,
+dl.json-array dt::before {
+	content: '\251c\00a0';
+}
+
+dl.json-object dt:last-of-type::before,
+dl.json-array dt:last-of-type::before {
+	content: '\2514\00a0';
 }
 
 dl.json-object dd,

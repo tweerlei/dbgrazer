@@ -31,6 +31,7 @@
 		if (content) {
 			$('result').innerHTML = content;
 		}
+		$('formTarget').src = '';
 		Dialog.hide();
 		tw_contentChanged();
 	}

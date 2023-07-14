@@ -18,7 +18,7 @@ package de.tweerlei.dbgrazer.web.controller.mongodb;
 /**
  * Keys for localized messages in messages.properties
  * 
- * @author Robert Wruck <wruck@tweerlei.de>
+ * @author Robert Wruck
  */
 public final class MongoDBMessageKeys
 	{

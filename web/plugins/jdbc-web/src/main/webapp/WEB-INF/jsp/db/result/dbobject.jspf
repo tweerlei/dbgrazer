@@ -78,8 +78,14 @@
 							<td title="JDBC type ID ${c.type.type}">${c.type.name}</td>
 							<td>${c.type.length}</td>
 							<td>${c.type.decimals > 0 ? c.type.decimals : ''}</td>
-							<td>${fn:escapeXml(c.defaultValue)}</td>
-							<td>${fn:escapeXml(c.comment)}</td>
+							<td><c:choose
+								><c:when test="${c.defaultValue == null}"><fmt:message key="null"/></c:when
+								><c:otherwise>${fn:escapeXml(c.defaultValue)}</c:otherwise
+								></c:choose></td>
+							<td><c:choose
+								><c:when test="${c.comment == null}"><fmt:message key="null"/></c:when
+								><c:otherwise>${fn:escapeXml(c.comment)}</c:otherwise
+								></c:choose></td>
 						</tr>
 </c:forEach
 ><c:if test="${currentConnection.writable && currentConnection.editorActive}"
@@ -99,7 +105,7 @@
 >					</tbody>
 				</table>
 			</ui:panel>
-<c:if test="${not empty privs}"
+<c:if test="${(currentConnection.writable && currentConnection.editorActive) || not empty privs}"
 >			<fmt:message key="privilegesTab" var="title"><fmt:param value="${fn:length(privs)}"/></fmt:message><ui:panel title="${title}" zoomable="true">
 				<table class="multiple table-autosort">
 					<thead>
@@ -142,7 +148,7 @@
 >		</div>
 	
 		<div class="column2">
-<c:if test="${not empty info.indices}"
+<c:if test="${(currentConnection.writable && currentConnection.editorActive) || not empty info.indices}"
 >			<fmt:message key="indicesTab" var="title"><fmt:param value="${fn:length(info.indices)}"/></fmt:message><ui:panel title="${title}" zoomable="true">
 				<table class="multiple table-autosort">
 					<thead>
@@ -178,7 +184,7 @@
 >					</tbody>
 				</table>
 			</ui:panel>
-</c:if><c:if test="${not empty info.referencedKeys}"
+</c:if><c:if test="${(currentConnection.writable && currentConnection.editorActive) || not empty info.referencedKeys}"
 >			<fmt:message key="referencedObjectsTab" var="title"><fmt:param value="${fn:length(info.referencedKeys)}"/></fmt:message><ui:panel title="${title}" zoomable="true">
 				<table class="multiple table-autosort">
 					<thead>
@@ -329,7 +335,7 @@
 			</form>
 		</div>
 		<div class="tab-body">
-			<pre id="src">${fn:escapeXml(ddl)}</pre>
+			<pre id="src">${fn:escapeXml(createDDL)}${fn:escapeXml(dropDDL)}</pre>
 		</div>
 </c:when><%--
 ***********************************************************************

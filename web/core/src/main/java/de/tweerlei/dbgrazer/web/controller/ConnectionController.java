@@ -88,6 +88,22 @@ public class ConnectionController
 		}
 	
 	/**
+	 * Display the connections menu
+	 * @return Model
+	 */
+	@RequestMapping(value = "/ws/connections.html", method = RequestMethod.GET)
+	public Map<String, Object> showConnectionsWS()
+		{
+		final Map<String, Object> model = new HashMap<String, Object>();
+		
+		final Map<String, String> all = linkService.findAllLinkNames(userSettingsManager.getEffectiveUserGroups(userSettings.getPrincipal()), null, null);
+		
+		model.put("allConnections", all);
+		
+		return (model);
+		}
+	
+	/**
 	 * Set the session's current connection
 	 * @param connection Connection
 	 * @return View
