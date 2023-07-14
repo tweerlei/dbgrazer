@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.tweerlei.dbgrazer.extension.sql.impl;
+package de.tweerlei.dbgrazer.plugins.sql;
 
 import java.util.List;
 

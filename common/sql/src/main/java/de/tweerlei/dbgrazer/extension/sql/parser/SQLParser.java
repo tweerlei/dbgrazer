@@ -61,6 +61,7 @@ public class SQLParser
 		INITIAL,
 		NAME,
 		QUOTED_NAME,
+		QUOTED_NAME2,
 		PARAMETER,
 		STRING,
 		NUMBER,
@@ -172,6 +173,7 @@ public class SQLParser
 				{
 				case NAME:
 				case QUOTED_NAME:
+				case QUOTED_NAME2:
 					consumer.appendName(s);
 					break;
 				case STRING:
@@ -302,6 +304,11 @@ public class SQLParser
 						{
 						token.append(c);
 						state = State.QUOTED_NAME;
+						}
+					else if (c == '`')
+						{
+						token.append(c);
+						state = State.QUOTED_NAME2;
 						}
 					else if (c == '(')
 						{
@@ -448,6 +455,15 @@ public class SQLParser
 						}
 					break;
 				
+				case QUOTED_NAME2:
+					token.append(c);
+					if (c == '`')
+						{
+						flushToken();
+						state = State.INITIAL;
+						}
+					break;
+				
 				case PARAMETER:
 					if (isNameStart(c))
 						{
@@ -463,6 +479,11 @@ public class SQLParser
 						{
 						token.append(c);
 						state = State.QUOTED_NAME;
+						}
+					else if (c == '`')
+						{
+						token.append(c);
+						state = State.QUOTED_NAME2;
 						}
 					else if (c == '=')
 						{
@@ -559,6 +580,12 @@ public class SQLParser
 						flushToken();
 						token.append(c);
 						state = State.QUOTED_NAME;
+						}
+					else if (c == '`')
+						{
+						flushToken();
+						token.append(c);
+						state = State.QUOTED_NAME2;
 						}
 					else if (c == '(')
 						{
@@ -675,7 +702,7 @@ public class SQLParser
 		
 		if ((state == State.STRING) || (state == State.QUOTED_STRING_START) || (state == State.QUOTED_STRING) || (state == State.QUOTED_STRING_END))
 			throw new IllegalStateException("Unterminated string literal");
-		if (state == State.QUOTED_NAME)
+		if ((state == State.QUOTED_NAME) || (state == State.QUOTED_NAME2))
 			throw new IllegalStateException("Unterminated name");
 		if ((state == State.COMMENT) || (state == State.COMMENT_END))
 			throw new IllegalStateException("Unterminated comment");
