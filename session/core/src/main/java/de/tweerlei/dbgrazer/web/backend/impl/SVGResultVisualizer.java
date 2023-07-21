@@ -84,7 +84,7 @@ public class SVGResultVisualizer extends NamedBase implements Visualizer
 	@Autowired
 	public SVGResultVisualizer(SVGBuilder svgBuilder, FrontendNotificationService frontendNotificationService)
 		{
-		super("Graph");
+		super("SVG");
 		this.svgBuilder = svgBuilder;
 		this.frontendNotificationService = frontendNotificationService;
 		}
