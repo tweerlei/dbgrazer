@@ -20,7 +20,6 @@ import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
 
-import de.tweerlei.ermtools.tns.TNSNamesParser;
 import junit.framework.TestCase;
 
 /**

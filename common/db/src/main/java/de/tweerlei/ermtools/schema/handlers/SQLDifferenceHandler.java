@@ -208,10 +208,39 @@ public class SQLDifferenceHandler implements DifferenceHandler
 		modifyPrivilege(dialect.revokePrivilege(t, i));
 		}
 	
+	/**
+	 * Get the DDL statements, in order
+	 * @return DDL statements
+	 */
+	public List<String> getDDLStatements()
+		{
+		final SQLStatementWrapper w = dialect.getStatementWrapper();
+		final List<String> ret = new ArrayList<String>(
+				del_relationships.size() + del_indexes.size() + tables.size() + privs.size() + structures.size() + add_indexes.size() + add_relationships.size()
+				);
+		
+		for (Iterator<String> i = del_relationships.iterator(); i.hasNext(); )
+			ret.add(w.wrapStatement(i.next()));
+		for (Iterator<String> i = del_indexes.iterator(); i.hasNext(); )
+			ret.add(w.wrapStatement(i.next()));
+		for (Iterator<String> i = tables.iterator(); i.hasNext(); )
+			ret.add(w.wrapStatement(i.next()));
+		for (Iterator<String> i = privs.iterator(); i.hasNext(); )
+			ret.add(w.wrapStatement(i.next()));
+		for (Iterator<String> i = structures.iterator(); i.hasNext(); )
+			ret.add(w.wrapStatement(i.next()));
+		for (Iterator<String> i = add_indexes.iterator(); i.hasNext(); )
+			ret.add(w.wrapStatement(i.next()));
+		for (Iterator<String> i = add_relationships.iterator(); i.hasNext(); )
+			ret.add(w.wrapStatement(i.next()));
+		
+		return (ret);
+		}
+	
 	@Override
 	public String toString()
 		{
-		final SQLStatementWrapper w = dialect.getStatementWrapper();
+		final SQLStatementWrapper w = dialect.getScriptStatementWrapper();
 		
 		final StringBuffer sb = new StringBuffer();
 		if (!del_relationships.isEmpty())

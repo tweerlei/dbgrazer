@@ -18,17 +18,19 @@ package de.tweerlei.ermtools.schema;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import de.tweerlei.common5.jdbc.MetadataReader;
 import de.tweerlei.common5.jdbc.impl.JdbcMetadataReader;
 import de.tweerlei.ermtools.model.SQLSchema;
+import de.tweerlei.ermtools.util.LoggingSupport;
 
 /**
  * Auslesen von Schemainformationen per JDBC
  * 
  * @author Robert Wruck
  */
-public class DBSchemaReader
+public class DBSchemaReader extends LoggingSupport
 	{
 	/**
 	 * Erzeugt ein SQLSchema durch Auslesen einer DB
@@ -42,6 +44,7 @@ public class DBSchemaReader
 	public SQLSchema dumpSchema(Connection c, String catalogName, String schemaName, String pattern) throws SQLException
 		{
 		final String curCat = (catalogName == null) ? c.getCatalog() : catalogName;
+		final Pattern pat = Pattern.compile(pattern, Pattern.CASE_INSENSITIVE);
 		
 		final SQLSchema schema = new SQLSchema(curCat, schemaName);
 		
@@ -50,14 +53,13 @@ public class DBSchemaReader
 		int i = 0;
 		for (Map.Entry<String, String> ent : tables.entrySet())
 			{
-			if ("TABLE".equals(ent.getValue()))
+			if ("TABLE".equals(ent.getValue()) && pat.matcher(ent.getKey()).matches())
+				{
+				log(i + "/" + tables.size() + ": " + ent.getKey());
 				schema.addTable(md.getTableDescription(curCat, schemaName, ent.getKey()));
+				}
 			i++;
-			System.err.print("\r" + i + "/" + tables.size());
-			System.err.flush();
 			}
-		System.err.println();
-		System.err.flush();
 		
 		return (schema);
 		}

@@ -13,39 +13,44 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.tweerlei.ermtools.schema.naming;
+package de.tweerlei.ermtools.util;
 
-import de.tweerlei.common5.jdbc.model.QualifiedName;
-import de.tweerlei.ermtools.dialect.SQLNamingStrategy;
+import java.io.IOException;
 
 /**
- * Strict comparison, but ignoring catalog and schema
+ * Logging support
  * 
  * @author Robert Wruck
  */
-public class PrefixNamingStrategy implements SQLNamingStrategy
+public class LoggingSupport
 	{
-	private final String prefix;
+	private Appendable log;
 	
 	/**
-	 * Constructor
-	 * @param prefix Prefix to use
+	 * Set an Appendable as logger
+	 * @param a Appendable
 	 */
-	public PrefixNamingStrategy(String prefix)
+	public void setLogger(Appendable a)
 		{
-		this.prefix = prefix;
+		log = a;
 		}
 	
-	public String getQualifiedTableName(QualifiedName qn)
+	/**
+	 * Log a message
+	 * @param msg Message
+	 */
+	protected final void log(String msg)
 		{
-		if (qn.getObjectName().startsWith(prefix))
-			return (qn.getObjectName().substring(prefix.length()));
-		else
-			return (qn.getObjectName());
-		}
-	
-	public String quoteIdentifier(String c)
-		{
-		return (c);
+		if (log != null)
+			{
+			try	{
+				log.append(msg);
+				log.append("\n");
+				}
+			catch (IOException e)
+				{
+				// ignore
+				}
+			}
 		}
 	}

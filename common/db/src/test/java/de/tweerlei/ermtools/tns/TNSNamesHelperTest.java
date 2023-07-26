@@ -15,7 +15,6 @@
  */
 package de.tweerlei.ermtools.tns;
 
-import de.tweerlei.ermtools.tns.TNSNamesHelper;
 import junit.framework.TestCase;
 
 /**
