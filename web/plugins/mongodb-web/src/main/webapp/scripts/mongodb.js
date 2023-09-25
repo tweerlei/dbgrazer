@@ -16,7 +16,7 @@ function showCollection(ev, database, collection, id, value, view) {
 			params.view = view;
 		}
 		WSApi.getDBAsync('documents', params, function(txt) {
-			el.innerHTML = extractLocalStyles(txt);
+			replaceElementContent(el, txt);
 			tw_contentChanged();
 			HashMonitor.set(params);
 			Tabs.hashChanged(HashMonitor.values);
@@ -46,7 +46,7 @@ function showDocument(ev, database, collection, id, formatting, coloring, lineno
 			params.struct = struct;
 		}
 		WSApi.getDBAsync('document', params, function(txt) {
-			el.innerHTML = extractLocalStyles(txt);
+			replaceElementContent(el, txt);
 			tw_contentChanged();
 			HashMonitor.set(params);
 			Tabs.hashChanged(HashMonitor.values);
@@ -74,7 +74,7 @@ function refreshDatabase() {
 					params.formatting = 'true';
 				}
 				WSApi.getDBAsync('document', params, function(txt) {
-					el.innerHTML = extractLocalStyles(txt);
+					replaceElementContent(el, txt);
 					tw_contentChanged();
 					Tabs.hashChanged(HashMonitor.values);
 					startAutoRefresh();
@@ -85,7 +85,7 @@ function refreshDatabase() {
 					params.id = id;
 				}
 				WSApi.getDBAsync('documents', params, function(txt) {
-					el.innerHTML = extractLocalStyles(txt);
+					replaceElementContent(el, txt);
 					tw_contentChanged();
 					Tabs.hashChanged(HashMonitor.values);
 					startAutoRefresh();

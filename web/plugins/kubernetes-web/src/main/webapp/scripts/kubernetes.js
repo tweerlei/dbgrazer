@@ -20,7 +20,7 @@ function showApiObject(ev, namespace, kind, name, format, formatting) {
 			params.formatting = 'true';
 		}
 		WSApi.getDBAsync('apiobject', params, function(txt) {
-			el.innerHTML = extractLocalStyles(txt);
+			replaceElementContent(el, txt);
 			tw_contentChanged();
 			HashMonitor.set(params);
 			Tabs.hashChanged(HashMonitor.values);
@@ -48,7 +48,7 @@ function refreshApiObject() {
 					params.formatting = 'true';
 				}
 				WSApi.getDBAsync('apiobject', params, function(txt) {
-					el.innerHTML = extractLocalStyles(txt);
+					replaceElementContent(el, txt);
 					tw_contentChanged();
 					Tabs.hashChanged(HashMonitor.values);
 					startAutoRefresh();

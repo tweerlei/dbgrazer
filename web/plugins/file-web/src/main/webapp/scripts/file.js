@@ -34,7 +34,7 @@ function showDir(ev, path) {
 	var el = $('explorer-right');
 	if (el) {
 		WSApi.getDBAsync('dir', { path: path }, function(txt) {
-			el.innerHTML = extractLocalStyles(txt);
+			replaceElementContent(el, txt);
 			tw_contentChanged();
 			HashMonitor.set({ path: path });
 			Tabs.hashChanged(HashMonitor.values);
@@ -50,7 +50,7 @@ function refreshDir() {
 		var el = $('explorer-right');
 		if (el) {
 			WSApi.getDBAsync('dir', { path: path }, function(txt) {
-				el.innerHTML = extractLocalStyles(txt);
+				replaceElementContent(el, txt);
 				tw_contentChanged();
 				Tabs.hashChanged(HashMonitor.values);
 				startAutoRefresh();

@@ -132,7 +132,7 @@ function showDBObject(ev, catalog, schema, obj, depth, all, sort, where, order, 
 	var el = $('explorer-right');
 	if (el) {
 		getDBObject(catalog, schema, obj, depth, all, sort, function(txt) {
-			el.innerHTML = extractLocalStyles(txt);
+			replaceElementContent(el, txt);
 			tw_contentChanged();
 			HashMonitor.set({ catalog: catalog, schema: schema, object: obj, depth: depth, all: all, sort: sort });
 			Tabs.hashChanged(HashMonitor.values);
@@ -154,7 +154,7 @@ function showDBObjectData(ev, catalog, schema, obj, where, order, target) {
 	var el = $('result');
 	if (el) {
 		WSApi.postDBAsync('submit-simple', { catalog: catalog, schema: schema, object: obj, where: where, order: order||'', target: target||'' }, function(txt) {
-			el.innerHTML = extractLocalStyles(txt);
+			replaceElementContent(el, txt);
 			tw_contentChanged();
 			HashMonitor.set({ catalog: catalog, schema: schema, object: obj, where: where, order: order });
 			var w = $('where');
@@ -184,7 +184,7 @@ function refreshDBObject() {
 		var el = $('explorer-right');
 		if (el) {
 			getDBObject(catalog, schema, obj, depth, all, sort, function(txt) {
-				el.innerHTML = extractLocalStyles(txt);
+				replaceElementContent(el, txt);
 				tw_contentChanged();
 				Tabs.hashChanged(HashMonitor.values);
 				startAutoRefresh();

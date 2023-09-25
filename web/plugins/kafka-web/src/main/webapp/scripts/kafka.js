@@ -19,7 +19,7 @@ function showPartition(ev, topic, partition, offset, key, value, compact) {
 			params.compact = true;
 		}
 		WSApi.getDBAsync('messages', params, function(txt) {
-			el.innerHTML = extractLocalStyles(txt);
+			replaceElementContent(el, txt);
 			tw_contentChanged();
 			HashMonitor.set(params);
 			Tabs.hashChanged(HashMonitor.values);
@@ -43,7 +43,7 @@ function showMessage(ev, topic, partition, offset, format, formatting) {
 			params.formatting = 'true';
 		}
 		WSApi.getDBAsync('message', params, function(txt) {
-			el.innerHTML = extractLocalStyles(txt);
+			replaceElementContent(el, txt);
 			tw_contentChanged();
 			HashMonitor.set(params);
 			Tabs.hashChanged(HashMonitor.values);
@@ -61,7 +61,7 @@ function showConsumerGroup(ev, group) {
 	if (el) {
 		var params = { group: group };
 		WSApi.getDBAsync('consumergroup', params, function(txt) {
-			el.innerHTML = extractLocalStyles(txt);
+			replaceElementContent(el, txt);
 			tw_contentChanged();
 			HashMonitor.set(params);
 			Tabs.hashChanged(HashMonitor.values);
@@ -92,7 +92,7 @@ function refreshTopic() {
 					params.formatting = 'true';
 				}
 				WSApi.getDBAsync('message', params, function(txt) {
-					el.innerHTML = extractLocalStyles(txt);
+					replaceElementContent(el, txt);
 					tw_contentChanged();
 					Tabs.hashChanged(HashMonitor.values);
 					startAutoRefresh();
@@ -112,7 +112,7 @@ function refreshTopic() {
 					params.compact = true;
 				}
 				WSApi.getDBAsync('messages', params, function(txt) {
-					el.innerHTML = extractLocalStyles(txt);
+					replaceElementContent(el, txt);
 					tw_contentChanged();
 					Tabs.hashChanged(HashMonitor.values);
 					startAutoRefresh();
@@ -131,7 +131,7 @@ function refreshConsumerGroup() {
 		if (el) {
 			var params = { group: group };
 			WSApi.getDBAsync('consumergroup', params, function(txt) {
-				el.innerHTML = extractLocalStyles(txt);
+				replaceElementContent(el, txt);
 				tw_contentChanged();
 				Tabs.hashChanged(HashMonitor.values);
 				startAutoRefresh();

@@ -292,6 +292,7 @@ public class KafkaBrowseController
 	 * @param textFormatterService TextFormatterService
 	 * @param querySettingsManager QuerySettingsManager
 	 * @param topicStateManager TopicStateManager
+	 * @param timeService TimeService
 	 * @param connectionSettings ConnectionSettings
 	 */
 	@Autowired

@@ -240,16 +240,25 @@ function toggleScaling(e) {
 	return true;
 }
 
-function extractLocalStyles(txt) {
-	// Hack: extract custom CSS rules from response
+function replaceElementContent(el, txt) {
+	// Extract embedded CSS rules from response
 	var start = txt.indexOf('<style>');
-	var end = txt.indexOf('</style>');
-	if ((start >= 0) && (end > start)) {
-		var css = txt.substring(start + 7, end);
-		$('local-styles').innerHTML = css;
-		txt = txt.substring(0, start) + txt.substring(end + 8);
+	if (start >= 0) {
+		var end = txt.indexOf('</style>');
+		if (end > start) {
+			var css = txt.substring(start + 7, end);
+			$('local-styles').innerHTML = css;
+			txt = txt.substring(0, start) + txt.substring(end + 8);
+		}
 	}
-	return txt;
+	// Reset any cached table definition
+	el.select('table').each(function (t) {
+		if (t.id) {
+			delete Table.tabledata[t.id];
+			delete Table.tableHeaderIndexes[t.id]; 
+		}
+	});
+	el.innerHTML = txt;
 }
 
 function setFormFields(fields) {
@@ -277,7 +286,7 @@ function getFormInto(f, target, fields, cb, prog) {
 		
 		setFormFields(fields);
 		Forms.submitAsync(frm, null, function(txt) {
-			el.innerHTML = extractLocalStyles(txt);
+			replaceElementContent(el, txt);
 //			el.show();
 		}, function() {
 			Dialog.hide();
@@ -1155,12 +1164,12 @@ function runQuery(ev, query, param, target) {
 	if (el) {
 		if (target.indexOf('drilldown') == 0) {
 			WSApi.getDBAsync('drilldown', 'level='+target.substr(9)+'&q='+query+param, function(txt) {
-				el.innerHTML = txt;
+				replaceElementContent(el, txt);
 				tw_contentChanged();
 			});
 		} else {
 			WSApi.getDBAsync('result', 'q='+query+param, function(txt) {
-				el.innerHTML = extractLocalStyles(txt);
+				replaceElementContent(el, txt);
 				tw_contentChanged();
 				HashMonitor.set({ detail: query, params: param });
 				Tabs.hashChanged(HashMonitor.values);
@@ -1196,7 +1205,7 @@ function rerunQuery() {
 		var el = $('explorer-right');
 		if (el) {
 			WSApi.getDBAsync('result', 'q='+d+p, function(txt) {
-				el.innerHTML = extractLocalStyles(txt);
+				replaceElementContent(el, txt);
 				tw_contentChanged();
 				Tabs.hashChanged(HashMonitor.values);
 				startAutoRefresh();
@@ -1469,7 +1478,7 @@ function getQueryLevel(query, level, params) {
 	
 	WSApi.getDBAsync('multilevel', p, function(txt) {
 		var el = $('explorer-left');
-		el.innerHTML = txt;
+		replaceElementContent(el, txt);
 		tw_contentChanged();
 		HashMonitor.set({ level: level }, true);
 	});

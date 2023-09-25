@@ -872,7 +872,7 @@ public class DDLDiffController
 			}
 		finally
 			{
- 			try	{
+			try	{
 				h1.abort();
 				src.interrupt();
 				src.join();
@@ -939,7 +939,7 @@ public class DDLDiffController
 			}
 		finally
 			{
- 			try	{
+			try	{
 				h1.abort();
 				src.interrupt();
 				src.join();

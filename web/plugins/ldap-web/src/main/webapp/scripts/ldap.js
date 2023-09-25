@@ -17,7 +17,7 @@ function showEntry(ev, path) {
 	var el = $('explorer-right');
 	if (el) {
 		WSApi.getDBAsync('entry', { path: path }, function(txt) {
-			el.innerHTML = extractLocalStyles(txt);
+			replaceElementContent(el, txt);
 			tw_contentChanged();
 			HashMonitor.set({ path: path });
 			Tabs.hashChanged(HashMonitor.values);
@@ -33,7 +33,7 @@ function refreshEntry() {
 		var el = $('explorer-right');
 		if (el) {
 			WSApi.getDBAsync('entry', { path: path }, function(txt) {
-				el.innerHTML = extractLocalStyles(txt);
+				replaceElementContent(el, txt);
 				tw_contentChanged();
 				Tabs.hashChanged(HashMonitor.values);
 				startAutoRefresh();
