@@ -27,7 +27,6 @@ import javax.annotation.PreDestroy;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ldap.core.LdapTemplate;
-import org.springframework.ldap.core.support.LdapContextSource;
 import org.springframework.stereotype.Service;
 
 import de.tweerlei.common.util.StringUtils;
@@ -35,6 +34,7 @@ import de.tweerlei.common5.collections.StringComparators;
 import de.tweerlei.dbgrazer.common.service.ConfigService;
 import de.tweerlei.dbgrazer.extension.ldap.ConfigKeys;
 import de.tweerlei.dbgrazer.extension.ldap.LdapAccessService;
+import de.tweerlei.dbgrazer.extension.ldap.support.PagedLdapContextSource;
 import de.tweerlei.dbgrazer.link.model.LinkDef;
 import de.tweerlei.dbgrazer.link.service.LinkListener;
 import de.tweerlei.dbgrazer.link.service.LinkManager;
@@ -178,11 +178,12 @@ public class LdapAccessServiceImpl implements LdapAccessService, LinkListener, L
 				configService.getConfigProvider()
 				), serializerFactory);
 		
-		final LdapContextSource src = new LdapContextSource();
+		final PagedLdapContextSource src = new PagedLdapContextSource();
 		src.setUrl(def.getUrl());
 		src.setBase(def.getDriver());
 		src.setUserDn(user);
 		src.setPassword(pass);
+		src.setPageSize(accessor.get(ConfigKeys.FETCH_SIZE));
 //		src.setPooled(true);
 		
 		final String binaryAttributes = accessor.get(ConfigKeys.LDAP_BINARY_ATTRIBUTES);
