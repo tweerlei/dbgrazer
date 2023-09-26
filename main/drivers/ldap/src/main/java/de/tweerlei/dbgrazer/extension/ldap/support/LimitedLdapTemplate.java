@@ -25,6 +25,7 @@ import org.springframework.ldap.core.ContextSource;
 import org.springframework.ldap.core.DirContextProcessor;
 import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.ldap.core.NameClassPairCallbackHandler;
+import org.springframework.ldap.core.SearchExecutor;
 
 /**
  * LdapTemplate that sets the countLimit and timeLimit search controls for any search
@@ -111,7 +112,7 @@ public class LimitedLdapTemplate extends LdapTemplate
 		{
 		try	{
 			prepareSearchControls(controls);
-			super.search(base, filter, controls, handler, getPagingDirContextProcessor());
+			super.search(base, filter, controls, handler);
 			}
 		catch (SizeLimitExceededException e)
 			{
@@ -128,7 +129,7 @@ public class LimitedLdapTemplate extends LdapTemplate
 		{
 		try	{
 			prepareSearchControls(controls);
-			super.search(base, filter, controls, handler, getPagingDirContextProcessor());
+			super.search(base, filter, controls, handler);
 			}
 		catch (SizeLimitExceededException e)
 			{
@@ -138,6 +139,12 @@ public class LimitedLdapTemplate extends LdapTemplate
 			{
 			// ignore
 			}
+		}
+	
+	@Override
+	public void search(SearchExecutor se, NameClassPairCallbackHandler handler)
+		{
+		super.search(se, handler, getPagingDirContextProcessor());
 		}
 	
 	@Override
