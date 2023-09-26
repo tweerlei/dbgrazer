@@ -46,7 +46,7 @@ COPY --from=build /build/web/image/root/var/opt/dbgrazer /var/opt/dbgrazer
 VOLUME /var/opt/dbgrazer
 
 # Set Tomcat options
-ENV CATALINA_OPTS -Xmx512m -XX:-OmitStackTraceInFastThrow -Ddbgrazer.configPath=/opt/dbgrazer -Duser.language=de -Duser.country=DE -Duser.timezone=Europe/Berlin
+ENV CATALINA_OPTS -Xmx512m -XX:-OmitStackTraceInFastThrow -Ddbgrazer.configPath=/opt/dbgrazer -Ddbgrazer.configFile=etc/config.properties -Duser.language=de -Duser.country=DE -Duser.timezone=Europe/Berlin
 
 # Possibly run init.sh and launch Tomcat afterwards
 CMD [ "/usr/local/bin/startup.sh" ]
