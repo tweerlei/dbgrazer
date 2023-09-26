@@ -209,6 +209,7 @@ public class LdapAccessServiceImpl implements LdapAccessService, ConfigListener,
 		final LimitedLdapTemplate tmp = new LimitedLdapTemplate(src);
 		tmp.setCountLimit(accessor.get(ConfigKeys.MAX_ROWS));
 		tmp.setTimeLimit(accessor.get(ConfigKeys.QUERY_TIMEOUT) * 1000);
+		tmp.setPageSize(accessor.get(ConfigKeys.FETCH_SIZE));
 		// Workaround for ActiveDirectory servers
 		tmp.setIgnorePartialResultException(true);
 		
