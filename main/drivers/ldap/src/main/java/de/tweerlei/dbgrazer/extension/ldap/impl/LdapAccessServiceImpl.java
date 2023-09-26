@@ -27,14 +27,16 @@ import javax.annotation.PreDestroy;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ldap.core.LdapTemplate;
+import org.springframework.ldap.core.support.LdapContextSource;
 import org.springframework.stereotype.Service;
 
 import de.tweerlei.common.util.StringUtils;
 import de.tweerlei.common5.collections.StringComparators;
+import de.tweerlei.dbgrazer.common.service.ConfigListener;
 import de.tweerlei.dbgrazer.common.service.ConfigService;
 import de.tweerlei.dbgrazer.extension.ldap.ConfigKeys;
 import de.tweerlei.dbgrazer.extension.ldap.LdapAccessService;
-import de.tweerlei.dbgrazer.extension.ldap.support.PagedLdapContextSource;
+import de.tweerlei.dbgrazer.extension.ldap.support.LimitedLdapTemplate;
 import de.tweerlei.dbgrazer.link.model.LinkDef;
 import de.tweerlei.dbgrazer.link.service.LinkListener;
 import de.tweerlei.dbgrazer.link.service.LinkManager;
@@ -50,7 +52,7 @@ import de.tweerlei.spring.service.SerializerFactory;
  * @author Robert Wruck
  */
 @Service
-public class LdapAccessServiceImpl implements LdapAccessService, LinkListener, LinkManager
+public class LdapAccessServiceImpl implements LdapAccessService, ConfigListener, LinkListener, LinkManager
 	{
 	private final SerializerFactory serializerFactory;
 	private final ConfigService configService;
@@ -81,8 +83,15 @@ public class LdapAccessServiceImpl implements LdapAccessService, LinkListener, L
 	@PostConstruct
 	public void init()
 		{
+		configService.addListener(this);
 		linkService.addListener(this);
 		linkService.addManager(this);
+		}
+	
+	@Override
+	public void configChanged()
+		{
+		closeConnections();
 		}
 	
 	/**
@@ -178,12 +187,11 @@ public class LdapAccessServiceImpl implements LdapAccessService, LinkListener, L
 				configService.getConfigProvider()
 				), serializerFactory);
 		
-		final PagedLdapContextSource src = new PagedLdapContextSource();
+		final LdapContextSource src = new LdapContextSource();
 		src.setUrl(def.getUrl());
 		src.setBase(def.getDriver());
 		src.setUserDn(user);
 		src.setPassword(pass);
-		src.setPageSize(accessor.get(ConfigKeys.FETCH_SIZE));
 //		src.setPooled(true);
 		
 		final String binaryAttributes = accessor.get(ConfigKeys.LDAP_BINARY_ATTRIBUTES);

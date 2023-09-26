@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.tweerlei.dbgrazer.extension.ldap.impl;
+package de.tweerlei.dbgrazer.extension.ldap.support;
 
 import javax.naming.Name;
 import javax.naming.directory.SearchControls;
 
 import org.springframework.ldap.SizeLimitExceededException;
 import org.springframework.ldap.TimeLimitExceededException;
+import org.springframework.ldap.control.PagedResultsDirContextProcessor;
 import org.springframework.ldap.core.ContextSource;
 import org.springframework.ldap.core.DirContextProcessor;
 import org.springframework.ldap.core.LdapTemplate;
@@ -34,6 +35,7 @@ public class LimitedLdapTemplate extends LdapTemplate
 	{
 	private int countLimit;
 	private int timeLimit;
+	private int pageSize;
 	
 	/**
 	 * Constructor
@@ -80,6 +82,24 @@ public class LimitedLdapTemplate extends LdapTemplate
 		this.timeLimit = timeLimit;
 		}
 	
+	/**
+	 * Get the pageSize
+	 * @return the pageSize
+	 */
+	public int getPageSize()
+		{
+		return pageSize;
+		}
+	
+	/**
+	 * Set the pageSize
+	 * @param pageSize the pageSize to set
+	 */
+	public void setPageSize(int pageSize)
+		{
+		this.pageSize = pageSize;
+		}
+	
 	private void prepareSearchControls(SearchControls controls)
 		{
 		controls.setCountLimit(countLimit);
@@ -91,7 +111,7 @@ public class LimitedLdapTemplate extends LdapTemplate
 		{
 		try	{
 			prepareSearchControls(controls);
-			super.search(base, filter, controls, handler);
+			super.search(base, filter, controls, handler, getPagingDirContextProcessor());
 			}
 		catch (SizeLimitExceededException e)
 			{
@@ -108,7 +128,7 @@ public class LimitedLdapTemplate extends LdapTemplate
 		{
 		try	{
 			prepareSearchControls(controls);
-			super.search(base, filter, controls, handler);
+			super.search(base, filter, controls, handler, getPagingDirContextProcessor());
 			}
 		catch (SizeLimitExceededException e)
 			{
@@ -125,7 +145,7 @@ public class LimitedLdapTemplate extends LdapTemplate
 		{
 		try	{
 			prepareSearchControls(controls);
-			super.search(base, filter, controls, handler, processor);
+			super.search(base, filter, controls, handler, new MultiDirContextProcessor(getPagingDirContextProcessor(), processor));
 			}
 		catch (SizeLimitExceededException e)
 			{
@@ -142,7 +162,7 @@ public class LimitedLdapTemplate extends LdapTemplate
 		{
 		try	{
 			prepareSearchControls(controls);
-			super.search(base, filter, controls, handler, processor);
+			super.search(base, filter, controls, handler, new MultiDirContextProcessor(getPagingDirContextProcessor(), processor));
 			}
 		catch (SizeLimitExceededException e)
 			{
@@ -152,5 +172,13 @@ public class LimitedLdapTemplate extends LdapTemplate
 			{
 			// ignore
 			}
+		}
+	
+	private DirContextProcessor getPagingDirContextProcessor()
+		{
+		if (pageSize > 0)
+			return new PagedResultsDirContextProcessor(pageSize);
+		else
+			return null;
 		}
 	}
