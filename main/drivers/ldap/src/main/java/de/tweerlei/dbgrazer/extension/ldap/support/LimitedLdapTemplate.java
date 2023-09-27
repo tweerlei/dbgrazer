@@ -15,36 +15,56 @@
  */
 package de.tweerlei.dbgrazer.extension.ldap.support;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import javax.naming.Name;
 import javax.naming.directory.SearchControls;
 
 import org.springframework.ldap.SizeLimitExceededException;
 import org.springframework.ldap.TimeLimitExceededException;
 import org.springframework.ldap.control.PagedResultsDirContextProcessor;
-import org.springframework.ldap.core.ContextSource;
 import org.springframework.ldap.core.DirContextProcessor;
 import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.ldap.core.NameClassPairCallbackHandler;
 import org.springframework.ldap.core.SearchExecutor;
+import org.springframework.ldap.core.support.LdapContextSource;
+import org.springframework.ldap.transaction.compensating.manager.ContextSourceTransactionManager;
+import org.springframework.ldap.transaction.compensating.manager.TransactionAwareContextSourceProxy;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 /**
- * LdapTemplate that sets the countLimit and timeLimit search controls for any search
+ * LdapTemplate that sets the countLimit and timeLimit search controls for any search.
  * 
  * @author Robert Wruck
  */
 public class LimitedLdapTemplate extends LdapTemplate
 	{
+	private final ContextSourceTransactionManager txManager;
+	private final DefaultTransactionDefinition def;
 	private int countLimit;
 	private int timeLimit;
 	private int pageSize;
+	
+	private final Logger logger;
 	
 	/**
 	 * Constructor
 	 * @param contextSource ContextSource
 	 */
-	public LimitedLdapTemplate(ContextSource contextSource)
+	public LimitedLdapTemplate(LdapContextSource contextSource)
 		{
-		super(contextSource);
+		super(new TransactionAwareContextSourceProxy(contextSource));
+		
+		txManager = new ContextSourceTransactionManager();
+		txManager.setContextSource(contextSource);
+		
+		def = new DefaultTransactionDefinition();
+		def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
+		
+		logger = Logger.getLogger(getClass().getCanonicalName());
 		}
 	
 	/**
@@ -142,9 +162,43 @@ public class LimitedLdapTemplate extends LdapTemplate
 		}
 	
 	@Override
-	public void search(SearchExecutor se, NameClassPairCallbackHandler handler)
+	public void search(SearchExecutor se, NameClassPairCallbackHandler handler, DirContextProcessor processor)
 		{
-		super.search(se, handler, getPagingDirContextProcessor());
+		if (pageSize <= 0)
+			{
+			logger.log(Level.INFO, "Performing search without paging");
+			
+			super.search(se, handler, processor);
+			return;
+			}
+		
+		logger.log(Level.INFO, "Performing search with page size of " + pageSize);
+		
+		final PagedResultsDirContextProcessor pager = new PagedResultsDirContextProcessor(pageSize);
+		final DirContextProcessor multiProcessor = new MultiDirContextProcessor(pager, processor);
+		
+		// Wrap search calls in a transaction to prevent LdapTemplate from closing the connection
+		// after each call.
+		
+		final TransactionStatus status = txManager.getTransaction(def);
+		try	{
+			int pageNumber = 1;
+			do	{
+				logger.log(Level.INFO, "Fetching page " + pageNumber++);
+				
+				super.search(se, handler, multiProcessor);
+				}
+			while (pager.getCookie() != null);
+			
+			logger.log(Level.INFO, "Fetched all pages");
+			
+			txManager.commit(status);
+			}
+		catch (Exception ex)
+			{
+			txManager.rollback(status);
+			throw ex;
+			}
 		}
 	
 	@Override
@@ -152,7 +206,7 @@ public class LimitedLdapTemplate extends LdapTemplate
 		{
 		try	{
 			prepareSearchControls(controls);
-			super.search(base, filter, controls, handler, new MultiDirContextProcessor(getPagingDirContextProcessor(), processor));
+			super.search(base, filter, controls, handler, processor);
 			}
 		catch (SizeLimitExceededException e)
 			{
@@ -169,7 +223,7 @@ public class LimitedLdapTemplate extends LdapTemplate
 		{
 		try	{
 			prepareSearchControls(controls);
-			super.search(base, filter, controls, handler, new MultiDirContextProcessor(getPagingDirContextProcessor(), processor));
+			super.search(base, filter, controls, handler, processor);
 			}
 		catch (SizeLimitExceededException e)
 			{
@@ -179,13 +233,5 @@ public class LimitedLdapTemplate extends LdapTemplate
 			{
 			// ignore
 			}
-		}
-	
-	private DirContextProcessor getPagingDirContextProcessor()
-		{
-		if (pageSize > 0)
-			return new PagedResultsDirContextProcessor(pageSize);
-		else
-			return null;
 		}
 	}

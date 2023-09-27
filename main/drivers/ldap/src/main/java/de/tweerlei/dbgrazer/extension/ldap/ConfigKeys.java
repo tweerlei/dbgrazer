@@ -34,7 +34,7 @@ public final class ConfigKeys
 	public static final ConfigKey<Integer> MAX_ROWS = ConfigKey.create(PACKAGE_NAME, "maxRows", Integer.class, 100);
 	
 	/** Fetch size */
-	public static final ConfigKey<Integer> FETCH_SIZE = ConfigKey.create(PACKAGE_NAME, "fetchSize", Integer.class, 1000);
+	public static final ConfigKey<Integer> FETCH_SIZE = ConfigKey.create(PACKAGE_NAME, "fetchSize", Integer.class, 0);
 	
 	/** Query timeout */
 	public static final ConfigKey<Integer> QUERY_TIMEOUT = ConfigKey.create(PACKAGE_NAME, "timeout", Integer.class, 60);
