@@ -220,7 +220,7 @@ public class LimitedLdapTemplate extends LdapTemplate
 			
 			super.search(se, handler, multiProcessor);
 			}
-		while (pager.getCookie() != null);
+		while ((pager.getCookie() != null) && (pager.getCookie().getCookie() != null));
 		
 		logger.log(Level.INFO, "Fetched all pages");
 		}
