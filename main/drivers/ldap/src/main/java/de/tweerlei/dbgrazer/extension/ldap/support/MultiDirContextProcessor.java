@@ -41,7 +41,7 @@ public class MultiDirContextProcessor implements DirContextProcessor
 		for (ListIterator<DirContextProcessor> it = processors.listIterator(); it.hasNext(); )
 			{
 			final DirContextProcessor p = it.next();
-			p.postProcess(ctx);
+			p.preProcess(ctx);
 			}
 		}
 	
