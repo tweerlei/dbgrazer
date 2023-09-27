@@ -29,11 +29,13 @@ import javax.naming.directory.Attributes;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ldap.core.ContextMapper;
+import org.springframework.ldap.core.ContextSource;
 import org.springframework.ldap.core.DirContextOperations;
 import org.springframework.ldap.core.DistinguishedName;
 import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.ldap.core.support.LdapContextSource;
 import org.springframework.ldap.support.LdapUtils;
+import org.springframework.ldap.transaction.compensating.manager.TransactionAwareContextSourceProxy;
 import org.springframework.stereotype.Service;
 
 import de.tweerlei.common.util.StringJoiner;
@@ -178,37 +180,37 @@ public class LdapQueryRunner extends BaseQueryRunner
 					else if (RDN_LINK_ATTRIBUTE.equalsIgnoreCase(attrId))
 						columns.add(new ColumnDefImpl(RDN_LINK_ATTRIBUTE, ColumnType.STRING, null, getQuery().getTargetQueries().get(columns.size()), null, null));
 					else if (ALL_ATTRIBUTES.equals(attrId))
-					{
-//					columns.add(new ColumnDefImpl(DN_ATTRIBUTE, ColumnType.STRING, null, getQuery().getTargetQueries().get(0), null, null));
-//					columns.add(new ColumnDefImpl(RDN_ATTRIBUTE, ColumnType.STRING, null, getQuery().getTargetQueries().get(1), null, null));
-//					columns.add(new ColumnDefImpl(RDN_NAME_ATTRIBUTE, ColumnType.STRING, null, getQuery().getTargetQueries().get(2), null, null));
-//					columns.add(new ColumnDefImpl(RDN_PARENT_ATTRIBUTE, ColumnType.STRING, null, getQuery().getTargetQueries().get(3), null, null));
-						final List<ColumnDef> allColumns = new ArrayList<ColumnDef>(attributes.size());
-					final NamingEnumeration<? extends Attribute> all = attributes.getAll();
-					try	{
-						while (all.hasMore())
-							{
-							final Attribute a = all.next();
-								allColumns.add(new ColumnDefImpl(a.getID(), ColumnType.forObject(a.get()), null, null, null, null));
-							}
-						}
-					finally
 						{
-						all.close();
-						}
+//						columns.add(new ColumnDefImpl(DN_ATTRIBUTE, ColumnType.STRING, null, getQuery().getTargetQueries().get(0), null, null));
+//						columns.add(new ColumnDefImpl(RDN_ATTRIBUTE, ColumnType.STRING, null, getQuery().getTargetQueries().get(1), null, null));
+//						columns.add(new ColumnDefImpl(RDN_NAME_ATTRIBUTE, ColumnType.STRING, null, getQuery().getTargetQueries().get(2), null, null));
+//						columns.add(new ColumnDefImpl(RDN_PARENT_ATTRIBUTE, ColumnType.STRING, null, getQuery().getTargetQueries().get(3), null, null));
+						final List<ColumnDef> allColumns = new ArrayList<ColumnDef>(attributes.size());
+						final NamingEnumeration<? extends Attribute> all = attributes.getAll();
+						try	{
+							while (all.hasMore())
+								{
+								final Attribute a = all.next();
+								allColumns.add(new ColumnDefImpl(a.getID(), ColumnType.forObject(a.get()), null, null, null, null));
+								}
+							}
+						finally
+							{
+							all.close();
+							}
 						Collections.sort(allColumns, NamedComparators.BY_NAME);
 						columns.addAll(allColumns);
-					}
-				else
-					{
-							final Attribute a = attributes.get(attrId);
-							if (a == null)
-								columns.add(new ColumnDefImpl(attrId, ColumnType.STRING, null, getQuery().getTargetQueries().get(columns.size()), null, null));
-							else
-								columns.add(new ColumnDefImpl(attrId, ColumnType.forObject(a.get()), null, getQuery().getTargetQueries().get(columns.size()), null, null));
-							}
+						}
+					else
+						{
+						final Attribute a = attributes.get(attrId);
+						if (a == null)
+							columns.add(new ColumnDefImpl(attrId, ColumnType.STRING, null, getQuery().getTargetQueries().get(columns.size()), null, null));
+						else
+							columns.add(new ColumnDefImpl(attrId, ColumnType.forObject(a.get()), null, getQuery().getTargetQueries().get(columns.size()), null, null));
 						}
 					}
+				}
 /* TODO: Include columns not present on first entry
 			else if ((attrIds == null) && (attributes.size() + 1 > columns.size()))
 				{
@@ -426,12 +428,9 @@ public class LdapQueryRunner extends BaseQueryRunner
 	
 	private void performLdapQuery(LdapTemplate ldap, String statement, Query query, int subQueryIndex, Result res, int limit)
 		{
-		final long start = timeService.getCurrentTime();
-		
 		final LdapQueryParser p = new LdapQueryParser(statement);
-		
 		final RowMapper mapper;
-		
+		final long start = timeService.getCurrentTime();
 		if (res.getQuery().getType() instanceof LdapSearchQueryType)
 			{
 			final LdapSearchQueryType sqt = (LdapSearchQueryType) res.getQuery().getType();
@@ -476,7 +475,6 @@ public class LdapQueryRunner extends BaseQueryRunner
 			else
 				ldap.lookup(p.getBaseDN(), mapper);
 			}
-		
 		final long end = timeService.getCurrentTime();
 		
 		final RowSetImpl rs = new RowSetImpl(query, subQueryIndex, mapper.getColumns());
@@ -489,6 +487,10 @@ public class LdapQueryRunner extends BaseQueryRunner
 	
 	private DistinguishedName getRootDN(LdapTemplate ldap)
 		{
-		return (((LdapContextSource) ldap.getContextSource()).getBaseLdapPath());
+		ContextSource src = ldap.getContextSource();
+		if (src instanceof TransactionAwareContextSourceProxy)
+			src = ((TransactionAwareContextSourceProxy) src).getTarget();
+		
+		return (((LdapContextSource) src).getBaseLdapPath());
 		}
 	}
